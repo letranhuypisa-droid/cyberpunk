@@ -528,7 +528,7 @@ a{color:inherit;text-decoration:none}
 .lore__sec .lbl{display:block;margin-bottom:5px;color:var(--chrome-hi)}
 .lore--rust .lore__sec .lbl{color:var(--rust-hi)}
 .lore__sec p{font-size:var(--fs-md);line-height:1.6;color:var(--text-1);margin-bottom:8px}
-.lore__sec p.ideal{font-weight:700;letter-spacing:.02em}
+.lore__sec p.lead{color:var(--text-2);font-style:italic}
 .lore__sec p.voice{font-style:italic;color:var(--text-2);border-left:2px solid var(--line-3);padding-left:10px}
 .lore__mood{display:inline-block;margin-top:2px;font:var(--fs-2xs) var(--font-mono);letter-spacing:.1em;color:var(--text-3)}
 

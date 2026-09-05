@@ -136,10 +136,9 @@ function openLore(id){
       <button class="btn-act btn-act--go lore__up" id="loreUp" ${L1>=UPGRADE.maxLevel||PLAYER.credits<UPGRADE.cost(L1)?'disabled':''}><span class="btn-act__k">Upgrade</span><span class="btn-act__v">${upTxt} · +${Math.round(UPGRADE.statPerLevel*100)}% ATK/HP</span></button></div>
     <div class="lore__ult"><b>ULT · ${d.ult.name} · ${d.ult.cost} EN</b><span>${d.ult.desc}</span></div>`;
   $('#loreBody').innerHTML = stats + `
-    <div class="lore__sec"><span class="lbl">Hồ sơ</span><p>${L.profile}</p><span class="lore__mood">SẮC THÁI · ${L.mood}</span></div>
+    <div class="lore__sec"><span class="lbl">Tiểu sử</span><p class="lead">${L.profile}</p></div>
     <div class="lore__sec"><span class="lbl">Câu chuyện</span>${L.story.split('\n\n').map(x=>`<p>${x}</p>`).join('')}</div>
-    <div class="lore__sec"><span class="lbl">Lý tưởng</span><p class="ideal">${L.ideal}</p></div>
-    <div class="lore__sec"><span class="lbl">Lời thoại</span><p class="voice">${L.voice}</p></div>`;
+    <div class="lore__sec"><p class="voice">${L.voice}</p></div>`;
   $('#loreBody').scrollTop=0; box.hidden=false;
   const up=$('#loreUp'); if(up) up.addEventListener('click',()=>{ const r=upgrade(id); if(r==='ok'){ sfx('open',.5); renderWallet(); const sc=$('#loreBody').scrollTop; openLore(id); $('#loreBody').scrollTop=sc; } else sfx('error',.4); });
 }
