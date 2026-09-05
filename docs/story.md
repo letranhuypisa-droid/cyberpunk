@@ -117,19 +117,27 @@ Nhân vật nói có chân dung; địch dùng silhouette cho đến khi có art
 
 ---
 
-## 4. Chương 2 · SPIRE (District 04 · Chrome tier) — DÀN Ý
+## 4. Chương 2 · SPIRE (District 04 · Chrome tier) — ĐÃ CÀI
 
-Tổ theo thang máy lên tầng Chrome. Sạch, sáng, đối xứng — và mọi thứ đều nhìn thấy họ.
+Tổ theo thang máy lên tầng Chrome. Sạch, sáng, đối xứng — và mọi thứ đều nhìn thấy họ. Nhịp chương:
+**bị coi là hàng trả về → em gái săn chị → gặp bản sao của mình → Psalm đối mặt ghế cũ → Cantor tái xuất.**
+Cantor Ascendant nhắm thẳng vào Operator: "Ngươi không có Halo, vậy mà chúng nghe ngươi."
 
-| Sector | Tên | Nhịp | Boss dự kiến |
-|---|---|---|---|
-| 04-A | ARRIVAL HALL | Sảnh đón: Choir tưởng họ là hàng trả về | ENFORCER PRIME |
-| 04-B | GLASS GARDEN | Vườn kính; Vesper săn Kira lần đầu | VESPER (boss trước, mở gacha sau) |
-| 04-C | ARCHIVE | Kho ký ức Choir; Kira thấy bản sao giọng mình (Echo) | ECHO |
-| 04-D | CONFESSIONAL | Nơi Psalm từng "xưng tội" cho unit lỗi; bà đối mặt quá khứ | CONFESSOR MK-II |
-| 04-E | THE NAVE | Sảnh chính Canticle; Cantor tái xuất với Halo mới | CANTOR ASCENDANT |
+**Cơ chế mới: HALO LINK.** Địch Chrome có nhãn HALO LINK hồi 8% HP ở đầu lượt chừng nào còn một unit link khác sống.
+Đánh dàn đều là thua; phải chọn thứ tự giết. Đây là bài học "thứ tự lệnh" mà cốt truyện nhắc suốt chương 1.
 
-Cơ chế mới đề xuất: **HALO LINK** — một số địch Chrome hồi năng lượng cho nhau khi đứng cạnh; giết đúng thứ tự để cắt link.
+| Sector | Tên | Nhịp | Wave | Hệ số ★ | Boss | Thưởng lần đầu ★ |
+|---|---|---|---|---|---|---|
+| 04-A | ARRIVAL HALL | Choir tưởng tổ là hàng trả về; học HALO LINK | 3 | 1.60 | ENFORCER PRIME | 200 SH · 3200 CR |
+| 04-B | GLASS GARDEN | Vesper săn Kira; rút lui, mở gợi ý gacha | 3 | 1.75 | VESPER | 220 SH · 3400 CR |
+| 04-C | ARCHIVE | Kira gặp bản sao giọng mình | 3 | 1.90 | ECHO | 250 SH · 3800 CR · **ECHO** |
+| 04-D | CONFESSIONAL | Psalm đối mặt Confessor mới ngồi ghế cũ | 3 | 2.05 | CONFESSOR MK-II | 280 SH · 4200 CR |
+| 04-E | THE NAVE | Cantor Ascendant, Halo mới; kết chương | 4 | 2.20 | CANTOR ASCENDANT | 400 SH · 6000 CR |
+
+Địch mới: SERAPH DRONE, CHORISTER (grunt, link), WARDEN (elite, link), và 5 boss trên. Nền tạm dùng `bg_07c` cho tới khi
+có `bg_04a..e` (prompt ở `docs/bg-prompts.md`).
+
+**Chơi lại sector đã clear = tuần tra (PATROL):** nhận 25% thưởng lần đầu. Đây là nguồn SH ổn định cho Requisition.
 
 ## 5. Chương 3 · CHOIR (The Canticle) — DÀN Ý
 

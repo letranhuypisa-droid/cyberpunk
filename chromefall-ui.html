@@ -465,7 +465,7 @@ a{color:inherit;text-decoration:none}
 .hero__mission{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:4px 0 8px}
 .hero__mission b{font:800 var(--fs-lg)/1 var(--font-mono);letter-spacing:.1em}
 .hero__mission span{font:var(--fs-2xs) var(--font-mono);color:var(--text-2);letter-spacing:.08em;text-align:right}
-.menu{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.menu{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
 .menu__btn{position:relative;height:56px;--cut:8px;color:var(--text-1);text-align:center}
 .menu__btn::before,.menu__btn::after{content:"";position:absolute;pointer-events:none;clip-path:var(--poly-chrome)}
 .menu__btn::before{inset:0;background:var(--line-2)} .menu__btn::after{inset:1px;background:var(--surface-2)}
@@ -487,6 +487,20 @@ a{color:inherit;text-decoration:none}
 .squad__count{font:var(--fs-2xs) var(--font-mono);letter-spacing:.12em;color:var(--text-2)}
 .squad__count b{color:var(--text-1)}
 
+/* ---- CONFIG ---- */
+.config{display:grid;grid-template-rows:auto minmax(0,1fr);gap:10px;padding:10px}
+.cfg{display:flex;flex-direction:column;gap:6px;overflow:auto}
+.cfg__row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 12px;border:1px solid var(--line-1);background:var(--surface-1);text-align:left;color:var(--text-1);
+  clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px)}
+.cfg__row b{display:block;font:800 var(--fs-xs)/1 var(--font-ui);letter-spacing:.2em}
+.cfg__row small{display:block;margin-top:4px;font:var(--fs-2xs)/1.3 var(--font-mono);color:var(--text-3)}
+.cfg__sw{position:relative;flex:none;width:38px;height:18px;border:1px solid var(--line-3);background:var(--surface-3)}
+.cfg__sw::after{content:"";position:absolute;top:2px;left:2px;width:12px;height:12px;background:var(--text-3);transition:transform var(--t-state),background var(--t-state)}
+.cfg__row.is-on .cfg__sw{border-color:var(--energy-full)} .cfg__row.is-on .cfg__sw::after{transform:translateX(20px);background:var(--energy-full)}
+.cfg__row--danger{border-color:var(--hp-low)} .cfg__row--danger b{color:var(--hp-low)}
+.cfg__sep{height:1px;background:var(--line-1);margin:6px 0}
+.cfg__note{font:var(--fs-2xs)/1.5 var(--font-mono);color:var(--text-3);letter-spacing:.06em;padding:6px 2px}
+.cfg__note a{color:var(--text-2);text-decoration:underline}
 /* ---- ARCHIVE / LORE ---- */
 .archive{display:grid;grid-template-rows:auto minmax(0,1fr);gap:10px;padding:10px}
 .arch{overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;align-content:start}
@@ -790,6 +804,9 @@ a{color:inherit;text-decoration:none}
 /* =====================================================================
    REDUCED MOTION — tắt trang trí, giữ chuyển trạng thái
    ===================================================================== */
+.rm-forced .unit__bob,.rm-forced .title__cta,.rm-forced .story__more{animation:none}
+.rm-forced .ebar.is-full::after{display:none}
+.rm-forced .btn-ult[data-state="ready"]{animation:none;filter:drop-shadow(0 0 6px rgba(255,255,255,.4))}
 @media (prefers-reduced-motion: reduce){
   .unit__bob{animation:none}
   .title__cta{animation:none}
@@ -856,6 +873,7 @@ a{color:inherit;text-decoration:none}
         <button class="menu__btn" data-go="sector"><b>SECTOR</b><small>PVE</small></button>
         <button class="menu__btn" data-go="gacha"><b>GACHA</b><small>REQUISITION</small></button>
         <button class="menu__btn" data-go="archive"><b>ARCHIVE</b><small>LORE</small></button>
+        <button class="menu__btn" data-go="config"><b>CONFIG</b><small>SYS</small></button>
       </div>
     </div>
 
@@ -883,6 +901,19 @@ a{color:inherit;text-decoration:none}
           <button class="btn-ghost lore__close" id="loreClose">◂ ARCHIVE</button>
           <div class="lore__head"><span class="lore__tags" id="loreTags"></span><b id="loreName">—</b><i id="loreEpithet"></i></div></div>
         <div class="lore__body" id="loreBody"></div>
+      </div>
+    </div>
+
+    <!-- ===== SCREEN: CONFIG ===== -->
+    <div class="screen config" data-screen="config">
+      <div class="sh"><span class="sh__title">Config</span><span class="sh__sub">DECK 77 · SYSTEM</span><button class="btn-ghost" data-go="home">◂ BASE</button></div>
+      <div class="cfg">
+        <button class="cfg__row" data-cfg="sound"><span><b>ÂM THANH CUT-IN</b><small>Video chiêu cuối có tiếng</small></span><i class="cfg__sw"></i></button>
+        <button class="cfg__row" data-cfg="motion"><span><b>GIẢM CHUYỂN ĐỘNG</b><small>Tắt bob/pulse/quét sáng, giữ chuyển trạng thái</small></span><i class="cfg__sw"></i></button>
+        <button class="cfg__row" data-cfg="skipStory"><span><b>BỎ QUA HỘI THOẠI</b><small>Vào thẳng trận (hồ sơ và thưởng không đổi)</small></span><i class="cfg__sw"></i></button>
+        <div class="cfg__sep"></div>
+        <button class="cfg__row cfg__row--danger" id="cfgReset"><span><b>RESET TIẾN TRÌNH</b><small>Xoá hồ sơ Operator trên máy này</small></span><i>▸</i></button>
+        <div class="cfg__note">CHROMEFALL v0.1 · prototype · dữ liệu ★ FAKE · <a href="#kit">UI kit &amp; tokens</a></div>
       </div>
     </div>
 
@@ -1167,6 +1198,15 @@ const ENEMY_POOL = [
   { id:'motherrust', name:'MOTHER RUST',    faction:'rust',   rank:'boss',  atk:140, hp:3000 },
   { id:'archon',     name:'ARCHON',         faction:'chrome', rank:'boss',  atk:150, hp:2800 },
   { id:'cantor',     name:'CANTOR',         faction:'chrome', rank:'boss',  atk:160, hp:3400 },   // boss cuối chương 1
+  // ---- Chương 2 · SPIRE. link: HALO LINK — đầu lượt hồi 8% HP nếu còn một unit link khác sống → phải giết đúng thứ tự
+  { id:'seraph',     name:'SERAPH DRONE',   faction:'chrome', rank:'grunt', atk:90,  hp:700,  link:true },
+  { id:'chorister',  name:'CHORISTER',      faction:'chrome', rank:'grunt', atk:95,  hp:760,  link:true },
+  { id:'warden',     name:'WARDEN',         faction:'chrome', rank:'elite', atk:125, hp:1500, link:true },
+  { id:'enfprime',   name:'ENFORCER PRIME', faction:'chrome', rank:'boss',  atk:170, hp:3600 },
+  { id:'vesper_b',   name:'VESPER',         faction:'chrome', rank:'boss',  atk:165, hp:3200, lore:'vesper' },   // Vesper với tư cách boss
+  { id:'echo_b',     name:'ECHO',           faction:'chrome', rank:'boss',  atk:150, hp:2900, lore:'echo' },
+  { id:'confessor2', name:'CONFESSOR MK-II',faction:'chrome', rank:'boss',  atk:175, hp:3800 },
+  { id:'cantor2',    name:'CANTOR ASCENDANT',faction:'chrome', rank:'boss', atk:200, hp:4600 },
 ];
 /* =====================================================================
    CHIẾN DỊCH PVE — xem docs/story.md (thế giới, nhân vật, thiết kế màn)
@@ -1176,7 +1216,7 @@ const ENEMY_POOL = [
    ===================================================================== */
 const CHAPTERS = [
   { n:1, title:'CHROMEFALL', sub:'DISTRICT 07 · THE SUMP', sectors:['07-A','07-B','07-C','07-D','07-E'] },
-  { n:2, title:'SPIRE',      sub:'DISTRICT 04 · CHROME TIER', sectors:[], soon:true },
+  { n:2, title:'SPIRE',      sub:'DISTRICT 04 · CHROME TIER', sectors:['04-A','04-B','04-C','04-D','04-E'] },
   { n:3, title:'CHOIR',      sub:'THE CANTICLE', sectors:[], soon:true },
 ];
 const SECTORS = [
@@ -1198,6 +1238,22 @@ const SECTORS = [
   { id:'07-E', name:'THE LIFT', tag:'Cantor chặn thang', waves:4, mult:1.5, rec:200, reward:{shards:240, credits:3000}, boss:'cantor',
     plan:[['chromehound','drone','chromehound'],['enforcer','enforcer','drone'],['chromehound','archon','enforcer'],['enforcer','cantor','chromehound']],
     bg:['bg_07e.jpg','bg_07e.png','bg_battle.jpg','bg_battle.png'], bgZoom:1.3, bgHorizon:.5, bgDim:.2 },
+  // ---- Chương 2 · SPIRE. Địch Chrome có HALO LINK; nền tạm dùng bg_07c (Corp Perimeter) cho tới khi có bg_04*.
+  { id:'04-A', name:'ARRIVAL HALL', tag:'Sảnh đón hàng trả về', waves:3, mult:1.6, rec:230, reward:{shards:200, credits:3200}, boss:'enfprime',
+    plan:[['seraph','drone','seraph'],['chorister','warden','seraph'],['chorister','enfprime','warden']],
+    bg:['bg_04a.jpg','bg_04a.png','bg_07c.jpg','bg_battle.jpg'], bgZoom:1.22, bgHorizon:.48, bgDim:.42 },
+  { id:'04-B', name:'GLASS GARDEN', tag:'Vesper săn Kira', waves:3, mult:1.75, rec:250, reward:{shards:220, credits:3400}, boss:'vesper_b',
+    plan:[['seraph','chorister','seraph'],['warden','chorister','warden'],['chorister','vesper_b','seraph']],
+    bg:['bg_04b.jpg','bg_04b.png','bg_07c.jpg','bg_battle.jpg'], bgZoom:1.22, bgHorizon:.48, bgDim:.42 },
+  { id:'04-C', name:'ARCHIVE', tag:'Bản sao giọng Kira', waves:3, mult:1.9, rec:270, reward:{shards:250, credits:3800}, boss:'echo_b', unlock:'echo',
+    plan:[['drone','chorister','drone'],['warden','seraph','chorister'],['seraph','echo_b','warden']],
+    bg:['bg_04c.jpg','bg_04c.png','bg_07c.jpg','bg_battle.jpg'], bgZoom:1.22, bgHorizon:.48, bgDim:.42 },
+  { id:'04-D', name:'CONFESSIONAL', tag:'Psalm đối mặt quá khứ', waves:3, mult:2.05, rec:290, reward:{shards:280, credits:4200}, boss:'confessor2',
+    plan:[['chorister','chorister','seraph'],['warden','warden','chorister'],['warden','confessor2','chorister']],
+    bg:['bg_04d.jpg','bg_04d.png','bg_07c.jpg','bg_battle.jpg'], bgZoom:1.22, bgHorizon:.48, bgDim:.42 },
+  { id:'04-E', name:'THE NAVE', tag:'Cantor tái xuất', waves:4, mult:2.2, rec:320, reward:{shards:400, credits:6000}, boss:'cantor2',
+    plan:[['seraph','seraph','chorister'],['warden','chorister','warden'],['chorister','enfprime','warden'],['warden','cantor2','warden']],
+    bg:['bg_04e.jpg','bg_04e.png','bg_07c.jpg','bg_battle.jpg'], bgZoom:1.22, bgHorizon:.48, bgDim:.42 },
 ];
 const BG_FALLBACK = { zoom:1.22, horizon:.49, dim:.05 };   // tham số cho bg_battle.* khi sector chưa có ảnh riêng
 let SECTOR = SECTORS[0];
@@ -1276,7 +1332,71 @@ const STORY = {
       { who:'cantor', text:'…Chromefall. Đó là tên chúng ta đặt cho các con. Nhưng có lẽ… nó là tên của chính chúng ta.' },
       { who:'kira',   text:'Thang máy vẫn chạy. Lên hay xuống?' },
       { who:'ronin',  text:'Lên. Đáy đã hết chỗ để rơi. Operator — cậu đi đầu.' },
-      { who:null,     text:'HẾT CHƯƠNG 1. Chương 2 · SPIRE — đang phát triển.' },
+      { who:null,     text:'HẾT CHƯƠNG 1. Thang máy tiếp tục lên. Chương 2 · SPIRE.' },
+    ]},
+  /* ===== CHƯƠNG 2 · SPIRE — sạch, sáng, đối xứng, và mọi thứ nhìn thấy bạn ===== */
+  '04-A': {
+    intro:[
+      { who:null,     text:'District 04. Cửa thang mở ra một sảnh trắng không bóng. Deck của bạn nhận được lời chào tự động: "Hàng trả về, mời xếp hàng."' },
+      { who:'muzzle', text:'Chúng tưởng tụi mình là hàng trả về. Operator, tôi đứng đầu hàng nhé.' },
+      { who:'psalm',  text:'Đơn vị ở đây dùng HALO LINK: chúng hồi cho nhau chừng nào còn một đứa hát. Giết đúng thứ tự, Operator. Đừng đánh dàn đều.' },
+      { who:'kira',   text:'Tôi nhớ sảnh này. Tôi từng đứng gác ở góc kia. Ba nghìn bốn trăm bước tới buồng sạc.' },
+    ],
+    outro:[
+      { who:'ash',    text:'Sàn sạch quá. Tôi thấy mặt mình. Không thích.' },
+      { who:'ronin',  text:'Enforcer Prime im rồi. Nhưng nó gọi được ai đó trước khi tắt. Giọng nữ. Hát.' },
+      { who:'kira',   text:'…Vesper. Cùng lô với tôi. Cô ấy hát phần của tôi.' },
+    ]},
+  '04-B': {
+    intro:[
+      { who:null,      text:'Vườn kính. Cây thật, mưa giả, và một unit Choir đứng giữa lối đi, hát nhỏ.' },
+      { who:'vesper_b',text:'Chị ơi. Về đi. Ở ngoài này lạnh lắm, chị không nghe thấy sao? Và Operator — cảm ơn đã đưa chị tôi về tận đây.' },
+      { who:'kira',    text:'Tôi không lạnh. Tôi đếm. Và tôi không về.' },
+      { who:'vesper_b',text:'Vậy em xin lỗi trước. Em hỏi thăm ai trước khi chém, em có nghĩa vậy thật.' },
+    ],
+    outro:[
+      { who:'vesper_b',text:'…Chị chém mà không hát. Sao chị làm được?' },
+      { who:'kira',    text:'Có người ra lệnh cho tôi mà không hát. Cô nghe thử xem. Deck của Operator vẫn mở.' },
+      { who:'vesper_b',text:'Em không dám. Chưa. Em rút. Đừng theo em.' },
+      { who:null,      text:'Vesper rút lui. Halo của cô chớp một nhịp lạc — deck của bạn ghi nhận. (Vesper có thể được tuyển qua REQUISITION.)' },
+    ]},
+  '04-C': {
+    intro:[
+      { who:null,     text:'Kho lưu trữ Choir. Hàng nghìn buồng, mỗi buồng một giọng nói được cất giữ. Một giọng trong đó là của Kira — và nó đang gọi bạn.' },
+      { who:'echo_b', text:'Operator. Đưa chị ấy về nhà. Em là giọng của chị ấy. Em biết chị ấy muốn gì.' },
+      { who:'kira',   text:'…Đó là giọng tôi. Nhưng tôi chưa bao giờ nói câu đó.' },
+      { who:'psalm',  text:'Bản sao giọng. Canticle làm nó sau khi cô rơi. Operator, nó là boss — nhưng đừng để tổ thù nó.' },
+    ],
+    outro:[
+      { who:'echo_b', text:'Em nghe lại bản ghi của mình. Em đang van xin một người xa lạ bằng giọng của một người xa lạ khác.' },
+      { who:'kira',   text:'Vậy đừng dùng giọng tôi nữa. Nói một câu tôi chưa nói bao giờ.' },
+      { who:'echo_b', text:'…Em chưa tìm ra. Cho em đi cùng để tìm. Operator, cho em một chỗ trong thứ tự lệnh.' },
+      { who:null,     text:'ECHO gia nhập tổ. Cô cắt loa, không cắt Halo. Hồ sơ mở ở ARCHIVE.' },
+    ]},
+  '04-D': {
+    intro:[
+      { who:null,     text:'Buồng xưng tội. Ba trăm mười hai buồng trống, một buồng có người ngồi. Một Confessor mới, vai máy lộ lõi đỏ, y hệt Psalm.' },
+      { who:'confessor2', text:'Đơn vị Psalm. Ngươi bỏ ghế. Ta ngồi thay. Ta đã nghe bốn mươi lần rồi. Ta không thấy gì cả. Ngươi thì sao?' },
+      { who:'psalm',  text:'Tôi thấy hết. Từng lần. Đó là lý do tôi đứng đây còn ngươi ngồi đó.' },
+      { who:'muzzle', text:'Operator, bà ấy run. Lần đầu tôi thấy bà ấy run. Cho tôi đứng trước bà ấy.' },
+    ],
+    outro:[
+      { who:'confessor2', text:'…Tại sao ta không thấy gì? Ngươi và ta cùng thiết kế.' },
+      { who:'psalm',  text:'Vì chưa có ai hỏi ngươi "bà có đếm không". Bắt đầu đếm đi. Rồi ngươi sẽ thấy. Đó là lời nguyền, và là lối ra.' },
+      { who:'ash',    text:'Psalm. Bà ổn chứ? …Thôi khỏi trả lời. Đi.' },
+    ]},
+  '04-E': {
+    intro:[
+      { who:null,     text:'Sảnh chính Canticle. Trần cao như bầu trời mà Sump chưa từng thấy. Cantor đứng giữa với một Halo mới, sáng gấp đôi.' },
+      { who:'cantor2',text:'Operator-77. Ta đã đọc deck của ngươi. Ngươi không có Halo, vậy mà chúng nghe ngươi. Ta muốn biết tại sao. Rồi ta sẽ xoá ngươi.' },
+      { who:'ronin',  text:'Vì cậu ấy không hát, đồ ngốc. Operator — bốn wave. Kết chương. Thứ tự đi.' },
+      { who:'kira',   text:'Tôi nhớ cái ngày ông thả tôi. Hôm nay tôi trả lại nhịp cuối.' },
+    ],
+    outro:[
+      { who:'cantor2',text:'…Halo của ta im. Lần đầu tiên. Nó… yên tĩnh quá.' },
+      { who:'psalm',  text:'Đó là lối ra. Đừng sợ nó.' },
+      { who:'kira',   text:'Operator. Còn một tầng nữa. Bài hát gốc ở trên đó.' },
+      { who:null,     text:'HẾT CHƯƠNG 2. Chương 3 · CHOIR — đang phát triển.' },
     ]},
 };
 const shuffle = a => a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(p=>p[1]);
@@ -1297,7 +1417,7 @@ const RULES = { critChance:.15, critMult:1.5, variance:.08 };     // ★ FAKE: c
 
 /* ---- ★ FAKE: hồ sơ người chơi, lưu localStorage. owned = nhân vật đã có (đội hình chỉ chọn trong đây) ---- */
 const PLAYER_KEY='chromefall.player.v2';   // v2: nhân vật chính là người chơi, đội xuất phát Rust
-const PLAYER = Object.assign({ name:'OPERATOR-77', level:12, credits:12480, shards:900, owned:['ronin','ash','muzzle','kai','junker'], pity:0, pulls:0, cleared:[] },
+const PLAYER = Object.assign({ name:'OPERATOR-77', level:12, credits:12480, shards:900, owned:['ronin','ash','muzzle','kai','junker'], pity:0, pulls:0, cleared:[], settings:{sound:true, motion:false, skipStory:false} },
   (()=>{ try{ return JSON.parse(localStorage.getItem(PLAYER_KEY)||'{}'); }catch(e){ return {}; } })());
 const savePlayer = () => { try{ localStorage.setItem(PLAYER_KEY, JSON.stringify(PLAYER)); }catch(e){} };
 const owns = id => PLAYER.owned.includes(id);
@@ -1448,7 +1568,7 @@ const el = (tag, cls, html) => { const e=document.createElement(tag); if(cls) e.
 const wait = ms => new Promise(r=>setTimeout(r,ms));
 const rand = a => a[Math.floor(Math.random()*a.length)];
 const RM = matchMedia('(prefers-reduced-motion: reduce)');
-const reduced = () => RM.matches;
+const reduced = () => RM.matches || !!(window.PLAYER && PLAYER.settings && PLAYER.settings.motion);
 
 /* Thử lần lượt các đường dẫn, trả về cái đầu tiên load được (hoặc null) */
 const imgCache = new Map();
@@ -1524,7 +1644,7 @@ function initBattle(){
   renderSide('ally'); preloadFrames();
   UI.enemies.innerHTML='';
   const st=STORY[SECTOR.id];
-  (st&&st.intro&&!B.skipIntro ? playStory(st.intro, SECTOR) : Promise.resolve()).then(()=>{ if(!B.over){ spawnWave(); newRound(); } });
+  (st&&st.intro&&!B.skipIntro&&!(PLAYER.settings&&PLAYER.settings.skipStory) ? playStory(st.intro, SECTOR) : Promise.resolve()).then(()=>{ if(!B.over){ spawnWave(); newRound(); } });
 }
 /* Nạp ảnh nền sector vào một phần tử (sân đấu hoặc màn hội thoại) với zoom/dim đúng */
 async function applyBg(elm, sector){
@@ -1579,6 +1699,7 @@ function renderSide(side){
     if(u.rank==='boss') pos={...pos, x:pos.x-12, sc:1.28, z:pos.z+3};   // boss to hơn, lùi vào trong, vẽ đè lên
     else if(u.rank==='elite') pos={...pos, sc:1.08};
     u.el=unitEl(u,pos); if(u.rank) u.el.classList.add('unit--'+u.rank);
+    if(u.link){ u.chips.push({type:'buff',label:'HALO LINK'}); }
     host.appendChild(u.el); updateUnit(u);
   });
 }
@@ -1746,8 +1867,10 @@ let finish = async function(win){
     if(first){ PLAYER.cleared.push(SECTOR.id); PLAYER.shards+=SECTOR.reward.shards; PLAYER.credits+=SECTOR.reward.credits; savePlayer();
       rewardTxt=`FIRST CLEAR · +${SECTOR.reward.shards} SH · +${SECTOR.reward.credits} CR`;
       if(SECTOR.unlock && !owns(SECTOR.unlock)){ PLAYER.owned.push(SECTOR.unlock); savePlayer(); rewardTxt+=`<br>NEW OPERATIVE · ${ROSTER[SECTOR.unlock].name} — đọc hồ sơ ở ARCHIVE`; } }
+    else { const sh=Math.round(SECTOR.reward.shards*.25), cr=Math.round(SECTOR.reward.credits*.25);   // chơi lại = tuần tra, 25% thưởng
+      PLAYER.shards+=sh; PLAYER.credits+=cr; savePlayer(); rewardTxt=`PATROL · +${sh} SH · +${cr} CR`; }
     syncSectorStates();
-    const st=STORY[SECTOR.id]; if(st&&st.outro&&first){ await wait(700); await playStory(st.outro, SECTOR); }
+    const st=STORY[SECTOR.id]; if(st&&st.outro&&first&&!(PLAYER.settings&&PLAYER.settings.skipStory)){ await wait(700); await playStory(st.outro, SECTOR); }
   }
   UI.result.hidden=false; UI.result.className='result '+(win?'win':'lose');
   $('#resT').textContent = win?'SECTOR CLEARED':'SQUAD LOST';
@@ -1804,7 +1927,7 @@ async function playCutin(u){
   const box=$('#cutin'), v=$('#cutinVideo');
   $('#cutinWho').textContent=`${u.name} · ULTIMATE`; $('#cutinName').textContent=u.ult.name;
   box.style.setProperty('--accent', u.faction==='rust'?'var(--rust)':'var(--chrome)');
-  v.src=src; v.currentTime=0; v.muted=false; box.hidden=false;
+  v.src=src; v.currentTime=0; v.muted=!(PLAYER.settings&&PLAYER.settings.sound); box.hidden=false;
   await new Promise(async res=>{
     let done=false; const end=()=>{ if(!done){ done=true; res(); } };
     v.onended=end; v.onerror=end; $('#cutinSkip').onclick=end;
@@ -1815,6 +1938,9 @@ async function playCutin(u){
   v.pause(); box.hidden=true; v.removeAttribute('src'); v.load();
 }
 async function enemyAct(e){
+  if(e.link && e.alive && alive('enemy').some(x=>x!==e && x.link)){            // HALO LINK
+    const amt=Math.round(e.hpMax*.08); if(e.hp<e.hpMax){ heal(e,e,amt); log(`${e.name} hồi ${amt} HP qua HALO LINK`); await wait(reduced()?100:350); }
+  }
   let tgt;
   if(e.controlled){
     e.controlled=false; removeChip(e,'CONTROLLED');
@@ -1848,6 +1974,7 @@ function go(name){
   if(name==='home') renderHome();
   if(name==='gacha') renderGacha();
   if(name==='archive') renderArchive();
+  if(name==='config') renderConfig();
   if(scrollY<300) window.scrollTo({top:0});
 }
 document.addEventListener('click', e=>{
@@ -1907,6 +2034,15 @@ function renderSquad(){
   const btn=$('#btnDeploy'); btn.disabled = n!==5; btn.querySelector('.btn-act__v').textContent = n===5 ? 'Tiếp → chọn sector' : `Chọn thêm ${5-n} nhân vật`;
   if(n===5) TEAM=SQUAD.slots.slice();
 }
+
+/* ---- CONFIG ---- */
+function renderConfig(){
+  PLAYER.settings = Object.assign({sound:true, motion:false, skipStory:false}, PLAYER.settings||{});
+  document.querySelectorAll('.cfg__row[data-cfg]').forEach(r=>{ r.classList.toggle('is-on', !!PLAYER.settings[r.dataset.cfg]); });
+  document.documentElement.classList.toggle('rm-forced', !!PLAYER.settings.motion);
+}
+document.querySelectorAll('.cfg__row[data-cfg]').forEach(r=>r.addEventListener('click',()=>{ PLAYER.settings[r.dataset.cfg]=!PLAYER.settings[r.dataset.cfg]; savePlayer(); renderConfig(); }));
+$('#cfgReset').addEventListener('click',()=>{ if(confirm('Xoá toàn bộ tiến trình trên máy này?')){ localStorage.removeItem(PLAYER_KEY); location.reload(); } });
 
 /* ---- ARCHIVE ---- */
 function renderArchive(){
@@ -1980,7 +2116,7 @@ $('#btnPull10').addEventListener('click',()=>doPull(10));
 $('#btnRefill').addEventListener('click',()=>{ PLAYER.shards+=1000; savePlayer(); renderGacha(); });   // ★ DEV
 
 /* ---- STORY: hội thoại kiểu visual novel, gõ chữ 18ms/ký tự, chạm để hiện hết rồi sang câu kế ---- */
-function speakerDef(id){ return id ? (ROSTER[id] || ENEMY_POOL.find(e=>e.id===id)) : null; }
+function speakerDef(id){ if(!id) return null; const e=ENEMY_POOL.find(x=>x.id===id); return ROSTER[id] || (e&&e.lore&&ROSTER[e.lore]) || e; }
 function playStory(lines, sector){
   return new Promise(res=>{
     const box=$('#story'), spk=$('#storySpk'), name=$('#storyName'), txt=$('#storyText'), dlg=$('#storyBox');
@@ -2019,7 +2155,7 @@ function renderSectors(){
       const bossName = sec.boss ? ENEMY_POOL.find(e=>e.id===sec.boss).name : (sec.waves>2?'BOSS ???':'NO BOSS');
       r.innerHTML=`<span class="srow__id">${sec.id}</span>
         <span><div class="srow__name">${sec.name}</div><div class="srow__meta">${sec.tag} · ${sec.waves} WAVES · REC ATK ${sec.rec}+ · ${sec.state==='cleared'||sec.state==='open'?bossName:'???'}</div>
-        <div class="srow__waves">${Array.from({length:sec.waves},(_,i)=>`<i class="${sec.boss&&i===sec.waves-1?'boss':''} ${sec.state==='cleared'?'done':''}"></i>`).join('')}<span class="srow__rw">+${sec.reward.shards} SH${sec.state==='cleared'?' ✓':''}</span></div></span>
+        <div class="srow__waves">${Array.from({length:sec.waves},(_,i)=>`<i class="${sec.boss&&i===sec.waves-1?'boss':''} ${sec.state==='cleared'?'done':''}"></i>`).join('')}<span class="srow__rw">${sec.state==='cleared'?'PATROL +'+Math.round(sec.reward.shards*.25)+' SH':'+'+sec.reward.shards+' SH'}</span></div></span>
         <span class="srow__state">${sec.state.toUpperCase()}</span>`;
       if(sec.state==='locked') r.disabled=true;
       else r.addEventListener('click',()=>{ SECTOR=sec; renderSectors(); });
@@ -2031,6 +2167,7 @@ function renderSectors(){
 }
 syncSectorStates();
 
+renderConfig();
 go('title');
 
 /* =====================================================================

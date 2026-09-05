@@ -131,3 +131,44 @@ lighting from above meeting warm rust-orange emergency lamps from below, sparks 
 dust. Half chrome, half rust: the upper part of the frame is clean and violet, the lower part
 is scarred and orange. Floor: flat, empty center, slight downward camera angle.
 ```
+
+---
+
+## Chương 2 · SPIRE — bg_04a..bg_04e (tầng Chrome: sạch, sáng có kiểm soát, đối xứng)
+
+Lưu ý chung cho chương 2: ảnh sáng hơn chương 1, nhưng **vẫn giữ 25% đáy tối** và tránh trắng xoá ở nửa trên
+(game phủ lớp tối 42% lên ảnh sáng; nếu ảnh quá trắng thì chữ HUD sẽ phải phủ nặng và mất chi tiết).
+
+**bg_04a.png — ARRIVAL HALL**
+```
+Corporate arrival hall of a vertical megacity: an immense white marble floor with hairline grid seams,
+rows of pale violet holographic queue markers hovering low, a distant reception wall of frosted glass
+with a thin violet #7C4DFF light strip, symmetrical columns receding, no people. Cold white and slate,
+faint mist at floor level, the lower quarter of the frame in soft shadow.
+```
+**bg_04b.png — GLASS GARDEN**
+```
+Indoor glass garden on a high floor: real trees under a glass ceiling, artificial rain streaking the
+panes, a straight stone walkway between reflecting pools, pale violet grow-lights hidden in the canopy,
+city lights far below through the glass walls. Cool green-white palette with violet accents, symmetrical,
+the walkway flat and empty in the center, bottom of the frame darker.
+```
+**bg_04c.png — ARCHIVE**
+```
+Choir voice archive: endless rows of identical glass pods stacked into curved walls, each with a faint
+violet standby light, a central polished black floor, soft data-light haze, absolute silence conveyed
+by symmetry and emptiness. Dark graphite and violet, cold, the pods dimmer toward the edges.
+```
+**bg_04d.png — CONFESSIONAL**
+```
+A long hall of confession booths: hundreds of small dark alcoves with one red light each, a single
+booth at the far end lit brighter, a narrow white floor lane leading to it, everything else near black.
+Red #FF4B4B pinpoints on black with a cold white lane; low fog; bottom of the frame nearly black.
+```
+**bg_04e.png — THE NAVE**
+```
+The nave of the Canticle: a cathedral-scale corporate hall with a ceiling lost in light, tall slit
+windows glowing pale violet, a raised central dais at the far end under a suspended glowing ring
+(a giant Halo), symmetrical rows of pillars, a polished floor reflecting the ring. Grand, cold, sacred,
+no people, the floor flat and empty in the center, bottom quarter in shadow.
+```
