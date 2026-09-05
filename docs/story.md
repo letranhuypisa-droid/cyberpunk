@@ -18,8 +18,11 @@
   vàng độc, cạnh sờn, chắp vá.
 - **CHROMEFALL** là từ lóng ở Sump: *một thứ chrome rơi xuống đáy.* Đến cuối chương 1, nó mang nghĩa thứ hai.
 
-**Người chơi = OPERATOR-77.** Một handler ở Sump điều khiển tổ salvage qua một *command deck* ăn cắp của
-Canticle. Vì vậy người chơi ra lệnh cho cả đội theo lượt, và mỗi màn PvE là một "job".
+**Nhân vật chính là người chơi: OPERATOR-77.** Một handler ở Sump điều khiển tổ salvage qua một *command deck*
+nhặt được từ xác một Enforcer của Canticle. Deck cho phép người không có Halo ra lệnh cho những kẻ có Halo — vì vậy
+người chơi ra lệnh cho cả đội theo lượt, mọi nhân vật đều xưng hô với "Operator", và mỗi màn PvE là một "job".
+Kira không phải nhân vật chính: cô là **phần thưởng sau tutorial (07-A)**, còn Psalm gia nhập sau 07-C.
+Hồ sơ đầy đủ của từng nhân vật (đọc ở màn ARCHIVE sau khi sở hữu) nằm trong `docs/characters.md`.
 
 ### Ba chỉ số, ba luật
 
@@ -43,11 +46,14 @@ lệnh xoá Kira, Psalm **tự cắt Halo của mình** (mã lỗi Canticle ghi 
 rơi cùng. Halo của Psalm giờ đỏ. Chiêu **APOSTASY**: chiếm quyền điều khiển một kẻ địch một lượt — bà biết
 rõ Choir bị điều khiển thế nào.
 
-### Tổ salvage (Rust, đội xuất phát)
+### Tổ salvage (Rust, đội xuất phát của người chơi)
 
 - **RONIN** (A) — Trưởng tổ. Kiếm thép thường, không cấy ghép, tự hào về điều đó. Chiêu **IAIDO** ★.
 - **ASH** (A) — Chuyên gia nổ và cháy. Thực dụng, luôn muốn "tháo lõi bán". Chiêu **FLASHOVER** ★ (đánh toàn bộ).
 - **MUZZLE** (B) — Tanker, đọc chiến trường, nói chuyện trực tiếp với Operator. Chiêu **FIELD PATCH** ★ (hồi máu).
+- **KAI** (B) — Lính trẻ khoác lác, viết thư mỗi đêm. **JUNKER** (B) — nửa người nửa xe kéo, nói dưới mười từ mỗi ngày.
+
+Kira và Psalm là **thưởng cốt truyện**, không lên banner gacha. Banner rate-up mở đầu là **VESPER**.
 
 ### Roster mở rộng (mở qua Gacha) ★ toàn bộ là placeholder
 
@@ -78,13 +84,15 @@ rõ Choir bị điều khiển thế nào.
 
 ## 3. Chương 1 · CHROMEFALL (District 07 · The Sump) — ĐÃ CÀI
 
-Nhịp chương: **rơi → cần lửa → chạm Spire → bị kéo xuống → leo lên.** Mỗi sector mở thêm một mảnh ký ức của Kira.
+Nhịp chương: **rơi → cần lửa → chạm Spire → bị kéo xuống → leo lên.** Người chơi là người ra quyết định ở mỗi
+nút thắt (giữ hay bán Kira, có tin "tín hiệu lạ" hay không, có leo lên hay không); Kira là nhân vật *được* phát triển
+qua quyết định của người chơi. Trước 07-C, Psalm chỉ xuất hiện dưới dạng "TÍN HIỆU LẠ" chen vào deck.
 
 | Sector | Tên | Nhịp truyện | Wave | Hệ số ★ | Boss | Thưởng lần đầu ★ |
 |---|---|---|---|---|---|---|
-| 07-A | SCRAPYARD GATE | Kira thức dậy, tổ Ronin nhặt được | 2 | 0.85 | — | 60 SH · 800 CR |
+| 07-A | SCRAPYARD GATE | **Tutorial.** Tổ nhặt được Kira; cô đi cùng dạng khách, clear xong gia nhập | 2 | 0.85 | — | 60 SH · 800 CR · **KIRA** |
 | 07-B | FOUNDRY ROW | Cần lò để mở Halo; băng Foreman | 3 | 1.00 | THE FOREMAN | 90 SH · 1200 CR |
-| 07-C | CORP PERIMETER | Canticle nhận ra Psalm | 3 | 1.15 | ARCHON | 120 SH · 1600 CR |
+| 07-C | CORP PERIMETER | "Tín hiệu lạ" trong deck lộ diện: Psalm; gia nhập sau trận | 3 | 1.15 | ARCHON | 120 SH · 1600 CR · **PSALM** |
 | 07-D | DRAINAGE CATHEDRAL | Giáo phái muốn tháo rời Kira | 3 | 1.30 | MOTHER RUST | 150 SH · 2000 CR |
 | 07-E | THE LIFT | Cantor chặn thang; Kira nhớ hết | 4 | 1.50 | CANTOR | 240 SH · 3000 CR |
 

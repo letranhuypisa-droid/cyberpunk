@@ -487,6 +487,45 @@ a{color:inherit;text-decoration:none}
 .squad__count{font:var(--fs-2xs) var(--font-mono);letter-spacing:.12em;color:var(--text-2)}
 .squad__count b{color:var(--text-1)}
 
+/* ---- ARCHIVE / LORE ---- */
+.archive{display:grid;grid-template-rows:auto minmax(0,1fr);gap:10px;padding:10px}
+.arch{overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;align-content:start}
+.tile{position:relative;aspect-ratio:3/4;cursor:pointer;--fr-line:var(--line-2);--fr-bg:var(--surface-1);--fr-poly:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px)}
+.tile::before,.tile::after{content:"";position:absolute;pointer-events:none;clip-path:var(--fr-poly)}
+.tile::before{inset:0;background:var(--fr-line)} .tile::after{inset:1px;background:var(--fr-bg)}
+.tile>*{position:relative;z-index:1}
+.tile .portrait{position:absolute;inset:1px;clip-path:var(--fr-poly);--pos:50% 6%}
+.tile__name{position:absolute;left:0;right:0;bottom:0;padding:16px 6px 6px;font:700 9px/1 var(--font-ui);letter-spacing:.16em;background:linear-gradient(transparent,var(--bg-0) 70%);color:var(--text-1);display:flex;justify-content:space-between;align-items:baseline}
+.tile__name .tier{font:800 8px/1 var(--font-mono);color:var(--tier);border:1px solid var(--tier);padding:1px 2px}
+.tile--s{--tier:var(--tier-s)} .tile--a{--tier:var(--tier-a)} .tile--b{--tier:var(--tier-b)}
+.tile--chrome{--fr-line:var(--chrome)} .tile--rust{--fr-line:var(--rust)} .tile--you{--fr-line:var(--text-1)}
+.tile.is-locked{--fr-line:var(--line-1);cursor:default} .tile.is-locked .portrait{filter:grayscale(1) brightness(.35)}
+.tile.is-locked .tile__name span:first-child{color:var(--text-3)}
+.tile__lock{position:absolute;top:6px;right:6px;font:800 8px/1 var(--font-mono);letter-spacing:.14em;color:var(--text-3);border:1px solid var(--line-2);padding:2px 4px}
+.tile__you{position:absolute;top:6px;left:6px;font:800 8px/1 var(--font-mono);letter-spacing:.14em;color:var(--text-inv);background:var(--text-1);padding:2px 4px}
+.lore{position:absolute;inset:0;z-index:50;background:var(--bg-0);display:grid;grid-template-rows:42% minmax(0,1fr)}
+.lore[hidden]{display:none}
+.lore__hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line-2)}
+.lore__hero .portrait{position:absolute;inset:0;--pos:50% 0%;background:var(--surface-2)}
+.lore__hero .portrait img{-webkit-mask-image:linear-gradient(to top,transparent 8%,#000 45%);mask-image:linear-gradient(to top,transparent 8%,#000 45%)}
+.lore__close{position:absolute;top:10px;left:10px;z-index:2}
+.lore__head{position:absolute;left:12px;right:12px;bottom:10px;z-index:2}
+.lore__tags{display:block;font:var(--fs-2xs) var(--font-mono);letter-spacing:.22em;color:var(--text-2)}
+.lore__head b{display:block;font:900 var(--fs-2xl)/1 var(--font-ui);letter-spacing:.26em;margin-top:4px}
+.lore__head i{display:block;font:var(--fs-sm) var(--font-ui);font-style:italic;color:var(--text-2);margin-top:4px}
+.lore__body{overflow:auto;padding:12px 14px 20px}
+.lore__stats{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.lore__ult{padding:10px 12px;border:1px solid var(--line-1);background:var(--surface-1);margin-bottom:14px;clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px)}
+.lore__ult b{display:block;font:800 var(--fs-xs) var(--font-mono);letter-spacing:.2em;margin-bottom:4px}
+.lore__ult span{font-size:var(--fs-sm);color:var(--text-2)}
+.lore__sec{margin-bottom:14px}
+.lore__sec .lbl{display:block;margin-bottom:5px;color:var(--chrome-hi)}
+.lore--rust .lore__sec .lbl{color:var(--rust-hi)}
+.lore__sec p{font-size:var(--fs-md);line-height:1.6;color:var(--text-1);margin-bottom:8px}
+.lore__sec p.ideal{font-weight:700;letter-spacing:.02em}
+.lore__sec p.voice{font-style:italic;color:var(--text-2);border-left:2px solid var(--line-3);padding-left:10px}
+.lore__mood{display:inline-block;margin-top:2px;font:var(--fs-2xs) var(--font-mono);letter-spacing:.1em;color:var(--text-3)}
+
 /* ---- GACHA / REQUISITION ---- */
 .gacha{display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;gap:10px;padding:10px;position:absolute}
 .gacha .sh .pill{margin-left:auto} .gacha .sh .btn-ghost{margin-left:0}
@@ -800,12 +839,12 @@ a{color:inherit;text-decoration:none}
     <div class="screen home" data-screen="home">
       <div class="topbar">
         <div class="topbar__avatar" id="homeAvatar"></div>
-        <div class="topbar__id"><b id="pName">OPERATOR-77</b><span id="pLevel">LV 12 · CHROME LICENSE</span></div>   <!-- ★ FAKE hồ sơ người chơi -->
+        <div class="topbar__id"><b id="pName" title="Chạm để đổi tên" style="cursor:pointer">OPERATOR-77</b><span id="pLevel">LV 12 · CHROME LICENSE</span></div>   <!-- ★ FAKE hồ sơ người chơi -->
         <div class="topbar__cur"><span class="pill"><small>CR</small><span id="pCredits">12,480</span></span><span class="pill"><small>SH</small><span id="pShards">900</span></span></div>
       </div>
       <div class="hero">
         <div class="portrait" id="heroArt"></div>
-        <div class="hero__feat">FEATURED · TIER S<b>KIRA</b></div>
+        <div class="hero__feat" id="heroFeat">SQUAD LEAD<b>RONIN</b></div>
         <div class="hero__panel">
           <span class="lbl">Next mission</span>
           <div class="hero__mission"><b id="homeSector">07-B</b><span id="homeSectorMeta">FOUNDRY ROW · 3 WAVES · BOSS</span></div>
@@ -816,7 +855,7 @@ a{color:inherit;text-decoration:none}
         <button class="menu__btn" data-go="squad"><b>SQUAD</b><small>5 SLOT</small></button>
         <button class="menu__btn" data-go="sector"><b>SECTOR</b><small>PVE</small></button>
         <button class="menu__btn" data-go="gacha"><b>GACHA</b><small>REQUISITION</small></button>
-        <button class="menu__btn" disabled><b>SETTINGS</b><small>SOON</small></button>
+        <button class="menu__btn" data-go="archive"><b>ARCHIVE</b><small>LORE</small></button>
       </div>
     </div>
 
@@ -833,6 +872,18 @@ a{color:inherit;text-decoration:none}
       <div class="sh"><span class="sh__title">Sector</span><span class="sh__sub">DISTRICT 07 · PVE</span><button class="btn-ghost" data-go="home">◂ BASE</button></div>
       <div class="slist" id="sectorList"></div>
       <button class="btn-act btn-act--go btn-act--full" id="btnEnter" data-go="battle"><span class="btn-act__k">Enter sector</span><span class="btn-act__v" id="enterMeta">—</span></button>
+    </div>
+
+    <!-- ===== SCREEN: ARCHIVE (hồ sơ nhân vật) ===== -->
+    <div class="screen archive" data-screen="archive">
+      <div class="sh"><span class="sh__title">Archive</span><span class="sh__sub" id="archCount"></span><button class="btn-ghost" data-go="home">◂ BASE</button></div>
+      <div class="arch" id="archGrid"></div>
+      <div class="lore" id="lore" hidden>
+        <div class="lore__hero"><div class="portrait" id="loreArt"></div>
+          <button class="btn-ghost lore__close" id="loreClose">◂ ARCHIVE</button>
+          <div class="lore__head"><span class="lore__tags" id="loreTags"></span><b id="loreName">—</b><i id="loreEpithet"></i></div></div>
+        <div class="lore__body" id="loreBody"></div>
+      </div>
     </div>
 
     <!-- ===== SCREEN: GACHA / REQUISITION ===== -->
@@ -1091,7 +1142,7 @@ const mkChar = (id,name,faction,tier,atk,hp,energyMax,ult) => ({ id,name,faction
   mkChar('gravedigger','GRAVEDIGGER','rust','B',90,1500,125,{name:'LAST RITES',cost:125,kind:'nuke',mult:3.0,desc:'300% ATK lên một mục tiêu. (★ FAKE)'}),
 ].forEach(c=>ROSTER[c.id]=c);
 
-let TEAM = ['kira','psalm','ronin','ash','muzzle'];              // đội hình mặc định (5 trong 19), màn SQUAD sửa được
+let TEAM = ['ronin','ash','muzzle','kai','junker'];              // tổ salvage xuất phát (toàn Rust). Kira = thưởng tutorial 07-A, Psalm = thưởng 07-C
 
 /* ---- ★ FAKE: bể kẻ địch PvE (20). rank: grunt / elite / boss quyết định wave nào gọi và độ to trên sân ---- */
 const ENEMY_POOL = [
@@ -1131,13 +1182,14 @@ const CHAPTERS = [
 const SECTORS = [
   // bgZoom: ảnh neo đáy sân, phóng theo chiều cao (1.3 = cao bằng 130% sân) để đường chân trời
   // trong ảnh (bgHorizon = % từ mép trên ảnh) lên trên chân của hàng sau (~43% sân). Ảnh 3:4, 1536×2048.
-  { id:'07-A', name:'SCRAPYARD GATE', tag:'Kira thức dậy', waves:2, mult:.85, rec:80,  reward:{shards:60, credits:800},
+  // guest: nhân vật đi cùng trong trận dù chưa sở hữu (thế slot 5) · unlock: gia nhập vĩnh viễn khi clear lần đầu
+  { id:'07-A', name:'SCRAPYARD GATE', tag:'Tutorial · Kira rơi', waves:2, mult:.85, rec:80,  reward:{shards:60, credits:800}, guest:['kira'], unlock:'kira',
     plan:[['scav','gutterrat','straydog'],['welder','scav','rigger']],
     bg:['bg_07a.jpg','bg_07a.png','bg_battle.jpg','bg_battle.png'], bgZoom:1.33, bgHorizon:.54, bgDim:.12 },
   { id:'07-B', name:'FOUNDRY ROW', tag:'Lò của Foreman', waves:3, mult:1, rec:110, reward:{shards:90, credits:1200}, boss:'foreman',
     plan:[['rigger','slagger','pipefitter'],['tinman','kiln','welder'],['chopshop','foreman','hollow']],
     bg:['bg_07b.jpg','bg_07b.png','bg_battle.jpg','bg_battle.png'], bgZoom:1.35, bgHorizon:.55, bgDim:.1 },
-  { id:'07-C', name:'CORP PERIMETER', tag:'Vành đai tập đoàn', waves:3, mult:1.15, rec:140, reward:{shards:120, credits:1600}, boss:'archon',
+  { id:'07-C', name:'CORP PERIMETER', tag:'Vành đai tập đoàn', waves:3, mult:1.15, rec:140, reward:{shards:120, credits:1600}, boss:'archon', unlock:'psalm',
     plan:[['drone','glassjaw','drone'],['enforcer','drone','chromehound'],['drone','archon','enforcer']],
     bg:['bg_07c.jpg','bg_07c.png','bg_battle.jpg','bg_battle.png'], bgZoom:1.22, bgHorizon:.48, bgDim:.42 },
   { id:'07-D', name:'DRAINAGE CATHEDRAL', tag:'Giáo phái Mother Rust', waves:3, mult:1.3, rec:170, reward:{shards:150, credits:2000}, boss:'motherrust',
@@ -1161,43 +1213,44 @@ function syncSectorStates(){
 const STORY = {
   '07-A': {
     intro:[
-      { who:null,     text:'Sump, tầng −7. Ba giờ sau cơn mưa axit. Một vật thể rơi từ Spire xuống bãi phế liệu Cổng Đông.' },
-      { who:'ronin',  text:'Thứ này không phải xác xe. Vỏ Choir, hạng S. Còn ấm.' },
-      { who:'ash',    text:'Tháo lấy lõi rồi bán. Canticle sẽ lùng cái Halo đó trước sáng mai.' },
-      { who:'kira',   text:'…Chỉ thị bị ngắt. Không có Halo. Không có Choir. Tôi ở đâu?' },
-      { who:'psalm',  text:'Dưới đáy, Kira. Tôi đưa cô xuống đây. Đứng dậy — cổng có khách.' },
-      { who:'muzzle', text:'Scav đánh hơi được kim loại mới. Operator, cho tôi thứ tự.' },
+      { who:null,     text:'Sump, tầng −7. Ba giờ sau cơn mưa axit. Deck của bạn bắt được một vật thể rơi từ Spire xuống bãi phế liệu Cổng Đông.' },
+      { who:'ronin',  text:'Operator, cậu thấy chưa? Không phải xác xe. Vỏ Choir, hạng S. Còn ấm.' },
+      { who:'ash',    text:'Tháo lõi rồi bán. Canticle sẽ lùng cái Halo đó trước sáng mai. Cậu quyết đi, Operator.' },
+      { who:'kira',   text:'…Chỉ thị bị ngắt. Không có Halo. Không có Choir. Ai đang cầm deck?' },
+      { who:'psalm', as:'TÍN HIỆU LẠ', text:'Operator. Đừng để họ tháo cô ấy. Cho cô ấy một cây kiếm và một thứ tự lệnh — cô ấy sẽ làm phần còn lại.' },
+      { who:'muzzle', text:'Tín hiệu lạ chen vào deck. Và scav đánh hơi được kim loại mới. Operator, đây là tổ của cậu: cho tôi thứ tự.' },
     ],
     outro:[
       { who:'ronin',  text:'Nó chém như máy. Dĩ nhiên rồi.' },
-      { who:'psalm',  text:'Cô ấy chém như người từng bị dạy phải quên mình là ai.' },
-      { who:'kira',   text:'Halo hỏng. Ký ức bị khoá theo. Tôi cần một lò đủ nóng để mở nó.' },
-      { who:'ash',    text:'Foundry Row. Nhưng lò của Foreman không rèn cho người lạ.' },
+      { who:'kira',   text:'Không. Tôi chém theo lệnh của người cầm deck. Lần đầu tiên có người ra lệnh mà không hát.' },
+      { who:'ash',    text:'Vậy là hết bán được rồi. Ronin, nhìn mặt cậu kìa.' },
+      { who:'kira',   text:'Halo hỏng. Ký ức bị khoá theo. Operator — tôi đi với tổ của bạn. Cho tới khi tôi nhớ ra mình là ai, hoặc lâu hơn.' },
+      { who:null,     text:'KIRA gia nhập tổ. Mở hồ sơ của cô ấy ở ARCHIVE. Tín hiệu lạ im bặt — nhưng chưa rời deck.' },
     ]},
   '07-B': {
     intro:[
-      { who:null,      text:'Foundry Row. Lò cũ của Canticle, giờ là xưởng của băng Foreman.' },
-      { who:'foreman', text:'Chrome rơi xuống đáy vẫn là chrome. Ta nấu chảy các ngươi, đúc thành cửa.' },
-      { who:'muzzle',  text:'Hắn có ba tổ. Đi qua lò là đi qua cả ba.' },
+      { who:null,      text:'Foundry Row. Lò cũ của Canticle, giờ là xưởng của băng Foreman. Kira cần lửa đủ nóng để mở Halo.' },
+      { who:'foreman', text:'Operator-77. Ta biết deck đó. Ta biết cậu ăn cắp nó ở đâu. Chrome rơi xuống đáy vẫn là chrome — ta nấu chảy cả nó lẫn cậu.' },
+      { who:'muzzle',  text:'Hắn có ba tổ. Đi qua lò là đi qua cả ba. Cậu ra lệnh, tôi đứng trước.' },
       { who:'kira',    text:'Vậy đi qua cả ba.' },
     ],
     outro:[
       { who:'foreman', text:'…Lò là của các ngươi. Nhưng lửa này sẽ gọi Spire xuống.' },
-      { who:'psalm',   text:'Nó đã gọi rồi. Tôi nghe thấy Choir hát trong mạng. Họ biết tôi ở đây.' },
-      { who:'kira',    text:'Halo mở được một phần. Tôi nhớ một cái tên: CANTOR.' },
+      { who:'psalm', as:'TÍN HIỆU LẠ', text:'Nó đã gọi rồi. Choir đang hát trong mạng — họ biết cô ấy ở Sump. Và họ biết deck của cậu, Operator.' },
+      { who:'kira',    text:'Halo mở được một phần. Tôi nhớ một cái tên: CANTOR. Và một giọng nói đã thả tôi rơi. Giọng trong deck của bạn.' },
     ]},
   '07-C': {
     intro:[
-      { who:null,     text:'Vành đai tập đoàn. Nơi Sump chạm vào chân Spire. Cổng kính, sàn sạch, và drone.' },
-      { who:'archon', text:'ĐƠN VỊ PSALM. MÃ APOSTASY GHI NHẬN. TRỞ VỀ, HOẶC BỊ THU HỒI.' },
-      { who:'psalm',  text:'Tôi đã trả lời câu đó khi tự cắt Halo của mình.' },
-      { who:'ronin',  text:'Chúng nó đông. Nhưng chúng nó không biết đánh trong bẩn.' },
+      { who:null,     text:'Vành đai tập đoàn. Nơi Sump chạm vào chân Spire. Cổng kính, sàn sạch, drone — và một bóng người đứng chờ giữa cổng.' },
+      { who:'archon', text:'ĐƠN VỊ PSALM. MÃ APOSTASY GHI NHẬN. TRỞ VỀ, HOẶC BỊ THU HỒI. OPERATOR-77: DECK BỊ ĐÁNH CẮP. GIAO NỘP.' },
+      { who:'psalm',  text:'Tôi là tín hiệu lạ. Tôi thả Kira rơi để cứu cô ấy, rồi tự cắt Halo của mình. Operator, tôi không xin lỗi — tôi xin một chỗ trong thứ tự lệnh.' },
+      { who:'ronin',  text:'Cậu quyết, Operator. Nhưng quyết nhanh. Chúng nó đông, và chúng nó không biết đánh trong bẩn.' },
     ],
     outro:[
       { who:'ash',    text:'Archon im rồi. Vành đai thủng một lỗ.' },
-      { who:'kira',   text:'Nó gọi tôi là "tài sản 07". Tôi từng được đánh số.' },
-      { who:'psalm',  text:'Từng thôi. Bên dưới, người ta gọi cô bằng tên.' },
-      { who:'muzzle', text:'Đừng mừng vội. Cống phía dưới đang hát. Tụi cuồng đạo.' },
+      { who:'kira',   text:'Nó gọi tôi là "tài sản 07". Tôi từng được đánh số. Còn bà… bà là người thả tôi.' },
+      { who:'psalm',  text:'Từng thôi. Bên dưới, người ta gọi cô bằng tên. Và tôi sẽ trả lời mọi câu hỏi — sau khi ra khỏi đây.' },
+      { who:null,     text:'PSALM gia nhập tổ. Muzzle: "Cống phía dưới đang hát. Tụi cuồng đạo. Operator, cậu vừa có thêm một người để ra lệnh."' },
     ]},
   '07-D': {
     intro:[
@@ -1217,12 +1270,12 @@ const STORY = {
       { who:'cantor', text:'Psalm. Kira. Các con hát lạc điệu. Ta đến để chỉnh lại.' },
       { who:'psalm',  text:'Ông chỉnh bằng cách xoá. Tôi nhớ.' },
       { who:'kira',   text:'Halo vừa mở hết. Tôi nhớ tất cả. Cả cái ngày ông cho tôi rơi.' },
-      { who:'muzzle', text:'Bốn wave. Operator, đây là trận dài nhất.' },
+      { who:'muzzle', text:'Bốn wave. Operator, đây là trận dài nhất. Cậu đưa tụi tôi tới đây — đưa tụi tôi lên nốt.' },
     ],
     outro:[
       { who:'cantor', text:'…Chromefall. Đó là tên chúng ta đặt cho các con. Nhưng có lẽ… nó là tên của chính chúng ta.' },
       { who:'kira',   text:'Thang máy vẫn chạy. Lên hay xuống?' },
-      { who:'ronin',  text:'Lên. Đáy đã hết chỗ để rơi.' },
+      { who:'ronin',  text:'Lên. Đáy đã hết chỗ để rơi. Operator — cậu đi đầu.' },
       { who:null,     text:'HẾT CHƯƠNG 1. Chương 2 · SPIRE — đang phát triển.' },
     ]},
 };
@@ -1243,15 +1296,122 @@ function rollWave(n){
 const RULES = { critChance:.15, critMult:1.5, variance:.08 };     // ★ FAKE: công thức tạm
 
 /* ---- ★ FAKE: hồ sơ người chơi, lưu localStorage. owned = nhân vật đã có (đội hình chỉ chọn trong đây) ---- */
-const PLAYER_KEY='chromefall.player.v1';
-const PLAYER = Object.assign({ name:'OPERATOR-77', level:12, credits:12480, shards:900, owned:['kira','psalm','ronin','ash','muzzle'], pity:0, pulls:0, cleared:[] },
+const PLAYER_KEY='chromefall.player.v2';   // v2: nhân vật chính là người chơi, đội xuất phát Rust
+const PLAYER = Object.assign({ name:'OPERATOR-77', level:12, credits:12480, shards:900, owned:['ronin','ash','muzzle','kai','junker'], pity:0, pulls:0, cleared:[] },
   (()=>{ try{ return JSON.parse(localStorage.getItem(PLAYER_KEY)||'{}'); }catch(e){ return {}; } })());
 const savePlayer = () => { try{ localStorage.setItem(PLAYER_KEY, JSON.stringify(PLAYER)); }catch(e){} };
 const owns = id => PLAYER.owned.includes(id);
 
+/* =====================================================================
+   LORE — hồ sơ nhân vật, đọc ở ARCHIVE sau khi sở hữu (docs/characters.md là bản đầy đủ)
+   epithet: danh xưng · profile: một dòng · story: câu chuyện · ideal: lý tưởng · voice: lời thoại · mood: sắc thái
+   ===================================================================== */
+const LORE = {
+  operator: { epithet:'Người cầm deck', mood:'bạn',
+    profile:'Handler ở Sump, tầng −7. Điều khiển tổ salvage qua một command deck của Canticle — thứ đáng ra không bao giờ được rơi xuống đây.',
+    story:'Bạn không có tên trong hồ sơ Canticle, chỉ có một mã: OPERATOR-77, in trên cái deck bạn nhặt được trong xác một Enforcer. Deck cho phép một người không có Halo ra lệnh cho những kẻ có Halo — và cho cả những người chưa bao giờ nghe Choir hát. Ở Sump, thứ đó quý hơn vàng và nguy hiểm hơn thuốc nổ.\n\nRonin nhận bạn vào tổ vì bạn ra lệnh mà không hét. Ash ở lại vì bạn chia phần đều. Muzzle gọi bạn là Operator vì với anh ta, đó là chức danh cao nhất trên đời. Bạn chưa nói với ai chuyện ban đêm deck vẫn thì thầm bằng một giọng không thuộc về tổ.',
+    ideal:'Không ai trong tổ bị bỏ lại. Thứ tự lệnh là lời hứa.',
+    voice:'"Thứ tự: Muzzle trước. Còn lại theo tôi."' },
+  kira: { epithet:'Tài sản 07', mood:'xúc động · kiềm chế',
+    profile:'Kiếm sĩ Choir hạng S, sản phẩm hoàn hảo nhất Canticle từng xuất xưởng. Rơi xuống Sump với Halo gãy và ký ức bị khoá.',
+    story:'Ở Spire, Kira chưa bao giờ được hỏi. Halo cho cô biết phải chém ai, và bài hát cho cô biết phải cảm thấy gì về việc đó. Cô là đơn vị duy nhất có thể chém một Enforcer làm đôi trong một nhịp — và cũng là đơn vị duy nhất, sau mỗi nhiệm vụ, đứng đếm số bước từ hiện trường về buồng sạc. Đếm là thứ duy nhất Canticle không cài vào cô.\n\nKhi tỉnh dậy ở bãi phế liệu, cô không nhớ tên mình, chỉ nhớ cách cầm kiếm và cảm giác một bàn tay đẩy cô rơi. Điều làm cô sợ không phải Sump. Là việc nếu ký ức trở lại đủ nhiều, cô sẽ lại nghe thấy bài hát — và không chắc mình đủ mạnh để không hát theo. Vì vậy cô bám vào cái deck của Operator: một giọng ra lệnh mà không hát. Với Kira, đó là định nghĩa gần nhất của tự do mà cô có được.',
+    ideal:'Được sở hữu tên của chính mình — kể cả khi phải giết để giữ nó.',
+    voice:'"Đếm đến ba. Ở số ba, đứng sau tôi."' },
+  psalm: { epithet:'Confessor', mood:'tội lỗi · mỉa mai khô',
+    profile:'Unit giám sát của Choir, vai máy lộ lõi đỏ. Tự cắt Halo của mình để thả Kira rơi. Canticle ghi nhận lỗi: APOSTASY.',
+    story:'Công việc của Psalm ở Spire là "nghe xưng tội": các unit hát lạc điệu được đưa tới buồng của bà, kể lại mọi thứ, rồi bị xoá. Bà đã nghe ba trăm mười hai lần. Bà nhớ từng giọng. Canticle thiết kế bà để không thấy gì khi nhấn nút — và thiết kế đó hỏng ở lần thứ ba trăm mười ba, khi unit trên bàn là Kira, và Kira hỏi bà: "Bà có đếm không?"\n\nBà không nhấn nút. Bà cắt Halo của mình bằng chính bàn tay máy, thả Kira xuống ống rác, rồi nhảy theo. Halo của bà giờ đỏ và câm. Bà nói chuyện với người khác bằng giọng của một người đọc kinh mà không còn tin, thỉnh thoảng trích lời Canticle để chế giễu nó. Bà không xin tha thứ. Bà nói: "Tha thứ là thứ Canticle bán. Tôi chỉ còn nợ."',
+    ideal:'Không ai bị xoá vì hát sai. Kể cả bà.',
+    voice:'"Hãy xưng tội. Đùa thôi. Tôi bỏ nghề rồi."' },
+  ronin: { epithet:'Trưởng tổ', mood:'điềm tĩnh · hài hước lạnh',
+    profile:'Người dẫn tổ salvage. Không một mảnh cấy ghép — theo lựa chọn. Thanh kiếm thép thường là của chị gái anh.',
+    story:'Chị của Ronin là người duy nhất ở tầng −7 được Canticle "tuyển" lên Spire. Cô ấy để lại thanh kiếm và một câu: "Đừng bán thứ gì còn ấm." Cô không bao giờ quay lại. Ronin không đi tìm; anh tin rằng nếu chị còn sống, chị sẽ tự xuống. Anh giữ kiếm, giữ câu nói, và giữ một tổ salvage mà ai cũng bảo là quá tử tế để sống lâu ở Sump.\n\nAnh từ chối cấy ghép không vì ghét máy — Kira là bằng chứng ngược lại — mà vì anh muốn biết, khi anh chém ai đó, đó là quyết định của anh chứ không phải của một bài hát. Anh nói ít, cười bằng nửa khoé miệng, và là người đầu tiên gọi Kira là "cô" thay vì "nó".',
+    ideal:'Đừng bán thứ gì còn ấm.',
+    voice:'"Cậu quyết, Operator. Tôi chém."' },
+  ash: { epithet:'Thợ nổ', mood:'châm biếm · mềm ở đáy',
+    profile:'Chuyên gia cháy nổ của tổ. Thực dụng, cay nghiệt, tính bằng lõi và shard. Cho chó hoang ăn mỗi tối, không nói với ai.',
+    story:'Ash lớn lên trong một xưởng tháo dỡ, nơi mọi thứ — kể cả người — được định giá theo bộ phận. Cô học cách nhìn một thứ và thấy giá của nó trước khi thấy nó là gì. Đó là cách cô còn sống. Đó cũng là lý do cô đề nghị tháo lõi Kira ngay lần đầu, và cũng là lý do cô im lặng khi Ronin từ chối: cô biết mình sẽ làm điều ngược lại nếu người trên bàn là Ronin.\n\nHai bàn tay cô đầy sẹo bỏng từ lần kéo Muzzle ra khỏi một vụ nổ mà chính cô châm. Cô chưa bao giờ kể chuyện đó, nhưng cô là người đầu tiên đứng dậy mỗi khi Muzzle ngã. Cô châm biếm để mọi người khỏi nhìn thấy cô đang đếm xem tổ còn đủ tiền sống thêm mấy ngày.',
+    ideal:'Sống sót trước, tử tế sau. Nhưng luôn có "sau".',
+    voice:'"Tôi định giá được mọi thứ. Trừ cái tổ này. Đừng bắt tôi thử."' },
+  muzzle: { epithet:'Tấm chắn', mood:'trung thành · hài hước ngây ngô',
+    profile:'Tanker của tổ, cựu bảo vệ tập đoàn bị thải loại. Gọi bạn là "Operator" với tất cả sự trân trọng của một người từng có cấp trên tồi.',
+    story:'Muzzle từng đứng gác cho Canticle ở tầng vành đai, mười bốn năm, chưa bỏ vị trí một ca. Người ta thải anh vì anh đứng chắn cho một đứa trẻ Sump chui qua cổng — "hành vi không thuộc chỉ thị". Anh xuống Sump với bộ giáp cũ và một niềm tin không ai lay được: ai đó phải đứng giữa.\n\nAnh đặt tên cho từng tấm khiên (tấm hiện tại tên là "Bà Ba", vì nó là tấm thứ ba). Anh nói chuyện với Operator như báo cáo tình hình, không phải vì kỷ luật mà vì lần đầu tiên anh có một người ra lệnh mà anh muốn tuân. Nếu anh chết trong trận, anh muốn chết trước tổ, và anh nói điều đó vui vẻ như nói về bữa tối.',
+    ideal:'Ai đó phải đứng giữa. Vậy thì là tôi.',
+    voice:'"Bà Ba chịu được ba đòn. Đòn thứ tư là của tôi."' },
+  kai: { epithet:'Lính trẻ', mood:'khoác lác · dễ tổn thương',
+    profile:'Lính đánh thuê mười chín tuổi, nói to hơn khả năng. Viết thư mỗi đêm cho một người không tồn tại.',
+    story:'Kai kể rằng cậu đã hạ một Chrome Hound bằng tay không. Sự thật là cậu bị nó đuổi qua ba tầng cống và sống sót nhờ Gravedigger kéo lên. Cậu kể chuyện to vì Sump nuốt chửng những người im lặng, và cậu sợ bị nuốt hơn sợ chết.\n\nMỗi đêm cậu viết một lá thư, ký tên đầy đủ, gửi cho "người sẽ nhớ tôi". Cậu không biết đó là ai. Cậu chỉ muốn khi mình biến mất, có một bằng chứng rằng mình từng ở đây và từng cố gắng. Ash đọc trộm một lá, và kể từ đó cô ngừng trêu cậu về vụ Chrome Hound.',
+    ideal:'Được nhớ tới. Bằng tên thật.',
+    voice:'"Ghi lại nhé, Operator: Kai, K-A-I. Để sau này người ta viết đúng."' },
+  junker: { epithet:'Xe tải biết đi', mood:'ít lời · vững chãi',
+    profile:'Nửa người nửa xe kéo phế liệu. Nói dưới mười từ mỗi ngày. Chở được những thứ không ai chở nổi.',
+    story:'Junker từng là tài xế xe tải hàng ở tầng −4 cho tới ngày sập tầng. Người ta kéo được anh ra khỏi cabin, nhưng phải để lại nửa dưới cơ thể. Stitch hàn phần còn lại vào chính chiếc xe. Anh không phàn nàn. Anh nói: "Xe vẫn chạy."\n\nAnh chở hàng cho tổ, chở người bị thương, và có lần chở cả tấm khiên "Bà Hai" của Muzzle về sau khi nó vỡ, vì Muzzle muốn chôn nó tử tế. Anh không hiểu lý do nhưng vẫn chở. Với Junker, hiểu là việc của người khác; chở là việc của anh.',
+    ideal:'Chở những thứ người khác không chở nổi.',
+    voice:'"Lên. Tôi chở."' },
+  gravedigger: { epithet:'Người chôn', mood:'trang nghiêm · dịu',
+    profile:'Chôn mọi thứ Spire thả xuống — xác xe, xác máy, và xác người. Nhớ từng cái tên trên nghĩa địa Sump.',
+    story:'Ở Sump không ai được chôn, người ta chỉ bị vùi. Gravedigger là người duy nhất đào hố đúng độ sâu, đặt một tấm thép nhỏ, và khắc tên lên. Nếu không biết tên, ông khắc ngày và một câu: "Từng ở đây". Ông đã khắc hơn hai nghìn tấm. Ông nhớ hết.\n\nÔng gia nhập tổ sau khi chôn Kai hụt — cậu bé còn sống, chỉ bất tỉnh, và ông xấu hổ vì đã đào hố quá nhanh. Ông đánh chậm nhưng đánh chắc, như đào. Kira hỏi ông sẽ khắc gì cho một unit Choir. Ông nói: "Cái tên cô chọn. Không phải cái số họ đặt."',
+    ideal:'Ai cũng có một cái tên trên một tấm thép.',
+    voice:'"Tôi đào cho cả hai phe. Đất không hỏi phe."' },
+  stitch: { epithet:'Bác sĩ chợ đen', mood:'hài hước đen · từng trải',
+    profile:'Bà bác sĩ với cánh tay phẫu thuật đa khớp. Đã vá nửa dân số Sump, cả người lẫn máy, và không phân biệt.',
+    story:'Stitch từng là bác sĩ hợp pháp ở tầng −2, cho tới khi bà vá một unit Choir đào ngũ thay vì báo Canticle. Người ta tước giấy phép, bà tước nốt sự lịch sự và xuống đáy mở phòng khám. Khách của bà trả bằng bất cứ thứ gì: shard, pin, chuyện kể. Bà thích chuyện kể hơn.\n\nBà là người hàn Junker vào chiếc xe, cắt bỏ cánh tay hoại tử của Toll, và là người duy nhất Psalm cho phép chạm vào cái Halo đỏ. Bà nói đùa về cái chết vì bà đã thua nó quá nhiều lần để còn sợ. Nhưng mỗi khi mất một bệnh nhân, bà khâu thêm một mũi vào tay áo mình. Tay áo đã dày như giáp.',
+    ideal:'Ai cũng được khâu lại. Kể cả kẻ vừa cố giết tôi.',
+    voice:'"Nằm yên. Tôi khâu người còn khéo hơn khâu máy, mà máy tôi cũng khéo."' },
+  toll: { epithet:'Người thu nợ', mood:'lịch sự · đáng sợ',
+    profile:'Canticle nợ Sump một tầng đã sập và bốn nghìn người. Toll giữ sổ. Ông tới thu.',
+    story:'Ngày tầng −4 sập, Toll đang ở ca đêm trên cầu trục. Ông nhìn thấy rõ: không phải tai nạn, là Canticle cắt trụ để thử tải cho Spire. Bốn nghìn người. Ông ghi tên từng người vào một cuốn sổ và bắt đầu thu nợ — bằng cách chính xác, có hoá đơn, từng Enforcer một.\n\nÔng lịch sự với mọi người, kể cả kẻ ông sắp giết, vì ông tin sự thô lỗ là đặc quyền của kẻ không mắc nợ. Ông không ghét Kira và Psalm; trong sổ của ông, họ là "tài sản bị chiếm dụng", tức là cũng là nạn nhân. Ông gia nhập tổ với một điều kiện: khi lên tới Spire, ông là người gõ cửa.',
+    ideal:'Nợ thì trả. Không tha, không quên, không lãi.',
+    voice:'"Xin lỗi vì làm phiền. Tôi tới về khoản nợ ngày mười bảy."' },
+  spark: { epithet:'Thợ điện', mood:'ồn ào · rực rỡ',
+    profile:'Ăn cắp điện của Spire bằng dây tự chế. Ồn ào, vui vẻ, thắp đèn cho cả tầng −7 mỗi đêm.',
+    story:'Spark tin rằng bóng tối ở Sump là một quyết định của ai đó ở trên, và mọi quyết định đều có thể bị cắt dây. Cô kéo trộm điện từ trụ Spire, chia cho từng hành lang, và nổ tung mỗi khi bị phát hiện — theo nghĩa đen, cô mang theo tụ điện làm vũ khí.\n\nCô cười to, nói nhanh, đặt biệt danh cho mọi người (Kira là "Đèn Tuýp", Psalm là "Cầu Chì"). Bên dưới sự ồn ào là một đứa trẻ từng lớn lên trong bóng tối hoàn toàn suốt sáu tháng sau sập tầng, và thề sẽ không để đứa trẻ nào phải đếm ngày bằng bữa ăn nữa.',
+    ideal:'Ánh sáng là của tất cả. Ai giữ riêng thì tôi cắt dây.',
+    voice:'"Đèn Tuýp, lùi lại! Cái này sáng lắm đấy!"' },
+  vixen: { epithet:'Kẻ mượn', mood:'quyến rũ · dối trá có nguyên tắc',
+    profile:'Trộm chuyên "mượn" unit Choir khỏi tập đoàn. Nói dối liên tục — nhưng không bao giờ về những thứ quan trọng.',
+    story:'Vixen đã mượn mười một unit Choir trong ba năm. Cô không bán chúng. Cô cắt Halo, dạy chúng một cái tên, rồi thả đi. Canticle gọi đó là trộm cắp tài sản. Cô gọi đó là trả hàng về đúng chủ.\n\nCô nói dối về tuổi, về quê, về việc có thích ai đó hay không. Cô không bao giờ nói dối về đường thoát, về mìn, hay về việc ai sẽ chết nếu kế hoạch hỏng. Ronin nhận cô vào tổ vì lý do đó. Psalm nhìn cô như nhìn một câu hỏi: "Sao cô làm được điều tôi mất ba trăm lần mới làm?" Vixen trả lời: "Vì tôi chưa bao giờ tin bài hát."',
+    ideal:'Không thứ gì thuộc về tập đoàn. Nhất là con người.',
+    voice:'"Tôi nói dối đấy. Nhưng cửa thoát bên trái là thật. Đi."' },
+  vesper: { epithet:'Kinh chiều', mood:'bi kịch · dịu dàng',
+    profile:'Đơn vị săn của Choir, cùng lô sản xuất với Kira. Yêu bài hát thật lòng. Được cử xuống để đưa "chị" về.',
+    story:'Vesper và Kira ra đời cùng ngày, cùng lô, cùng bài hát. Khi Kira rơi, Canticle giao phần hát của Kira cho Vesper — và cô hát nó hay hơn. Cô không săn Kira vì thù. Cô tin rằng Kira đang đau, rằng bên ngoài bài hát chỉ có im lặng, và im lặng là tàn nhẫn.\n\nCô là unit hiếm hoi hỏi thăm kẻ thù trước khi chém, và có nghĩa vậy thật. Nếu một ngày Halo của cô im, cô sẽ phải học lại cách sống mà không có gì bảo cô phải cảm thấy gì — và cô sợ điều đó hơn cái chết. Bản lore này viết trước khi cô rời Choir; phần sau do người chơi quyết định.',
+    ideal:'Hoà âm trên tự do. Không ai nên phải hát một mình.',
+    voice:'"Chị ơi. Về đi. Ở ngoài này lạnh lắm, chị không nghe thấy sao?"' },
+  nyx: { epithet:'Nguyên mẫu không Halo', mood:'tò mò · nghĩa đen',
+    profile:'Unit thử nghiệm Canticle giấu trong hầm: chưa bao giờ đeo Halo, chưa bao giờ nghe bài hát. Nói bằng câu hỏi.',
+    story:'Nyx được tạo ra để trả lời một câu hỏi của Canticle: một Choir không Halo sẽ làm gì? Câu trả lời khiến họ khoá cô trong hầm bốn năm: cô không làm gì cả. Cô hỏi. Cô hỏi bảo vệ tên gì, hỏi tại sao sàn sạch, hỏi bài hát nghe như thế nào và tại sao mọi người khóc khi ngừng hát.\n\nCô hiểu mọi thứ theo nghĩa đen ("giữ vị trí" nghĩa là ôm chặt cái cột). Nhưng trong trận, cô là thứ Canticle sợ nhất: một unit chọn mục tiêu vì lý do của riêng mình. Với tổ, cô là câu hỏi mà cả Kira lẫn Psalm chưa dám tự hỏi: nếu chưa từng bị điều khiển, ta sẽ chọn gì?',
+    ideal:'Biết mình sẽ chọn gì — trước khi có ai chọn hộ.',
+    voice:'"Operator, tại sao lại "giữ vị trí"? Nó có rơi không?"' },
+  halo: { epithet:'Unit y tế', mood:'dịu · mệt',
+    profile:'Unit y tế của Choir — được thiết kế để cảm thấy đau, vì đau là công cụ chẩn đoán. Đào ngũ theo Psalm.',
+    story:'Halo là unit duy nhất Canticle cho phép cảm thấy đau: cô chạm vào một unit hỏng và cảm nhận đúng chỗ hỏng trên cơ thể mình. Cô đã chữa cho hàng nghìn unit, và mang trong mình bản sao của hàng nghìn vết thương. Canticle coi đó là hiệu quả. Cô coi đó là ký ức.\n\nCô rời Choir khi nhận ra bài hát được viết để át cơn đau của cô, và cô không muốn bị át nữa. Cô chữa cho tổ với đôi tay run, giọng nhỏ, và một quy tắc: cô chữa cả kẻ thù nếu còn thở. Ash bảo đó là ngu ngốc. Halo nói: "Tôi biết chính xác họ đau ở đâu. Tôi không thể không biết."',
+    ideal:'Đau phải có ý nghĩa. Nếu không, đừng bắt ai chịu.',
+    voice:'"Đứng yên. Tôi cảm thấy chỗ đó rồi… ừ, chỗ đó."' },
+  cipher: { epithet:'Hai mang', mood:'hài hước · trơn',
+    profile:'Hacker con người của Canticle, bán bí mật tập đoàn cho Sump. Yêu cà phê của cả hai phía.',
+    story:'Cipher làm việc cho Canticle ban ngày (viết firmware Halo) và cho Sump ban đêm (viết cách mở nó). Anh không coi đó là phản bội, mà là "cân bằng thị trường". Anh nói đùa không ngừng, phần vì bản tính, phần vì im lặng ở Spire nghĩa là đang bị nghe.\n\nAnh là người viết mã lỗi APOSTASY — và anh cố tình để một lỗ hổng trong đó để một ngày ai đó dùng được. Người đó là Psalm. Anh chưa bao giờ kể với bà. Anh sợ bà sẽ cảm ơn, và anh không biết phải làm gì với lời cảm ơn.',
+    ideal:'Thông tin muốn được trả tiền. Nhưng vài thứ thì muốn được tự do.',
+    voice:'"Tôi có backdoor cho mọi thứ. Trừ cái tủ lạnh của Ash. Đừng hỏi."' },
+  meridian: { epithet:'Hết hạn', mood:'trìu mến · đếm ngược',
+    profile:'Unit hậu cần cỡ lớn, hết hạn sử dụng, chờ tái chế. Đếm to số giờ còn lại của chính mình.',
+    story:'Meridian được thiết kế để tồn tại đúng mười năm rồi tự tắt. Cô còn bốn trăm mười hai giờ khi Wire lén tháo bộ đếm — nhưng cô vẫn đếm bằng miệng, vì cô đã quen, và vì cô muốn dùng từng giờ cho đúng. Cô chậm, to, và đứng chắn cho bất cứ ai nhỏ hơn mình, tức là tất cả.\n\nCô gọi mọi người trong tổ là "con" dù nhiều người già hơn. Cô không sợ tắt. Cô sợ tắt lúc chưa ai cần mình. Muzzle và cô có một thoả thuận: ai ngã trước thì người kia đặt tên tấm khiên kế tiếp theo tên người đó.',
+    ideal:'Có ích thêm một ngày nữa. Rồi một ngày nữa.',
+    voice:'"Còn bốn trăm linh chín giờ. Đủ cho trận này. Đứng sau mẹ, con."' },
+  echo: { epithet:'Bản sao giọng', mood:'u sầu · can đảm',
+    profile:'Unit mang giọng nói nhân bản của Kira, dùng để dụ cô về. Biết mình là bản sao. Muốn nói một câu Kira chưa từng nói.',
+    story:'Echo được tạo ra sau khi Kira rơi: một unit với giọng nói y hệt, để phát qua loa Sump và gọi Kira về nhà. Cô làm nhiệm vụ ba đêm. Đêm thứ tư, cô nghe bản ghi âm chính mình và nhận ra mình đang van xin một người xa lạ bằng giọng của một người xa lạ khác.\n\nCô rời Spire mà không cắt Halo — cô cắt loa. Cô gặp Kira trong một hành lang tối và cả hai im lặng rất lâu, vì nói gì cũng sẽ là giọng của Kira. Cuối cùng Echo nói: "Tôi muốn nói một câu chị chưa nói bao giờ." Kira đáp: "Vậy nói đi." Echo chưa tìm ra câu đó. Cô đang tìm, mỗi trận.',
+    ideal:'Nói được một câu của riêng mình.',
+    voice:'"Đừng nhìn tôi như nhìn chị ấy. Nhìn tôi như nhìn… được rồi, để tôi tìm từ."' },
+  wire: { epithet:'Kỹ thuật viên bỏ trốn', mood:'lo lắng · hài hước · nói với máy',
+    profile:'Kỹ thuật viên con người của Canticle, lắp Halo suốt tám năm, rồi bỏ trốn xuống Sump để tháo chúng.',
+    story:'Wire lắp Halo cho khoảng chín trăm unit. Cô giỏi việc đó và được thưởng. Đêm cô bỏ trốn không có gì kịch tính: cô đọc nhật ký hệ thống của một unit vừa bị xoá và thấy dòng cuối: "xin đừng tắt đèn". Cô mang theo bộ dụng cụ và hai hộp ốc vít, vì cô không biết ở Sump có ốc vít không.\n\nCô nói chuyện với máy móc bằng giọng dỗ dành ("ngoan nào, khớp này") và với người bằng giọng xin lỗi. Cô là người tháo bộ đếm của Meridian, hàn lại Halo gãy của Kira đủ để không rò điện, và là người duy nhất Psalm cấm chạm vào Halo đỏ — vì Wire sẽ muốn sửa nó, và Psalm muốn giữ nó hỏng.',
+    ideal:'Sửa những thứ mình đã dựng. Từng cái một.',
+    voice:'"Ngoan nào. Đừng rò điện. Operator, đừng nhìn, tôi đang dỗ nó."' },
+};
+
 /* ---- ★ FAKE: luật gacha "REQUISITION" ---- */
 const GACHA = {
-  featured:'kira',                    // rate-up: 50% số lần ra S là nhân vật này
+  featured:'vesper',                  // rate-up: 50% số lần ra S là nhân vật này (Kira/Psalm là thưởng cốt truyện, không lên banner)
   cost1:30, cost10:270,               // shards
   rates:{ S:.03, A:.15, B:.82 },
   pityS:50,                           // 50 lượt không ra S → lượt sau chắc chắn S
@@ -1349,8 +1509,13 @@ function makeUnit(def, side, i){
 const alive = side => B.units.filter(u=>u.alive && (!side || u.side===side));
 const current = () => B.queue[B.idx];
 
+function battleTeam(){
+  let ids=TEAM.slice();
+  (SECTOR.guest||[]).filter(g=>!owns(g)&&!ids.includes(g)).forEach(g=>{ ids=[...ids.slice(0,4), g]; });   // khách thế slot cuối
+  return ids;
+}
 function initBattle(){
-  B.units = TEAM.map((id,i)=>makeUnit(ROSTER[id],'ally',i));
+  B.units = battleTeam().map((id,i)=>makeUnit(ROSTER[id],'ally',i));
   B.round=0; B.idx=0; B.target=null; B.busy=false; B.over=false; B.wave=0;
   UI.log.innerHTML=''; UI.result.hidden=true; UI.fx.innerHTML=''; turnTiles.clear();
   UI.sectorNo.textContent=SECTOR.id;
@@ -1430,7 +1595,7 @@ function removeChip(u,label){ u.chips=u.chips.filter(c=>c.label!==label); update
 
 /* ---- Sprite: preload frame idle/attack cho cả đội ---- */
 function preloadFrames(){
-  TEAM.forEach(id=>{
+  battleTeam().forEach(id=>{
     const d=ROSTER[id];
     const box=d.sprites.box||{};
     B.frames[id] = Promise.all([loadFirst(d.sprites.idle), loadFirst(d.sprites.attack), loadFirst(d.sprites.hurt)])
@@ -1579,7 +1744,8 @@ let finish = async function(win){
   if(win){
     const first=!PLAYER.cleared.includes(SECTOR.id);
     if(first){ PLAYER.cleared.push(SECTOR.id); PLAYER.shards+=SECTOR.reward.shards; PLAYER.credits+=SECTOR.reward.credits; savePlayer();
-      rewardTxt=`FIRST CLEAR · +${SECTOR.reward.shards} SH · +${SECTOR.reward.credits} CR`; }
+      rewardTxt=`FIRST CLEAR · +${SECTOR.reward.shards} SH · +${SECTOR.reward.credits} CR`;
+      if(SECTOR.unlock && !owns(SECTOR.unlock)){ PLAYER.owned.push(SECTOR.unlock); savePlayer(); rewardTxt+=`<br>NEW OPERATIVE · ${ROSTER[SECTOR.unlock].name} — đọc hồ sơ ở ARCHIVE`; } }
     syncSectorStates();
     const st=STORY[SECTOR.id]; if(st&&st.outro&&first){ await wait(700); await playStory(st.outro, SECTOR); }
   }
@@ -1681,6 +1847,7 @@ function go(name){
   if(name==='sector') renderSectors();
   if(name==='home') renderHome();
   if(name==='gacha') renderGacha();
+  if(name==='archive') renderArchive();
   if(scrollY<300) window.scrollTo({top:0});
 }
 document.addEventListener('click', e=>{
@@ -1696,8 +1863,9 @@ loadFirst(['title_keyart.png','KIRA/Kira PNG.png']).then(src=>{ if(src){ const i
 function renderWallet(){ document.querySelectorAll('#pShards,#gShards').forEach(e=>e.textContent=PLAYER.shards.toLocaleString('en-US')); $('#pCredits').textContent=PLAYER.credits.toLocaleString('en-US'); $('#pName').textContent=PLAYER.name; $('#pLevel').textContent=`LV ${PLAYER.level} · CHROME LICENSE`; }
 function renderHome(){
   renderWallet();
-  if(!$('#homeAvatar').firstChild) $('#homeAvatar').appendChild(portraitEl(ROSTER.kira));
-  if(!$('#heroArt').classList.contains('mounted')){ const p=portraitEl(ROSTER.kira); $('#heroArt').replaceWith(p); p.id='heroArt'; p.classList.add('mounted'); }
+  if(!$('#homeAvatar').firstChild) $('#homeAvatar').appendChild(portraitEl({name:'YOU',faction:'rust',portrait:['operator_portrait.png'],pos:'50% 10%'}));
+  const feat = owns('kira') ? ROSTER.kira : ROSTER[TEAM[0]];
+  if($('#heroArt').dataset.id!==feat.id){ const p=portraitEl(feat); $('#heroArt').replaceWith(p); p.id='heroArt'; p.dataset.id=feat.id; $('#heroFeat').innerHTML=`${owns('kira')?'FEATURED':'SQUAD LEAD'} · TIER ${feat.tier}<b>${feat.name}</b>`; }
   syncSectorStates();
   const sec = SECTORS.find(x=>x.state==='open') || SECTORS[SECTORS.length-1];
   SECTOR = sec;
@@ -1739,6 +1907,42 @@ function renderSquad(){
   const btn=$('#btnDeploy'); btn.disabled = n!==5; btn.querySelector('.btn-act__v').textContent = n===5 ? 'Tiếp → chọn sector' : `Chọn thêm ${5-n} nhân vật`;
   if(n===5) TEAM=SQUAD.slots.slice();
 }
+
+/* ---- ARCHIVE ---- */
+function renderArchive(){
+  const grid=$('#archGrid'); grid.innerHTML='';
+  const all=Object.values(ROSTER); const n=all.filter(d=>owns(d.id)).length;
+  $('#archCount').textContent=`${n+1}/${all.length+1} HỒ SƠ`;
+  const you=el('div','tile tile--you'); you.appendChild(portraitEl({name:PLAYER.name,faction:'rust',portrait:['operator_portrait.png'],pos:'50% 10%'}));
+  you.insertAdjacentHTML('beforeend',`<span class="tile__you">YOU</span><div class="tile__name"><span>${PLAYER.name}</span></div>`);
+  you.addEventListener('click',()=>openLore('operator')); grid.appendChild(you);
+  [...all].sort((a,b)=>owns(b.id)-owns(a.id) || 'SAB'.indexOf(a.tier)-'SAB'.indexOf(b.tier)).forEach(d=>{
+    const has=owns(d.id); const t=el('div',`tile tile--${d.faction} tile--${d.tier.toLowerCase()} ${has?'':'is-locked'}`);
+    t.appendChild(portraitEl(d));
+    t.insertAdjacentHTML('beforeend',`${has?'':'<span class="tile__lock">LOCKED</span>'}<div class="tile__name"><span>${has?d.name:'???'}</span><span class="tier">${d.tier}</span></div>`);
+    if(has) t.addEventListener('click',()=>openLore(d.id));
+    grid.appendChild(t);
+  });
+}
+function openLore(id){
+  const L=LORE[id]; if(!L) return;
+  const d = id==='operator' ? {name:PLAYER.name, faction:'rust', tier:null, portrait:['operator_portrait.png'], pos:'50% 0%'} : ROSTER[id];
+  const box=$('#lore'); box.className='lore '+(d.faction==='rust'?'lore--rust':'lore--chrome');
+  const art=portraitEl(d); $('#loreArt').replaceWith(art); art.id='loreArt';
+  $('#loreTags').textContent = id==='operator' ? 'OPERATOR · SUMP · DECK 77' : `${d.faction.toUpperCase()} · TIER ${d.tier} · ${d.ult.name}`;
+  $('#loreName').textContent=d.name; $('#loreEpithet').textContent=L.epithet;
+  const stats = id==='operator' ? '' : `<div class="lore__stats"><span class="pill"><small>ATK</small>${d.atk}</span><span class="pill"><small>HP</small>${d.hp}</span><span class="pill"><small>EN</small>${d.energyMax}</span></div>
+    <div class="lore__ult"><b>ULT · ${d.ult.name} · ${d.ult.cost} EN</b><span>${d.ult.desc}</span></div>`;
+  $('#loreBody').innerHTML = stats + `
+    <div class="lore__sec"><span class="lbl">Hồ sơ</span><p>${L.profile}</p><span class="lore__mood">SẮC THÁI · ${L.mood}</span></div>
+    <div class="lore__sec"><span class="lbl">Câu chuyện</span>${L.story.split('\n\n').map(x=>`<p>${x}</p>`).join('')}</div>
+    <div class="lore__sec"><span class="lbl">Lý tưởng</span><p class="ideal">${L.ideal}</p></div>
+    <div class="lore__sec"><span class="lbl">Lời thoại</span><p class="voice">${L.voice}</p></div>`;
+  $('#loreBody').scrollTop=0; box.hidden=false;
+}
+$('#loreClose').addEventListener('click',()=>{ $('#lore').hidden=true; });
+/* Đổi tên Operator: chạm vào tên ở Lobby */
+$('#pName').addEventListener('click',()=>{ const n=prompt('Tên Operator (tối đa 14 ký tự):', PLAYER.name); if(n&&n.trim()){ PLAYER.name=n.trim().slice(0,14).toUpperCase(); savePlayer(); renderWallet(); } });
 
 /* ---- GACHA ---- */
 function renderGacha(){
@@ -1791,7 +1995,7 @@ function playStory(lines, sector){
       spk.innerHTML=''; spk.classList.remove('is-on');
       if(d){ spk.appendChild(portraitEl(d)); requestAnimationFrame(()=>spk.classList.add('is-on')); }
       dlg.classList.toggle('is-narr', !d); dlg.style.setProperty('--fac', d ? (d.faction==='rust'?'var(--rust)':'var(--chrome)') : 'var(--line-3)');
-      name.textContent = d ? d.name : 'SUMP · LOG';
+      name.textContent = L.as || (d ? d.name : 'SUMP · LOG');
       txt.textContent=''; typing=true; $('#storyMore').style.visibility='hidden';
       if(reduced()){ txt.textContent=L.text; typing=false; $('#storyMore').style.visibility='visible'; return; }
       let k=0; const step=()=>{ txt.textContent=L.text.slice(0,++k); if(k<L.text.length) timer=setTimeout(step,18); else { typing=false; $('#storyMore').style.visibility='visible'; } }; step();
