@@ -396,14 +396,114 @@ a{color:inherit;text-decoration:none}
 /* =====================================================================
    C. MÀN CHIẾN ĐẤU
    ===================================================================== */
-.battle{background:var(--bg-0);color:var(--text-1);display:grid;grid-template-columns:minmax(0,1fr);justify-content:center}
-.arena{position:relative;display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;height:calc(100dvh - 44px);min-height:600px;max-height:980px;width:100%;max-width:560px;margin:0 auto;background:var(--bg-0);overflow:hidden}
+.battle{background:var(--bg-0);color:var(--text-1);display:grid;grid-template-columns:minmax(0,1fr);justify-content:center;scroll-margin-top:44px}
+/* Khung màn hình game (portrait, max 560px). Mọi screen chồng lên nhau, JS bật .is-active */
+.screens{position:relative;height:calc(100dvh - 44px);min-height:600px;max-height:980px;width:100%;max-width:560px;margin:0 auto;background:var(--bg-0);overflow:hidden}
+.screen{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity var(--t-state),visibility 0s linear var(--t-state)}
+.screen.is-active{opacity:1;visibility:visible;transition-delay:0s,0s}
+.arena{display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;overflow:hidden}
 .side{display:none}
 @media (min-width:960px){
   .battle{grid-template-columns:minmax(0,560px) 320px;gap:var(--s-4);padding:var(--s-4)}
-  .arena{height:calc(100dvh - 76px);border:1px solid var(--line-1)}
-  .side{display:flex;flex-direction:column;gap:var(--s-4);height:calc(100dvh - 76px);max-height:980px;overflow:auto}
+  .battle:not([data-screen="battle"]){grid-template-columns:minmax(0,560px)}
+  .screens{height:calc(100dvh - 76px);border:1px solid var(--line-1)}
+  .battle[data-screen="battle"] .side{display:flex;flex-direction:column;gap:var(--s-4);height:calc(100dvh - 76px);max-height:980px;overflow:auto}
 }
+
+/* ---- Màn hình chung ---- */
+.sh{display:flex;align-items:center;gap:10px;padding-bottom:8px;border-bottom:1px solid var(--line-1)}
+.sh__title{font:800 var(--fs-md)/1 var(--font-ui);letter-spacing:.26em;text-transform:uppercase}
+.sh__sub{font:var(--fs-2xs) var(--font-mono);letter-spacing:.1em;color:var(--text-3)}
+.sh .btn-ghost{margin-left:auto}
+.btn-act--full{width:100%;height:52px}
+.btn-act--go::after{background:var(--chrome)} .btn-act--go::before{background:var(--chrome-hi)} .btn-act--go{color:#fff}
+.btn-act--go .btn-act__v{color:rgba(255,255,255,.75)}
+.btn-act--go:disabled{opacity:.45;filter:saturate(.2)}
+
+/* ---- TITLE ---- */
+.title{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;cursor:pointer;user-select:none;overflow:hidden;
+  background:linear-gradient(112deg,var(--chrome-tint) 0 50%,transparent 50%),linear-gradient(112deg,transparent 0 50%,var(--rust-tint) 50%),
+  radial-gradient(80% 50% at 50% 100%,rgba(124,77,255,.12),transparent 70%),var(--bg-0)}
+.title::before{content:"";position:absolute;inset:0;background:linear-gradient(112deg,transparent calc(50% - .5px),var(--line-3) 50%,transparent calc(50% + .5px))}
+.title::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(0,0,0,.16) 3px 4px)}
+.title__art{position:absolute;right:-26%;bottom:0;height:76%;width:auto;opacity:.42;pointer-events:none;display:none;
+  -webkit-mask-image:linear-gradient(to top,#000 55%,transparent);mask-image:linear-gradient(to top,#000 55%,transparent)}
+.title__art.has-img{display:block}
+.title__grid{position:absolute;left:-30%;right:-30%;bottom:0;height:42%;transform:perspective(420px) rotateX(58deg);transform-origin:50% 100%;
+  background:repeating-linear-gradient(90deg,var(--line-1) 0 1px,transparent 1px 48px),repeating-linear-gradient(0deg,var(--line-1) 0 1px,transparent 1px 48px);
+  -webkit-mask-image:linear-gradient(to top,#000 20%,transparent);mask-image:linear-gradient(to top,#000 20%,transparent)}
+.title__wrap{position:relative;z-index:1;transform:translateY(-8%)}
+.title__tag{font:var(--fs-2xs) var(--font-mono);letter-spacing:.5em;color:var(--text-3);margin-bottom:14px}
+.title__logo{font:900 clamp(34px,9.5vw,58px)/1 var(--font-ui);letter-spacing:.3em;text-indent:.3em;color:var(--text-1)}
+.title__logo b{color:var(--chrome-hi);font-weight:900} .title__logo i{color:var(--rust-hi);font-style:normal}
+.title__rule{width:180px;height:1px;margin:14px auto;background:linear-gradient(90deg,var(--chrome),var(--line-3),var(--rust))}
+.title__sub{font:var(--fs-2xs) var(--font-mono);letter-spacing:.42em;color:var(--text-2)}
+.title__cta{margin-top:64px;font:700 var(--fs-sm)/1 var(--font-ui);letter-spacing:.34em;color:var(--text-1);animation:hp-warn 1400ms steps(2,end) infinite}
+.title__ver{position:absolute;left:12px;bottom:10px;z-index:1;font:var(--fs-2xs) var(--font-mono);letter-spacing:.1em;color:var(--text-3);text-align:left}
+.title__legal{position:absolute;right:12px;bottom:10px;z-index:1;font:8px var(--font-mono);letter-spacing:.1em;color:var(--text-3)}
+
+/* ---- HOME / LOBBY ---- */
+.home{display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:10px;padding:10px}
+.topbar{display:flex;align-items:center;gap:10px;padding-bottom:8px;border-bottom:1px solid var(--line-1)}
+.topbar__avatar{width:34px;height:34px;flex:none;--cut:6px;position:relative}
+.topbar__avatar::before{content:"";position:absolute;inset:0;background:var(--chrome);clip-path:var(--poly-chrome)}
+.topbar__avatar .portrait{position:absolute;inset:1px;clip-path:var(--poly-chrome);--pos:50% 4%}
+.topbar__id b{display:block;font:700 var(--fs-sm)/1 var(--font-ui);letter-spacing:.18em}
+.topbar__id span{font:var(--fs-2xs) var(--font-mono);color:var(--text-3);letter-spacing:.08em}
+.topbar__cur{margin-left:auto;display:flex;gap:6px}
+.pill{padding:4px 8px;border:1px solid var(--line-2);background:var(--surface-1);font:600 var(--fs-2xs)/1 var(--font-mono);letter-spacing:.06em;color:var(--text-1);
+  clip-path:polygon(0 0,calc(100% - 5px) 0,100% 5px,100% 100%,5px 100%,0 calc(100% - 5px))}
+.pill small{color:var(--text-3);margin-right:5px;letter-spacing:.14em}
+.hero{position:relative;overflow:hidden;border:1px solid var(--line-1);background:var(--surface-1);min-height:0}
+.hero .portrait{position:absolute;inset:0;--pos:50% 0%;background:var(--surface-2)}
+.hero .portrait img{-webkit-mask-image:linear-gradient(to top,transparent 12%,#000 45%);mask-image:linear-gradient(to top,transparent 12%,#000 45%)}
+.hero__feat{position:absolute;top:10px;left:10px;font:var(--fs-2xs) var(--font-mono);letter-spacing:.24em;color:var(--text-2)}
+.hero__feat b{display:block;font:800 var(--fs-xl)/1 var(--font-ui);letter-spacing:.24em;color:var(--text-1);margin-top:4px}
+.hero__panel{position:absolute;left:10px;right:10px;bottom:10px;padding:10px 12px;background:rgba(6,7,10,.8);border:1px solid var(--line-2);
+  clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px)}
+.hero__panel .lbl{display:block}
+.hero__mission{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:4px 0 8px}
+.hero__mission b{font:800 var(--fs-lg)/1 var(--font-mono);letter-spacing:.1em}
+.hero__mission span{font:var(--fs-2xs) var(--font-mono);color:var(--text-2);letter-spacing:.08em;text-align:right}
+.menu{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.menu__btn{position:relative;height:56px;--cut:8px;color:var(--text-1);text-align:center}
+.menu__btn::before,.menu__btn::after{content:"";position:absolute;pointer-events:none;clip-path:var(--poly-chrome)}
+.menu__btn::before{inset:0;background:var(--line-2)} .menu__btn::after{inset:1px;background:var(--surface-2)}
+.menu__btn>*{position:relative;z-index:1;display:block}
+.menu__btn b{font:800 var(--fs-2xs)/1 var(--font-ui);letter-spacing:.22em}
+.menu__btn small{margin-top:4px;font:8px/1 var(--font-mono);letter-spacing:.1em;color:var(--text-3)}
+.menu__btn:not(:disabled):hover::before{background:var(--line-3)}
+.menu__btn:disabled{opacity:.4;cursor:not-allowed}
+.menu__btn--go::before{background:var(--chrome-hi)} .menu__btn--go::after{background:var(--chrome)} .menu__btn--go{color:#fff} .menu__btn--go small{color:rgba(255,255,255,.7)}
+
+/* ---- SQUAD ---- */
+.squad{display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;gap:10px;padding:10px}
+.squad .team{max-width:none;gap:6px}
+.squad .tslot{cursor:pointer}
+.roster{overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px;align-content:start;padding-right:2px}
+.roster .card{width:auto;cursor:pointer}
+.roster .card__name{font-size:var(--fs-xs)}
+.roster .card__stats em{font-size:var(--fs-xs)}
+.squad__count{font:var(--fs-2xs) var(--font-mono);letter-spacing:.12em;color:var(--text-2)}
+.squad__count b{color:var(--text-1)}
+
+/* ---- SECTOR ---- */
+.sector{display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:10px;padding:10px}
+.slist{display:flex;flex-direction:column;gap:8px;overflow:auto}
+.srow{position:relative;display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:12px;border:1px solid var(--line-1);background:var(--surface-1);cursor:pointer;text-align:left;color:var(--text-1);
+  clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);transition:border-color var(--t-state)}
+.srow:hover{border-color:var(--line-3)}
+.srow.is-selected{border-color:var(--text-1);background:var(--surface-2)}
+.srow.is-locked{opacity:.45;cursor:not-allowed}
+.srow__id{font:800 var(--fs-lg)/1 var(--font-mono);letter-spacing:.04em;color:var(--text-2)}
+.srow.is-selected .srow__id{color:var(--text-1)}
+.srow__name{font:700 var(--fs-sm)/1 var(--font-ui);letter-spacing:.22em;text-transform:uppercase}
+.srow__meta{font:var(--fs-2xs)/1.4 var(--font-mono);color:var(--text-3);margin-top:4px;letter-spacing:.06em}
+.srow__state{font:800 8px/1 var(--font-mono);letter-spacing:.2em;padding:3px 5px;border:1px solid currentColor;color:var(--text-2)}
+.srow.is-cleared .srow__state{color:var(--hp)} .srow.is-open .srow__state{color:var(--energy)}
+.srow__waves{display:flex;gap:3px;margin-top:6px}
+.srow__waves i{width:16px;height:4px;background:var(--surface-4);clip-path:var(--poly-slant)} .srow__waves i.boss{background:var(--hp-low)} .srow__waves i.done{background:var(--hp)}
+
 .side__block{border:1px solid var(--line-1);background:var(--surface-1);padding:var(--s-3)}
 .side__block .lbl{display:block;margin-bottom:8px}
 .log{list-style:none;display:flex;flex-direction:column;gap:3px;font:var(--fs-xs)/1.4 var(--font-mono);color:var(--text-2);max-height:360px;overflow:auto}
@@ -424,8 +524,12 @@ a{color:inherit;text-decoration:none}
 
 /* ---- Sân đấu ---- */
 .stage{position:relative;overflow:hidden;background:
+  var(--bgimg,none) center/cover no-repeat,
   radial-gradient(120% 60% at 50% 100%,rgba(124,77,255,.08),transparent 60%),
   linear-gradient(var(--bg-0),var(--bg-1) 55%,var(--bg-0))}
+/* Khi có ảnh nền (bg_<sector>.png): phủ scrim tối để nhân vật và UI vẫn nổi */
+.stage.has-bg::before{content:"";position:absolute;inset:0;background:linear-gradient(rgba(6,7,10,.45),rgba(6,7,10,.12) 35%,rgba(6,7,10,.55) 100%)}
+.stage.has-bg .stage__floor{opacity:.6}
 .stage__floor{position:absolute;left:-30%;right:-30%;bottom:0;height:52%;transform:perspective(420px) rotateX(58deg);transform-origin:50% 100%;
   background:
     repeating-linear-gradient(90deg,var(--line-1) 0 1px,transparent 1px 48px),
@@ -560,6 +664,7 @@ a{color:inherit;text-decoration:none}
    ===================================================================== */
 @media (prefers-reduced-motion: reduce){
   .unit__bob{animation:none}
+  .title__cta{animation:none}
   .ebar.is-full::after{animation:none;display:none}
   .btn-ult[data-state="ready"]{animation:none;filter:drop-shadow(0 0 6px rgba(255,255,255,.4))}
   .bar[data-state="low"] .bar__fill,.hpline[data-state="low"] .mono,.chip--control::before{animation:none}
@@ -576,21 +681,79 @@ a{color:inherit;text-decoration:none}
 
 <nav class="topnav">
   <div class="brand"><span class="brand__mark"></span>CHROMEFALL<span class="brand__sub">UI KIT · v0.1</span></div>
-  <div class="topnav__links"><a href="#battle">Battle</a><a href="#kit">Components</a><a href="#tokens">Tokens</a></div>
+  <div class="topnav__links"><a href="#battle">Play</a><a href="#kit">Components</a><a href="#tokens">Tokens</a></div>
   <button class="btn-ghost" id="themeBtn" title="Đổi theme để kiểm tra token">THEME: AUTO</button>
 </nav>
 
 <!-- =====================================================================
      C. MÀN CHIẾN ĐẤU — hiển thị đầy đủ ngay khi load (fit viewport)
      ===================================================================== -->
-<section id="battle" class="battle">
-  <div class="arena">
+<section id="battle" class="battle" data-screen="title">
+  <div class="screens" id="screens">
+
+    <!-- ===== SCREEN: TITLE ===== -->
+    <div class="screen title is-active" data-screen="title" data-go="home">
+      <div class="title__grid"></div>
+      <img class="title__art" id="titleArt" alt="">
+      <div class="title__wrap">
+        <div class="title__tag">A GACHA TACTICS GAME</div>
+        <div class="title__logo"><b>CHROME</b><i>FALL</i></div>
+        <div class="title__rule"></div>
+        <div class="title__sub">CHROME ABOVE · RUST BELOW</div>
+        <div class="title__cta">TAP TO START</div>
+      </div>
+      <div class="title__ver">v0.1 · BUILD 2026-09-05<br>PROTOTYPE · DỮ LIỆU GIẢ</div>
+      <div class="title__legal">© CHROMEFALL</div>
+    </div>
+
+    <!-- ===== SCREEN: HOME / LOBBY ===== -->
+    <div class="screen home" data-screen="home">
+      <div class="topbar">
+        <div class="topbar__avatar" id="homeAvatar"></div>
+        <div class="topbar__id"><b>OPERATOR-77</b><span>LV 12 · CHROME LICENSE</span></div>   <!-- ★ FAKE hồ sơ người chơi -->
+        <div class="topbar__cur"><span class="pill"><small>CR</small>12,480</span><span class="pill"><small>SH</small>320</span></div>   <!-- ★ FAKE tiền tệ -->
+      </div>
+      <div class="hero">
+        <div class="portrait" id="heroArt"></div>
+        <div class="hero__feat">FEATURED · TIER S<b>KIRA</b></div>
+        <div class="hero__panel">
+          <span class="lbl">Next mission</span>
+          <div class="hero__mission"><b id="homeSector">07-B</b><span id="homeSectorMeta">FOUNDRY ROW · 3 WAVES · BOSS</span></div>
+          <button class="btn-act btn-act--go btn-act--full" data-go="squad"><span class="btn-act__k">Deploy</span><span class="btn-act__v">Chọn đội hình → chọn sector → chiến đấu</span></button>
+        </div>
+      </div>
+      <div class="menu">
+        <button class="menu__btn" data-go="squad"><b>SQUAD</b><small>5 SLOT</small></button>
+        <button class="menu__btn" data-go="sector"><b>SECTOR</b><small>PVE</small></button>
+        <button class="menu__btn" disabled><b>GACHA</b><small>SOON</small></button>
+        <button class="menu__btn" disabled><b>SETTINGS</b><small>SOON</small></button>
+      </div>
+    </div>
+
+    <!-- ===== SCREEN: SQUAD ===== -->
+    <div class="screen squad" data-screen="squad">
+      <div class="sh"><span class="sh__title">Squad</span><span class="sh__sub" id="squadCount"></span><button class="btn-ghost" data-go="home">◂ BASE</button></div>
+      <div class="team" id="squadSlots"></div>
+      <div class="roster" id="squadRoster"></div>
+      <button class="btn-act btn-act--go btn-act--full" id="btnDeploy" data-go="sector"><span class="btn-act__k">Confirm squad</span><span class="btn-act__v">Chọn đủ 5 nhân vật</span></button>
+    </div>
+
+    <!-- ===== SCREEN: SECTOR SELECT ===== -->
+    <div class="screen sector" data-screen="sector">
+      <div class="sh"><span class="sh__title">Sector</span><span class="sh__sub">DISTRICT 07 · PVE</span><button class="btn-ghost" data-go="home">◂ BASE</button></div>
+      <div class="slist" id="sectorList"></div>
+      <button class="btn-act btn-act--go btn-act--full" id="btnEnter" data-go="battle"><span class="btn-act__k">Enter sector</span><span class="btn-act__v" id="enterMeta">—</span></button>
+    </div>
+
+    <!-- ===== SCREEN: BATTLE ===== -->
+  <div class="arena screen" data-screen="battle">
     <header class="hud">
       <div class="hud__row">
         <div><span class="lbl">Sector</span><span class="mono" id="sectorNo">07-B</span></div>
         <div><span class="lbl">Round</span><span class="mono" id="roundNo">01</span></div>
         <div><span class="lbl">Wave</span><span class="mono" id="waveNo">1/3</span></div>
         <button class="btn-ghost hud__reset" id="btnReset">RESET</button>
+        <button class="btn-ghost" data-go="home" title="Rút lui về căn cứ">◂ BASE</button>
       </div>
       <div class="turn" id="turnbar" style="margin-top:14px"></div>
       <div class="ticker" id="ticker">Khởi tạo…</div>
@@ -606,7 +769,7 @@ a{color:inherit;text-decoration:none}
 
       <div class="stageflash" id="stageflash"></div>
       <div class="ultbanner" id="ultBanner"><div class="ultbanner__n" id="ubName">ZERO</div><div class="ultbanner__line"></div><div class="ultbanner__s" id="ubSub"></div></div>
-      <div class="result" id="result" hidden><div class="result__box"><div class="result__t" id="resT"></div><div class="result__s" id="resS"></div><button class="btn-ghost" id="btnAgain">RESTART</button></div></div>
+      <div class="result" id="result" hidden><div class="result__box"><div class="result__t" id="resT"></div><div class="result__s" id="resS"></div><button class="btn-ghost" id="btnAgain">RETRY</button> <button class="btn-ghost" data-go="home">RETURN TO BASE</button></div></div>
     </div>
 
     <div class="actions">
@@ -619,6 +782,7 @@ a{color:inherit;text-decoration:none}
     </div>
     <div id="fx" style="position:absolute;inset:0;pointer-events:none;z-index:35"></div>
   </div>
+  </div><!-- /screens -->
 
   <aside class="side">
     <div class="side__block"><span class="lbl">Ultimate · đang tới lượt</span><div class="ultinfo" id="ultInfo">—</div></div>
@@ -794,7 +958,7 @@ const mkChar = (id,name,faction,tier,atk,hp,energyMax,ult) => ({ id,name,faction
   mkChar('gravedigger','GRAVEDIGGER','rust','B',90,1500,125,{name:'LAST RITES',cost:125,kind:'nuke',mult:3.0,desc:'300% ATK lên một mục tiêu. (★ FAKE)'}),
 ].forEach(c=>ROSTER[c.id]=c);
 
-const TEAM = ['kira','psalm','ronin','ash','muzzle'];            // đội hình demo (5 trong 19)
+let TEAM = ['kira','psalm','ronin','ash','muzzle'];              // đội hình mặc định (5 trong 19), màn SQUAD sửa được
 
 /* ---- ★ FAKE: bể kẻ địch PvE (20). rank: grunt / elite / boss quyết định wave nào gọi và độ to trên sân ---- */
 const ENEMY_POOL = [
@@ -819,12 +983,20 @@ const ENEMY_POOL = [
   { id:'motherrust', name:'MOTHER RUST',    faction:'rust',   rank:'boss',  atk:140, hp:3000 },
   { id:'archon',     name:'ARCHON',         faction:'chrome', rank:'boss',  atk:150, hp:2800 },
 ];
-/* ---- ★ FAKE: sector PvE = 3 wave. Wave 1: 3 grunt · Wave 2: 2 grunt + 1 elite · Wave 3: grunt + elite + BOSS ---- */
-const SECTOR = { id:'07-B', waves:3 };
+/* ---- ★ FAKE: danh sách sector PvE. Wave 1: grunt · wave giữa: grunt + elite · wave cuối: grunt + elite + BOSS.
+   bg: ảnh nền sân đấu (xem docs/bg-prompts.md), thiếu thì dùng gradient mặc định ---- */
+const SECTORS = [
+  { id:'07-A', name:'SCRAPYARD GATE', waves:2, state:'cleared', rec:80,  bg:['bg_07a.png','bg_battle.png'] },
+  { id:'07-B', name:'FOUNDRY ROW',    waves:3, state:'open',    rec:110, bg:['bg_07b.png','bg_battle.png'] },
+  { id:'07-C', name:'CORP PERIMETER', waves:3, state:'locked',  rec:140, bg:['bg_07c.png','bg_battle.png'], boss:'archon' },
+];
+let SECTOR = SECTORS[1];
 const shuffle = a => a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(p=>p[1]);
 function rollWave(n){
   const pick=(rank,k)=>shuffle(ENEMY_POOL.filter(e=>e.rank===rank)).slice(0,k);
-  let w = n===1 ? pick('grunt',3) : n===2 ? [...pick('grunt',2),...pick('elite',1)] : [...pick('grunt',1),...pick('elite',1),...pick('boss',1)];
+  const last = n>=SECTOR.waves;
+  let w = n===1 ? pick('grunt',3) : !last ? [...pick('grunt',2),...pick('elite',1)]
+        : [...pick('grunt',1),...pick('elite',1), SECTOR.boss ? ENEMY_POOL.find(e=>e.id===SECTOR.boss) : pick('boss',1)[0]];
   const boss=w.find(e=>e.rank==='boss'); if(boss){ const r=w.filter(e=>e!==boss); w=[r[0],boss,r[1]]; }   // boss đứng giữa
   return w;
 }
@@ -888,7 +1060,7 @@ function setEnergyBar(ebar, v, max){
    ===================================================================== */
 const B = { units:[], queue:[], idx:0, round:0, target:null, busy:false, over:false, frames:{}, actorId:null };
 const UI = {
-  allies:$('#allies'), enemies:$('#enemies'), turnbar:$('#turnbar'), ticker:$('#ticker'), fx:$('#fx'), log:$('#log'),
+  stage:$('#stage'), allies:$('#allies'), enemies:$('#enemies'), turnbar:$('#turnbar'), ticker:$('#ticker'), fx:$('#fx'), log:$('#log'),
   btnAttack:$('#btnAttack'), btnUlt:$('#btnUlt'), ultName:$('#ultName'), ultMeta:$('#ultMeta'), ultBar:$('#ultBarFill'), ultInfo:$('#ultInfo'),
   banner:$('#ultBanner'), ubName:$('#ubName'), ubSub:$('#ubSub'), stageflash:$('#stageflash'), result:$('#result'), roundNo:$('#roundNo'), waveNo:$('#waveNo'), sectorNo:$('#sectorNo'),
 };
@@ -904,6 +1076,8 @@ function initBattle(){
   B.round=0; B.idx=0; B.target=null; B.busy=false; B.over=false; B.wave=0;
   UI.log.innerHTML=''; UI.result.hidden=true; UI.fx.innerHTML=''; turnTiles.clear();
   UI.sectorNo.textContent=SECTOR.id;
+  UI.stage.classList.remove('has-bg'); UI.stage.style.removeProperty('--bgimg');
+  loadFirst(SECTOR.bg).then(src=>{ if(src){ UI.stage.style.setProperty('--bgimg',`url("${src}")`); UI.stage.classList.add('has-bg'); } });
   renderSide('ally'); preloadFrames();
   spawnWave(); newRound();
 }
@@ -1094,13 +1268,13 @@ function endTurn(){
   B.idx++;
   setTimeout(()=> B.idx>=B.queue.length ? newRound() : startTurn(), 0);
 }
-function finish(win){
+let finish = function(win){
   B.over=true; setInputs(false);
   UI.result.hidden=false; UI.result.className='result '+(win?'win':'lose');
   $('#resT').textContent = win?'SECTOR CLEARED':'SQUAD LOST';
   $('#resS').textContent = win?`${SECTOR.waves} wave · round ${B.round} · ${alive('ally').length}/5 sống sót`:`Wave ${B.wave}/${SECTOR.waves} · round ${B.round} · toàn đội KIA`;
   log(win?'Thắng.':'Thua.', true);
-}
+};
 
 async function playerAttack(){
   if(B.busy||B.over) return; const u=current(); const t=ensureTarget(); if(!t) return;
@@ -1156,7 +1330,88 @@ UI.btnAttack.addEventListener('click', playerAttack);
 UI.btnUlt.addEventListener('click', playerUlt);
 $('#btnReset').addEventListener('click', initBattle);
 $('#btnAgain').addEventListener('click', initBattle);
-initBattle();
+
+/* =====================================================================
+   SCREEN ROUTER — title → home → squad → sector → battle
+   ===================================================================== */
+const APP=$('#battle');
+function go(name){
+  if(name==='battle'){ if(TEAM.length!==5) return go('squad'); }
+  APP.dataset.screen=name;
+  document.querySelectorAll('.screen').forEach(sc=>sc.classList.toggle('is-active', sc.dataset.screen===name));
+  if(name==='battle') initBattle();
+  if(name==='squad') renderSquad();
+  if(name==='sector') renderSectors();
+  if(name==='home') renderHome();
+  if(scrollY<300) window.scrollTo({top:0});
+}
+document.addEventListener('click', e=>{
+  const b=e.target.closest('[data-go]'); if(!b || b.disabled) return;
+  go(b.dataset.go);
+});
+document.addEventListener('keydown', e=>{ if(APP.dataset.screen==='title' && (e.key==='Enter'||e.key===' ')) go('home'); });
+
+/* ---- TITLE: key art (title_keyart.png → fallback ảnh Kira trong suốt) ---- */
+loadFirst(['title_keyart.png','KIRA/Kira PNG.png']).then(src=>{ if(src){ const im=$('#titleArt'); im.src=src; im.classList.add('has-img'); } });
+
+/* ---- HOME ---- */
+function renderHome(){
+  if(!$('#homeAvatar').firstChild) $('#homeAvatar').appendChild(portraitEl(ROSTER.kira));
+  if(!$('#heroArt').classList.contains('mounted')){ const p=portraitEl(ROSTER.kira); $('#heroArt').replaceWith(p); p.id='heroArt'; p.classList.add('mounted'); }
+  const sec = SECTORS.find(x=>x.state==='open') || SECTOR;
+  $('#homeSector').textContent=sec.id; $('#homeSectorMeta').textContent=`${sec.name} · ${sec.waves} WAVES · BOSS`;
+}
+
+/* ---- SQUAD: 5 slot + roster 19, bấm thẻ để thêm/bỏ, kéo thả cũng được ---- */
+const SQUAD = { slots:[...TEAM] };
+function renderSquad(){
+  const slots=$('#squadSlots'), roster=$('#squadRoster');
+  slots.innerHTML='';
+  SQUAD.slots.forEach((id,i)=>{
+    const t=el('div','tslot'); t.dataset.idx=i;
+    t.innerHTML=`<span class="tslot__idx">${String(i+1).padStart(2,'0')}</span><div class="tslot__empty"></div>`;
+    if(id){ const d=ROSTER[id]; t.classList.add('is-filled','f-'+d.faction); t.appendChild(portraitEl(d)); t.insertAdjacentHTML('beforeend',`<div class="tslot__name">${d.name}</div>`);
+      t.addEventListener('click',()=>{ SQUAD.slots[i]=null; renderSquad(); }); }
+    t.addEventListener('dragover',ev=>{ ev.preventDefault(); slots.querySelectorAll('.is-over').forEach(x=>x.classList.remove('is-over')); t.classList.add('is-over'); });
+    t.addEventListener('dragleave',()=>t.classList.remove('is-over'));
+    t.addEventListener('drop',ev=>{ ev.preventDefault(); const id=ev.dataTransfer.getData('text/plain'); if(!ROSTER[id]) return; const j=SQUAD.slots.indexOf(id); if(j>-1) SQUAD.slots[j]=null; SQUAD.slots[i]=id; renderSquad(); });
+    slots.appendChild(t);
+  });
+  if(!roster.dataset.built){
+    roster.dataset.built='1';
+    Object.values(ROSTER).forEach(d=>{
+      const c=cardEl(d,''); c.dataset.id=d.id;
+      c.addEventListener('click',()=>{ const j=SQUAD.slots.indexOf(d.id); if(j>-1) SQUAD.slots[j]=null; else { const k=SQUAD.slots.indexOf(null); if(k<0) return; SQUAD.slots[k]=d.id; } renderSquad(); });
+      roster.appendChild(c);
+    });
+  }
+  roster.querySelectorAll('.card').forEach(c=>{ const on=SQUAD.slots.includes(c.dataset.id); c.classList.toggle('is-selected',on); c.querySelector('.card__state').textContent=on?'SELECTED':''; });
+  const n=SQUAD.slots.filter(Boolean).length;
+  $('#squadCount').innerHTML=`<b>${n}</b>/5 DEPLOYED`;
+  const btn=$('#btnDeploy'); btn.disabled = n!==5; btn.querySelector('.btn-act__v').textContent = n===5 ? 'Tiếp → chọn sector' : `Chọn thêm ${5-n} nhân vật`;
+  if(n===5) TEAM=SQUAD.slots.slice();
+}
+
+/* ---- SECTOR SELECT ---- */
+function renderSectors(){
+  const list=$('#sectorList'); list.innerHTML='';
+  SECTORS.forEach(sec=>{
+    const r=el('button',`srow is-${sec.state} ${sec===SECTOR?'is-selected':''}`);
+    r.innerHTML=`<span class="srow__id">${sec.id}</span>
+      <span><div class="srow__name">${sec.name}</div><div class="srow__meta">${sec.waves} WAVES · REC ATK ${sec.rec}+ · ${sec.boss?ENEMY_POOL.find(e=>e.id===sec.boss).name:'BOSS ???'}</div>
+      <div class="srow__waves">${Array.from({length:sec.waves},(_,i)=>`<i class="${i===sec.waves-1?'boss':''} ${sec.state==='cleared'?'done':''}"></i>`).join('')}</div></span>
+      <span class="srow__state">${sec.state.toUpperCase()}</span>`;
+    if(sec.state==='locked') r.disabled=true;
+    else r.addEventListener('click',()=>{ SECTOR=sec; renderSectors(); });
+    list.appendChild(r);
+  });
+  $('#enterMeta').textContent=`${SECTOR.id} · ${SECTOR.name} · ${SECTOR.waves} WAVES`;
+}
+/* Thắng sector → đánh dấu cleared, mở sector kế */
+const _finish=finish;
+finish=function(win){ _finish(win); if(win){ SECTOR.state='cleared'; const i=SECTORS.indexOf(SECTOR); if(SECTORS[i+1]&&SECTORS[i+1].state==='locked') SECTORS[i+1].state='open'; } };
+
+go('title');
 
 /* =====================================================================
    KIT DEMOS
