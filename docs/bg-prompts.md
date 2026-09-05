@@ -15,6 +15,21 @@ dọc theo mặt sàn từ 2% đến ~95% chiều cao sân. Vì vậy ảnh nề
 Tên file HTML sẽ tự tìm: `bg_07a.png`, `bg_07b.png`, `bg_07c.png`, fallback `bg_battle.png`.
 Thiếu file thì sân dùng gradient + lưới CSS mặc định.
 
+## Cách sân đấu đặt ảnh (để không bị "nhân vật lơ lửng" hoặc "quá nhỏ")
+
+- Ảnh **neo mép dưới** sân và phóng theo chiều cao bằng `bgZoom` trong `SECTORS` (JS).
+  `bgZoom: 1.3` nghĩa là ảnh cao bằng 130% sân, phần trên ảnh (trời/trần) bị cắt bớt,
+  hai mép trái/phải bị cắt khoảng 15–25% tuỳ màn hình.
+- Vì sao cần zoom: đội hình 2 hàng đặt chân nhân vật từ đáy sân lên tới ~43% từ trên xuống,
+  nên đường chân trời trong ảnh phải nằm **cao hơn 43%**. Công thức vị trí chân trời trên sân:
+  `y = horizon × zoom − (zoom − 1)` (tính theo phần chiều cao sân, từ trên xuống).
+  Ví dụ 07-B chân trời ở 52% ảnh, zoom 1.32 → 0.52×1.32 − 0.32 = 0.37 → 37% sân. Đạt.
+- Kích thước nhân vật = 23% chiều cao sân (`--uw` trong CSS). Muốn nhân vật to hơn thì tăng
+  `--uw` và giảm `y` của hàng sau trong `FORMATION`; muốn ảnh ít bị phóng thì giảm `bgZoom`
+  và kéo hàng sau xuống thấp hơn. Hai tham số này kéo nhau, chỉnh một thì kiểm tra cái kia.
+- Khi vẽ ảnh: chân trời ở 45–55% là đẹp nhất; 25% đáy ảnh sẽ là chỗ hàng trước đứng nên
+  giữ tối, ít chi tiết.
+
 ---
 
 ## Prompt chung (dán trước mỗi prompt riêng)

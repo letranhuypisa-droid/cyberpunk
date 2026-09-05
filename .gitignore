@@ -5,3 +5,4 @@ UI/
 Thumbs.db
 desktop.ini
 *.tmp
+_test_*
