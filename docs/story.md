@@ -9,7 +9,7 @@
 
 **HALCYON SPIRE** là một megacity dựng thẳng đứng. Càng lên cao càng sạch, càng xuống thấp càng rỉ.
 
-- **SPIRE (trên)** — lãnh địa của tập đoàn **CANTICLE**. Canticle sản xuất android chiến đấu gọi là **CHOIR**
+- **SPIRE (trên)** — lãnh địa của tập đoàn **CANTICLE**, dân đáy chỉ gọi là **The Corp**. The Corp sản xuất android chiến đấu gọi là **CHOIR**
   ("dàn đồng ca"). Mỗi unit Choir đeo một **HALO**: vòng điều khiển trên đầu, vừa là dây xích vừa là ký ức.
   Halo còn sáng thì unit còn "hát đúng điệu". Halo tắt hoặc gãy: unit bị coi là *hát lạc điệu* và bị thu hồi.
   Phe này trong game là **CHROME**: tím #7C4DFF, trắng lạnh, đường nét chuẩn xác.
@@ -19,10 +19,14 @@
 - **CHROMEFALL** là từ lóng ở Sump: *một thứ chrome rơi xuống đáy.* Đến cuối chương 1, nó mang nghĩa thứ hai.
 
 **Nhân vật chính là người chơi: OPERATOR-77.** Một handler ở Sump điều khiển tổ salvage qua một *command deck*
-nhặt được từ xác một Enforcer của Canticle. Deck cho phép người không có Halo ra lệnh cho những kẻ có Halo — vì vậy
+nhặt được từ xác một Enforcer của The Corp. Deck cho phép người không có Halo ra lệnh cho những kẻ có Halo — vì vậy
 người chơi ra lệnh cho cả đội theo lượt, mọi nhân vật đều xưng hô với "Operator", và mỗi màn PvE là một "job".
 Kira không phải nhân vật chính: cô là **phần thưởng sau tutorial (07-A)**, còn Psalm gia nhập sau 07-C.
 Hồ sơ đầy đủ của từng nhân vật (đọc ở màn ARCHIVE sau khi sở hữu) nằm trong `docs/characters.md`.
+
+**Giọng văn** (áp cho hồ sơ, lời thoại, COMMS): giọng kể phim hành động. Mở bằng một cảnh đang diễn ra, kể xong cảnh mới
+quay lại giải thích, tự hỏi tự trả lời khi cần nhấn, có địa danh và truyền thuyết đường phố, động cơ nói thẳng.
+Tên gọi theo dân đáy: **The Corp** (tên chính thức Canticle chỉ nhắc khi cần), **Free Zone** (tầng âm bảy), **quận SIS**.
 
 ### Ba chỉ số, ba luật
 
@@ -36,13 +40,13 @@ Hồ sơ đầy đủ của từng nhân vật (đọc ở màn ARCHIVE sau khi 
 
 ### Hai nhân vật trung tâm (Chrome, hạng S)
 
-**KIRA** — "Tài sản 07". Kiếm sĩ Choir, sản phẩm hoàn hảo nhất Canticle từng xuất xưởng. Rơi xuống Sump với
+**KIRA** — "Tài sản 07". Kiếm sĩ Choir, sản phẩm hoàn hảo nhất The Corp từng xuất xưởng. Rơi xuống Sump với
 Halo gãy, ký ức bị khoá. Không nhớ mình là ai, chỉ nhớ *cách chém*. Cả chương 1 là hành trình mở lại Halo và
 nhớ ra cái ngày cô bị thả rơi. Chiêu **ZERO**: 320% ATK một mục tiêu, giết được thì hoàn 50 Energy — Kira
 càng giết càng sắc.
 
-**PSALM** — "Confessor". Unit cao cấp có vai máy lộ lõi đỏ. Là người giám sát Kira ở Spire. Khi Canticle ra
-lệnh xoá Kira, Psalm **tự cắt Halo của mình** (mã lỗi Canticle ghi nhận: *APOSTASY* — bội giáo) và đưa Kira
+**PSALM** — "Confessor". Unit cao cấp có vai máy lộ lõi đỏ. Là người giám sát Kira ở Spire. Khi The Corp ra
+lệnh xoá Kira, Psalm **tự cắt Halo của mình** (mã lỗi The Corp ghi nhận: *APOSTASY* — bội giáo) và đưa Kira
 rơi cùng. Halo của Psalm giờ đỏ. Chiêu **APOSTASY**: chiếm quyền điều khiển một kẻ địch một lượt — bà biết
 rõ Choir bị điều khiển thế nào.
 
@@ -60,13 +64,13 @@ Kira và Psalm là **thưởng cốt truyện**, không lên banner gacha. Banne
 | ID | Tên | Phe | Tier | Vai trò gợi ý | Ghi chú cốt truyện |
 |---|---|---|---|---|---|
 | vesper | VESPER | Chrome | S | AOE | Choir "kinh chiều", đơn vị săn Kira ở chương 2 |
-| nyx | NYX | Chrome | S | Nuke | Unit thử nghiệm không Halo, Canticle giấu |
+| nyx | NYX | Chrome | S | Nuke | Unit thử nghiệm không Halo, The Corp giấu |
 | halo | HALO | Chrome | A | Heal | Unit y tế của Choir, đào ngũ theo Psalm |
-| cipher | CIPHER | Chrome | A | Control | Hacker của Canticle, hai mang |
+| cipher | CIPHER | Chrome | A | Control | Hacker của The Corp, hai mang |
 | meridian | MERIDIAN | Chrome | B | Heal/Tank | Unit hậu cần hết hạn sử dụng |
 | echo | ECHO | Chrome | A | Nuke | Bản sao giọng Kira, dùng để dụ cô |
-| wire | WIRE | Chrome | B | Nuke | Kỹ thuật viên Canticle bỏ trốn xuống Sump |
-| toll | TOLL | Rust | S | Nuke | "Người thu nợ" — đòi Canticle món nợ cũ |
+| wire | WIRE | Chrome | B | Nuke | Kỹ thuật viên The Corp bỏ trốn xuống Free Zone |
+| toll | TOLL | Rust | S | Nuke | "Người thu nợ" — đòi The Corp món nợ cũ |
 | stitch | STITCH | Rust | S | Heal | Bác sĩ chợ đen, vá cả người lẫn máy |
 | spark | SPARK | Rust | A | AOE | Thợ điện, ăn cắp điện Spire |
 | vixen | VIXEN | Rust | A | Control | Trộm, chuyên "mượn" Choir |
@@ -77,7 +81,7 @@ Kira và Psalm là **thưởng cốt truyện**, không lên banner gacha. Banne
 ### Phe địch
 
 - **Băng Foreman** (Rust) — chiếm Foundry Row. Boss **THE FOREMAN**.
-- **Canticle / Choir** (Chrome) — drone, Enforcer, Chrome Hound. Boss **ARCHON** (AI cổng), **CANTOR** (Choir-master).
+- **The Corp / Choir** (Chrome) — drone, Enforcer, Chrome Hound. Boss **ARCHON** (AI cổng), **CANTOR** (Choir-master).
 - **Giáo phái Mother Rust** (Rust) — thờ chrome rơi, muốn "thánh hoá" Kira bằng cách tháo rời. Boss **MOTHER RUST**.
 
 ---
@@ -141,7 +145,7 @@ có `bg_04a..e` (prompt ở `docs/bg-prompts.md`).
 
 ## 5. Chương 3 · CHOIR (District 01 · The Canticle) — ĐÃ CÀI
 
-Đỉnh Spire. Canticle không phải một công ty, mà là một *bản nhạc* chạy trên mọi Halo. Nhịp chương:
+Đỉnh Spire. The Corp không phải một công ty, mà là một *bản nhạc* chạy trên mọi Halo. Nhịp chương:
 **gác đồng ca → đại phong cầm → lò Halo → hầm giấu Nyx → bản gốc.** Cantor Ascendant đã hỏi "tại sao chúng nghe
 ngươi"; The Canticle hỏi lại câu đó và bắt Operator trả lời bằng một lựa chọn.
 

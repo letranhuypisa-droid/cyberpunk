@@ -489,50 +489,50 @@ const LORE = {
 /* ---- BONDS: hội thoại ngoài trận, hiện ở Lobby khi cả hai nhân vật đã trong tổ ---- */
 const BONDS = [
   { pair:['ash','muzzle'], title:'Sẹo', lines:[
-    { who:'muzzle', text:'Ash. Tay cô. Lần đó là tôi làm cô bỏng, đúng không.' },
-    { who:'ash',    text:'Không. Là mìn của tôi. Anh chỉ đứng sai chỗ. Như mọi khi.' },
-    { who:'muzzle', text:'Đứng sai chỗ là việc của tôi. Cô châm mìn, tôi đứng giữa. Bà Ba đồng ý.' },
-    { who:'ash',    text:'…Đừng đặt tên khiên theo tên tôi. Tôi sẽ nổ nó.' } ]},
-  { pair:['kai','gravedigger'], title:'Hố quá nhanh', lines:[
-    { who:'kai',    text:'Ông đào hố cho tôi lúc tôi còn thở. Tôi nhớ đấy.' },
-    { who:'gravedigger', text:'Ta đào nhanh quá. Ta xin lỗi. Ta có khắc tên cậu rồi. K-A-I. Đúng chính tả.' },
-    { who:'kai',    text:'…Ông giữ tấm đó đi. Để sau này khỏi phải khắc lại.' },
-    { who:'gravedigger', text:'Ta giữ. Nhưng ta hy vọng nó rỉ trước khi cần.' } ]},
+    { who:'muzzle', text:'Ash. Tay cô. Hôm đó là tại tôi, đúng không? Tôi đứng sai chỗ.' },
+    { who:'ash',    text:'Không. Mìn của tôi, tay của tôi. Anh chỉ to xác quá nên khó kéo thôi.' },
+    { who:'muzzle', text:'Lần sau cô châm mìn, tôi vẫn đứng giữa. Bà Ba đồng ý rồi.' },
+    { who:'ash',    text:'Anh mà đặt tên khiên theo tên tôi, tôi nổ nó ngay tại chỗ.' } ]},
+  { pair:['kai','gravedigger'], title:'Hố đào nhanh quá', lines:[
+    { who:'kai',    text:'Ông đào hố cho tôi lúc tôi còn thở. Tôi nhớ đấy nhé.' },
+    { who:'gravedigger', text:'Ta đào nhanh quá. Ta xin lỗi. Tấm thép ta vẫn giữ. K, A, I. Đúng chính tả.' },
+    { who:'kai',    text:'…Giữ đi. Sau này đỡ phải khắc lại.' },
+    { who:'gravedigger', text:'Ta giữ. Nhưng ta mong nó rỉ trước khi phải dùng.' } ]},
   { pair:['junker','stitch'], title:'Xe vẫn chạy', lines:[
-    { who:'stitch', text:'Junker. Khớp hàn bên trái kêu. Lại đây tôi xem.' },
+    { who:'stitch', text:'Junker. Khớp hàn bên trái kêu cót két. Lại đây tôi xem.' },
     { who:'junker', text:'Xe vẫn chạy.' },
-    { who:'stitch', text:'Xe vẫn chạy vì tôi hàn nó, đồ to xác. Ngồi xuống. Kể tôi nghe chuyện gì đó, tôi lấy công bằng chuyện.' },
-    { who:'junker', text:'…Hôm nay chở được Muzzle. Nặng. Hết.' } ]},
-  { pair:['meridian','muzzle'], title:'Thoả thuận', lines:[
-    { who:'meridian', text:'Còn bốn trăm linh ba giờ, con. Nếu mẹ tắt trước, con đặt tên khiên kế là gì?' },
-    { who:'muzzle', text:'"Mẹ Bốn". Không bàn cãi.' },
-    { who:'meridian', text:'Mẹ Bốn. Nghe vững. Được. Còn nếu con ngã trước—' },
-    { who:'muzzle', text:'Thì mẹ đứng chỗ tôi. Mẹ to hơn tôi mà. Che được cả Ash.' } ]},
+    { who:'stitch', text:'Chạy là nhờ tôi hàn, đồ to xác. Ngồi xuống. Kể tôi nghe chuyện gì đó, coi như trả công.' },
+    { who:'junker', text:'…Hôm nay chở Muzzle. Nặng. Hết.' } ]},
+  { pair:['meridian','muzzle'], title:'Giao kèo', lines:[
+    { who:'meridian', text:'Còn bốn trăm linh ba giờ, con ạ. Nếu mẹ tắt trước, con đặt tên khiên kế là gì?' },
+    { who:'muzzle', text:'"Mẹ Bốn". Không bàn.' },
+    { who:'meridian', text:'Mẹ Bốn. Nghe chắc. Được. Còn nếu con ngã trước?' },
+    { who:'muzzle', text:'Thì mẹ đứng vào chỗ tôi. Mẹ to hơn tôi, che được cả Ash.' } ]},
   { pair:['cipher','psalm'], title:'Lỗ hổng', lines:[
-    { who:'psalm',  text:'Cipher. Mã APOSTASY. Có một lỗ hổng. Ai đó cố tình để lại.' },
-    { who:'cipher', text:'Ai mà biết. Firmware Canticle nhiều tay viết lắm. Bà uống cà phê không?' },
+    { who:'psalm',  text:'Cipher. Mã APOSTASY có một lỗ hổng ba giây. Ai đó cố tình để lại.' },
+    { who:'cipher', text:'Ai mà biết. Phần mềm của The Corp cả trăm người viết. Bà uống cà phê không?' },
     { who:'psalm',  text:'…Cảm ơn.' },
     { who:'cipher', text:'Tôi nói tôi không biết mà. Đừng cảm ơn. Uống cà phê đi.' } ]},
   { pair:['kira','echo'], title:'Một câu', lines:[
     { who:'echo',   text:'Chị. Em tìm được rồi. Một câu chị chưa nói bao giờ.' },
-    { who:'kira',   text:'Nói đi.' },
+    { who:'kira',   text:'Nói đi. Hop, skip… đến jump là phải xong đấy.' },
     { who:'echo',   text:'"Em không muốn đếm nữa."' },
-    { who:'kira',   text:'…Ừ. Đó là câu của em. Giữ lấy.' } ]},
+    { who:'kira',   text:'…Ừ. Câu đó của em. Giữ lấy. Chị vẫn đếm hộ cả hai.' } ]},
   { pair:['kira','psalm'], title:'Đếm', lines:[
-    { who:'kira',   text:'Bà có đếm không?' },
+    { who:'kira',   text:'Bà có đếm không? Hồi đó ấy.' },
     { who:'psalm',  text:'Ba trăm mười ba. Cô là số cuối.' },
-    { who:'kira',   text:'Tôi đếm bước. Bà đếm người. Vậy bà mệt hơn tôi.' },
-    { who:'psalm',  text:'…Lần đầu có người nói thế. Đi ngủ đi, Kira. Operator cần cô sáng mai.' } ]},
+    { who:'kira',   text:'Tôi đếm bước. Bà đếm người. Vậy bà mệt hơn tôi nhiều.' },
+    { who:'psalm',  text:'…Lần đầu có người nói thế. Đi ngủ đi, Kira. Sáng mai Operator cần cô tỉnh táo. Hoặc điên. Tuỳ trận.' } ]},
   { pair:['wire','halo'], title:'Ốc vít', lines:[
-    { who:'wire',   text:'Halo. Tôi… tôi lắp cái vòng trên đầu cô. Tôi nhớ số lô.' },
-    { who:'halo',   text:'Tôi biết. Tôi cảm thấy tay cô run khi vặn ốc cuối. Cô đã run từ hồi đó.' },
-    { who:'wire',   text:'…Cô có đau không? Lúc đó?' },
-    { who:'halo',   text:'Có. Nhưng cô là người duy nhất hỏi. Cầm lấy hộp ốc vít, ta còn việc.' } ]},
+    { who:'wire',   text:'Halo. Tôi… cái vòng trên đầu cô là tôi lắp. Tôi nhớ cả số lô.' },
+    { who:'halo',   text:'Tôi biết. Tôi cảm thấy tay cô run lúc vặn con ốc cuối. Cô run từ hồi đó rồi.' },
+    { who:'wire',   text:'…Lúc đó cô có đau không?' },
+    { who:'halo',   text:'Có. Nhưng cô là người duy nhất hỏi. Cầm hộp ốc lên, ta còn việc.' } ]},
   { pair:['nyx','ronin'], title:'Nghĩa đen', lines:[
-    { who:'ronin',  text:'Nyx. "Giữ vị trí" nghĩa là đứng yên chỗ cô đang đứng. Không ôm cột.' },
+    { who:'ronin',  text:'Nyx. "Giữ vị trí" nghĩa là đứng yên chỗ cô đang đứng. Không phải ôm cột.' },
     { who:'nyx',    text:'Cái cột không phản đối. Ronin, anh không có Halo. Anh chọn cảm thấy gì?' },
     { who:'ronin',  text:'…Hôm nay chọn mệt. Mai chọn lại.' },
-    { who:'nyx',    text:'Được chọn lại. Tôi thích quy tắc đó. Tôi sẽ ôm cột ít hơn.' } ]},
+    { who:'nyx',    text:'Được chọn lại. Tôi thích luật đó. Tôi sẽ ôm cột ít hơn.' } ]},
 ];
 function availableBonds(){ return BONDS.filter(b=>b.pair.every(owns)); }
 
