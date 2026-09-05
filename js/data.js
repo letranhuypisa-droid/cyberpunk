@@ -14,6 +14,8 @@ const ROSTER = {
            // attack canvas rộng hơn để không cắt kiếm/vệt chém, HTML tự căn theo ax.
            sprites:{ idle:['kira_idle.png','KIRA/Kira PNG.png'], attack:['kira_attack.png'], hurt:['kira_hurt.png'],
                      box:{ idle:{w:744,h:682,ax:372}, attack:{w:1173,h:682,ax:466}, hurt:{w:924,h:682,ax:641} } },
+           // kira_portrait.png = bán thân cắt từ KIRA.png (ô 210,90 → 1170,1790 = 960×1700, đúng tỉ lệ 1536:2720
+           // của các art thẻ khác): art gốc toàn thân nên trong thẻ/tile mặt bị nhỏ hơn hẳn phần còn lại của roster.
            portrait:['kira_portrait.png','KIRA/Kira PNG.png'], pos:'50% 5%',
            ultVideo:['kira_ult.mp4','KIRA/Kira Ultimate.mp4'] },   // cut-in 5s khi phát chiêu cuối (H.264 1280×720)
   psalm: { id:'psalm', name:'PSALM', faction:'chrome', tier:'S', atk:110, hp:1100, energyMax:125,

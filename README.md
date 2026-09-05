@@ -34,6 +34,8 @@ Mọi số liệu cân bằng đánh dấu `★ FAKE` là bản nháp.
 
 - Sprite: `<id>_idle.png` (744×682), `<id>_attack.png`, `<id>_hurt.png` — tách nền bằng `scratch/key_frame.py` (xem docs).
 - Nền sector: `bg_<sector>.jpg` 1536×2048; thiếu thì dùng `bg_battle.jpg`.
+- Art thẻ: `<TÊN>.png` khung bán thân (đầu → ngang đùi/gối), 1536×2720. Ảnh gốc toàn thân thì cắt một bản bán thân
+  `<id>_portrait.png` cùng tỉ lệ và để trước trong `portrait:[...]` — Kira cắt từ `KIRA.png`.
 - Video ult: `<id>_ult.mp4` H.264.
 - Ảnh gốc độ phân giải cao để trong `art-src/` (không đưa lên repo).
 
