@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark light">
+<title>CHROMEFALL — UI Kit + Battle</title>
+<!--
+  ╔══════════════════════════════════════════════════════════════════════╗
+  ║ CHROMEFALL · UI KIT + BATTLE DEMO · một file, không phụ thuộc ngoài  ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║ ASSET — đặt cùng thư mục với file này (đường dẫn tương đối):         ║
+  ║   kira_idle.png / kira_attack.png      (744×682, PNG trong suốt)     ║
+  ║   psalm_idle.png / psalm_attack.png    (744×682, PNG trong suốt)     ║
+  ║   <id>_portrait.png                    (ảnh chân dung nhỏ, tuỳ chọn) ║
+  ║   Nếu thiếu, loader thử lần lượt các fallback trong ROSTER (JS),     ║
+  ║   cuối cùng hiện silhouette CSS — layout không vỡ.                    ║
+  ║                                                                      ║
+  ║ DỮ LIỆU GIẢ — tìm chuỗi  "★ FAKE"  trong file để thay bằng data thật ║
+  ║   • ROSTER: 4 nhân vật chưa có spec (ECHO/KAI/STITCH/WIRE), phe +     ║
+  ║     chỉ số + chiêu cuối của RONIN/ASH/MUZZLE (cost + hiệu ứng)        ║
+  ║   • ENEMY_POOL / SECTOR / rollWave: kẻ địch + wave PvE demo            ║
+  ║   • Công thức sát thương / tỉ lệ chí mạng (dealDamage)                ║
+  ║   • Thứ tự lượt đi (buildQueue) — chưa có chỉ số tốc độ nên xen kẽ    ║
+  ║   • Nhãn HUD: SECTOR / WAVE                                           ║
+  ╚══════════════════════════════════════════════════════════════════════╝
+-->
+<style>
+/* =====================================================================
+   A. DESIGN TOKENS
+   Mọi component đọc từ đây. Không hardcode màu ở dưới.
+   ===================================================================== */
+:root, .battle{
+  color-scheme: dark;
+
+  /* ---- Phe CHROME: tập đoàn — tím, trắng lạnh, xám xanh ---- */
+  --chrome:        #7C4DFF;
+  --chrome-hi:     #B7A4FF;
+  --chrome-lo:     #4B2FB0;
+  --chrome-white:  #DCE6F7;
+  --chrome-slate:  #5C6C8E;
+  --chrome-tint:   rgba(124,77,255,.16);
+
+  /* ---- Phe RUST: đáy xã hội — cam rỉ, vàng độc, xám bẩn ---- */
+  --rust:          #E2703A;
+  --rust-hi:       #F5A26E;
+  --rust-lo:       #88401D;
+  --rust-acid:     #C9D830;
+  --rust-grime:    #6E6357;
+  --rust-tint:     rgba(226,112,58,.16);
+
+  /* ---- Tier ---- */
+  --tier-s: #F0C55E;
+  --tier-a: #8CCFFF;
+  --tier-b: #9CA6B2;
+
+  /* ---- Nền & bề mặt ---- */
+  --bg-0:      #06070A;
+  --bg-1:      #0B0D12;
+  --surface-1: #10131A;
+  --surface-2: #161A23;
+  --surface-3: #1E2330;
+  --surface-4: #2A3040;
+
+  /* ---- Viền ---- */
+  --line-1: rgba(190,200,222,.12);
+  --line-2: rgba(190,200,222,.26);
+  --line-3: rgba(190,200,222,.55);
+
+  /* ---- Chữ ---- */
+  --text-1:   #EBEFF6;
+  --text-2:   #A5AEBF;
+  --text-3:   #68718A;
+  --text-inv: #0A0B10;
+
+  /* ---- Ngữ nghĩa ---- */
+  --hp:          #5DC286;
+  --hp-mid:      #D8B64B;
+  --hp-low:      #FF4B4B;   /* máu thấp */
+  --heal:        #72E7A9;   /* hồi máu */
+  --crit:        #FFB224;   /* chí mạng */
+  --energy:      #42C4EA;
+  --energy-full: #FFFFFF;   /* ĐẦY: trắng nóng, tín hiệu quan trọng nhất */
+  --danger:      #FF4B4B;
+  --flash:       #FFFFFF;
+
+  /* ---- Type scale ---- */
+  --font-ui:   "Segoe UI", Inter, "Helvetica Neue", Arial, system-ui, sans-serif;
+  --font-mono: "Cascadia Mono", "JetBrains Mono", "SF Mono", Consolas, "Roboto Mono", Menlo, monospace;
+  --fs-2xs: 10px; --fs-xs: 11px; --fs-sm: 12px; --fs-md: 14px;
+  --fs-lg: 16px;  --fs-xl: 20px; --fs-2xl: 26px; --fs-3xl: 34px;
+  --track: .14em;             /* giãn chữ cho nhãn kỹ thuật */
+
+  /* ---- Spacing scale ---- */
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px;
+  --s-5: 24px; --s-6: 32px; --s-7: 48px;
+
+  /* ---- Motion ---- */
+  --t-fast: 120ms;
+  --t-state: 220ms;
+  --ease-hit-out:  cubic-bezier(.16,.9,.3,1);   /* attack lao ra   */
+  --ease-hit-back: cubic-bezier(.3,0,.4,1);     /* attack thu về   */
+  --ease-sine:     cubic-bezier(.37,0,.63,1);   /* sin mượt (idle) */
+
+  /* ---- Hình học ---- */
+  --cut: 10px;
+  --poly-chrome: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
+  --poly-rust: polygon(0 0, 58% 0, 61% 5px, 100% 5px, 100% 64%, calc(100% - 6px) 67%, 100% 70%, 100% 100%, 34% 100%, 31% calc(100% - 4px), 0 calc(100% - 4px), 0 42%, 5px 39%, 0 36%);
+  --poly-slant: polygon(0 0, 100% 0, calc(100% - 5px) 100%, 0 100%);
+}
+
+/* Theme sáng — trang tài liệu/kit đổi nền; màn chiến đấu (.battle) vẫn giữ
+   tối vì nhân vật sáng cần nền tối (đã khai báo lại token ở selector .battle). */
+:root[data-theme="light"]{
+  color-scheme: light;
+  --chrome-white:#3E2B9E; --chrome-slate:#6F7EA3; --chrome-hi:#5B3BD6;
+  --rust-hi:#B85A28; --rust-acid:#8A9410;
+  --tier-s:#B8860B; --tier-a:#1E7FC2; --tier-b:#6B7580;
+  --bg-0:#E4E7ED; --bg-1:#ECEEF3; --surface-1:#F5F6F9; --surface-2:#FFFFFF; --surface-3:#E3E7EE; --surface-4:#CDD4DF;
+  --line-1:rgba(20,30,50,.12); --line-2:rgba(20,30,50,.26); --line-3:rgba(20,30,50,.55);
+  --text-1:#12151C; --text-2:#4A5468; --text-3:#7B8597; --text-inv:#FFFFFF;
+  --hp:#2E9E5B; --hp-mid:#A8841A; --heal:#1F9A5C; --crit:#B86A00; --energy:#0E8FB5; --energy-full:#12151C;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    color-scheme: light;
+    --chrome-white:#3E2B9E; --chrome-slate:#6F7EA3; --chrome-hi:#5B3BD6;
+    --rust-hi:#B85A28; --rust-acid:#8A9410;
+    --tier-s:#B8860B; --tier-a:#1E7FC2; --tier-b:#6B7580;
+    --bg-0:#E4E7ED; --bg-1:#ECEEF3; --surface-1:#F5F6F9; --surface-2:#FFFFFF; --surface-3:#E3E7EE; --surface-4:#CDD4DF;
+    --line-1:rgba(20,30,50,.12); --line-2:rgba(20,30,50,.26); --line-3:rgba(20,30,50,.55);
+    --text-1:#12151C; --text-2:#4A5468; --text-3:#7B8597; --text-inv:#FFFFFF;
+    --hp:#2E9E5B; --hp-mid:#A8841A; --heal:#1F9A5C; --crit:#B86A00; --energy:#0E8FB5; --energy-full:#12151C;
+  }
+}
+
+/* =====================================================================
+   RESET + BASE
+   ===================================================================== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{height:100%;scroll-behavior:smooth}
+body{min-height:100%;font-family:var(--font-ui);font-size:var(--fs-md);background:var(--bg-0);color:var(--text-1);-webkit-font-smoothing:antialiased;line-height:1.35}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:disabled{cursor:not-allowed}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+.lbl{font-size:var(--fs-2xs);letter-spacing:var(--track);text-transform:uppercase;color:var(--text-3)}
+.fake{display:inline-block;margin-left:6px;padding:1px 5px;border:1px solid var(--rust);color:var(--rust-hi);font:600 9px/1.4 var(--font-mono);letter-spacing:.12em;vertical-align:middle}
+
+/* ---- Khung chamfer dùng chung (viền 1px bằng 2 lớp clip-path) ---- */
+.fr{position:relative;--fr-line:var(--line-2);--fr-bg:var(--surface-1);--fr-poly:var(--poly-chrome)}
+.fr::before,.fr::after{content:"";position:absolute;pointer-events:none;clip-path:var(--fr-poly)}
+.fr::before{inset:0;background:var(--fr-line)}
+.fr::after{inset:1px;background:var(--fr-bg)}
+.fr>*{position:relative;z-index:1}
+
+/* =====================================================================
+   TOP NAV
+   ===================================================================== */
+.topnav{position:sticky;top:0;z-index:50;height:44px;display:flex;align-items:center;gap:var(--s-4);padding:0 var(--s-4);background:var(--bg-1);border-bottom:1px solid var(--line-1)}
+.brand{display:flex;align-items:center;gap:8px;font-weight:700;letter-spacing:.22em;font-size:var(--fs-sm)}
+.brand__mark{width:14px;height:14px;background:var(--chrome);clip-path:polygon(0 0,100% 0,100% 60%,60% 100%,0 100%)}
+.brand__sub{font:var(--fs-2xs) var(--font-mono);letter-spacing:.1em;color:var(--text-3);margin-left:4px}
+.topnav__links{display:flex;gap:var(--s-4);margin-left:auto}
+.topnav__links a{font-size:var(--fs-2xs);letter-spacing:var(--track);color:var(--text-2);padding:4px 0;border-bottom:1px solid transparent}
+.topnav__links a:hover{color:var(--text-1);border-color:var(--line-3)}
+.btn-ghost{height:26px;padding:0 10px;border:1px solid var(--line-2);font:var(--fs-2xs) var(--font-mono);letter-spacing:.1em;color:var(--text-2);white-space:nowrap}
+.btn-ghost:hover{color:var(--text-1);border-color:var(--line-3)}
+@media (max-width:640px){.brand__sub{display:none}.topnav{gap:var(--s-3);padding:0 var(--s-3)}.topnav__links{gap:var(--s-3)}.brand{letter-spacing:.16em}}
+
+/* =====================================================================
+   PORTRAIT + SILHOUETTE PLACEHOLDER (dùng khi ảnh không load)
+   ===================================================================== */
+.portrait{position:relative;overflow:hidden;background:var(--surface-3)}
+.portrait img{width:100%;height:100%;object-fit:cover;object-position:var(--pos,50% 10%);display:none}
+.portrait.has-img img{display:block}
+.portrait.has-img .sil{display:none}
+.sil{position:absolute;inset:0;--sil:var(--chrome);background:
+  repeating-linear-gradient(0deg,transparent 0 3px,rgba(0,0,0,.22) 3px 4px)}
+.sil--rust{--sil:var(--rust)}
+.sil::before{content:"";position:absolute;left:50%;top:7%;width:22%;aspect-ratio:1;transform:translateX(-50%);background:var(--sil);opacity:.5;
+  clip-path:polygon(30% 0,70% 0,100% 30%,100% 70%,70% 100%,30% 100%,0 70%,0 30%)}
+.sil::after{content:"";position:absolute;left:50%;top:29%;width:62%;height:71%;transform:translateX(-50%);background:var(--sil);opacity:.38;
+  clip-path:polygon(24% 0,76% 0,90% 8%,86% 38%,78% 42%,76% 100%,58% 100%,54% 55%,46% 55%,42% 100%,24% 100%,22% 42%,14% 38%,10% 8%)}
+.sil__lbl{position:absolute;left:50%;bottom:6%;transform:translateX(-50%);font:8px/1 var(--font-mono);letter-spacing:.14em;color:var(--text-3);white-space:nowrap}
+.sil--free{background:none}   /* silhouette đứng trên sân, không nền */
+.tu .sil__lbl,.slot .sil__lbl{display:none}
+
+/* =====================================================================
+   B1. CHARACTER CARD
+   ===================================================================== */
+.card{position:relative;width:150px;--fr-bg:var(--surface-1);--fr-line:var(--line-2);transition:transform var(--t-state),filter var(--t-state);user-select:none}
+.card::before,.card::after{content:"";position:absolute;pointer-events:none}
+.card::before{inset:0;background:var(--fr-line)}
+.card::after{inset:1px;background:var(--fr-bg)}
+.card__body{position:relative;z-index:1;padding:5px 5px 7px}
+.card__portrait{aspect-ratio:3/4;--pos:50% 8%}
+.card__tier{position:absolute;top:5px;left:5px;z-index:2;width:22px;height:22px;display:grid;place-items:center;background:var(--tier);color:var(--text-inv);font:800 var(--fs-xs)/1 var(--font-mono);clip-path:polygon(0 0,100% 0,100% 70%,70% 100%,0 100%)}
+.card__fac{position:absolute;top:8px;right:8px;z-index:2;font:600 8px/1 var(--font-mono);letter-spacing:.16em;color:var(--fac);text-transform:uppercase}
+.card__info{padding:7px 3px 0}
+.card__name{font-size:var(--fs-sm);font-weight:700;letter-spacing:.18em;text-transform:uppercase}
+.card__stats{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:5px;padding-top:5px;border-top:1px solid var(--line-1)}
+.card__stats span{display:flex;justify-content:space-between;align-items:baseline}
+.card__stats b{font:var(--fs-2xs) var(--font-ui);letter-spacing:.12em;color:var(--text-3)}
+.card__stats em{font:600 var(--fs-sm) var(--font-mono);font-style:normal;color:var(--text-1);font-variant-numeric:tabular-nums}
+.card__state{display:block;visibility:hidden;margin:6px 3px 0;padding:3px 5px;text-align:center;font:700 8px/1 var(--font-mono);letter-spacing:.2em}
+.card--s{--tier:var(--tier-s)} .card--a{--tier:var(--tier-a)} .card--b{--tier:var(--tier-b)}
+
+/* Chrome: viền liền, sắc cạnh, chamfer 45° chuẩn xác */
+.card--chrome{--fac:var(--chrome-hi)}
+.card--chrome::before,.card--chrome::after{clip-path:var(--poly-chrome)}
+.card--chrome .card__portrait{clip-path:polygon(0 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%)}
+.card--chrome .card__name{color:var(--chrome-white)}
+.card--chrome::before{background:linear-gradient(160deg,var(--chrome-hi) 0 14%,var(--line-2) 15% 100%)}
+
+/* Rust: viền đứt đoạn, cắt ghép, khấc răng cưa, đinh tán, nhãn lệch */
+.card--rust{--fac:var(--rust-hi)}
+.card--rust::before,.card--rust::after{clip-path:var(--poly-rust)}
+.card--rust::before{background:
+  repeating-linear-gradient(90deg,var(--rust) 0 16px,transparent 16px 23px) top/100% 1px no-repeat,
+  repeating-linear-gradient(90deg,var(--rust-grime) 0 11px,transparent 11px 17px) bottom/100% 1px no-repeat,
+  repeating-linear-gradient(180deg,var(--rust) 0 13px,transparent 13px 19px) left/1px 100% no-repeat,
+  repeating-linear-gradient(180deg,var(--rust-grime) 0 9px,transparent 9px 14px) right/1px 100% no-repeat,
+  var(--line-1)}
+.card--rust .card__portrait{clip-path:polygon(0 0,100% 0,100% 100%,60% 100%,57% calc(100% - 5px),0 calc(100% - 5px))}
+.card--rust .card__name{display:inline-block;padding:1px 5px;background:var(--rust-tint);color:var(--rust-hi);transform:rotate(-.8deg) translateX(-2px)}
+.card--rust .card__body::after{content:"";position:absolute;left:7px;bottom:7px;width:24px;height:6px;
+  background:radial-gradient(circle,var(--rust-grime) 1.2px,transparent 1.6px) 0 0/6px 6px}   /* đinh tán */
+.card--rust .card__tier{clip-path:polygon(0 0,100% 0,100% 100%,20% 100%,0 75%)}
+.card--rust .card__fac::after{content:"";display:block;margin-top:3px;height:1px;background:repeating-linear-gradient(90deg,var(--rust-acid) 0 3px,transparent 3px 5px)}
+
+/* Trạng thái */
+.card:hover{transform:translateY(-2px)}
+.card.is-selected{--fr-line:var(--text-1)}
+.card--chrome.is-selected::before{background:var(--text-1)}
+.card.is-selected .card__state{visibility:visible;background:var(--text-1);color:var(--text-inv)}
+.card.is-selected .card__state::before{content:"■ "}
+.card.is-locked{filter:saturate(.15) contrast(.9)}
+.card.is-locked .card__portrait{opacity:.5}
+.card.is-locked .card__state{visibility:visible;border:1px solid var(--line-3);color:var(--text-2)}
+.card.is-locked .card__state::before{content:"";display:inline-block;width:6px;height:5px;margin-right:4px;border:1px solid currentColor;border-top-width:2px;vertical-align:1px}
+.card.is-locked .card__name{color:var(--text-3)}
+.card.is-locked:hover{transform:none}
+.card.is-dragging{opacity:.55;transform:rotate(-2deg) scale(.96);outline:1px dashed var(--line-3);outline-offset:4px}
+
+/* =====================================================================
+   B2. HP BAR — hình chữ nhật cắt chéo đầu phải, KHÔNG bo tròn
+   ===================================================================== */
+.bar{position:relative;height:9px;width:100%;background:var(--line-2);clip-path:var(--poly-slant);--v:100%}
+.bar__track{position:absolute;inset:1px;background:var(--surface-2);clip-path:polygon(0 0,100% 0,calc(100% - 4.3px) 100%,0 100%);overflow:hidden}
+.bar__track>i{position:absolute;top:0;bottom:0;left:0;display:block;width:var(--v)}
+.bar__ghost{background:var(--line-3);transition:width 700ms ease-out 260ms}  /* vệt trắng đuổi theo khi mất máu */
+.bar__fill{background:var(--hp);transition:width var(--t-state) var(--ease-hit-back)}
+.bar__ticks{width:auto!important;right:0;background:repeating-linear-gradient(90deg,transparent 0 calc(10% - 1px),var(--bg-0) calc(10% - 1px) 10%);opacity:.75}
+.bar[data-state="mid"] .bar__fill{background:var(--hp-mid)}
+.bar[data-state="low"]{background:var(--hp-low)}
+.bar[data-state="low"] .bar__fill{background:var(--hp-low);animation:hp-warn 900ms steps(2,end) infinite}
+.bar--lg{height:14px}
+@keyframes hp-warn{50%{opacity:.35}}
+.hpline{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px}
+.hpline .lbl{color:var(--text-3)} .hpline .mono{font-size:var(--fs-xs);color:var(--text-2)}
+.hpline[data-state="low"] .mono{color:var(--hp-low);animation:hp-warn 900ms steps(2,end) infinite}
+
+/* =====================================================================
+   B3. ENERGY BAR — chia ô 25, ĐẦY = trắng nóng + quét sáng + READY
+   ===================================================================== */
+.ebar{position:relative;display:flex;gap:2px;height:6px;width:100%;color:var(--energy-full)}
+.seg{flex:1;background:var(--surface-4);clip-path:polygon(0 0,100% 0,calc(100% - 3px) 100%,0 100%);transition:background var(--t-state)}
+.seg.on{background:var(--energy)}
+.ebar.is-full .seg{background:currentColor}
+.ebar.is-full{box-shadow:0 0 0 1px currentColor,0 0 10px color-mix(in srgb,currentColor 45%,transparent)}
+.ebar.is-full::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 0 38%,color-mix(in srgb,var(--flash) 70%,transparent) 50%,transparent 62%);background-size:260% 100%;animation:sweep 1400ms linear infinite;mix-blend-mode:screen}
+@keyframes sweep{from{background-position:120% 0}to{background-position:-120% 0}}
+.eline{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px}
+.eline .mono{font-size:var(--fs-xs);color:var(--text-2)}
+.eline.is-full .mono{color:var(--energy-full);font-weight:700}
+.eline .ready{display:none;font:800 9px/1 var(--font-mono);letter-spacing:.2em;color:var(--text-inv);background:var(--energy-full);padding:2px 4px}
+.eline.is-full .ready{display:inline-block}
+.ebar--lg{height:10px}
+
+/* =====================================================================
+   B4. Ô ĐỘI HÌNH 5 SLOT
+   ===================================================================== */
+.team{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;max-width:520px}
+.tslot{position:relative;aspect-ratio:3/4;--fr-bg:var(--surface-1);--fr-line:var(--line-1);--fr-poly:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px)}
+.tslot::before,.tslot::after{content:"";position:absolute;pointer-events:none;clip-path:var(--fr-poly)}
+.tslot::before{inset:0;background:var(--fr-line)}
+.tslot::after{inset:1px;background:var(--fr-bg)}
+.tslot>*{position:relative;z-index:1}
+.tslot__idx{position:absolute;top:5px;left:7px;font:var(--fs-2xs) var(--font-mono);letter-spacing:.1em;color:var(--text-3)}
+.tslot__empty{position:absolute;inset:0;display:grid;place-items:center}
+.tslot__empty::before{content:"";width:14px;height:14px;background:
+  linear-gradient(var(--line-3),var(--line-3)) center/100% 1px no-repeat,
+  linear-gradient(var(--line-3),var(--line-3)) center/1px 100% no-repeat}
+.tslot:not(.is-filled)::before{background:repeating-linear-gradient(45deg,var(--line-2) 0 4px,transparent 4px 8px)}
+.tslot .portrait{position:absolute;inset:1px;clip-path:var(--fr-poly)}
+.tslot__name{position:absolute;left:0;right:0;bottom:0;padding:4px 6px;font:700 9px/1 var(--font-ui);letter-spacing:.16em;text-transform:uppercase;background:linear-gradient(transparent,var(--bg-0) 70%);color:var(--text-1)}
+.tslot.is-filled .tslot__empty{display:none}
+.tslot.is-filled.f-chrome{--fr-line:var(--chrome)}
+.tslot.is-filled.f-rust{--fr-line:var(--rust)}
+.tslot.is-over{--fr-line:var(--text-1);transform:scale(1.04)}
+.tslot.is-over::before{background:var(--text-1)}
+.tslot.is-over::after{background:var(--surface-3)}
+.tslot.is-over .tslot__empty::before{background:none;width:auto;height:auto;content:"DROP";font:800 9px/1 var(--font-mono);letter-spacing:.2em;color:var(--text-1)}
+.tslot__x{position:absolute;top:4px;right:6px;font:var(--fs-xs) var(--font-mono);color:var(--text-2);line-height:1;padding:2px 3px}
+.tslot__x:hover{color:var(--danger)}
+
+/* =====================================================================
+   B5. NÚT CHIÊU CUỐI + NÚT TẤN CÔNG
+   ===================================================================== */
+.btn-act,.btn-ult{position:relative;height:56px;padding:0 14px;text-align:left;--cut:12px;color:var(--text-1);--accent:var(--chrome)}
+.btn-act::before,.btn-ult::before,.btn-act::after,.btn-ult::after{content:"";position:absolute;pointer-events:none;clip-path:var(--poly-chrome)}
+.btn-act::before,.btn-ult::before{inset:0;background:var(--line-2)}
+.btn-act::after,.btn-ult::after{inset:1px;background:var(--surface-2)}
+.btn-act>*,.btn-ult>*{position:relative;z-index:1;display:block}
+.btn-act__k,.btn-ult__name{font-weight:800;letter-spacing:.2em;font-size:var(--fs-sm);text-transform:uppercase}
+.btn-act__v,.btn-ult__meta{font:var(--fs-2xs) var(--font-mono);letter-spacing:.1em;color:var(--text-2);margin-top:3px}
+.btn-act:not(:disabled):hover::before{background:var(--line-3)}
+.btn-act:not(:disabled):active::after{background:var(--surface-4)}
+.btn-act:disabled{opacity:.4}
+.btn-ult__bar{position:absolute!important;left:12px;right:12px;bottom:6px;height:2px;background:var(--surface-4)}
+.btn-ult__bar i{position:absolute;inset:0;right:auto;width:var(--p,0%);background:var(--energy);transition:width var(--t-state)}
+/* chưa đủ energy: mờ, viền băm, hiện số còn thiếu */
+.btn-ult[data-state="locked"]{opacity:.55;cursor:not-allowed}
+.btn-ult[data-state="locked"]::before{background:repeating-linear-gradient(45deg,var(--line-2) 0 5px,transparent 5px 10px)}
+.btn-ult[data-state="locked"] .btn-ult__meta{color:var(--hp-low)}
+/* sẵn sàng: nổi bật, nhịp đập nhẹ — chỗ duy nhất trong action bar được phép sáng */
+.btn-ult[data-state="ready"]::before{background:var(--energy-full)}
+.btn-ult[data-state="ready"]::after{background:var(--accent)}
+.btn-ult[data-state="ready"]{color:#fff;animation:ult-pulse 1600ms var(--ease-sine) infinite}
+.btn-ult[data-state="ready"] .btn-ult__meta{color:rgba(255,255,255,.75)}
+.btn-ult[data-state="ready"] .btn-ult__bar{background:rgba(255,255,255,.25)} .btn-ult[data-state="ready"] .btn-ult__bar i{background:#fff}
+@keyframes ult-pulse{0%,100%{filter:drop-shadow(0 0 0 rgba(255,255,255,0))}50%{filter:drop-shadow(0 0 9px rgba(255,255,255,.55))}}
+/* đang phát */
+.btn-ult[data-state="casting"]{cursor:progress;color:var(--text-1)}
+.btn-ult[data-state="casting"]::before{background:var(--energy-full)}
+.btn-ult[data-state="casting"]::after{background:var(--surface-3)}
+.btn-ult[data-state="casting"] .btn-ult__bar i{width:100%;background:var(--energy-full);animation:cast 900ms linear forwards}
+.btn-ult[data-state="casting"] .btn-ult__meta{color:var(--energy-full)}
+@keyframes cast{from{width:0}to{width:100%}}
+.btn-ult--rust{--accent:var(--rust)}
+
+/* =====================================================================
+   B6. THANH LƯỢT ĐI
+   ===================================================================== */
+.turn{display:flex;align-items:flex-end;gap:5px;height:46px;padding:0 4px}
+.tu{position:relative;width:30px;height:30px;flex:none;--cut:5px;--fac:var(--line-3);transition:transform var(--t-state),opacity var(--t-state)}
+.tu::before,.tu::after{content:"";position:absolute;pointer-events:none;clip-path:var(--poly-chrome)}
+.tu::before{inset:0;background:var(--fac)}
+.tu::after{inset:1px;background:var(--surface-2)}
+.tu .portrait{position:absolute;inset:1px;z-index:1;clip-path:var(--poly-chrome);--pos:50% 6%}
+.tu--chrome{--fac:var(--chrome)} .tu--rust{--fac:var(--rust)}
+.tu__mark{position:absolute;left:50%;bottom:-9px;transform:translateX(-50%);width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-bottom:5px solid var(--text-1);opacity:0}
+.tu.is-active{transform:translateY(-6px) scale(1.2);z-index:2}
+.tu.is-active::before{background:var(--text-1)}
+.tu.is-active .tu__mark{opacity:1}
+.tu.is-next{opacity:.35}
+.tu__lbl{position:absolute;top:-13px;left:50%;transform:translateX(-50%);font:800 8px/1 var(--font-mono);letter-spacing:.18em;color:var(--text-1);white-space:nowrap;display:none}
+.tu.is-active .tu__lbl{display:block}
+.turn__sep{align-self:center;width:1px;height:18px;background:repeating-linear-gradient(180deg,var(--line-3) 0 2px,transparent 2px 4px);margin:0 3px;flex:none}
+
+/* =====================================================================
+   B7. SỐ SÁT THƯƠNG BAY LÊN
+   ===================================================================== */
+.dmg{position:absolute;z-index:30;transform:translate(-50%,-50%);font:700 var(--fs-xl)/1 var(--font-mono);color:var(--text-1);white-space:nowrap;pointer-events:none;
+  text-shadow:0 1px 0 rgba(0,0,0,.9),0 0 8px rgba(0,0,0,.9);animation:dmg-rise 950ms var(--ease-hit-out) forwards}
+.dmg--crit{color:var(--crit);font-size:var(--fs-3xl);font-weight:800;--rot:-6deg;text-align:center}
+.dmg--crit::after{content:"CRIT";display:block;font-size:var(--fs-2xs);letter-spacing:.3em;margin-top:2px}
+.dmg--heal{color:var(--heal)}
+.dmg--miss{color:var(--text-3);font-size:var(--fs-md);letter-spacing:.2em}
+@keyframes dmg-rise{
+  0%{opacity:0;transform:translate(-50%,-30%) rotate(var(--rot,0)) scale(.6)}
+  12%{opacity:1;transform:translate(-50%,-55%) rotate(var(--rot,0)) scale(1.18)}
+  32%{transform:translate(-50%,-62%) rotate(var(--rot,0)) scale(1)}
+  100%{opacity:0;transform:translate(-50%,-130%) rotate(var(--rot,0)) scale(1)}}
+.dmg-demo{position:relative;height:120px;width:min(420px,calc(100vw - 32px));background:var(--surface-1);border:1px solid var(--line-1)}
+
+/* =====================================================================
+   B8. CHIP TRẠNG THÁI
+   ===================================================================== */
+.chip{display:inline-flex;align-items:center;gap:5px;height:18px;padding:0 6px 0 5px;border:1px solid var(--line-2);background:var(--surface-2);color:var(--text-2);
+  font:600 9px/1 var(--font-ui);letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;
+  clip-path:polygon(0 0,calc(100% - 4px) 0,100% 4px,100% 100%,4px 100%,0 calc(100% - 4px))}
+.chip::before{content:"";width:0;height:0;border-left:3px solid transparent;border-right:3px solid transparent;border-bottom:5px solid currentColor}
+.chip em{font:700 var(--fs-2xs) var(--font-mono);font-style:normal;color:var(--text-1)}
+.chip--buff{color:var(--chrome-hi);border-color:var(--chrome)}
+.chip--debuff{color:var(--rust-hi);border-color:var(--rust)}
+.chip--debuff::before{border-bottom:0;border-top:5px solid currentColor}
+.chip--control{color:var(--danger);border-color:var(--danger)}
+.chip--control::before{border:0;width:5px;height:5px;background:currentColor;animation:hp-warn 700ms steps(2,end) infinite}
+.chip--refund{color:var(--energy-full);border-color:var(--energy-full)}
+.chip--refund::before{border:0;width:2px;height:7px;background:currentColor;box-shadow:3px 2px 0 currentColor}
+.chips{display:flex;flex-wrap:wrap;gap:4px}
+
+/* =====================================================================
+   C. MÀN CHIẾN ĐẤU
+   ===================================================================== */
+.battle{background:var(--bg-0);color:var(--text-1);display:grid;grid-template-columns:minmax(0,1fr);justify-content:center}
+.arena{position:relative;display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;height:calc(100dvh - 44px);min-height:600px;max-height:980px;width:100%;max-width:560px;margin:0 auto;background:var(--bg-0);overflow:hidden}
+.side{display:none}
+@media (min-width:960px){
+  .battle{grid-template-columns:minmax(0,560px) 320px;gap:var(--s-4);padding:var(--s-4)}
+  .arena{height:calc(100dvh - 76px);border:1px solid var(--line-1)}
+  .side{display:flex;flex-direction:column;gap:var(--s-4);height:calc(100dvh - 76px);max-height:980px;overflow:auto}
+}
+.side__block{border:1px solid var(--line-1);background:var(--surface-1);padding:var(--s-3)}
+.side__block .lbl{display:block;margin-bottom:8px}
+.log{list-style:none;display:flex;flex-direction:column;gap:3px;font:var(--fs-xs)/1.4 var(--font-mono);color:var(--text-2);max-height:360px;overflow:auto}
+.log li b{color:var(--text-3);font-weight:400;margin-right:6px}
+.log li.hi{color:var(--text-1)}
+.ultinfo{font-size:var(--fs-sm);color:var(--text-2)}
+.ultinfo b{display:block;color:var(--text-1);letter-spacing:.18em;font-size:var(--fs-sm);margin-bottom:4px}
+.ultinfo .mono{color:var(--text-3);font-size:var(--fs-2xs);display:block;margin-top:6px}
+
+/* ---- HUD trên ---- */
+.hud{padding:8px 10px 4px;border-bottom:1px solid var(--line-1);background:linear-gradient(var(--bg-1),var(--bg-0))}
+.hud__row{display:flex;align-items:center;gap:var(--s-4)}
+.hud__row>div{display:flex;flex-direction:column;gap:1px}
+.hud__row .mono{font-size:var(--fs-sm);color:var(--text-1);font-weight:600}
+.hud__reset{margin-left:auto}
+.ticker{margin-top:6px;padding-top:6px;border-top:1px solid var(--line-1);font:var(--fs-2xs) var(--font-mono);letter-spacing:.08em;color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ticker::before{content:"» ";color:var(--text-3)}
+
+/* ---- Sân đấu ---- */
+.stage{position:relative;overflow:hidden;background:
+  radial-gradient(120% 60% at 50% 100%,rgba(124,77,255,.08),transparent 60%),
+  linear-gradient(var(--bg-0),var(--bg-1) 55%,var(--bg-0))}
+.stage__floor{position:absolute;left:-30%;right:-30%;bottom:0;height:52%;transform:perspective(420px) rotateX(58deg);transform-origin:50% 100%;
+  background:
+    repeating-linear-gradient(90deg,var(--line-1) 0 1px,transparent 1px 48px),
+    repeating-linear-gradient(0deg,var(--line-1) 0 1px,transparent 1px 48px);
+  -webkit-mask-image:linear-gradient(to top,#000 20%,transparent);mask-image:linear-gradient(to top,#000 20%,transparent)}
+.stage__horizon{position:absolute;left:0;right:0;bottom:52%;height:1px;background:linear-gradient(90deg,transparent,var(--line-2),transparent)}
+.stage__tag{position:absolute;left:10px;top:8px;font:var(--fs-2xs) var(--font-mono);letter-spacing:.14em;color:var(--text-3)}
+.stage__tag--r{left:auto;right:10px;text-align:right}
+
+/* ---- Đội hình side-by-side: đội mình trái (quay phải), địch phải ----
+   Vị trí từng unit do FORMATION (JS) đặt qua --x/--y/--z/--sc. Kích thước unit
+   tính theo chiều cao sân (cqh) nên tự co giãn theo màn hình. */
+.stage{container-type:size;min-height:0}
+.field{position:absolute;top:7%;bottom:2%}
+.field--ally{left:0;width:57%}
+.field--enemy{right:0;width:43%}
+.unit{position:absolute;left:var(--x);bottom:var(--y);z-index:var(--z,1);width:var(--uw);--uw:clamp(84px,23cqh,160px);--fac:var(--line-3);
+  transform:translateX(-50%) scale(var(--sc,1));transform-origin:50% 100%;display:flex;flex-direction:column;align-items:center}
+.unit--chrome{--fac:var(--chrome)} .unit--rust{--fac:var(--rust)}
+.unit--enemy{cursor:pointer}
+.unit__sprite{position:relative;width:100%;aspect-ratio:744/682}
+.unit__shadow{position:absolute;left:50%;bottom:-3%;width:60%;height:9%;transform:translateX(-50%);background:radial-gradient(ellipse at center,rgba(0,0,0,.7),rgba(0,0,0,0) 68%)}
+.unit__ring{position:absolute;left:50%;bottom:-4.5%;width:68%;height:12%;transform:translateX(-50%);border:1px solid var(--text-1);border-radius:50%;opacity:0;transition:opacity var(--t-state)}
+.unit.is-active .unit__ring{opacity:.9}
+.unit__bob{position:absolute;inset:0}
+.unit--ally .unit__bob{animation:bob 2400ms var(--ease-sine) infinite;animation-delay:var(--bob-delay,0ms)}   /* idle: 6px / 2400ms */
+.unit__pose{position:absolute;inset:0;transform-origin:50% 100%;will-change:transform}
+.unit__frame{position:absolute;left:0;bottom:0;width:100%;height:100%}   /* JS đặt left/width theo box.ax */
+.unit__frame img{width:100%;height:100%;object-fit:contain;object-position:50% 100%;display:none}
+.unit__pose.has-img img{display:block}
+.unit__pose.has-img .sil{display:none}
+.unit__pose .sil{left:24%;right:24%}
+.unit__flash{position:absolute;inset:0;background:var(--flash);opacity:0;pointer-events:none;
+  -webkit-mask:var(--mask) 50% 100%/contain no-repeat;mask:var(--mask) 50% 100%/contain no-repeat}
+/* Bảng thông tin dưới chân */
+.unit__plate{position:relative;width:100%;margin-top:3px;padding:3px 5px 4px;background:var(--surface-1);border:1px solid var(--line-1);
+  clip-path:polygon(5px 0,100% 0,100% calc(100% - 5px),calc(100% - 5px) 100%,0 100%,0 5px);transition:border-color var(--t-state)}
+.unit__name{display:flex;justify-content:space-between;align-items:baseline;gap:3px;margin-bottom:3px;font:700 8px/1 var(--font-ui);letter-spacing:.14em;text-transform:uppercase;color:var(--text-2);white-space:nowrap}
+.unit__name>span:first-child{overflow:hidden;text-overflow:ellipsis}
+.unit__name .tier{flex:none;font:800 8px/1 var(--font-mono);color:var(--tier);padding:1px 2px;border:1px solid var(--tier)}
+.unit__name .mono{font-size:8px;color:var(--text-3);letter-spacing:0}
+.unit--s{--tier:var(--tier-s)} .unit--a{--tier:var(--tier-a)} .unit--b{--tier:var(--tier-b)}
+.unit--enemy .unit__name{color:var(--rust-hi)}
+.unit--enemy.unit--chrome .unit__name{color:var(--chrome-hi)}
+.unit__name .rank{flex:none;font:800 7px/1 var(--font-mono);letter-spacing:.14em;color:var(--text-3)}
+.unit--elite .unit__name .rank{color:var(--tier-a);border:1px solid var(--tier-a);padding:1px 2px}
+.unit--boss .unit__name .rank{color:var(--text-inv);background:var(--hp-low);padding:1px 3px}
+.unit--boss .unit__plate{border-color:var(--hp-low)}
+.unit .bar{height:5px;margin-bottom:3px}
+.unit .ebar{height:4px}
+.unit__hp{font:8px/1 var(--font-mono);color:var(--text-3);margin-top:3px;text-align:right}
+.unit .chips{margin-top:3px;gap:2px}
+.unit .chip{height:13px;font-size:7px;padding:0 3px;gap:3px}
+.unit__ready{display:none;position:absolute;top:0;right:0;padding:2px 3px;font:800 7px/1 var(--font-mono);letter-spacing:.2em;background:var(--energy-full);color:var(--text-inv)}
+.unit.is-ready .unit__ready{display:block}
+.unit.is-ready .unit__plate{border-color:var(--energy-full)}
+.unit.is-active .unit__plate{border-color:var(--text-1)}
+.unit.is-active .unit__name{color:var(--text-1)}
+/* Mục tiêu */
+.unit__brk{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity var(--t-fast)}
+.unit__brk::before,.unit__brk::after,.unit__brk i::before,.unit__brk i::after{content:"";position:absolute;width:9px;height:9px;border:1px solid var(--text-1)}
+.unit__brk::before{left:0;top:0;border-right:0;border-bottom:0}
+.unit__brk::after{right:0;top:0;border-left:0;border-bottom:0}
+.unit__brk i::before{left:0;bottom:0;border-right:0;border-top:0}
+.unit__brk i::after{right:0;bottom:0;border-left:0;border-top:0}
+.unit.is-target .unit__brk{opacity:1}
+.unit__tgt{position:absolute;top:-4px;right:-4px;z-index:2;font:800 8px/1 var(--font-mono);letter-spacing:.16em;color:var(--text-inv);background:var(--text-1);padding:2px 3px;display:none}
+.unit.is-target .unit__tgt{display:block}
+.unit.is-target .unit__name{color:var(--text-1)}
+/* Trúng đòn / lao tới / KIA */
+.unit.is-hit .unit__sprite{animation:hit-shake 300ms var(--ease-hit-back)}
+.unit.is-hit .sil,.unit.is-hit img{filter:brightness(1.7) sepia(1) saturate(5) hue-rotate(-40deg)}
+.unit.is-lunge .unit__sprite{animation:lunge 260ms var(--ease-hit-out)}
+.unit.is-dead{pointer-events:none}
+.unit.is-dead .unit__sprite{filter:grayscale(1) brightness(.4)}
+.unit.is-dead .unit__bob{animation:none}
+.unit.is-dead .unit__name>span:first-child{color:var(--text-3);text-decoration:line-through}
+.kia{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%) rotate(-8deg);padding:2px 6px;border:2px solid var(--hp-low);color:var(--hp-low);font:900 var(--fs-md)/1 var(--font-mono);letter-spacing:.3em;display:none;z-index:3}
+.is-dead .kia{display:block}
+@keyframes hit-shake{0%{transform:translateX(0)}25%{transform:translateX(-5px)}55%{transform:translateX(4px)}100%{transform:translateX(0)}}
+@keyframes lunge{0%{transform:translateX(0)}40%{transform:translateX(-16px) scale(1.04,.97)}100%{transform:translateX(0)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
+/* Banner chiêu cuối */
+.ultbanner{position:absolute;left:0;right:0;top:44%;z-index:20;padding:10px 0;background:linear-gradient(90deg,transparent,rgba(0,0,0,.75) 20% 80%,transparent);text-align:center;pointer-events:none;opacity:0}
+.ultbanner.show{animation:banner 1100ms var(--ease-hit-out) forwards}
+.ultbanner__n{font:900 var(--fs-3xl)/1 var(--font-ui);letter-spacing:.4em;color:#fff;text-indent:.4em}
+.ultbanner__s{margin-top:4px;font:var(--fs-2xs) var(--font-mono);letter-spacing:.2em;color:var(--text-2)}
+.ultbanner__line{height:1px;margin:6px 20%;background:linear-gradient(90deg,transparent,var(--accent,var(--chrome)),transparent)}
+@keyframes banner{0%{opacity:0;transform:translateX(-40px)}15%{opacity:1;transform:translateX(0)}80%{opacity:1;transform:translateX(0)}100%{opacity:0;transform:translateX(40px)}}
+.stageflash{position:absolute;inset:0;background:var(--flash);opacity:0;pointer-events:none;z-index:19}
+
+/* Overlay kết quả */
+.result{position:absolute;inset:0;z-index:40;display:grid;place-items:center;background:rgba(6,7,10,.82)}
+.result[hidden]{display:none}
+.result__box{text-align:center;padding:var(--s-5) var(--s-6);border:1px solid var(--line-2);background:var(--surface-1)}
+.result__t{font:900 var(--fs-2xl)/1 var(--font-ui);letter-spacing:.3em;text-indent:.3em}
+.result__s{margin:8px 0 16px;font:var(--fs-xs) var(--font-mono);color:var(--text-2);letter-spacing:.1em}
+.result.win .result__t{color:var(--text-1)} .result.lose .result__t{color:var(--hp-low)}
+
+
+/* ---- Action bar ---- */
+.actions{display:grid;grid-template-columns:1fr 1.35fr;gap:8px;padding:6px 8px calc(8px + env(safe-area-inset-bottom));background:var(--bg-1)}
+
+/* =====================================================================
+   KIT — bố cục trang trưng bày
+   ===================================================================== */
+.kit{max-width:1180px;margin:0 auto;padding:var(--s-6) var(--s-4) var(--s-7)}
+.kit__h{display:flex;align-items:baseline;gap:var(--s-3);margin-bottom:var(--s-4)}
+.kit__h h1{font-size:var(--fs-xl);letter-spacing:.3em;font-weight:800}
+.kit__h p{color:var(--text-3);font-size:var(--fs-sm)}
+.spec{border-top:1px solid var(--line-1);padding:var(--s-5) 0}
+.spec__head{display:flex;flex-wrap:wrap;align-items:baseline;gap:var(--s-3);margin-bottom:var(--s-4)}
+.spec__no{font:600 var(--fs-xs) var(--font-mono);color:var(--text-3);letter-spacing:.1em}
+.spec__title{font-size:var(--fs-md);font-weight:700;letter-spacing:var(--track);text-transform:uppercase}
+.spec__note{color:var(--text-3);font-size:var(--fs-sm);flex-basis:100%}
+.row{display:flex;flex-wrap:wrap;gap:var(--s-4);align-items:flex-start}
+.sample{display:flex;flex-direction:column;gap:7px;min-width:0}
+.sample--w{width:220px}
+.sample__cap{font:var(--fs-2xs)/1.3 var(--font-mono);letter-spacing:.1em;color:var(--text-3);text-transform:uppercase}
+.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.sw{display:flex;align-items:center;gap:8px;padding:5px;border:1px solid var(--line-1);background:var(--surface-1)}
+.sw i{width:26px;height:26px;flex:none;background:var(--c);clip-path:polygon(4px 0,100% 0,100% calc(100% - 4px),calc(100% - 4px) 100%,0 100%,0 4px)}
+.sw b{font:var(--fs-2xs) var(--font-mono);color:var(--text-2);letter-spacing:.06em}
+.sw small{display:block;color:var(--text-3);font-size:9px}
+.typerow{display:flex;flex-wrap:wrap;gap:var(--s-4);align-items:baseline}
+.typerow span{color:var(--text-2)}
+.kit .turn{background:var(--surface-1);border:1px solid var(--line-1);padding:14px 8px 8px;height:auto;width:max-content}
+
+/* =====================================================================
+   REDUCED MOTION — tắt trang trí, giữ chuyển trạng thái
+   ===================================================================== */
+@media (prefers-reduced-motion: reduce){
+  .unit__bob{animation:none}
+  .ebar.is-full::after{animation:none;display:none}
+  .btn-ult[data-state="ready"]{animation:none;filter:drop-shadow(0 0 6px rgba(255,255,255,.4))}
+  .bar[data-state="low"] .bar__fill,.hpline[data-state="low"] .mono,.chip--control::before{animation:none}
+  .dmg{animation:dmg-rise-rm 800ms linear forwards}
+  @keyframes dmg-rise-rm{0%{opacity:1;transform:translate(-50%,-60%)}100%{opacity:0;transform:translate(-50%,-70%)}}
+  .unit.is-hit .unit__sprite,.unit.is-lunge .unit__sprite{animation:none}
+  .ultbanner.show{animation:banner-rm 1000ms linear forwards}
+  @keyframes banner-rm{0%,90%{opacity:1}100%{opacity:0}}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="brand"><span class="brand__mark"></span>CHROMEFALL<span class="brand__sub">UI KIT · v0.1</span></div>
+  <div class="topnav__links"><a href="#battle">Battle</a><a href="#kit">Components</a><a href="#tokens">Tokens</a></div>
+  <button class="btn-ghost" id="themeBtn" title="Đổi theme để kiểm tra token">THEME: AUTO</button>
+</nav>
+
+<!-- =====================================================================
+     C. MÀN CHIẾN ĐẤU — hiển thị đầy đủ ngay khi load (fit viewport)
+     ===================================================================== -->
+<section id="battle" class="battle">
+  <div class="arena">
+    <header class="hud">
+      <div class="hud__row">
+        <div><span class="lbl">Sector</span><span class="mono" id="sectorNo">07-B</span></div>
+        <div><span class="lbl">Round</span><span class="mono" id="roundNo">01</span></div>
+        <div><span class="lbl">Wave</span><span class="mono" id="waveNo">1/3</span></div>
+        <button class="btn-ghost hud__reset" id="btnReset">RESET</button>
+      </div>
+      <div class="turn" id="turnbar" style="margin-top:14px"></div>
+      <div class="ticker" id="ticker">Khởi tạo…</div>
+    </header>
+
+    <div class="stage" id="stage">
+      <div class="stage__floor"></div>
+      <div class="stage__horizon"></div>
+      <div class="stage__tag">SQUAD · CHROME/RUST</div>
+      <div class="stage__tag stage__tag--r">HOSTILE · RUST</div>
+      <div class="field field--ally" id="allies"></div>
+      <div class="field field--enemy" id="enemies"></div>
+
+      <div class="stageflash" id="stageflash"></div>
+      <div class="ultbanner" id="ultBanner"><div class="ultbanner__n" id="ubName">ZERO</div><div class="ultbanner__line"></div><div class="ultbanner__s" id="ubSub"></div></div>
+      <div class="result" id="result" hidden><div class="result__box"><div class="result__t" id="resT"></div><div class="result__s" id="resS"></div><button class="btn-ghost" id="btnAgain">RESTART</button></div></div>
+    </div>
+
+    <div class="actions">
+      <button class="btn-act" id="btnAttack"><span class="btn-act__k">Attack</span><span class="btn-act__v">+25 EN · 100% ATK</span></button>
+      <button class="btn-ult" id="btnUlt" data-state="locked">
+        <span class="btn-ult__name" id="ultName">—</span>
+        <span class="btn-ult__meta" id="ultMeta">—</span>
+        <span class="btn-ult__bar"><i id="ultBarFill"></i></span>
+      </button>
+    </div>
+    <div id="fx" style="position:absolute;inset:0;pointer-events:none;z-index:35"></div>
+  </div>
+
+  <aside class="side">
+    <div class="side__block"><span class="lbl">Ultimate · đang tới lượt</span><div class="ultinfo" id="ultInfo">—</div></div>
+    <div class="side__block"><span class="lbl">Battle log</span><ol class="log" id="log"></ol></div>
+    <div class="side__block"><span class="lbl">Ghi chú</span><div class="ultinfo">Đội mình bên trái, địch bên phải. Bấm vào kẻ địch để đổi mục tiêu. Kẻ địch tự hành động khi tới lượt. HP về 0 là KIA vĩnh viễn trong trận.<span class="mono">Chỉ số địch, công thức sát thương, thứ tự lượt = ★ FAKE (xem JS)</span></div></div>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     B. COMPONENT LIBRARY
+     ===================================================================== -->
+<main id="kit" class="kit">
+  <div class="kit__h"><h1>COMPONENTS</h1><p>Mọi trạng thái đặt cạnh nhau · mọi màu đọc từ token</p></div>
+
+  <!-- B1 -->
+  <section class="spec">
+    <div class="spec__head"><span class="spec__no">B1</span><span class="spec__title">Character card</span>
+      <span class="spec__note">Chrome: viền liền, chamfer 45°. Rust: viền đứt đoạn, khấc cắt ghép, đinh tán, nhãn lệch. Kéo thẻ thả vào slot ở B4.</span></div>
+    <div class="row" id="cardRow"></div>
+  </section>
+
+  <!-- B2 -->
+  <section class="spec">
+    <div class="spec__head"><span class="spec__no">B2</span><span class="spec__title">HP bar</span>
+      <span class="spec__note">Đầu phải cắt chéo, vạch chia 10%. Dưới 25%: viền + fill đỏ nhấp nháy, số HP nhấp nháy. Mất máu: fill tụt ngay, vệt sáng đuổi theo sau 260ms.</span></div>
+    <div class="row">
+      <div class="sample sample--w"><div class="hpline" data-state="ok"><span class="lbl">HP</span><span class="mono">950 / 950</span></div><div class="bar bar--lg" data-state="ok" style="--v:100%"><div class="bar__track"><i class="bar__ghost"></i><i class="bar__fill"></i><i class="bar__ticks"></i></div></div><span class="sample__cap">Đầy</span></div>
+      <div class="sample sample--w"><div class="hpline" data-state="mid"><span class="lbl">HP</span><span class="mono">475 / 950</span></div><div class="bar bar--lg" data-state="mid" style="--v:50%"><div class="bar__track"><i class="bar__ghost"></i><i class="bar__fill"></i><i class="bar__ticks"></i></div></div><span class="sample__cap">50%</span></div>
+      <div class="sample sample--w"><div class="hpline" data-state="low"><span class="lbl">HP</span><span class="mono">171 / 950</span></div><div class="bar bar--lg" data-state="low" style="--v:18%"><div class="bar__track"><i class="bar__ghost"></i><i class="bar__fill"></i><i class="bar__ticks"></i></div></div><span class="sample__cap">Dưới 25% · cảnh báo</span></div>
+      <div class="sample sample--w"><div class="hpline" id="drainLine" data-state="ok"><span class="lbl">HP</span><span class="mono" id="drainTxt">950 / 950</span></div><div class="bar bar--lg" id="drainBar" data-state="ok" style="--v:100%"><div class="bar__track"><i class="bar__ghost"></i><i class="bar__fill"></i><i class="bar__ticks"></i></div></div><span class="sample__cap">Đang mất máu (lặp demo)</span></div>
+    </div>
+  </section>
+
+  <!-- B3 -->
+  <section class="spec">
+    <div class="spec__head"><span class="spec__no">B3</span><span class="spec__title">Energy bar</span>
+      <span class="spec__note">Mỗi ô = 25. Số ô = cost chiêu cuối (75/100/125). ĐẦY: toàn bộ chuyển trắng nóng, viền + glow, quét sáng, nhãn READY — tín hiệu duy nhất được phép sáng liên tục.</span></div>
+    <div class="row" id="energyRow"></div>
+  </section>
+
+  <!-- B4 -->
+  <section class="spec">
+    <div class="spec__head"><span class="spec__no">B4</span><span class="spec__title">Đội hình 5 slot</span>
+      <span class="spec__note">Trống (viền băm, dấu +), đã điền (viền màu phe), đang kéo thả (viền trắng, DROP). Kéo thẻ từ B1 vào để thử thật; bấm × để gỡ.</span></div>
+    <div class="row">
+      <div class="sample"><div class="team" id="team"></div><span class="sample__cap">Slot 03 đang ở trạng thái drag-over (tĩnh) — sẽ tự cập nhật khi bạn kéo thật</span></div>
+      <div class="sample"><div id="dragGhost"></div><span class="sample__cap">Thẻ ở trạng thái đang kéo</span></div>
+    </div>
+  </section>
+
+  <!-- B5 -->
+  <section class="spec">
+    <div class="spec__head"><span class="spec__no">B5</span><span class="spec__title">Nút chiêu cuối</span>
+      <span class="spec__note">Chưa đủ: mờ, viền băm, số còn thiếu màu đỏ, vạch tiến độ. Sẵn sàng: nền màu phe, viền trắng, nhịp đập 1600ms. Đang phát: vạch chạy 900ms.</span></div>
+    <div class="row">
+      <div class="sample sample--w"><button class="btn-ult" data-state="locked" style="width:100%"><span class="btn-ult__name">Zero</span><span class="btn-ult__meta">−50 EN · 50/100</span><span class="btn-ult__bar"><i style="--p:50%"></i></span></button><span class="sample__cap">Chưa đủ energy</span></div>
+      <div class="sample sample--w"><button class="btn-ult" data-state="ready" style="width:100%"><span class="btn-ult__name">Zero</span><span class="btn-ult__meta">100/100 · 320% ATK</span><span class="btn-ult__bar"><i style="--p:100%"></i></span></button><span class="sample__cap">Sẵn sàng · Chrome</span></div>
+      <div class="sample sample--w"><button class="btn-ult btn-ult--rust" data-state="ready" style="width:100%"><span class="btn-ult__name">Iaido</span><span class="btn-ult__meta">100/100 · 280% ATK</span><span class="btn-ult__bar"><i style="--p:100%"></i></span></button><span class="sample__cap">Sẵn sàng · Rust</span></div>
+      <div class="sample sample--w"><button class="btn-ult" data-state="casting" style="width:100%"><span class="btn-ult__name">Apostasy</span><span class="btn-ult__meta">CASTING…</span><span class="btn-ult__bar"><i id="castDemo"></i></span></button><span class="sample__cap">Đang phát</span></div>
+      <div class="sample sample--w"><button class="btn-act" style="width:100%"><span class="btn-act__k">Attack</span><span class="btn-act__v">+25 EN · 100% ATK</span></button><span class="sample__cap">Nút thường (tham chiếu)</span></div>
+    </div>
+  </section>
+
+  <!-- B6 -->
+  <section class="spec">
+    <div class="spec__head"><span class="spec__no">B6</span><span class="spec__title">Thanh lượt đi</span>
+      <span class="spec__note">Chân dung nhỏ theo thứ tự, viền màu phe. Người tới lượt: nâng lên, viền trắng, nhãn NOW, mũi tên dưới. Sau dấu ngắt là lượt của vòng sau (mờ). Tự chạy demo.</span></div>
+    <div class="row"><div class="sample"><div class="turn" id="turnDemo"></div><span class="sample__cap">Auto-advance mỗi 1.6s</span></div></div>
+  </section>
+
+  <!-- B7 -->
+  <section class="spec">
+    <div class="spec__head"><span class="spec__no">B7</span><span class="spec__title">Số sát thương bay lên</span>
+      <span class="spec__note">Thường: trắng mono. Chí mạng: vàng, to hơn, nghiêng −6°, nhãn CRIT. Hồi máu: xanh, dấu +.</span></div>
+    <div class="row">
+      <div class="sample"><div class="dmg-demo" id="dmgDemo"></div><button class="btn-ghost" id="btnDmg" style="align-self:flex-start">REPLAY</button></div>
+    </div>
+  </section>
+
+  <!-- B8 -->
+  <section class="spec">
+    <div class="spec__head"><span class="spec__no">B8</span><span class="spec__title">Chip trạng thái</span>
+      <span class="spec__note">Buff: tam giác lên, tím Chrome. Debuff: tam giác xuống, cam Rust. Điều khiển (Apostasy): chấm đỏ nháy. Hoàn Energy (Zero): trắng. Số = lượt còn lại / giá trị.</span></div>
+    <div class="chips">
+      <span class="chip chip--buff">ATK UP <em>+20%</em> <em>2T</em></span>
+      <span class="chip chip--buff">GUARD <em>1T</em></span>
+      <span class="chip chip--debuff">ATK DOWN <em>−15%</em> <em>2T</em></span>
+      <span class="chip chip--debuff">BLEED <em>3T</em></span>
+      <span class="chip chip--control">CONTROLLED <em>1T</em></span>
+      <span class="chip chip--refund">EN REFUND <em>+50</em></span>
+      <span class="chip">TAUNT <em>1T</em></span>
+    </div>
+  </section>
+
+  <!-- ROSTER -->
+  <section class="spec">
+    <div class="spec__head"><span class="spec__no">R</span><span class="spec__title">Roster · <span id="rosterCount"></span> nhân vật</span>
+      <span class="spec__note">Toàn bộ roster đọc từ ROSTER (JS). Nhân vật chưa có art hiện silhouette theo phe. Kéo vào đội hình ở B4 được.</span></div>
+    <div class="row" id="rosterRow"></div>
+  </section>
+
+  <!-- BESTIARY -->
+  <section class="spec">
+    <div class="spec__head"><span class="spec__no">E</span><span class="spec__title">Bestiary · <span id="enemyCount"></span> kẻ địch PvE</span>
+      <span class="spec__note">Bể kẻ địch cho sector. Badge: G = grunt, E = elite, B = boss. Wave 1 gọi 3 grunt, wave 2 thêm elite, wave 3 có boss.<span class="fake">FAKE</span></span></div>
+    <div class="row" id="enemyRow"></div>
+  </section>
+
+  <!-- A. TOKENS -->
+  <section class="spec" id="tokens">
+    <div class="spec__head"><span class="spec__no">A</span><span class="spec__title">Design tokens</span>
+      <span class="spec__note">Đổi theme ở góc trên để kiểm tra bộ token sáng/tối. Giá trị hiển thị là giá trị đang được tính (computed).</span></div>
+    <div class="swatches" id="swatches"></div>
+    <div class="typerow" style="margin-top:var(--s-5)">
+      <span class="lbl">Type scale</span>
+      <span style="font-size:var(--fs-2xs)">2xs 10</span><span style="font-size:var(--fs-xs)">xs 11</span><span style="font-size:var(--fs-sm)">sm 12</span><span style="font-size:var(--fs-md)">md 14</span><span style="font-size:var(--fs-lg)">lg 16</span><span style="font-size:var(--fs-xl)">xl 20</span><span style="font-size:var(--fs-2xl)">2xl 26</span><span style="font-size:var(--fs-3xl)">3xl 34</span>
+      <span class="mono">mono 0123456789</span><span class="lbl" style="color:var(--text-1)">LABEL · TRACK .14EM</span>
+    </div>
+    <div class="typerow" style="margin-top:var(--s-4)"><span class="lbl">Spacing</span>
+      <i style="display:inline-block;width:var(--s-1);height:12px;background:var(--line-3)"></i><i style="display:inline-block;width:var(--s-2);height:12px;background:var(--line-3)"></i><i style="display:inline-block;width:var(--s-3);height:12px;background:var(--line-3)"></i><i style="display:inline-block;width:var(--s-4);height:12px;background:var(--line-3)"></i><i style="display:inline-block;width:var(--s-5);height:12px;background:var(--line-3)"></i><i style="display:inline-block;width:var(--s-6);height:12px;background:var(--line-3)"></i><i style="display:inline-block;width:var(--s-7);height:12px;background:var(--line-3)"></i>
+      <span class="mono" style="color:var(--text-3);font-size:var(--fs-2xs)">4 · 8 · 12 · 16 · 24 · 32 · 48</span></div>
+  </section>
+</main>
+
+<script>
+'use strict';
+/* =====================================================================
+   DỮ LIỆU  ★ FAKE = dữ liệu giả, thay bằng dữ liệu thật từ server
+   ===================================================================== */
+const ROSTER = {
+  // ---- Có spec thật ----
+  kira:  { id:'kira',  name:'KIRA',  faction:'chrome', tier:'S', atk:145, hp:950,  energyMax:100,
+           ult:{ name:'ZERO', cost:100, kind:'nuke', mult:3.2, refundOnKill:50,
+                 desc:'320% ATK lên một mục tiêu. Nếu giết được, hoàn 50 Energy.' },
+           // Frame đã tách nền từ KIRA/Kira idle.png + Kira attack.png (cùng tỉ lệ 0.72, sàn ở y=678).
+           // box = kích thước canvas + ax = toạ độ x của điểm giữa hai bàn chân. idle đúng 744×682;
+           // attack canvas rộng hơn để không cắt kiếm/vệt chém, HTML tự căn theo ax.
+           sprites:{ idle:['kira_idle.png','KIRA/Kira PNG.png'], attack:['kira_attack.png'],
+                     box:{ idle:{w:744,h:682,ax:372}, attack:{w:1173,h:682,ax:466} } },
+           portrait:['kira_portrait.png','KIRA/Kira PNG.png'], pos:'50% 5%' },
+  psalm: { id:'psalm', name:'PSALM', faction:'chrome', tier:'S', atk:110, hp:1100, energyMax:125,
+           ult:{ name:'APOSTASY', cost:125, kind:'control',
+                 desc:'Chiếm quyền điều khiển một kẻ địch trong một lượt: lượt tới nó tấn công đồng bọn.' },
+           sprites:{ idle:['psalm_idle.png','PSALM/psalm_idle.png'], attack:['psalm_attack.png','PSALM/psalm_attack.png'] },
+           portrait:['psalm_portrait.png','PSALM.png'], pos:'50% 12%' },
+  ronin: { id:'ronin', name:'RONIN', faction:'rust', tier:'A', atk:130, hp:1050, energyMax:100,   // ★ FAKE: cost + chiêu cuối
+           ult:{ name:'IAIDO', cost:100, kind:'nuke', mult:2.8, desc:'280% ATK lên một mục tiêu. (★ FAKE)' },
+           sprites:{ idle:['ronin_idle.png'], attack:['ronin_attack.png'] }, portrait:['ronin_portrait.png','RONIN.png'], pos:'50% 8%' },
+  ash:   { id:'ash',   name:'ASH',   faction:'rust', tier:'A', atk:120, hp:1000, energyMax:75,    // ★ FAKE: cost + chiêu cuối
+           ult:{ name:'FLASHOVER', cost:75, kind:'aoe', mult:1.5, desc:'150% ATK lên toàn bộ kẻ địch. (★ FAKE)' },
+           sprites:{ idle:['ash_idle.png'], attack:['ash_attack.png'] }, portrait:['ash_portrait.png','ASH.png'], pos:'50% 8%' },
+  muzzle:{ id:'muzzle',name:'MUZZLE',faction:'rust', tier:'B', atk:70,  hp:1750, energyMax:125,   // ★ FAKE: cost + chiêu cuối
+           ult:{ name:'FIELD PATCH', cost:125, kind:'heal', mult:1.2, desc:'Hồi 120% ATK cho toàn đội. (★ FAKE)' },
+           sprites:{ idle:['muzzle_idle.png'], attack:['muzzle_attack.png'] }, portrait:['muzzle_portrait.png','MUZZLE.png'], pos:'50% 8%' },
+  // ---- ★ FAKE toàn bộ: chưa có spec, chỉ để đủ roster 9 ----
+  echo:  { id:'echo',  name:'ECHO',  faction:'chrome', tier:'A', atk:105, hp:1000, energyMax:100, ult:{name:'RESONANCE',cost:100,kind:'nuke',mult:2.5,desc:'★ FAKE'}, sprites:{idle:['echo_idle.png'],attack:['echo_attack.png']}, portrait:['echo_portrait.png','ECHO.png'], pos:'50% 8%' },
+  wire:  { id:'wire',  name:'WIRE',  faction:'chrome', tier:'B', atk:80,  hp:1500, energyMax:75,  ult:{name:'OVERCLOCK',cost:75,kind:'nuke',mult:2.2,desc:'★ FAKE'}, sprites:{idle:['wire_idle.png'],attack:['wire_attack.png']}, portrait:['wire_portrait.png','WIRE.png'], pos:'50% 8%' },
+  stitch:{ id:'stitch',name:'STITCH',faction:'rust',   tier:'S', atk:140, hp:900,  energyMax:100, ult:{name:'SUTURE',cost:100,kind:'heal',mult:1.5,desc:'★ FAKE'}, sprites:{idle:['stitch_idle.png'],attack:['stitch_attack.png']}, portrait:['stitch_portrait.png','STITCH.png'], pos:'50% 8%' },
+  kai:   { id:'kai',   name:'KAI',   faction:'rust',   tier:'B', atk:95,  hp:1200, energyMax:100, ult:{name:'RIPCORD',cost:100,kind:'nuke',mult:2.4,desc:'★ FAKE'}, sprites:{idle:['kai_idle.png'],attack:['kai_attack.png']}, portrait:['kai_portrait.png','Kai.png'], pos:'50% 8%' },
+};
+/* ---- ★ FAKE: 10 nhân vật thêm cho đủ roster 19, chưa có art → silhouette; cost/chiêu cuối tạm ---- */
+const mkChar = (id,name,faction,tier,atk,hp,energyMax,ult) => ({ id,name,faction,tier,atk,hp,energyMax,ult,
+  sprites:{ idle:[id+'_idle.png'], attack:[id+'_attack.png'] }, portrait:[id+'_portrait.png'], pos:'50% 8%' });
+[ mkChar('vesper','VESPER','chrome','S',150,900,100,  {name:'EVENSONG',cost:100,kind:'aoe',mult:1.8,desc:'180% ATK lên toàn bộ kẻ địch. (★ FAKE)'}),
+  mkChar('nyx','NYX','chrome','S',140,1000,125,       {name:'BLACKOUT',cost:125,kind:'nuke',mult:3.4,desc:'340% ATK lên một mục tiêu. (★ FAKE)'}),
+  mkChar('halo','HALO','chrome','A',115,1150,100,     {name:'SANCTUM',cost:100,kind:'heal',mult:1.4,desc:'Hồi 140% ATK cho toàn đội. (★ FAKE)'}),
+  mkChar('cipher','CIPHER','chrome','A',125,950,75,   {name:'BACKDOOR',cost:75,kind:'control',desc:'Chiếm quyền điều khiển một kẻ địch một lượt. (★ FAKE)'}),
+  mkChar('meridian','MERIDIAN','chrome','B',85,1450,125,{name:'BULWARK PROTOCOL',cost:125,kind:'heal',mult:1.0,desc:'Hồi 100% ATK cho toàn đội. (★ FAKE)'}),
+  mkChar('toll','TOLL','rust','S',155,850,125,        {name:'DEBT COLLECTOR',cost:125,kind:'nuke',mult:3.6,desc:'360% ATK lên một mục tiêu. (★ FAKE)'}),
+  mkChar('spark','SPARK','rust','A',125,950,75,       {name:'ARC FLASH',cost:75,kind:'aoe',mult:1.4,desc:'140% ATK lên toàn bộ kẻ địch. (★ FAKE)'}),
+  mkChar('vixen','VIXEN','rust','A',135,900,100,      {name:'HEIST',cost:100,kind:'control',desc:'Chiếm quyền điều khiển một kẻ địch một lượt. (★ FAKE)'}),
+  mkChar('junker','JUNKER','rust','B',75,1700,100,    {name:'SCRAP CANNON',cost:100,kind:'nuke',mult:2.6,desc:'260% ATK lên một mục tiêu. (★ FAKE)'}),
+  mkChar('gravedigger','GRAVEDIGGER','rust','B',90,1500,125,{name:'LAST RITES',cost:125,kind:'nuke',mult:3.0,desc:'300% ATK lên một mục tiêu. (★ FAKE)'}),
+].forEach(c=>ROSTER[c.id]=c);
+
+const TEAM = ['kira','psalm','ronin','ash','muzzle'];            // đội hình demo (5 trong 19)
+
+/* ---- ★ FAKE: bể kẻ địch PvE (20). rank: grunt / elite / boss quyết định wave nào gọi và độ to trên sân ---- */
+const ENEMY_POOL = [
+  { id:'scav',       name:'SCAV-07',        faction:'rust',   rank:'grunt', atk:62,  hp:640  },
+  { id:'rigger',     name:'RIGGER',         faction:'rust',   rank:'grunt', atk:78,  hp:820  },
+  { id:'straydog',   name:'STRAY DOG',      faction:'rust',   rank:'grunt', atk:70,  hp:560  },
+  { id:'welder',     name:'WELDER',         faction:'rust',   rank:'grunt', atk:66,  hp:780  },
+  { id:'gutterrat',  name:'GUTTER RAT',     faction:'rust',   rank:'grunt', atk:58,  hp:520  },
+  { id:'chopshop',   name:'CHOP SHOP',      faction:'rust',   rank:'grunt', atk:74,  hp:700  },
+  { id:'tinman',     name:'TIN MAN',        faction:'rust',   rank:'grunt', atk:60,  hp:900  },
+  { id:'slagger',    name:'SLAGGER',        faction:'rust',   rank:'grunt', atk:80,  hp:760  },
+  { id:'pipefitter', name:'PIPE FITTER',    faction:'rust',   rank:'grunt', atk:64,  hp:840  },
+  { id:'hollow',     name:'HOLLOW',         faction:'rust',   rank:'grunt', atk:68,  hp:660  },
+  { id:'glassjaw',   name:'GLASS JAW',      faction:'rust',   rank:'grunt', atk:88,  hp:480  },
+  { id:'drone',      name:'CORP DRONE MK1', faction:'chrome', rank:'grunt', atk:72,  hp:600  },
+  { id:'bulwark',    name:'BULWARK',        faction:'rust',   rank:'elite', atk:48,  hp:1400 },
+  { id:'kiln',       name:'KILN',           faction:'rust',   rank:'elite', atk:95,  hp:1250 },
+  { id:'drillbit',   name:'DRILL-BIT',      faction:'rust',   rank:'elite', atk:105, hp:1100 },
+  { id:'enforcer',   name:'ENFORCER',       faction:'chrome', rank:'elite', atk:100, hp:1300 },
+  { id:'chromehound',name:'CHROME HOUND',   faction:'chrome', rank:'elite', atk:110, hp:1150 },
+  { id:'foreman',    name:'THE FOREMAN',    faction:'rust',   rank:'boss',  atk:125, hp:2600 },
+  { id:'motherrust', name:'MOTHER RUST',    faction:'rust',   rank:'boss',  atk:140, hp:3000 },
+  { id:'archon',     name:'ARCHON',         faction:'chrome', rank:'boss',  atk:150, hp:2800 },
+];
+/* ---- ★ FAKE: sector PvE = 3 wave. Wave 1: 3 grunt · Wave 2: 2 grunt + 1 elite · Wave 3: grunt + elite + BOSS ---- */
+const SECTOR = { id:'07-B', waves:3 };
+const shuffle = a => a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(p=>p[1]);
+function rollWave(n){
+  const pick=(rank,k)=>shuffle(ENEMY_POOL.filter(e=>e.rank===rank)).slice(0,k);
+  let w = n===1 ? pick('grunt',3) : n===2 ? [...pick('grunt',2),...pick('elite',1)] : [...pick('grunt',1),...pick('elite',1),...pick('boss',1)];
+  const boss=w.find(e=>e.rank==='boss'); if(boss){ const r=w.filter(e=>e!==boss); w=[r[0],boss,r[1]]; }   // boss đứng giữa
+  return w;
+}
+const RULES = { critChance:.15, critMult:1.5, variance:.08 };     // ★ FAKE: công thức tạm
+
+/* =====================================================================
+   TIỆN ÍCH
+   ===================================================================== */
+const $ = (s, r=document) => r.querySelector(s);
+const el = (tag, cls, html) => { const e=document.createElement(tag); if(cls) e.className=cls; if(html!=null) e.innerHTML=html; return e; };
+const wait = ms => new Promise(r=>setTimeout(r,ms));
+const rand = a => a[Math.floor(Math.random()*a.length)];
+const RM = matchMedia('(prefers-reduced-motion: reduce)');
+const reduced = () => RM.matches;
+
+/* Thử lần lượt các đường dẫn, trả về cái đầu tiên load được (hoặc null) */
+const imgCache = new Map();
+function loadFirst(list){
+  if(!list || !list.length) return Promise.resolve(null);
+  const key = list.join('|');
+  if(imgCache.has(key)) return imgCache.get(key);
+  const p = (async () => {
+    for(const src of list){
+      const ok = await new Promise(res => { const im = new Image(); im.onload=()=>res(true); im.onerror=()=>res(false); im.src=encodeURI(src); });
+      if(ok) return encodeURI(src);
+    }
+    return null;
+  })();
+  imgCache.set(key,p); return p;
+}
+function portraitEl(def, cls=''){
+  const p = el('div','portrait '+cls);
+  p.style.setProperty('--pos', def.pos||'50% 8%');
+  p.innerHTML = `<img alt=""><div class="sil ${def.faction==='rust'?'sil--rust':''}"><span class="sil__lbl">NO ASSET</span></div>`;
+  loadFirst(def.portrait).then(src => { if(src){ p.querySelector('img').src=src; p.classList.add('has-img'); } });
+  return p;
+}
+const hpBar = (cls='') => `<div class="bar ${cls}" data-state="ok" style="--v:100%"><div class="bar__track"><i class="bar__ghost"></i><i class="bar__fill"></i><i class="bar__ticks"></i></div></div>`;
+function setHpBar(bar, hp, max){
+  const pct = Math.max(0, hp/max*100);
+  bar.style.setProperty('--v', pct.toFixed(1)+'%');
+  bar.dataset.state = pct <= 25 ? 'low' : pct <= 50 ? 'mid' : 'ok';
+  return bar.dataset.state;
+}
+function energyBarEl(max){ const e=el('div','ebar'); for(let i=0;i<max/25;i++) e.appendChild(el('i','seg')); return e; }
+function setEnergyBar(ebar, v, max){
+  [...ebar.children].forEach((s,i)=> s.classList.toggle('on', v >= (i+1)*25));
+  ebar.classList.toggle('is-full', v >= max);
+}
+
+/* =====================================================================
+   THEME TOGGLE (auto → dark → light)
+   ===================================================================== */
+{
+  const order=['auto','dark','light']; const root=document.documentElement; const btn=$('#themeBtn');
+  btn.addEventListener('click',()=>{ const i=(order.indexOf(root.dataset.theme)+1)%order.length; root.dataset.theme=order[i]; btn.textContent='THEME: '+order[i].toUpperCase(); renderSwatches(); });
+}
+
+/* =====================================================================
+   BATTLE ENGINE
+   ===================================================================== */
+const B = { units:[], queue:[], idx:0, round:0, target:null, busy:false, over:false, frames:{}, actorId:null };
+const UI = {
+  allies:$('#allies'), enemies:$('#enemies'), turnbar:$('#turnbar'), ticker:$('#ticker'), fx:$('#fx'), log:$('#log'),
+  btnAttack:$('#btnAttack'), btnUlt:$('#btnUlt'), ultName:$('#ultName'), ultMeta:$('#ultMeta'), ultBar:$('#ultBarFill'), ultInfo:$('#ultInfo'),
+  banner:$('#ultBanner'), ubName:$('#ubName'), ubSub:$('#ubSub'), stageflash:$('#stageflash'), result:$('#result'), roundNo:$('#roundNo'), waveNo:$('#waveNo'), sectorNo:$('#sectorNo'),
+};
+
+function makeUnit(def, side, i){
+  return { ...def, side, uid:side+'-'+i, hp:def.hp, hpMax:def.hp, energy:0, alive:true, controlled:false, chips:[], el:null };
+}
+const alive = side => B.units.filter(u=>u.alive && (!side || u.side===side));
+const current = () => B.queue[B.idx];
+
+function initBattle(){
+  B.units = TEAM.map((id,i)=>makeUnit(ROSTER[id],'ally',i));
+  B.round=0; B.idx=0; B.target=null; B.busy=false; B.over=false; B.wave=0;
+  UI.log.innerHTML=''; UI.result.hidden=true; UI.fx.innerHTML=''; turnTiles.clear();
+  UI.sectorNo.textContent=SECTOR.id;
+  renderSide('ally'); preloadFrames();
+  spawnWave(); newRound();
+}
+/* Gọi wave kế: giữ nguyên đội mình (HP/Energy/KIA), thay toàn bộ kẻ địch */
+function spawnWave(){
+  B.wave++; UI.waveNo.textContent=`${B.wave}/${SECTOR.waves}`;
+  B.units = [ ...B.units.filter(u=>u.side==='ally'), ...rollWave(B.wave).map((d,i)=>makeUnit(d,'enemy',i)) ];
+  B.target=null; renderSide('enemy');
+  log(`Wave ${B.wave}/${SECTOR.waves}: ${alive('enemy').map(e=>e.name).join(' · ')}`, true);
+}
+async function waveTransition(){
+  B.busy=true; setInputs(false);
+  UI.ubName.textContent=`WAVE ${String(B.wave+1).padStart(2,'0')}`; UI.ubSub.textContent='HOSTILES INBOUND';
+  UI.banner.style.setProperty('--accent','var(--rust)');
+  UI.banner.classList.remove('show'); void UI.banner.offsetWidth; UI.banner.classList.add('show');
+  await wait(reduced()?300:1000);
+  spawnWave(); B.busy=false; newRound();
+}
+
+/* ---- Đội hình trên sân: % trong vùng phe (x từ trái, y từ đáy), z = thứ tự vẽ, sc = thu nhỏ hàng sau.
+   Đội mình: hàng trước 3 (slot 0/2/4), hàng sau 2 (slot 1/3). Tinh chỉnh tự do. ---- */
+const FORMATION = {
+  ally:  [{x:66,y:2,z:5},{x:32,y:18,z:4,sc:.92},{x:66,y:34,z:3},{x:32,y:50,z:2,sc:.92},{x:66,y:66,z:1}],
+  enemy: [{x:40,y:6,z:3},{x:62,y:36,z:2},{x:40,y:66,z:1}],
+};
+function unitEl(u,pos){
+  const e=el('div',`unit unit--${u.side} unit--${u.faction} unit--${(u.tier||'b').toLowerCase()}`);
+  e.dataset.uid=u.uid;
+  e.style.cssText=`--x:${pos.x}%;--y:${pos.y}%;--z:${pos.z};--sc:${pos.sc||1};--bob-delay:${-Math.round(Math.random()*2400)}ms`;
+  e.innerHTML=`<div class="unit__sprite"><div class="unit__shadow"></div><div class="unit__ring"></div>
+      <div class="unit__bob"><div class="unit__pose"><div class="sil sil--free ${u.faction==='rust'?'sil--rust':''}"><span class="sil__lbl">NO SPRITE</span></div>
+      <div class="unit__frame"><img alt=""><div class="unit__flash"></div></div></div></div>
+      <div class="unit__brk"><i></i></div><span class="unit__tgt">TGT</span><div class="kia">KIA</div></div>
+    <div class="unit__plate"><div class="unit__name"><span>${u.name}</span>${u.side==='ally'?`<span class="tier">${u.tier}</span>`:`<span class="rank">${u.rank==='boss'?'BOSS':u.rank==='elite'?'ELITE':'ATK '+u.atk}</span>`}</div>${hpBar()}</div>`;
+  const plate=e.querySelector('.unit__plate');
+  if(u.side==='ally') plate.appendChild(energyBarEl(u.energyMax));
+  plate.insertAdjacentHTML('beforeend',`<div class="unit__hp mono"></div><div class="chips"></div><span class="unit__ready">READY</span>`);
+  if(u.side==='enemy') e.addEventListener('click',()=>{ if(u.alive) setTarget(u); });
+  return e;
+}
+function renderSide(side){
+  const host = side==='ally'?UI.allies:UI.enemies; host.innerHTML='';
+  B.units.filter(u=>u.side===side).forEach(u=>{
+    const i=+u.uid.split('-')[1]; let pos=FORMATION[side][i];
+    if(u.rank==='boss') pos={...pos, x:pos.x-12, sc:1.28, z:pos.z+3};   // boss to hơn, lùi vào trong, vẽ đè lên
+    else if(u.rank==='elite') pos={...pos, sc:1.08};
+    u.el=unitEl(u,pos); if(u.rank) u.el.classList.add('unit--'+u.rank);
+    host.appendChild(u.el); updateUnit(u);
+  });
+}
+function updateUnit(u){
+  const e=u.el; if(!e) return;
+  setHpBar(e.querySelector('.bar'), u.hp, u.hpMax);
+  e.querySelector('.unit__hp').textContent = `${Math.max(0,u.hp)}/${u.hpMax}`;
+  const eb=e.querySelector('.ebar'); if(eb){ setEnergyBar(eb,u.energy,u.energyMax); e.classList.toggle('is-ready', u.energy>=u.energyMax && u.alive); }
+  e.querySelector('.chips').innerHTML = u.chips.map(c=>`<span class="chip chip--${c.type}">${c.label}${c.val?` <em>${c.val}</em>`:''}</span>`).join('');
+  e.classList.toggle('is-dead', !u.alive);
+}
+function addChip(u,type,label,val){ u.chips.push({type,label,val}); updateUnit(u); }
+function removeChip(u,label){ u.chips=u.chips.filter(c=>c.label!==label); updateUnit(u); }
+
+/* ---- Sprite: preload frame idle/attack cho cả đội ---- */
+function preloadFrames(){
+  TEAM.forEach(id=>{
+    const d=ROSTER[id];
+    const box=d.sprites.box||{};
+    B.frames[id] = Promise.all([loadFirst(d.sprites.idle), loadFirst(d.sprites.attack)])
+      .then(([idle,attack])=>({ idle:idle&&{src:idle, box:box.idle}, attack:(attack&&{src:attack, box:box.attack}) || (idle&&{src:idle, box:box.idle}) }));
+  });
+  B.units.filter(u=>u.side==='ally').forEach(mountSprite);
+}
+/* Đặt frame vào hộp 744×682 của unit: neo chân (box.ax) trùng x=372, sàn trùng đáy hộp.
+   Frame không có box (ảnh fallback) → chiếm trọn hộp, object-fit contain đáy. */
+function setFrame(u, frame){
+  const b=frame.box, fb=u.el.querySelector('.unit__frame'), st=fb.style;
+  if(b){ st.width=(b.w/744*100)+'%'; st.height=(b.h/682*100)+'%'; st.left=((372-b.ax)/744*100)+'%'; }
+  else { st.width='100%'; st.height='100%'; st.left='0'; }
+  fb.querySelector('img').src=frame.src; fb.querySelector('.unit__flash').style.setProperty('--mask', `url("${frame.src}")`);
+}
+async function mountSprite(u){
+  const f=await B.frames[u.id]; if(!f||!f.idle||!u.el) return;
+  setFrame(u,f.idle); u.el.querySelector('.unit__pose').classList.add('has-img');
+}
+/* Chớp trắng opacity .26 tắt dần 200ms, che khoảnh khắc đổi frame */
+function flashSprite(u){
+  const pose=u.el.querySelector('.unit__pose');
+  if(pose.classList.contains('has-img')) pose.querySelector('.unit__flash').animate([{opacity:.26},{opacity:0}],{duration:200,easing:'linear'});
+  else pose.querySelector('.sil').animate([{filter:'brightness(2.2)'},{filter:'brightness(1)'}],{duration:200,easing:'linear'});
+}
+/* Attack: +28px/90ms out (scale 1.02,.96) → giữ 120ms → về 0/180ms. Tổng 390ms */
+async function playAttackAnim(u){
+  const f = await B.frames[u.id]; const pose=u.el.querySelector('.unit__pose');
+  flashSprite(u);
+  if(f&&f.attack) setFrame(u,f.attack);
+  if(!reduced()){
+    const out = pose.animate([{transform:'translateX(0) scale(1,1)'},{transform:'translateX(28px) scale(1.02,.96)'}],{duration:90,easing:'cubic-bezier(.16,.9,.3,1)',fill:'forwards'});
+    await out.finished; await wait(120);
+    const back = pose.animate([{transform:'translateX(28px) scale(1.02,.96)'},{transform:'translateX(0) scale(1,1)'}],{duration:180,easing:'cubic-bezier(.3,0,.4,1)',fill:'forwards'});
+    await back.finished; out.cancel(); back.cancel();
+  } else { await wait(390); }
+  flashSprite(u);
+  if(f&&f.idle) setFrame(u,f.idle);
+}
+
+/* ---- Số bay lên ---- */
+function spawnNumber(targetEl, text, kind){
+  const s=UI.fx.getBoundingClientRect(), r=targetEl.getBoundingClientRect();
+  const d=el('div','dmg'+(kind?' dmg--'+kind:''), text);
+  d.style.left = (r.left + r.width/2 - s.left + (Math.random()*20-10)) + 'px';
+  d.style.top  = (r.top + r.height*.38 - s.top) + 'px';
+  UI.fx.appendChild(d); d.addEventListener('animationend',()=>d.remove());
+}
+
+/* ---- Sát thương ---- */
+function dealDamage(src, tgt, mult, opts={}){
+  const crit = Math.random() < RULES.critChance;
+  const v = 1 + (Math.random()*2-1)*RULES.variance;
+  const dmg = Math.round(src.atk * mult * v * (crit?RULES.critMult:1));
+  tgt.hp = Math.max(0, tgt.hp - dmg);
+  spawnNumber(tgt.el.querySelector('.unit__sprite'), dmg, crit?'crit':'');
+  tgt.el.classList.add('is-hit'); setTimeout(()=>tgt.el.classList.remove('is-hit'), 320);
+  const killed = tgt.hp<=0 && tgt.alive;
+  if(killed){ tgt.alive=false; tgt.chips=[]; }
+  updateUnit(tgt);
+  log(`${src.name} → ${tgt.name} · ${dmg}${crit?' CRIT':''}${killed?' · KIA':''}`, crit||killed);
+  if(killed && B.target===tgt) B.target=null;
+  return {dmg,crit,killed};
+}
+function heal(src, tgt, amount){
+  const before=tgt.hp; tgt.hp=Math.min(tgt.hpMax, tgt.hp+amount);
+  spawnNumber(tgt.el.querySelector('.unit__sprite'), '+'+(tgt.hp-before), 'heal'); updateUnit(tgt);
+}
+function gainEnergy(u, n){ u.energy=Math.min(u.energyMax, u.energy+n); updateUnit(u); if(u===current()) updateUltButton(u); }
+
+/* ---- Lượt ---- */
+function buildQueue(){
+  // ★ FAKE thứ tự: hệ chỉ có ATK/HP/Energy, chưa có tốc độ → xen kẽ ta/địch theo slot
+  const a=alive('ally'), e=alive('enemy'), q=[];
+  for(let i=0;i<Math.max(a.length,e.length);i++){ if(a[i]) q.push(a[i]); if(e[i]) q.push(e[i]); }
+  return q;
+}
+function newRound(){ B.round++; UI.roundNo.textContent=String(B.round).padStart(2,'0'); B.queue=buildQueue(); B.idx=0; startTurn(); }
+/* Ô chân dung trong thanh lượt được tạo một lần rồi tái sử dụng (không reload ảnh mỗi lượt) */
+const turnTiles = new Map();
+function turnTile(u, key){
+  const k=u.uid+key; if(!turnTiles.has(k)){ const t=el('div',`tu tu--${u.faction}`); t.appendChild(portraitEl(u)); t.insertAdjacentHTML('beforeend','<span class="tu__lbl">NOW</span><i class="tu__mark"></i>'); turnTiles.set(k,t); }
+  const t=turnTiles.get(k); t.classList.remove('is-active','is-next'); return t;
+}
+function renderTurnbar(){
+  UI.turnbar.innerHTML='';
+  const rest=B.queue.slice(B.idx).filter(u=>u.alive);
+  const next=buildQueue().slice(0, Math.max(0, 7-rest.length));
+  rest.forEach((u,i)=>{ const t=turnTile(u,'a'); if(i===0) t.classList.add('is-active'); UI.turnbar.appendChild(t); });
+  if(next.length){ UI.turnbar.appendChild(el('i','turn__sep')); next.forEach(u=>{ const t=turnTile(u,'n'); t.classList.add('is-next'); UI.turnbar.appendChild(t); }); }
+}
+function ensureTarget(){ if(!B.target||!B.target.alive){ const e=alive('enemy'); B.target=e[0]||null; } B.units.forEach(u=>u.el&&u.el.classList.toggle('is-target',u===B.target)); return B.target; }
+function setTarget(u){ B.target=u; ensureTarget(); ticker(`Mục tiêu: ${u.name}`); }
+function setInputs(on){ UI.btnAttack.disabled=!on; if(!on){ UI.btnUlt.dataset.state='locked'; } }
+function updateUltButton(u){
+  UI.btnUlt.classList.toggle('btn-ult--rust', u.faction==='rust');
+  UI.ultName.textContent=u.ult.name;
+  UI.ultBar.style.setProperty('--p', (u.energy/u.ult.cost*100)+'%');
+  if(u.energy>=u.ult.cost){ UI.btnUlt.dataset.state='ready'; UI.ultMeta.textContent=`${u.energy}/${u.ult.cost} · ${u.ult.kind==='control'?'CONTROL':u.ult.kind==='heal'?'HEAL':Math.round(u.ult.mult*100)+'% ATK'}`; }
+  else { UI.btnUlt.dataset.state='locked'; UI.ultMeta.textContent=`−${u.ult.cost-u.energy} EN · ${u.energy}/${u.ult.cost}`; }
+  UI.ultInfo.innerHTML=`<b>${u.name} · ${u.ult.name}</b>${u.ult.desc}<span class="mono">COST ${u.ult.cost} · ENERGY ${u.energy}/${u.energyMax}</span>`;
+}
+function ticker(t){ UI.ticker.textContent=t; }
+function log(t, hi){ const li=el('li', hi?'hi':'', `<b>R${B.round}</b>${t}`); UI.log.prepend(li); ticker(t); }
+
+async function startTurn(){
+  if(B.over) return;
+  const u=current();
+  if(!u){ return newRound(); }
+  if(!u.alive){ return endTurn(); }
+  renderTurnbar();
+  B.units.forEach(x=>x.el&&x.el.classList.toggle('is-active', x===u));
+  if(u.side==='ally'){
+    ensureTarget(); setInputs(true); updateUltButton(u); ticker(`${u.name} — chọn hành động`);
+  } else {
+    setInputs(false); ticker(`${u.name} đang hành động…`);
+    await wait(reduced()?250:700); await enemyAct(u);
+  }
+}
+function endTurn(){
+  if(B.over) return;
+  if(!alive('enemy').length) return B.wave<SECTOR.waves ? waveTransition() : finish(true);
+  if(!alive('ally').length) return finish(false);
+  B.idx++;
+  setTimeout(()=> B.idx>=B.queue.length ? newRound() : startTurn(), 0);
+}
+function finish(win){
+  B.over=true; setInputs(false);
+  UI.result.hidden=false; UI.result.className='result '+(win?'win':'lose');
+  $('#resT').textContent = win?'SECTOR CLEARED':'SQUAD LOST';
+  $('#resS').textContent = win?`${SECTOR.waves} wave · round ${B.round} · ${alive('ally').length}/5 sống sót`:`Wave ${B.wave}/${SECTOR.waves} · round ${B.round} · toàn đội KIA`;
+  log(win?'Thắng.':'Thua.', true);
+}
+
+async function playerAttack(){
+  if(B.busy||B.over) return; const u=current(); const t=ensureTarget(); if(!t) return;
+  B.busy=true; setInputs(false);
+  const anim=playAttackAnim(u);
+  await wait(90);                       // va chạm tại đỉnh của cú lao ra
+  dealDamage(u,t,1); gainEnergy(u,25);
+  await anim; await wait(reduced()?80:160);
+  B.busy=false; endTurn();
+}
+async function playerUlt(){
+  if(B.busy||B.over) return; const u=current(); if(u.energy<u.ult.cost) return;
+  B.busy=true; UI.btnAttack.disabled=true; UI.btnUlt.dataset.state='casting'; UI.ultMeta.textContent='CASTING…';
+  UI.ubName.textContent=u.ult.name; UI.ubSub.textContent=`${u.name} · ${u.ult.desc.split('.')[0]}`;
+  UI.banner.style.setProperty('--accent', u.faction==='rust'?'var(--rust)':'var(--chrome)');
+  UI.banner.classList.remove('show'); void UI.banner.offsetWidth; UI.banner.classList.add('show');
+  UI.stageflash.animate([{opacity:.18},{opacity:0}],{duration:360,easing:'ease-out'});
+  u.energy-=u.ult.cost; updateUnit(u);
+  await wait(reduced()?150:420);
+  const k=u.ult.kind;
+  if(k==='nuke'){
+    const t=ensureTarget(); const anim=playAttackAnim(u); await wait(90);
+    const r=dealDamage(u,t,u.ult.mult);
+    if(r.killed && u.ult.refundOnKill){ gainEnergy(u,u.ult.refundOnKill); addChip(u,'refund','EN REFUND','+'+u.ult.refundOnKill); log(`${u.name} hoàn ${u.ult.refundOnKill} Energy (kill)`, true); setTimeout(()=>removeChip(u,'EN REFUND'), 2500); }
+    await anim;
+  } else if(k==='aoe'){
+    const anim=playAttackAnim(u); await wait(90);
+    alive('enemy').forEach(t=>dealDamage(u,t,u.ult.mult)); await anim;
+  } else if(k==='heal'){
+    alive('ally').forEach(t=>heal(u,t,Math.round(u.atk*u.ult.mult))); log(`${u.name} hồi máu toàn đội`, true);
+  } else if(k==='control'){
+    const t=ensureTarget(); t.controlled=true; addChip(t,'control','CONTROLLED','1T'); log(`${u.name} chiếm quyền điều khiển ${t.name}`, true);
+  }
+  await wait(reduced()?200:600);
+  B.busy=false; endTurn();
+}
+async function enemyAct(e){
+  let tgt;
+  if(e.controlled){
+    e.controlled=false; removeChip(e,'CONTROLLED');
+    const others=alive('enemy').filter(x=>x!==e); tgt=others.length?rand(others):e;
+    log(`${e.name} bị điều khiển → tấn công ${tgt.name}`, true);
+  } else {
+    const a=alive('ally'); if(!a.length) return endTurn(); tgt=rand(a);
+  }
+  e.el.classList.add('is-lunge'); setTimeout(()=>e.el.classList.remove('is-lunge'),300);
+  await wait(reduced()?0:110);
+  dealDamage(e,tgt,1);
+  await wait(reduced()?200:520);
+  endTurn();
+}
+UI.btnAttack.addEventListener('click', playerAttack);
+UI.btnUlt.addEventListener('click', playerUlt);
+$('#btnReset').addEventListener('click', initBattle);
+$('#btnAgain').addEventListener('click', initBattle);
+initBattle();
+
+/* =====================================================================
+   KIT DEMOS
+   ===================================================================== */
+/* B1: cards — ma trận 2 phe × 3 tier + trạng thái */
+function cardEl(def, state){
+  const c=el('article', `card card--${def.faction} card--${def.tier.toLowerCase()} ${state==='selected'?'is-selected':state==='locked'?'is-locked':''}`);
+  c.dataset.id=def.id; c.draggable = state!=='locked';
+  const body=el('div','card__body');
+  body.appendChild(Object.assign(portraitEl(def,'card__portrait'),{}));
+  body.insertAdjacentHTML('beforeend', `<div class="card__tier">${def.tier}</div><div class="card__fac">${def.faction}</div>
+    <div class="card__info"><div class="card__name">${def.name}</div>
+    <div class="card__stats"><span><b>ATK</b><em>${def.atk}</em></span><span><b>HP</b><em>${def.hp}</em></span></div></div>
+    <div class="card__state">${state==='selected'?'SELECTED':state==='locked'?'LOCKED':''}</div>`);
+  c.appendChild(body);
+  c.addEventListener('dragstart', ev=>{ ev.dataTransfer.setData('text/plain',def.id); c.classList.add('is-dragging'); $('#team').querySelectorAll('.tslot.is-over').forEach(s=>s.classList.remove('is-over')); });
+  c.addEventListener('dragend', ()=>c.classList.remove('is-dragging'));
+  return c;
+}
+{
+  const row=$('#cardRow');
+  const specs=[['kira','selected'],['echo',''],['wire','locked'],['psalm','selected'],['stitch',''],['ronin',''],['muzzle',''],['ash','locked']];
+  specs.forEach(([id,st])=>{ const w=el('div','sample'); w.appendChild(cardEl(ROSTER[id],st)); const d=ROSTER[id];
+    w.insertAdjacentHTML('beforeend', `<span class="sample__cap">${d.faction} · tier ${d.tier} · ${st||'unselected'}${['echo','wire','stitch','kai'].includes(id)?'<span class="fake">FAKE</span>':''}</span>`); row.appendChild(w); });
+  const g=cardEl(ROSTER.kira,''); g.classList.add('is-dragging'); g.draggable=false; $('#dragGhost').appendChild(g);
+  // Roster đầy đủ
+  const rr=$('#rosterRow'); const all=Object.values(ROSTER); $('#rosterCount').textContent=all.length;
+  all.forEach(d=>{ const w=el('div','sample'); w.appendChild(cardEl(d,'')); w.insertAdjacentHTML('beforeend',`<span class="sample__cap">${d.faction} · ${d.tier} · ${d.ult.name}</span>`); rr.appendChild(w); });
+  // Bestiary: tái dùng khung thẻ, badge = rank
+  const er=$('#enemyRow'); $('#enemyCount').textContent=ENEMY_POOL.length;
+  ENEMY_POOL.forEach(d=>{
+    const tier={grunt:'B',elite:'A',boss:'S'}[d.rank];
+    const c=cardEl({...d, tier, portrait:[], pos:''},''); c.draggable=false;
+    c.querySelector('.card__tier').textContent=d.rank[0].toUpperCase();
+    c.querySelector('.card__fac').textContent=`${d.faction} · ${d.rank}`;
+    const w=el('div','sample'); w.appendChild(c); er.appendChild(w);
+  });
+}
+/* B2: mất máu demo */
+{
+  const bar=$('#drainBar'), line=$('#drainLine'), txt=$('#drainTxt'); let hp=950;
+  setInterval(()=>{ hp -= 140 + Math.round(Math.random()*180); if(hp<0) hp=950; const st=setHpBar(bar,hp,950); line.dataset.state=st; txt.textContent=`${hp} / 950`; }, 1700);
+}
+/* B3: energy 0/25/50/75/100 + 125 (Psalm) */
+{
+  const row=$('#energyRow');
+  [[0,100],[25,100],[50,100],[75,100],[100,100],[125,125]].forEach(([v,max])=>{
+    const s=el('div','sample sample--w'); const full=v>=max;
+    s.innerHTML=`<div class="eline ${full?'is-full':''}"><span class="lbl">Energy</span><span><span class="ready">READY</span> <span class="mono">${v}/${max}</span></span></div>`;
+    const eb=energyBarEl(max); eb.classList.add('ebar--lg'); setEnergyBar(eb,v,max); s.appendChild(eb);
+    s.insertAdjacentHTML('beforeend', `<span class="sample__cap">${full?'ĐẦY · sắp tung chiêu':v+' / '+max}${max===125?' · 5 ô (cost 125)':''}</span>`); row.appendChild(s);
+  });
+}
+/* B4: team slots + drag & drop */
+{
+  const team=$('#team'); const state=['kira','psalm',null,null,null];
+  function render(){
+    team.innerHTML='';
+    state.forEach((id,i)=>{
+      const s=el('div','tslot'); s.dataset.idx=i;
+      s.innerHTML=`<span class="tslot__idx">${String(i+1).padStart(2,'0')}</span><div class="tslot__empty"></div>`;
+      if(id){ const d=ROSTER[id]; s.classList.add('is-filled','f-'+d.faction); s.appendChild(portraitEl(d)); s.insertAdjacentHTML('beforeend', `<div class="tslot__name">${d.name}</div><button class="tslot__x" title="Gỡ">×</button>`);
+        s.querySelector('.tslot__x').addEventListener('click',()=>{ state[i]=null; render(); }); }
+      if(i===2 && !id && !team.dataset.touched) s.classList.add('is-over');   // demo tĩnh trạng thái drag-over
+      s.addEventListener('dragover', ev=>{ ev.preventDefault(); team.dataset.touched='1'; team.querySelectorAll('.is-over').forEach(x=>x.classList.remove('is-over')); s.classList.add('is-over'); });
+      s.addEventListener('dragleave', ()=>s.classList.remove('is-over'));
+      s.addEventListener('drop', ev=>{ ev.preventDefault(); const id=ev.dataTransfer.getData('text/plain'); if(!ROSTER[id]) return; const j=state.indexOf(id); if(j>-1) state[j]=null; state[i]=id; render(); });
+      team.appendChild(s);
+    });
+  }
+  render();
+}
+/* B5: casting demo lặp */
+setInterval(()=>{ const i=$('#castDemo'); i.style.animation='none'; void i.offsetWidth; i.style.animation=''; }, 1300);
+/* B6: turn bar demo tự chạy */
+{
+  const seq=['kira','scav','psalm','rigger','ronin','bulwark','ash','muzzle'].map(id=>ROSTER[id]||{...ENEMY_POOL.find(e=>e.id===id), portrait:[], pos:''});
+  let i=0; const bar=$('#turnDemo'); const tiles=new Map();
+  const mk=(u,key)=>{ const k=u.id+key; if(!tiles.has(k)){ const t=el('div',`tu tu--${u.faction}`); t.appendChild(portraitEl(u)); t.insertAdjacentHTML('beforeend','<span class="tu__lbl">NOW</span><i class="tu__mark"></i>'); tiles.set(k,t); } const t=tiles.get(k); t.classList.remove('is-active','is-next'); return t; };
+  function draw(){ bar.innerHTML=''; const rest=seq.slice(i), next=seq.slice(0,Math.max(0,7-rest.length));
+    rest.forEach((u,k)=>{ const t=mk(u,'a'); if(k===0) t.classList.add('is-active'); bar.appendChild(t); }); if(next.length){ bar.appendChild(el('i','turn__sep')); next.forEach(u=>{ const t=mk(u,'n'); t.classList.add('is-next'); bar.appendChild(t); }); } }
+  draw(); setInterval(()=>{ i=(i+1)%seq.length; draw(); },1600);
+}
+/* B7: số bay lên */
+{
+  const box=$('#dmgDemo');
+  const fire=()=>{ const s=box.getBoundingClientRect(); const put=(x,txt,k,delay)=>setTimeout(()=>{ const d=el('div','dmg'+(k?' dmg--'+k:''),txt); d.style.left=x+'%'; d.style.top='70%'; box.appendChild(d); d.addEventListener('animationend',()=>d.remove()); },delay);
+    put(18,'151','',0); put(50,'232','crit',180); put(82,'+84','heal',360); };
+  fire(); $('#btnDmg').addEventListener('click',fire); setInterval(fire,3200);
+}
+/* A: swatches — đọc giá trị computed để kiểm tra theme */
+function renderSwatches(){
+  const names=[['--chrome','Chrome'],['--chrome-hi','Chrome hi'],['--chrome-white','Chrome white'],['--chrome-slate','Chrome slate'],
+    ['--rust','Rust'],['--rust-hi','Rust hi'],['--rust-acid','Rust acid'],['--rust-grime','Rust grime'],
+    ['--tier-s','Tier S'],['--tier-a','Tier A'],['--tier-b','Tier B'],
+    ['--bg-0','bg 0'],['--bg-1','bg 1'],['--surface-1','surface 1'],['--surface-2','surface 2'],['--surface-3','surface 3'],['--surface-4','surface 4'],
+    ['--line-1','line 1'],['--line-2','line 2'],['--line-3','line 3'],['--text-1','text 1'],['--text-2','text 2'],['--text-3','text 3'],
+    ['--hp','hp'],['--hp-mid','hp mid'],['--hp-low','hp low'],['--heal','heal'],['--crit','crit'],['--energy','energy'],['--energy-full','energy full']];
+  const cs=getComputedStyle(document.documentElement);
+  $('#swatches').innerHTML=names.map(([v,n])=>`<div class="sw"><i style="--c:var(${v})"></i><b>${n}<small>${v} · ${cs.getPropertyValue(v).trim()}</small></b></div>`).join('');
+}
+renderSwatches();
+</script>
+</body>
+</html>
