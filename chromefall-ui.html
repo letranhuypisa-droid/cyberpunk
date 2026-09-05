@@ -927,7 +927,7 @@ async function waveTransition(){
    Đội mình: hàng trước 3 (slot 0/2/4), hàng sau 2 (slot 1/3). Tinh chỉnh tự do. ---- */
 const FORMATION = {
   ally:  [{x:66,y:2,z:5},{x:32,y:18,z:4,sc:.92},{x:66,y:34,z:3},{x:32,y:50,z:2,sc:.92},{x:66,y:66,z:1}],
-  enemy: [{x:40,y:6,z:3},{x:62,y:36,z:2},{x:40,y:66,z:1}],
+  enemy: [{x:40,y:6,z:3},{x:57,y:36,z:2},{x:40,y:66,z:1}],
 };
 function unitEl(u,pos){
   const e=el('div',`unit unit--${u.side} unit--${u.faction} unit--${(u.tier||'b').toLowerCase()}`);
