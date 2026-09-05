@@ -622,6 +622,20 @@ a{color:inherit;text-decoration:none}
 @keyframes banner{0%{opacity:0;transform:translateX(-40px)}15%{opacity:1;transform:translateX(0)}80%{opacity:1;transform:translateX(0)}100%{opacity:0;transform:translateX(40px)}}
 .stageflash{position:absolute;inset:0;background:var(--flash);opacity:0;pointer-events:none;z-index:19}
 
+/* Cut-in video chiêu cuối: phủ toàn sân, khung cắt chéo, thanh tên chạy vào */
+.cutin{position:absolute;inset:0;z-index:30;background:var(--bg-0);overflow:hidden}
+.cutin[hidden]{display:none}
+.cutin video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;animation:cutin-in 260ms var(--ease-hit-out)}
+.cutin::before,.cutin::after{content:"";position:absolute;left:0;right:0;height:9%;background:var(--bg-0);z-index:1}
+.cutin::before{top:0;clip-path:polygon(0 0,100% 0,100% 40%,0 100%)}
+.cutin::after{bottom:0;clip-path:polygon(0 60%,100% 0,100% 100%,0 100%)}
+.cutin__bar{position:absolute;left:0;bottom:14%;z-index:2;padding:8px 18px 8px 14px;background:linear-gradient(90deg,rgba(6,7,10,.92),rgba(6,7,10,.6));border-left:3px solid var(--accent,var(--chrome));animation:cutin-bar 500ms var(--ease-hit-out) both;animation-delay:120ms}
+.cutin__who{display:block;font:var(--fs-2xs) var(--font-mono);letter-spacing:.32em;color:var(--text-2)}
+.cutin__name{display:block;font:900 var(--fs-2xl)/1 var(--font-ui);letter-spacing:.3em;color:#fff;margin-top:2px}
+.cutin__skip{position:absolute;right:10px;top:12%;z-index:2}
+@keyframes cutin-in{from{transform:scale(1.08);filter:brightness(3)}to{transform:none;filter:none}}
+@keyframes cutin-bar{from{transform:translateX(-110%)}to{transform:none}}
+
 /* Overlay kết quả */
 .result{position:absolute;inset:0;z-index:40;display:grid;place-items:center;background:rgba(6,7,10,.82)}
 .result[hidden]{display:none}
@@ -672,6 +686,7 @@ a{color:inherit;text-decoration:none}
   @keyframes dmg-rise-rm{0%{opacity:1;transform:translate(-50%,-60%)}100%{opacity:0;transform:translate(-50%,-70%)}}
   .unit.is-hit .unit__sprite,.unit.is-lunge .unit__sprite{animation:none}
   .ultbanner.show{animation:banner-rm 1000ms linear forwards}
+  .cutin video,.cutin__bar{animation:none}
   @keyframes banner-rm{0%,90%{opacity:1}100%{opacity:0}}
   html{scroll-behavior:auto}
 }
@@ -768,6 +783,11 @@ a{color:inherit;text-decoration:none}
       <div class="field field--enemy" id="enemies"></div>
 
       <div class="stageflash" id="stageflash"></div>
+      <div class="cutin" id="cutin" hidden>
+        <video id="cutinVideo" playsinline preload="auto"></video>
+        <div class="cutin__bar"><span class="cutin__who" id="cutinWho">KIRA</span><span class="cutin__name" id="cutinName">ZERO</span></div>
+        <button class="cutin__skip btn-ghost" id="cutinSkip">SKIP ▸</button>
+      </div>
       <div class="ultbanner" id="ultBanner"><div class="ultbanner__n" id="ubName">ZERO</div><div class="ultbanner__line"></div><div class="ultbanner__s" id="ubSub"></div></div>
       <div class="result" id="result" hidden><div class="result__box"><div class="result__t" id="resT"></div><div class="result__s" id="resS"></div><button class="btn-ghost" id="btnAgain">RETRY</button> <button class="btn-ghost" data-go="home">RETURN TO BASE</button></div></div>
     </div>
@@ -922,11 +942,15 @@ const ROSTER = {
            // attack canvas rộng hơn để không cắt kiếm/vệt chém, HTML tự căn theo ax.
            sprites:{ idle:['kira_idle.png','KIRA/Kira PNG.png'], attack:['kira_attack.png'],
                      box:{ idle:{w:744,h:682,ax:372}, attack:{w:1173,h:682,ax:466} } },
-           portrait:['kira_portrait.png','KIRA/Kira PNG.png'], pos:'50% 5%' },
+           portrait:['kira_portrait.png','KIRA/Kira PNG.png'], pos:'50% 5%',
+           ultVideo:['kira_ult.mp4','KIRA/Kira Ultimate.mp4'] },   // cut-in 5s khi phát chiêu cuối (H.264 1280×720)
   psalm: { id:'psalm', name:'PSALM', faction:'chrome', tier:'S', atk:110, hp:1100, energyMax:125,
            ult:{ name:'APOSTASY', cost:125, kind:'control',
                  desc:'Chiếm quyền điều khiển một kẻ địch trong một lượt: lượt tới nó tấn công đồng bọn.' },
-           sprites:{ idle:['psalm_idle.png','PSALM/psalm_idle.png'], attack:['psalm_attack.png','PSALM/psalm_attack.png'] },
+           // Frame tách từ PSALM/PSALM idle.png + attack.png (nền xanh lá), tỉ lệ 0.715, sàn y=678, ax = điểm giữa hai bàn chân
+           sprites:{ idle:['psalm_idle.png'], attack:['psalm_attack.png'],
+                     box:{ idle:{w:744,h:682,ax:372}, attack:{w:1203,h:682,ax:534} } },
+           ultVideo:['psalm_ult.mp4','PSALM/PSALM ultimate.mp4'],
            portrait:['psalm_portrait.png','PSALM.png'], pos:'50% 12%' },
   ronin: { id:'ronin', name:'RONIN', faction:'rust', tier:'A', atk:130, hp:1050, energyMax:100,   // ★ FAKE: cost + chiêu cuối
            ult:{ name:'IAIDO', cost:100, kind:'nuke', mult:2.8, desc:'280% ATK lên một mục tiêu. (★ FAKE)' },
@@ -1302,6 +1326,7 @@ async function playerUlt(){
   UI.stageflash.animate([{opacity:.18},{opacity:0}],{duration:360,easing:'ease-out'});
   u.energy-=u.ult.cost; updateUnit(u);
   await wait(reduced()?150:420);
+  await playCutin(u);                     // video ult nếu nhân vật có (bỏ qua nếu thiếu file / không phát được)
   const k=u.ult.kind;
   if(k==='nuke'){
     const t=ensureTarget(); const anim=playAttackAnim(u); await wait(90);
@@ -1318,6 +1343,29 @@ async function playerUlt(){
   }
   await wait(reduced()?200:600);
   B.busy=false; endTurn();
+}
+/* ---- Cut-in video chiêu cuối ---- */
+const videoCache=new Map();
+function resolveVideo(list){
+  if(!list||!list.length) return Promise.resolve(null);
+  const key=list.join('|'); if(videoCache.has(key)) return videoCache.get(key);
+  const p=(async()=>{ for(const src of list){ try{ const r=await fetch(encodeURI(src),{method:'HEAD'}); if(r.ok) return encodeURI(src); }catch(e){} } return null; })();
+  videoCache.set(key,p); return p;
+}
+async function playCutin(u){
+  const src=await resolveVideo(u.ultVideo); if(!src) return;
+  const box=$('#cutin'), v=$('#cutinVideo');
+  $('#cutinWho').textContent=`${u.name} · ULTIMATE`; $('#cutinName').textContent=u.ult.name;
+  box.style.setProperty('--accent', u.faction==='rust'?'var(--rust)':'var(--chrome)');
+  v.src=src; v.currentTime=0; v.muted=false; box.hidden=false;
+  await new Promise(async res=>{
+    let done=false; const end=()=>{ if(!done){ done=true; res(); } };
+    v.onended=end; v.onerror=end; $('#cutinSkip').onclick=end;
+    const guard=setTimeout(end, 8000);                        // không bao giờ treo trận
+    try{ await v.play(); }catch(e){ v.muted=true; try{ await v.play(); }catch(e2){ end(); } }
+    v.addEventListener('ended',()=>clearTimeout(guard),{once:true});
+  });
+  v.pause(); box.hidden=true; v.removeAttribute('src'); v.load();
 }
 async function enemyAct(e){
   let tgt;
