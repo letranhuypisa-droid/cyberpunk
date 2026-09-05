@@ -27,6 +27,7 @@ rồi mở `http://localhost:8765/index.html`. UI kit và token nằm cuối tra
 | `docs/story.md` | Thế giới, chiến dịch, thiết kế màn, hai kết |
 | `docs/characters.md` | Hồ sơ 19 nhân vật + Operator |
 | `docs/bg-prompts.md` | Prompt sinh ảnh nền và quy tắc zoom/chân trời |
+| `docs/ult-prompts.md` | Prompt sinh video cut-in chiêu cuối: khung an toàn, nhịp 5s, thoại từng nhân vật |
 
 Mọi số liệu cân bằng đánh dấu `★ FAKE` là bản nháp.
 
@@ -36,7 +37,7 @@ Mọi số liệu cân bằng đánh dấu `★ FAKE` là bản nháp.
 - Nền sector: `bg_<sector>.jpg` 1536×2048; thiếu thì dùng `bg_battle.jpg`.
 - Art thẻ: `<TÊN>.png` khung bán thân (đầu → ngang đùi/gối), 1536×2720. Ảnh gốc toàn thân thì cắt một bản bán thân
   `<id>_portrait.png` cùng tỉ lệ và để trước trong `portrait:[...]` — Kira cắt từ `KIRA.png`.
-- Video ult: `<id>_ult.mp4` H.264.
+- Video ult: `<id>_ult.mp4` H.264 1280×720, 5s (trần cứng 8s) — prompt sinh video ở `docs/ult-prompts.md`.
 - Ảnh gốc độ phân giải cao để trong `art-src/` (không đưa lên repo).
 
 UI SFX: "Sci Fi UI SFX Pack (FREE)" © JDSherbert — xem `audio/CREDITS.txt`.
