@@ -128,26 +128,50 @@ Cantor Ascendant nhắm thẳng vào Operator: "Ngươi không có Halo, vậy m
 
 | Sector | Tên | Nhịp | Wave | Hệ số ★ | Boss | Thưởng lần đầu ★ |
 |---|---|---|---|---|---|---|
-| 04-A | ARRIVAL HALL | Choir tưởng tổ là hàng trả về; học HALO LINK | 3 | 1.60 | ENFORCER PRIME | 200 SH · 3200 CR |
-| 04-B | GLASS GARDEN | Vesper săn Kira; rút lui, mở gợi ý gacha | 3 | 1.75 | VESPER | 220 SH · 3400 CR |
-| 04-C | ARCHIVE | Kira gặp bản sao giọng mình | 3 | 1.90 | ECHO | 250 SH · 3800 CR · **ECHO** |
-| 04-D | CONFESSIONAL | Psalm đối mặt Confessor mới ngồi ghế cũ | 3 | 2.05 | CONFESSOR MK-II | 280 SH · 4200 CR |
-| 04-E | THE NAVE | Cantor Ascendant, Halo mới; kết chương | 4 | 2.20 | CANTOR ASCENDANT | 400 SH · 6000 CR |
+| 04-A | ARRIVAL HALL | Choir tưởng tổ là hàng trả về; học HALO LINK | 3 | 1.45 | ENFORCER PRIME | 200 SH · 3200 CR |
+| 04-B | GLASS GARDEN | Vesper săn Kira; rút lui, mở gợi ý gacha | 3 | 1.60 | VESPER | 220 SH · 3400 CR |
+| 04-C | ARCHIVE | Kira gặp bản sao giọng mình | 3 | 1.75 | ECHO | 250 SH · 3800 CR · **ECHO** |
+| 04-D | CONFESSIONAL | Psalm đối mặt Confessor mới ngồi ghế cũ | 3 | 1.90 | CONFESSOR MK-II | 280 SH · 4200 CR |
+| 04-E | THE NAVE | Cantor Ascendant, Halo mới; kết chương | 4 | 2.05 | CANTOR ASCENDANT | 400 SH · 6000 CR |
 
 Địch mới: SERAPH DRONE, CHORISTER (grunt, link), WARDEN (elite, link), và 5 boss trên. Nền tạm dùng `bg_07c` cho tới khi
 có `bg_04a..e` (prompt ở `docs/bg-prompts.md`).
 
 **Chơi lại sector đã clear = tuần tra (PATROL):** nhận 25% thưởng lần đầu. Đây là nguồn SH ổn định cho Requisition.
 
-## 5. Chương 3 · CHOIR (The Canticle) — DÀN Ý
+## 5. Chương 3 · CHOIR (District 01 · The Canticle) — ĐÃ CÀI
 
-Đỉnh Spire. Canticle không phải một công ty, mà là một *bản nhạc* chạy trên mọi Halo. Kira và Psalm phải chọn:
-cắt toàn bộ Halo (giải phóng Choir nhưng xoá ký ức của họ) hay giữ Halo và hát đè lên bản nhạc gốc.
-Kết chương: **CHROMEFALL** — Spire mất kiểm soát Choir; chrome "rơi" xuống cùng Sump. Cái tên đổi nghĩa.
+Đỉnh Spire. Canticle không phải một công ty, mà là một *bản nhạc* chạy trên mọi Halo. Nhịp chương:
+**gác đồng ca → đại phong cầm → lò Halo → hầm giấu Nyx → bản gốc.** Cantor Ascendant đã hỏi "tại sao chúng nghe
+ngươi"; The Canticle hỏi lại câu đó và bắt Operator trả lời bằng một lựa chọn.
 
-Boss cuối dự kiến: **THE CANTICLE** — không phải một unit, là cả sân khấu (mỗi wave là một "khúc").
+**Cơ chế mới: VERSE.** Ở sector có VERSE, mỗi wave mới (từ wave 2) bài hát gốc át deck: toàn đội mất 25 Energy.
+Bài học: kết thúc wave nhanh, tung ult trước khi wave đổi, đừng "để dành".
 
----
+| Sector | Tên | Nhịp | Wave | Hệ số ★ | Boss | Thưởng lần đầu ★ |
+|---|---|---|---|---|---|---|
+| 01-A | THE LOFT | Gác đồng ca; Echo nhận ra nhịp của mình bị dùng | 3 | 2.20 | PRECENTOR | 450 SH |
+| 01-B | THE ORGAN | Máy phát bài hát; VERSE bắt đầu; Spark cắt dây từ dưới | 3 | 2.35 | ORGANIST | 500 SH |
+| 01-C | HALO FORGE | Lò đúc Halo; Wire đối mặt thứ mình dựng; Halo bị xích | 3 | 2.50 | FORGEMASTER | 550 SH · **HALO** |
+| 01-D | THE VAULT | SILENCE (cái nút Psalm từng nhấn) canh hầm Nyx | 3 | 2.70 | SILENCE | 600 SH |
+| 01-E | THE CANTICLE | Bốn khúc; Nyx đi cùng; **lựa chọn kết** | 4 | 3.00 | THE CANTICLE | 1000 SH · **NYX** |
+
+### Hai kết
+
+Ở outro 01-E, người chơi chọn (lưu trong hồ sơ, `PLAYER.ending`):
+
+- **CẮT TOÀN BỘ HALO — "Im lặng".** Mọi Choir tự do nhưng mất ký ức Halo giữ. Kira quên Spire, chỉ nhớ bãi phế liệu,
+  cái deck và số ba. Psalm quên 313 giọng. "Chromefall" chỉ còn nghĩa: ngày chrome xuống đứng cùng rỉ.
+- **HÁT ĐÈ LÊN BẢN GỐC — "Nhịp mới".** Choir giữ ký ức, bài hát vẫn còn nhưng nhịp là của Operator. Nyx lần đầu nghe
+  thấy bài hát và nói nó "nghe như bạn". Kết này đặt gánh nặng lên người chơi: đừng hát lệch.
+
+Dù chọn gì, Ronin chốt: "Tổ vẫn nghe cậu. Thứ tự đi. Xuống thôi."
+
+### Hội thoại ngoài trận (COMMS)
+
+Khi cả hai nhân vật của một cặp đã trong tổ, Lobby hiện một dải COMMS; chạm để đọc đoạn 4 câu. 9 cặp: Ash–Muzzle,
+Kai–Gravedigger, Junker–Stitch, Meridian–Muzzle, Cipher–Psalm, Kira–Echo, Kira–Psalm, Wire–Halo, Nyx–Ronin.
+Đây là nơi trả các mối quan hệ đã gieo trong hồ sơ.
 
 ## 6. Việc cần làm để lên bản chơi thật
 

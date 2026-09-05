@@ -443,7 +443,14 @@ a{color:inherit;text-decoration:none}
 .title__legal{position:absolute;right:12px;bottom:10px;z-index:1;font:8px var(--font-mono);letter-spacing:.1em;color:var(--text-3)}
 
 /* ---- HOME / LOBBY ---- */
-.home{display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:10px;padding:10px}
+.home{display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;gap:8px;padding:10px}
+.comms{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--line-2);background:var(--surface-1);text-align:left;color:var(--text-1);
+  clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px))}
+.comms[hidden]{display:none}
+.comms__k{flex:none;font:800 8px/1 var(--font-mono);letter-spacing:.2em;color:var(--text-inv);background:var(--energy-full);padding:3px 5px}
+.comms__t{flex:1;min-width:0;font:var(--fs-xs)/1.35 var(--font-ui);color:var(--text-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.comms__t b{color:var(--text-1);letter-spacing:.14em;font-size:var(--fs-2xs)}
+.comms__go{font:var(--fs-sm) var(--font-mono);color:var(--text-3)}
 .topbar{display:flex;align-items:center;gap:10px;padding-bottom:8px;border-bottom:1px solid var(--line-1)}
 .topbar__avatar{width:34px;height:34px;flex:none;--cut:6px;position:relative}
 .topbar__avatar::before{content:"";position:absolute;inset:0;background:var(--chrome);clip-path:var(--poly-chrome)}
@@ -599,6 +606,7 @@ a{color:inherit;text-decoration:none}
 .story__box.is-narr .story__name{background:none;color:var(--text-3);padding:0;border-bottom:1px solid var(--line-2)}
 .story__text{font-size:var(--fs-md);line-height:1.55;color:var(--text-1);min-height:3.1em}
 .story__box.is-narr .story__text{color:var(--text-2);font-style:italic}
+.story__choice{display:grid;gap:6px;margin-top:10px} .story__choice .btn-act{height:44px}
 .story__more{position:absolute;right:12px;bottom:6px;font:var(--fs-2xs) var(--font-mono);color:var(--text-3);animation:hp-warn 1200ms steps(2,end) infinite}
 @media (prefers-reduced-motion: reduce){ .story__more{animation:none} }
 /* ---- SECTOR: header chương ---- */
@@ -868,6 +876,7 @@ a{color:inherit;text-decoration:none}
           <button class="btn-act btn-act--go btn-act--full" data-go="squad"><span class="btn-act__k">Deploy</span><span class="btn-act__v">Chọn đội hình → chọn sector → chiến đấu</span></button>
         </div>
       </div>
+      <button class="comms" id="comms" hidden><span class="comms__k">COMMS</span><span class="comms__t" id="commsText"></span><span class="comms__go">▸</span></button>
       <div class="menu">
         <button class="menu__btn" data-go="squad"><b>SQUAD</b><small>5 SLOT</small></button>
         <button class="menu__btn" data-go="sector"><b>SECTOR</b><small>PVE</small></button>
@@ -1207,6 +1216,14 @@ const ENEMY_POOL = [
   { id:'echo_b',     name:'ECHO',           faction:'chrome', rank:'boss',  atk:150, hp:2900, lore:'echo' },
   { id:'confessor2', name:'CONFESSOR MK-II',faction:'chrome', rank:'boss',  atk:175, hp:3800 },
   { id:'cantor2',    name:'CANTOR ASCENDANT',faction:'chrome', rank:'boss', atk:200, hp:4600 },
+  // ---- Chương 3 · CHOIR (The Canticle)
+  { id:'cantor_g',   name:'CANTOR GUARD',   faction:'chrome', rank:'grunt', atk:110, hp:900,  link:true },
+  { id:'exorcist',   name:'EXORCIST',       faction:'chrome', rank:'elite', atk:140, hp:1800, link:true },
+  { id:'precentor',  name:'PRECENTOR',      faction:'chrome', rank:'boss',  atk:210, hp:5000 },
+  { id:'organist',   name:'ORGANIST',       faction:'chrome', rank:'boss',  atk:220, hp:5200, link:true },
+  { id:'forgemaster',name:'FORGEMASTER',    faction:'chrome', rank:'boss',  atk:230, hp:5400 },
+  { id:'silence',    name:'SILENCE',        faction:'chrome', rank:'boss',  atk:240, hp:5600 },
+  { id:'canticle',   name:'THE CANTICLE',   faction:'chrome', rank:'boss',  atk:300, hp:8000, link:true },
 ];
 /* =====================================================================
    CHIẾN DỊCH PVE — xem docs/story.md (thế giới, nhân vật, thiết kế màn)
@@ -1217,7 +1234,7 @@ const ENEMY_POOL = [
 const CHAPTERS = [
   { n:1, title:'CHROMEFALL', sub:'DISTRICT 07 · THE SUMP', sectors:['07-A','07-B','07-C','07-D','07-E'] },
   { n:2, title:'SPIRE',      sub:'DISTRICT 04 · CHROME TIER', sectors:['04-A','04-B','04-C','04-D','04-E'] },
-  { n:3, title:'CHOIR',      sub:'THE CANTICLE', sectors:[], soon:true },
+  { n:3, title:'CHOIR',      sub:'THE CANTICLE · DISTRICT 01', sectors:['01-A','01-B','01-C','01-D','01-E'] },
 ];
 const SECTORS = [
   // bgZoom: ảnh neo đáy sân, phóng theo chiều cao (1.3 = cao bằng 130% sân) để đường chân trời
@@ -1239,21 +1256,37 @@ const SECTORS = [
     plan:[['chromehound','drone','chromehound'],['enforcer','enforcer','drone'],['chromehound','archon','enforcer'],['enforcer','cantor','chromehound']],
     bg:['bg_07e.jpg','bg_07e.png','bg_battle.jpg','bg_battle.png'], bgZoom:1.3, bgHorizon:.5, bgDim:.2 },
   // ---- Chương 2 · SPIRE. Địch Chrome có HALO LINK; nền tạm dùng bg_07c (Corp Perimeter) cho tới khi có bg_04*.
-  { id:'04-A', name:'ARRIVAL HALL', tag:'Sảnh đón hàng trả về', waves:3, mult:1.6, rec:230, reward:{shards:200, credits:3200}, boss:'enfprime',
+  { id:'04-A', name:'ARRIVAL HALL', tag:'Sảnh đón hàng trả về', waves:3, mult:1.45, rec:200, reward:{shards:200, credits:3200}, boss:'enfprime',
     plan:[['seraph','drone','seraph'],['chorister','warden','seraph'],['chorister','enfprime','warden']],
     bg:['bg_04a.jpg','bg_04a.png','bg_07c.jpg','bg_battle.jpg'], bgZoom:1.22, bgHorizon:.48, bgDim:.42 },
-  { id:'04-B', name:'GLASS GARDEN', tag:'Vesper săn Kira', waves:3, mult:1.75, rec:250, reward:{shards:220, credits:3400}, boss:'vesper_b',
+  { id:'04-B', name:'GLASS GARDEN', tag:'Vesper săn Kira', waves:3, mult:1.6, rec:220, reward:{shards:220, credits:3400}, boss:'vesper_b',
     plan:[['seraph','chorister','seraph'],['warden','chorister','warden'],['chorister','vesper_b','seraph']],
     bg:['bg_04b.jpg','bg_04b.png','bg_07c.jpg','bg_battle.jpg'], bgZoom:1.22, bgHorizon:.48, bgDim:.42 },
-  { id:'04-C', name:'ARCHIVE', tag:'Bản sao giọng Kira', waves:3, mult:1.9, rec:270, reward:{shards:250, credits:3800}, boss:'echo_b', unlock:'echo',
+  { id:'04-C', name:'ARCHIVE', tag:'Bản sao giọng Kira', waves:3, mult:1.75, rec:240, reward:{shards:250, credits:3800}, boss:'echo_b', unlock:'echo',
     plan:[['drone','chorister','drone'],['warden','seraph','chorister'],['seraph','echo_b','warden']],
     bg:['bg_04c.jpg','bg_04c.png','bg_07c.jpg','bg_battle.jpg'], bgZoom:1.22, bgHorizon:.48, bgDim:.42 },
-  { id:'04-D', name:'CONFESSIONAL', tag:'Psalm đối mặt quá khứ', waves:3, mult:2.05, rec:290, reward:{shards:280, credits:4200}, boss:'confessor2',
+  { id:'04-D', name:'CONFESSIONAL', tag:'Psalm đối mặt quá khứ', waves:3, mult:1.9, rec:260, reward:{shards:280, credits:4200}, boss:'confessor2',
     plan:[['chorister','chorister','seraph'],['warden','warden','chorister'],['warden','confessor2','chorister']],
     bg:['bg_04d.jpg','bg_04d.png','bg_07c.jpg','bg_battle.jpg'], bgZoom:1.22, bgHorizon:.48, bgDim:.42 },
-  { id:'04-E', name:'THE NAVE', tag:'Cantor tái xuất', waves:4, mult:2.2, rec:320, reward:{shards:400, credits:6000}, boss:'cantor2',
+  { id:'04-E', name:'THE NAVE', tag:'Cantor tái xuất', waves:4, mult:2.05, rec:290, reward:{shards:400, credits:6000}, boss:'cantor2',
     plan:[['seraph','seraph','chorister'],['warden','chorister','warden'],['chorister','enfprime','warden'],['warden','cantor2','warden']],
     bg:['bg_04e.jpg','bg_04e.png','bg_07c.jpg','bg_battle.jpg'], bgZoom:1.22, bgHorizon:.48, bgDim:.42 },
+  // ---- Chương 3 · CHOIR. verse: mỗi wave mới (từ wave 2) bài hát gốc át deck → toàn đội mất 25 Energy.
+  { id:'01-A', name:'THE LOFT', tag:'Gác đồng ca', waves:3, mult:2.2, rec:320, reward:{shards:450, credits:6500}, boss:'precentor',
+    plan:[['cantor_g','chorister','cantor_g'],['exorcist','cantor_g','warden'],['cantor_g','precentor','exorcist']],
+    bg:['bg_01a.jpg','bg_01a.png','bg_07c.jpg','bg_battle.jpg'], bgZoom:1.22, bgHorizon:.48, bgDim:.42 },
+  { id:'01-B', name:'THE ORGAN', tag:'Máy phát bài hát', waves:3, mult:2.35, rec:340, reward:{shards:500, credits:7000}, boss:'organist', verse:true,
+    plan:[['chorister','cantor_g','chorister'],['exorcist','exorcist','cantor_g'],['warden','organist','exorcist']],
+    bg:['bg_01b.jpg','bg_01b.png','bg_07c.jpg','bg_battle.jpg'], bgZoom:1.22, bgHorizon:.48, bgDim:.42 },
+  { id:'01-C', name:'HALO FORGE', tag:'Nơi đúc Halo', waves:3, mult:2.5, rec:360, reward:{shards:550, credits:7500}, boss:'forgemaster', unlock:'halo',
+    plan:[['cantor_g','cantor_g','seraph'],['exorcist','warden','exorcist'],['exorcist','forgemaster','cantor_g']],
+    bg:['bg_01c.jpg','bg_01c.png','bg_07b.jpg','bg_battle.jpg'], bgZoom:1.35, bgHorizon:.55, bgDim:.1 },
+  { id:'01-D', name:'THE VAULT', tag:'Hầm giấu Nyx', waves:3, mult:2.7, rec:380, reward:{shards:600, credits:8000}, boss:'silence', verse:true,
+    plan:[['cantor_g','exorcist','cantor_g'],['exorcist','exorcist','warden'],['exorcist','silence','exorcist']],
+    bg:['bg_01d.jpg','bg_01d.png','bg_07c.jpg','bg_battle.jpg'], bgZoom:1.22, bgHorizon:.48, bgDim:.5 },
+  { id:'01-E', name:'THE CANTICLE', tag:'Bản gốc · kết truyện', waves:4, mult:3, rec:420, reward:{shards:1000, credits:12000}, boss:'canticle', verse:true, guest:['nyx'], unlock:'nyx',
+    plan:[['cantor_g','exorcist','cantor_g'],['exorcist','warden','exorcist'],['cantor_g','cantor2','exorcist'],['exorcist','canticle','exorcist']],
+    bg:['bg_01e.jpg','bg_01e.png','bg_07c.jpg','bg_battle.jpg'], bgZoom:1.22, bgHorizon:.48, bgDim:.42 },
 ];
 const BG_FALLBACK = { zoom:1.22, horizon:.49, dim:.05 };   // tham số cho bg_battle.* khi sector chưa có ảnh riêng
 let SECTOR = SECTORS[0];
@@ -1396,7 +1429,76 @@ const STORY = {
       { who:'cantor2',text:'…Halo của ta im. Lần đầu tiên. Nó… yên tĩnh quá.' },
       { who:'psalm',  text:'Đó là lối ra. Đừng sợ nó.' },
       { who:'kira',   text:'Operator. Còn một tầng nữa. Bài hát gốc ở trên đó.' },
-      { who:null,     text:'HẾT CHƯƠNG 2. Chương 3 · CHOIR — đang phát triển.' },
+      { who:null,     text:'HẾT CHƯƠNG 2. Trên đỉnh Spire, bài hát gốc đang chờ. Chương 3 · CHOIR.' },
+    ]},
+  /* ===== CHƯƠNG 3 · CHOIR — Canticle không phải một công ty, mà là một bản nhạc chạy trên mọi Halo ===== */
+  '01-A': {
+    intro:[
+      { who:null,      text:'District 01. Gác đồng ca. Hàng trăm unit đứng thành hàng, môi mấp máy cùng một nhịp. Deck của bạn bắt đầu rè.' },
+      { who:'precentor',text:'Operator. Ngươi mang bốn giọng lạc điệu và một kẻ câm lên tận đây. Ta là người bắt nhịp. Hãy nghe.' },
+      { who:'echo',    text:'…Đó là nhịp của em. Chị Kira, họ dùng nhịp của em để hát. Em không cho phép.' },
+      { who:'ronin',   text:'Operator, deck còn nghe cậu không? Tốt. Vậy nó là thứ duy nhất ở đây không hát. Ra lệnh đi.' },
+    ],
+    outro:[
+      { who:'precentor',text:'…Không có ta bắt nhịp, họ sẽ hát lệch. Ngươi có biết hát lệch đau thế nào không?' },
+      { who:'psalm',   text:'Biết. Ba trăm mười ba lần. Và họ vẫn sống.' },
+      { who:'muzzle',  text:'Tiếng rè trong deck to lên rồi, Operator. Nó phát ra từ phía trước. Cái gì đó rất to.' },
+    ]},
+  '01-B': {
+    intro:[
+      { who:null,      text:'Đại phong cầm. Một cỗ máy cao bằng toà nhà, mỗi ống là một ăng-ten phát bài hát gốc xuống toàn bộ Spire. Khi nó đổi khúc, deck của bạn mất nhịp.' },
+      { who:'organist',text:'Ta không cần thấy ngươi, Operator. Ta chỉ cần đổi khúc. Mỗi khúc mới, tổ của ngươi sẽ quên lệnh của ngươi một chút.' },
+      { who:'spark', as:'SPARK (qua deck)', text:'Đèn Tuýp! Operator! Tôi cắt được một dây của nó từ dưới này — chỉ một thôi! Nhanh lên!' },
+      { who:'kira',    text:'Mỗi wave nó sẽ át chúng ta. Vậy phải kết thúc wave trước khi nó kịp hát hết câu.' },
+    ],
+    outro:[
+      { who:'organist',text:'…Ống hỏng. Bài hát vẫn còn. Nó không nằm trong ta. Nó nằm trong bản gốc.' },
+      { who:'kira',    text:'Bản gốc ở đâu?' },
+      { who:'organist',text:'Ở nơi Halo được đúc. Ngươi sẽ ghét nơi đó, Wire. Ta biết ngươi đang nghe.' },
+    ]},
+  '01-C': {
+    intro:[
+      { who:null,      text:'Lò Halo. Nơi mọi vòng điều khiển được đúc, nung, và cài bài hát. Có một unit y tế bị xích ở góc lò, đang cảm nhận cơn đau của cả dây chuyền.' },
+      { who:'forgemaster',text:'Halo là món quà. Không có nó, các ngươi phải tự quyết định cảm thấy gì. Các ngươi có chắc muốn thế không?' },
+      { who:'halo',    text:'…Operator. Tôi cảm thấy chỗ đau của tất cả họ. Làm ơn. Tắt lò.' },
+      { who:'ash',     text:'Lò này tôi nổ được. Cho tôi ba phút và đừng hỏi mìn ở đâu ra.' },
+    ],
+    outro:[
+      { who:'forgemaster',text:'…Lò nguội. Không còn Halo mới. Các ngươi vừa kết án cả một thế hệ phải tự cảm thấy.' },
+      { who:'halo',    text:'Không. Chúng tôi vừa cho họ quyền được đau. Operator — cho tôi một chỗ. Tôi biết chính xác ai trong tổ đang đau ở đâu.' },
+      { who:null,      text:'HALO gia nhập tổ. Wire đứng rất lâu trước cái lò nguội, rồi bỏ hai hộp ốc vít xuống.' },
+    ]},
+  '01-D': {
+    intro:[
+      { who:null,      text:'Hầm. Bốn năm khoá kín. Bên trong là một unit chưa bao giờ đeo Halo, và bên ngoài là thứ Canticle dùng để xoá: SILENCE.' },
+      { who:'silence', text:'' },
+      { who:'psalm',   text:'Nó không nói. Nó chưa bao giờ nói. Nó là cái nút tôi từng nhấn. Operator, tôi cần cậu ra lệnh cho tôi lần này. Tôi không tự đứng vững được.' },
+      { who:'nyx', as:'GIỌNG TRONG HẦM', text:'Có ai ngoài đó không? Tại sao mọi người dừng hát? Nó có đau không?' },
+    ],
+    outro:[
+      { who:null,      text:'SILENCE tắt. Cửa hầm mở. Một unit bước ra, không Halo, nhìn từng người một như đọc một cuốn sách.' },
+      { who:'nyx',     text:'Operator. Bạn ra lệnh cho họ mà không hát. Tôi chưa bao giờ nghe bài hát. Vậy tôi và bạn giống nhau?' },
+      { who:'kira',    text:'Không. Cô chưa bao giờ bị ép. Chúng tôi thì có. Nhưng đi cùng chúng tôi — bản gốc ở phía trước, và chúng tôi cần một người chưa từng hát.' },
+    ]},
+  '01-E': {
+    intro:[
+      { who:null,      text:'Đỉnh Spire. Không có trần. Bản gốc không phải một unit: là cả sân khấu, và mỗi wave là một khúc. Nyx đi cùng — người duy nhất không nghe thấy gì.' },
+      { who:'canticle',text:'OPERATOR-77. NGƯƠI KHÔNG CÓ HALO. NGƯƠI KHÔNG HÁT. VẬY MÀ HỌ NGHE NGƯƠI. HÃY CHO TA NGHE LỆNH CỦA NGƯƠI.' },
+      { who:'nyx',     text:'Nó hỏi giống tôi. Operator, bạn trả lời nó chưa?' },
+      { who:'kira',    text:'Bốn khúc. Sau mỗi khúc nó sẽ át deck. Đây là thứ tự lệnh cuối cùng, Operator. Chúng tôi nghe.' },
+    ],
+    outro:[
+      { who:'canticle',text:'…KHÚC CUỐI. BẢN GỐC LỘ RA. NGƯƠI CÓ THỂ CẮT MỌI HALO — HOẶC HÁT ĐÈ LÊN TA. CHỌN ĐI, OPERATOR.' },
+      { who:'psalm',   text:'Cắt hết: mọi Choir được tự do — và mất hết ký ức Halo giữ. Hát đè: họ giữ ký ức, nhưng bài hát vẫn còn, chỉ đổi người bắt nhịp. Là cậu.' },
+      { who:null,      text:'Quyết định của Operator.', choice:[{label:'CẮT TOÀN BỘ HALO', value:'cut'},{label:'HÁT ĐÈ LÊN BẢN GỐC', value:'sing'}] },
+      { who:'kira',    when:'cut', text:'…Yên tĩnh. Tôi không nhớ Spire nữa. Tôi nhớ bãi phế liệu, cái deck, và số ba. Đủ rồi.' },
+      { who:'psalm',   when:'cut', text:'Ba trăm mười ba giọng. Tôi không nhớ họ nữa. Nhưng họ đang sống ở đâu đó mà không ai đếm. Tốt.' },
+      { who:null,      when:'cut', text:'KẾT · IM LẶNG. Mọi Halo tắt. Spire và Sump cùng rơi vào một thế giới không ai bắt nhịp. Từ "Chromefall" giờ chỉ còn nghĩa: ngày chrome xuống đứng cùng rỉ.' },
+      { who:'kira',    when:'sing', text:'Bài hát vẫn còn. Nhưng nhịp là của Operator. Tôi… vẫn nhớ tất cả. Kể cả cái ngày rơi.' },
+      { who:'nyx',     when:'sing', text:'Vậy giờ tôi nghe thấy nó rồi. Operator. Nó nghe như bạn. Tôi thích nó hơn im lặng. Hình như thế.' },
+      { who:null,      when:'sing', text:'KẾT · NHỊP MỚI. Choir giữ ký ức, bài hát đổi người bắt nhịp. Một handler không Halo ở tầng −7 giờ là nhịp của cả thành phố. Đừng hát lệch, Operator.' },
+      { who:'ronin',   text:'Dù cậu chọn gì — tổ vẫn nghe cậu. Thứ tự đi. Xuống thôi.' },
+      { who:null,      text:'HẾT. NYX gia nhập tổ. Cảm ơn bạn đã chơi bản prototype CHROMEFALL.' },
     ]},
 };
 const shuffle = a => a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(p=>p[1]);
@@ -1529,6 +1631,56 @@ const LORE = {
     voice:'"Ngoan nào. Đừng rò điện. Operator, đừng nhìn, tôi đang dỗ nó."' },
 };
 
+/* ---- BONDS: hội thoại ngoài trận, hiện ở Lobby khi cả hai nhân vật đã trong tổ ---- */
+const BONDS = [
+  { pair:['ash','muzzle'], title:'Sẹo', lines:[
+    { who:'muzzle', text:'Ash. Tay cô. Lần đó là tôi làm cô bỏng, đúng không.' },
+    { who:'ash',    text:'Không. Là mìn của tôi. Anh chỉ đứng sai chỗ. Như mọi khi.' },
+    { who:'muzzle', text:'Đứng sai chỗ là việc của tôi. Cô châm mìn, tôi đứng giữa. Bà Ba đồng ý.' },
+    { who:'ash',    text:'…Đừng đặt tên khiên theo tên tôi. Tôi sẽ nổ nó.' } ]},
+  { pair:['kai','gravedigger'], title:'Hố quá nhanh', lines:[
+    { who:'kai',    text:'Ông đào hố cho tôi lúc tôi còn thở. Tôi nhớ đấy.' },
+    { who:'gravedigger', text:'Ta đào nhanh quá. Ta xin lỗi. Ta có khắc tên cậu rồi. K-A-I. Đúng chính tả.' },
+    { who:'kai',    text:'…Ông giữ tấm đó đi. Để sau này khỏi phải khắc lại.' },
+    { who:'gravedigger', text:'Ta giữ. Nhưng ta hy vọng nó rỉ trước khi cần.' } ]},
+  { pair:['junker','stitch'], title:'Xe vẫn chạy', lines:[
+    { who:'stitch', text:'Junker. Khớp hàn bên trái kêu. Lại đây tôi xem.' },
+    { who:'junker', text:'Xe vẫn chạy.' },
+    { who:'stitch', text:'Xe vẫn chạy vì tôi hàn nó, đồ to xác. Ngồi xuống. Kể tôi nghe chuyện gì đó, tôi lấy công bằng chuyện.' },
+    { who:'junker', text:'…Hôm nay chở được Muzzle. Nặng. Hết.' } ]},
+  { pair:['meridian','muzzle'], title:'Thoả thuận', lines:[
+    { who:'meridian', text:'Còn bốn trăm linh ba giờ, con. Nếu mẹ tắt trước, con đặt tên khiên kế là gì?' },
+    { who:'muzzle', text:'"Mẹ Bốn". Không bàn cãi.' },
+    { who:'meridian', text:'Mẹ Bốn. Nghe vững. Được. Còn nếu con ngã trước—' },
+    { who:'muzzle', text:'Thì mẹ đứng chỗ tôi. Mẹ to hơn tôi mà. Che được cả Ash.' } ]},
+  { pair:['cipher','psalm'], title:'Lỗ hổng', lines:[
+    { who:'psalm',  text:'Cipher. Mã APOSTASY. Có một lỗ hổng. Ai đó cố tình để lại.' },
+    { who:'cipher', text:'Ai mà biết. Firmware Canticle nhiều tay viết lắm. Bà uống cà phê không?' },
+    { who:'psalm',  text:'…Cảm ơn.' },
+    { who:'cipher', text:'Tôi nói tôi không biết mà. Đừng cảm ơn. Uống cà phê đi.' } ]},
+  { pair:['kira','echo'], title:'Một câu', lines:[
+    { who:'echo',   text:'Chị. Em tìm được rồi. Một câu chị chưa nói bao giờ.' },
+    { who:'kira',   text:'Nói đi.' },
+    { who:'echo',   text:'"Em không muốn đếm nữa."' },
+    { who:'kira',   text:'…Ừ. Đó là câu của em. Giữ lấy.' } ]},
+  { pair:['kira','psalm'], title:'Đếm', lines:[
+    { who:'kira',   text:'Bà có đếm không?' },
+    { who:'psalm',  text:'Ba trăm mười ba. Cô là số cuối.' },
+    { who:'kira',   text:'Tôi đếm bước. Bà đếm người. Vậy bà mệt hơn tôi.' },
+    { who:'psalm',  text:'…Lần đầu có người nói thế. Đi ngủ đi, Kira. Operator cần cô sáng mai.' } ]},
+  { pair:['wire','halo'], title:'Ốc vít', lines:[
+    { who:'wire',   text:'Halo. Tôi… tôi lắp cái vòng trên đầu cô. Tôi nhớ số lô.' },
+    { who:'halo',   text:'Tôi biết. Tôi cảm thấy tay cô run khi vặn ốc cuối. Cô đã run từ hồi đó.' },
+    { who:'wire',   text:'…Cô có đau không? Lúc đó?' },
+    { who:'halo',   text:'Có. Nhưng cô là người duy nhất hỏi. Cầm lấy hộp ốc vít, ta còn việc.' } ]},
+  { pair:['nyx','ronin'], title:'Nghĩa đen', lines:[
+    { who:'ronin',  text:'Nyx. "Giữ vị trí" nghĩa là đứng yên chỗ cô đang đứng. Không ôm cột.' },
+    { who:'nyx',    text:'Cái cột không phản đối. Ronin, anh không có Halo. Anh chọn cảm thấy gì?' },
+    { who:'ronin',  text:'…Hôm nay chọn mệt. Mai chọn lại.' },
+    { who:'nyx',    text:'Được chọn lại. Tôi thích quy tắc đó. Tôi sẽ ôm cột ít hơn.' } ]},
+];
+function availableBonds(){ return BONDS.filter(b=>b.pair.every(owns)); }
+
 /* ---- ★ FAKE: luật gacha "REQUISITION" ---- */
 const GACHA = {
   featured:'vesper',                  // rate-up: 50% số lần ra S là nhân vật này (Kira/Psalm là thưởng cốt truyện, không lên banner)
@@ -1658,6 +1810,10 @@ async function applyBg(elm, sector){
 /* Gọi wave kế: giữ nguyên đội mình (HP/Energy/KIA), thay toàn bộ kẻ địch */
 function spawnWave(){
   B.wave++; UI.waveNo.textContent=`${B.wave}/${SECTOR.waves}`;
+  if(SECTOR.verse && B.wave>1){                                             // VERSE: bài hát gốc át deck
+    alive('ally').forEach(u=>{ if(u.energy>0){ u.energy=Math.max(0,u.energy-25); u.chips=u.chips.filter(c=>c.label!=='VERSE'); u.chips.push({type:'debuff',label:'VERSE',val:'−25'}); updateUnit(u); setTimeout(()=>removeChip(u,'VERSE'),2500); } });
+    log('VERSE — bài hát gốc át deck: toàn đội −25 Energy', true);
+  }
   B.units = [ ...B.units.filter(u=>u.side==='ally'), ...rollWave(B.wave).map((d,i)=>makeUnit(d,'enemy',i)) ];
   B.target=null; renderSide('enemy');
   log(`Wave ${B.wave}/${SECTOR.waves}: ${alive('enemy').map(e=>e.name).join(' · ')}`, true);
@@ -1990,6 +2146,11 @@ loadFirst(['title_keyart.png','KIRA/Kira PNG.png']).then(src=>{ if(src){ const i
 function renderWallet(){ document.querySelectorAll('#pShards,#gShards').forEach(e=>e.textContent=PLAYER.shards.toLocaleString('en-US')); $('#pCredits').textContent=PLAYER.credits.toLocaleString('en-US'); $('#pName').textContent=PLAYER.name; $('#pLevel').textContent=`LV ${PLAYER.level} · CHROME LICENSE`; }
 function renderHome(){
   renderWallet();
+  const bonds=availableBonds(); const c=$('#comms');
+  if(bonds.length){ const b=bonds[Math.floor(Math.random()*bonds.length)]; c.hidden=false;
+    $('#commsText').innerHTML=`<b>${ROSTER[b.pair[0]].name} · ${ROSTER[b.pair[1]].name}</b> — ${b.lines[0].text}`;
+    c.onclick=()=>playStory(b.lines, {id:'BASE', name:`COMMS · ${b.title.toUpperCase()}`, bg:['bg_base.jpg','bg_battle.jpg','bg_battle.png']}).then(renderHome);
+  } else c.hidden=true;
   if(!$('#homeAvatar').firstChild) $('#homeAvatar').appendChild(portraitEl({name:'YOU',faction:'rust',portrait:['operator_portrait.png'],pos:'50% 10%'}));
   const feat = owns('kira') ? ROSTER.kira : ROSTER[TEAM[0]];
   if($('#heroArt').dataset.id!==feat.id){ const p=portraitEl(feat); $('#heroArt').replaceWith(p); p.id='heroArt'; p.dataset.id=feat.id; $('#heroFeat').innerHTML=`${owns('kira')?'FEATURED':'SQUAD LEAD'} · TIER ${feat.tier}<b>${feat.name}</b>`; }
@@ -2125,18 +2286,23 @@ function playStory(lines, sector){
     $('#storyWhere').textContent=`${sector.id} · ${sector.name}`;
     box.hidden=false; let i=0, timer=null, typing=false, done=false;
     const end=()=>{ if(done) return; done=true; clearTimeout(timer); box.hidden=true; dlg.onclick=null; $('#storySkip').onclick=null; res(); };
+    const vars={}; let finishCurrent=()=>{};
     const show=()=>{
+      while(i<lines.length && lines[i].when && lines[i].when!==vars.choice) i++;      // nhánh theo lựa chọn
       if(i>=lines.length) return end();
       const L=lines[i]; const d=speakerDef(L.who);
+      dlg.querySelectorAll('.story__choice').forEach(x=>x.remove());
       spk.innerHTML=''; spk.classList.remove('is-on');
       if(d){ spk.appendChild(portraitEl(d)); requestAnimationFrame(()=>spk.classList.add('is-on')); }
       dlg.classList.toggle('is-narr', !d); dlg.style.setProperty('--fac', d ? (d.faction==='rust'?'var(--rust)':'var(--chrome)') : 'var(--line-3)');
       name.textContent = L.as || (d ? d.name : 'SUMP · LOG');
       txt.textContent=''; typing=true; $('#storyMore').style.visibility='hidden';
-      if(reduced()){ txt.textContent=L.text; typing=false; $('#storyMore').style.visibility='visible'; return; }
-      let k=0; const step=()=>{ txt.textContent=L.text.slice(0,++k); if(k<L.text.length) timer=setTimeout(step,18); else { typing=false; $('#storyMore').style.visibility='visible'; } }; step();
+      finishCurrent=()=>{ typing=false; $('#storyMore').style.visibility=L.choice?'hidden':'visible';
+        if(L.choice){ const c=el('div','story__choice'); L.choice.forEach(o=>{ const b=el('button','btn-act btn-act--go', `<span class="btn-act__k">${o.label}</span>`); b.onclick=ev=>{ ev.stopPropagation(); vars.choice=o.value; if(sector&&sector.id) { PLAYER.ending=PLAYER.ending||{}; PLAYER.ending[sector.id]=o.value; savePlayer(); } i++; show(); }; c.appendChild(b); }); dlg.appendChild(c); } };
+      if(reduced()||!L.text){ txt.textContent=L.text||'…'; finishCurrent(); return; }
+      let k=0; const step=()=>{ txt.textContent=L.text.slice(0,++k); if(k<L.text.length) timer=setTimeout(step,18); else finishCurrent(); }; step();
     };
-    dlg.onclick=()=>{ if(typing){ clearTimeout(timer); txt.textContent=lines[i].text; typing=false; $('#storyMore').style.visibility='visible'; } else { i++; show(); } };
+    dlg.onclick=()=>{ if(typing){ clearTimeout(timer); txt.textContent=lines[i].text||'…'; finishCurrent(); } else if(!(lines[i]&&lines[i].choice)){ i++; show(); } };
     $('#storySkip').onclick=end;
     show();
   });
