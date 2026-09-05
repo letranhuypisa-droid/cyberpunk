@@ -625,15 +625,16 @@ a{color:inherit;text-decoration:none}
 /* Cut-in video chiêu cuối: phủ toàn sân, khung cắt chéo, thanh tên chạy vào */
 .cutin{position:absolute;inset:0;z-index:30;background:var(--bg-0);overflow:hidden}
 .cutin[hidden]{display:none}
-.cutin video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;animation:cutin-in 260ms var(--ease-hit-out)}
-.cutin::before,.cutin::after{content:"";position:absolute;left:0;right:0;height:9%;background:var(--bg-0);z-index:1}
+/* Video 16:9 hiện thành dải ngang giữa sân (rộng 125%, cắt bớt hai mép) thay vì phủ kín rồi mất hết hành động */
+.cutin video{position:absolute;left:50%;top:50%;width:125%;aspect-ratio:16/9;height:auto;transform:translate(-50%,-50%);object-fit:cover;background:#000;animation:cutin-in 260ms var(--ease-hit-out)}
+.cutin::before,.cutin::after{content:"";position:absolute;left:0;right:0;height:12%;background:var(--bg-0);z-index:1}
 .cutin::before{top:0;clip-path:polygon(0 0,100% 0,100% 40%,0 100%)}
 .cutin::after{bottom:0;clip-path:polygon(0 60%,100% 0,100% 100%,0 100%)}
 .cutin__bar{position:absolute;left:0;bottom:14%;z-index:2;padding:8px 18px 8px 14px;background:linear-gradient(90deg,rgba(6,7,10,.92),rgba(6,7,10,.6));border-left:3px solid var(--accent,var(--chrome));animation:cutin-bar 500ms var(--ease-hit-out) both;animation-delay:120ms}
 .cutin__who{display:block;font:var(--fs-2xs) var(--font-mono);letter-spacing:.32em;color:var(--text-2)}
 .cutin__name{display:block;font:900 var(--fs-2xl)/1 var(--font-ui);letter-spacing:.3em;color:#fff;margin-top:2px}
 .cutin__skip{position:absolute;right:10px;top:12%;z-index:2}
-@keyframes cutin-in{from{transform:scale(1.08);filter:brightness(3)}to{transform:none;filter:none}}
+@keyframes cutin-in{from{opacity:0;filter:brightness(3)}to{opacity:1;filter:none}}
 @keyframes cutin-bar{from{transform:translateX(-110%)}to{transform:none}}
 
 /* Overlay kết quả */
