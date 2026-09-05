@@ -4,7 +4,12 @@ Mỗi hồ sơ gồm đúng năm mục: **tên nhân vật · vũ khí · cự l
 
 Số liệu khớp với `ROSTER` trong `js/data.js`. Phần lore nối tiếp `docs/characters.md`, cùng một giọng kể:
 mở bằng một cảnh đang diễn ra, có địa danh và truyền thuyết đường phố, động cơ nói thẳng.
+Cơ chế nào cần engine đụng vào thì viết ở `docs/mechanics.md`, không viết ở đây.
 Thêm nhân vật thì nối vào cuối file, giữ nguyên năm mục theo đúng thứ tự.
+
+**Ràng buộc sản xuất** (quyết định mọi thiết kế vũ khí trong file này): engine load đúng ba frame mỗi nhân vật —
+`idle`, `attack`, `hurt` (`preloadFrames`, `js/battle.js:115`). Vũ khí phải đọc được trong **một pose vung tay duy nhất**.
+Chiêu cuối là video 5 giây phát bằng `playCutin`. Không particle system, không skeletal, không physics.
 
 ---
 
@@ -20,42 +25,68 @@ Tên thật ư? Hồ sơ nhân sự xưởng Halo tầng 40 ghi **KTV-9331**, ca
 
 ### 2. Vũ khí
 
-**Cặp cáp hàn hồ quang "CHÍN TRĂM"** — *"NINE HUNDRED" arc-cables*
+**ARC WHIP "CHÍN TRĂM"** — *cybernetic conductive blade*
 
-Hai cánh tay giả của Wire trong suốt, sáng xanh, và rỗng. Cuộn trong cẳng tay mỗi bên là sáu mét cáp hàn hồ quang lấy nguyên từ bàn thợ xưởng Halo — loại dùng để mở khoá vòng Halo mà không làm chín cái đầu bên trong. Cô đặt tên cho cặp cáp ấy là Chín Trăm. Đúng bằng số vòng cô đã lắp.
+Cô ấy có một sợi dây duy nhất, nhưng nó luôn tìm được đường tới mục tiêu.
 
-Cùng bộ đồ nghề dắt ở hông:
+Một sợi cáp kim loại đen, dài chừng một mét rưỡi, nối thẳng vào cẳng tay giả bên phải. Lúc không đánh nhau nó cuộn quanh cổ tay như một cái vòng. Lúc kích hoạt, ba mươi phân cuối cùng bung ra thành một lưỡi năng lượng cyan — và đó là toàn bộ vũ khí. Không có sợi thứ hai.
+
+Hai cánh tay cybernetic trong suốt của cô mới là bộ nguồn; Arc Whip chỉ là thứ được triển khai ra từ đó. Nên khi cả hai tay tắt đèn, cô không còn gì cả. Cô biết điều đó và vẫn tắt.
+
+Tên chính thức trong sổ tay xưởng là arc whip, loại dùng để mở khoá vòng Halo mà không làm chín cái đầu bên trong. Wire gọi nó là **Chín Trăm**. Đúng bằng số vòng cô đã lắp.
+
+Bộ đồ nghề dắt kèm ở hông:
 
 - **Kẹp chẩn đoán** — cắn vào cyberware đối phương, đọc số hiệu, rồi làm ngược lại đúng những gì hướng dẫn sử dụng dặn.
 - **Hai hộp ốc vít** — thứ duy nhất cô mang theo đêm bỏ trốn. Ốc M4 chèn khớp gối. Rẻ, bẩn, hiệu quả.
 
-Cô không mài cáp, không lên đạn, không kiểm tra vũ khí trước trận. Cô lau chúng. Trước mỗi trận, Wire ngồi lau hai sợi cáp bằng một mảnh giẻ, và nói chuyện với chúng.
+Cô không mài roi, không lên đạn, không kiểm tra vũ khí trước trận. Cô lau nó. Trước mỗi trận, Wire ngồi lau sợi cáp bằng một mảnh giẻ, và nói chuyện với nó.
 
 ### 3. Đánh xa hay cận chiến
 
-**Cận chiến — nhưng là cận chiến có tầm với.** Cự ly làm việc: hai đến sáu mét, đúng bằng đoạn cáp cô thả ra.
+**Cận chiến.** Tầm với chừng một mét rưỡi — đúng đoạn cáp bung ra, không hơn.
 
-Wire không lao vào ai. Cô đứng ở mép vòng chiến, thả cáp, và để hồ quang đi nốt quãng đường còn lại. Địch tới sát thì cô cũng không lùi: 1500 HP đi với ATK 80 nói rõ cô thuộc loại đứng chịu đòn, không phải loại giết nhanh. Trong đội hình, đặt cô ở tuyến giữa — đủ gần để cáp với tới, đủ xa để không che tầm ném của Ash.
+Đừng nhầm Arc Whip với vũ khí tầm xa. Wire vẫn phải đứng trong vòng chiến như Ronin, chỉ là cô không cần bước nốt bước cuối cùng. Một mét rưỡi ấy đủ để cô đứng ngoài tầm tay của một unit Choir mà vẫn chạm được vào cổng sống lưng của nó.
 
-Điểm yếu thì cô biết và không giấu: cáp cần một giây để cuộn về. Ai qua được một giây ấy thì tới được chỗ cô.
+Chỗ đứng: **tuyến trước–giữa**. Chỉ số nói rõ vai trò — ATK 80 là gần thấp nhất roster, nhưng HP 1500 chỉ thua Muzzle và Junker. Cô không giết ai nhanh cả. Cô đứng đó, chịu đòn, và làm cho mọi thứ đội mình đánh vào mục tiêu ấy đau hơn.
+
+Điểm yếu thì cô biết và không giấu: roi cần một nhịp để cuộn về. Ai qua được nhịp ấy thì tới được chỗ cô.
 
 ### 4. Chiêu cuối
 
-**OVERCLOCK — ÉP XUNG** · 75 Energy · sát thương đơn mục tiêu
+**Nội tại — [OVERLOAD]**
 
-> **EN — OVERCLOCK**
-> Wire jacks both cables into the target's spine port and pushes every piece of chrome in its body past rated load. Deals **220% ATK** to a single target. She doesn't kill it. Its own hardware does.
+Mỗi đòn thường của Wire cắm thêm một stack `[OVERLOAD]` lên mục tiêu, tối đa 3. Mỗi stack làm mục tiêu **nhận thêm 10% sát thương từ mọi nguồn** — kể cả đòn của đồng đội. Stack không tự nổ. Nó nằm đó và chờ.
 
-> **VN — ÉP XUNG**
-> Wire cắm cả hai sợi cáp vào cổng sống lưng của mục tiêu, rồi đẩy toàn bộ chrome trong người nó vượt quá mức cho phép. Gây **220% ATK** lên một mục tiêu. Cô không giết nó. Đồ trong người nó giết nó.
+Vì đòn thường cho 25 Energy còn Wire cần 75, ba đòn của cô vừa lấp đầy thanh Energy vừa lấp đầy ba stack. Hai cái đồng hồ chạy song song, và cùng về đích một lúc.
 
-Diễn hoạt: hai giây đầu không có gì xảy ra cả. Địch vẫn đứng. Rồi từng khớp chrome của nó sáng lên từ bên trong, theo đúng thứ tự lắp ráp — vai, khuỷu, gối. Wire quay đi trước khi nó đổ. Cô không bao giờ nhìn.
+**DEAD SHORT — CHẬP MẠCH** · 75 Energy · sát thương diện rộng
 
-> *"Xin lỗi nhé. Số lô của mày tao cũng nhớ."*
+> **EN — DEAD SHORT**
+> Wire cuts every load out of the circuit and lets the current take the short path. Deals **160% ATK to all enemies**, plus **40% ATK per [OVERLOAD]** stacked on that target, then consumes every stack on the field.
+
+> **VN — CHẬP MẠCH**
+> Wire cắt bỏ toàn bộ tải ra khỏi mạch và để dòng điện đi đường tắt. Gây **160% ATK lên toàn bộ kẻ địch**, cộng thêm **40% ATK cho mỗi stack [OVERLOAD]** đang nằm trên chính mục tiêu đó, rồi ăn sạch mọi stack trên sân.
+
+Nghĩa là người chơi có một quyết định thật trước khi bấm: dồn cả ba stack vào con boss, hay rải mỗi con một stack. Dồn thì một mục tiêu bốc hơi. Rải thì cả sân cùng cháy.
+
+*Chú thích thuật ngữ: dead short là đoản mạch — dòng điện tìm được đường đi không qua tải, và mọi thứ trên đường đó cháy tức thì. Đó đúng là việc Wire làm với cyberware của đối phương.*
+
+**Kịch bản video 5 giây** (`wire_ult.mp4`, H.264 1280×720):
+
+| Thời điểm | Hình |
+|---|---|
+| 0–1s | Wire cúi nhẹ người. Hai cánh tay cybernetic mở ra. Toàn bộ đèn cyan trên tay cô **tắt phụt**. Màn hình tối đi trong chớp mắt. |
+| 1–2s | *KZZZT—* Điện cyan chạy **ngược** từ hai bàn tay lên vai và cổ. Mắt Wire sáng lên. Sau lưng cô hiện một mạng lưới điện hình vòng cung. |
+| 2–3.5s | Wire biến mất khỏi vị trí. Một đường cyan loé ngang màn hình. *SLASH.* Cô xuất hiện phía sau toàn bộ kẻ địch. Một nhịp im lặng. |
+| 3.5–4.5s | Tất cả kẻ địch đồng loạt phát sáng cyan. Mọi `[OVERLOAD]` kích hoạt cùng một lúc. *KRA-KOOOM.* |
+| 4.5–5s | Wire quay người lại. Arc Whip tự cuộn về cổ tay. Cô nhìn thẳng phía trước. |
+
+> *"Chập mạch rồi. Xin lỗi nhé — số lô của mày tao cũng nhớ."*
 
 ### 5. Lore
 
-Xưởng Halo, tầng 40, ca đêm. Một unit vừa bị xoá được chở về để tháo vòng, và nhật ký hệ thống của nó còn mở trên màn hình. Dòng cuối ghi: *xin đừng tắt đèn*. Wire đọc dòng đó ba lần. Rồi cô đóng nhật ký lại, tháo cặp cáp hàn khỏi bàn thợ, nhét hai hộp ốc vít vào túi áo, và đi thang máy hàng xuống đáy. Vì cô không chắc dưới đó có ốc vít.
+Xưởng Halo, tầng 40, ca đêm. Một unit vừa bị xoá được chở về để tháo vòng, và nhật ký hệ thống của nó còn mở trên màn hình. Dòng cuối ghi: *xin đừng tắt đèn*. Wire đọc dòng đó ba lần. Rồi cô đóng nhật ký lại, tháo sợi arc whip khỏi bàn thợ, nhét hai hộp ốc vít vào túi áo, và đi thang máy hàng xuống đáy. Vì cô không chắc dưới đó có ốc vít.
 
 Đêm cô bỏ trốn chẳng có gì gay cấn. Không còi báo động, không truy đuổi, không ai chặn ở cửa. The Corp mất một kỹ thuật viên ca đêm, mà trong biên bản, một kỹ thuật viên ca đêm không đáng viết quá ba dòng.
 
