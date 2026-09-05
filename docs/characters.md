@@ -30,9 +30,9 @@ Kira đang bị vây trong một con phố hẹp ở quận SIS. Xung quanh cô 
 
 Mười phút sau, Kira bước ra khỏi con ngõ, lau thanh Zero còn dính một mảnh vải của một tên Neo Tokyo xấu số. Zero được rèn bởi một người vô danh. Dân quận SIS vẫn tin đó là một Ripperdoc tên Jack, nhưng chỉ đến thế thôi. Kira có thanh Zero từ năm bảy tuổi, và gần như ai ở Free Zone cũng thuộc câu chuyện mà đến giờ người ta vẫn dùng để dọa trẻ con không chịu ăn, không chịu ngủ: ác ma bé bỏng sẽ bắt mất linh hồn của con đấy!
 
-Điều Free Zone không biết là chuyện gì xảy ra sau đó. The Corp bắt được đứa bé ấy, đưa lên Spire, thay nửa người bằng chrome, chụp lên đầu một vòng Halo và đặt cho một cái mã: Tài sản 07. Sáu năm cô chém cho họ mà không nhớ mình là ai. Rồi một ngày, có người cắt vòng Halo, và cô rơi trở lại đáy thành phố cùng thanh Zero. Ký ức chưa về hết. Nhưng một thứ đã về trước tiên. Hiện tại, Kira đang truy tìm đầu mối cấp cao của The Corp. Để làm gì ư? Tất nhiên là để trả thù cho bố mẹ cô.
+Điều Free Zone không biết là chuyện gì xảy ra sau đó. The Corp bắt được đứa bé ấy, đưa lên Spire, thay nửa người bằng chrome, chụp lên đầu một vòng Halo và đặt cho một cái mã: Tài sản 07. Sáu năm trời làm một sát thủ giết thuê cho The Corp mà không hề có một mảnh ký ức nào. Chỉ có sự điên loạn ẩn sau vẻ ngoài đáng yêu. Cho đến một ngày, có người cắt vòng Halo của cô. Hiện tại, Kira đang truy tìm đầu mối cấp cao của The Corp. Để làm gì ư? Tất nhiên là để trả thù cho bố mẹ cô.
 
-> "Đếm đến ba. Đến ba thì đứng sau lưng tôi."
+> "Hop! Skip! Jump! Oh... you're dead already?"
 
 ---
 
