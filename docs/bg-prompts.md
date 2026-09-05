@@ -107,3 +107,27 @@ Kira, white-haired android swordswoman in white kimono-armor with violet accents
 ring, full body, standing three-quarter view facing left, katana lowered, calm expression,
 transparent background, 3D CG anime key visual, high detail, sharp edges, cold rim light.
 ```
+
+---
+
+## bg_07d.png — Sector 07-D · DRAINAGE CATHEDRAL (giáo phái Mother Rust)
+
+```
+Flooded drainage cathedral beneath the city: a vast brick and concrete sewer vault with gothic
+proportions, rows of rusted pipe organs made from welded conduits along the walls, an altar of
+stacked broken android shells at the far end lit by hundreds of red votive lamps, shallow black
+water on the floor with faint ripples and reflections, candle smoke, dripping stalactites of
+rust. Rusted orange metal, blood-red lamp light, wet dark stone. Floor: a raised walkway of
+riveted iron grating running toward the altar, flat and empty in the center.
+```
+
+## bg_07e.png — Sector 07-E · THE LIFT (thang máy hàng lên Spire)
+
+```
+Interior of a colossal industrial cargo lift climbing a vertical shaft: a wide flat steel deck
+with yellow hazard stripes worn to grey, waist-high railings, massive cable drums and pistons
+on both sides, the shaft walls rushing past as blurred bands of light, cold violet corporate
+lighting from above meeting warm rust-orange emergency lamps from below, sparks and wind-blown
+dust. Half chrome, half rust: the upper part of the frame is clean and violet, the lower part
+is scarred and orange. Floor: flat, empty center, slight downward camera angle.
+```

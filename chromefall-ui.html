@@ -528,6 +528,35 @@ a{color:inherit;text-decoration:none}
 .reveal.n1 .rv{width:min(60%,200px)}
 @media (prefers-reduced-motion: reduce){ .rv__in{transition:none} }
 
+/* ---- STORY OVERLAY ---- */
+.story{position:absolute;inset:0;z-index:60;display:grid;grid-template-rows:auto minmax(0,1fr) auto;background:var(--bg-0);overflow:hidden}
+.story[hidden]{display:none}
+.story__bg{position:absolute;inset:0;background:var(--bgimg,none) 50% 100%/auto calc(var(--bgzoom,1.3)*100%) no-repeat;filter:saturate(.8)}
+.story__bg::after{content:"";position:absolute;inset:0;background:linear-gradient(rgba(6,7,10,.6),rgba(6,7,10,.25) 40%,rgba(6,7,10,.9) 100%)}
+.story__top{position:relative;display:flex;justify-content:space-between;align-items:center;padding:10px 10px 0;font:var(--fs-2xs) var(--font-mono);letter-spacing:.2em;color:var(--text-2)}
+.story__cast{position:relative;display:flex;align-items:flex-end;justify-content:center;min-height:0}
+.story__spk{position:relative;width:min(70%,320px);height:100%;opacity:0;transform:translateY(4%);transition:opacity var(--t-state),transform var(--t-state)}
+.story__spk.is-on{opacity:1;transform:none}
+.story__spk .portrait{position:absolute;inset:0;background:none;--pos:50% 0%}
+.story__spk .portrait img{-webkit-mask-image:linear-gradient(to top,transparent 4%,#000 30%);mask-image:linear-gradient(to top,transparent 4%,#000 30%)}
+.story__spk .sil{background:none}
+.story__box{position:relative;margin:0 10px 12px;padding:12px 14px 16px;background:rgba(6,7,10,.92);border:1px solid var(--line-2);border-left:3px solid var(--fac,var(--line-3));min-height:118px;cursor:pointer;user-select:none;
+  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%)}
+.story__name{display:inline-block;padding:2px 8px;margin-bottom:8px;font:800 var(--fs-2xs)/1.4 var(--font-mono);letter-spacing:.24em;background:var(--fac,var(--line-3));color:var(--text-inv)}
+.story__box.is-narr .story__name{background:none;color:var(--text-3);padding:0;border-bottom:1px solid var(--line-2)}
+.story__text{font-size:var(--fs-md);line-height:1.55;color:var(--text-1);min-height:3.1em}
+.story__box.is-narr .story__text{color:var(--text-2);font-style:italic}
+.story__more{position:absolute;right:12px;bottom:6px;font:var(--fs-2xs) var(--font-mono);color:var(--text-3);animation:hp-warn 1200ms steps(2,end) infinite}
+@media (prefers-reduced-motion: reduce){ .story__more{animation:none} }
+/* ---- SECTOR: header chương ---- */
+.chap{display:flex;align-items:baseline;gap:10px;padding:10px 4px 4px;border-bottom:1px solid var(--line-2)}
+.chap__n{font:800 var(--fs-2xs) var(--font-mono);letter-spacing:.2em;color:var(--chrome-hi)}
+.chap__t{font:900 var(--fs-md)/1 var(--font-ui);letter-spacing:.28em}
+.chap__s{font:var(--fs-2xs) var(--font-mono);letter-spacing:.12em;color:var(--text-3)}
+.chap__p{margin-left:auto;font-size:var(--fs-2xs);color:var(--text-2)}
+.chap.is-soon{opacity:.5}
+.srow--soon{cursor:default;opacity:.35}
+.srow__rw{margin-left:auto;font:700 8px/1 var(--font-mono);letter-spacing:.1em;color:var(--energy)}
 /* ---- SECTOR ---- */
 .sector{display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:10px;padding:10px}
 .slist{display:flex;flex-direction:column;gap:8px;overflow:auto}
@@ -688,6 +717,7 @@ a{color:inherit;text-decoration:none}
 .result__t{font:900 var(--fs-2xl)/1 var(--font-ui);letter-spacing:.3em;text-indent:.3em}
 .result__s{margin:8px 0 16px;font:var(--fs-xs) var(--font-mono);color:var(--text-2);letter-spacing:.1em}
 .result.win .result__t{color:var(--text-1)} .result.lose .result__t{color:var(--hp-low)}
+.result__rw{display:inline-block;margin-top:8px;padding:3px 8px;color:var(--energy-full);border:1px solid var(--energy-full);letter-spacing:.14em}
 
 
 /* ---- Action bar ---- */
@@ -825,6 +855,17 @@ a{color:inherit;text-decoration:none}
       <div class="reveal" id="reveal" hidden>
         <div class="reveal__grid" id="revealGrid"></div>
         <div class="reveal__bar"><button class="btn-ghost" id="btnRevealSkip">SKIP ▸</button><button class="btn-act btn-act--go" id="btnRevealDone" hidden><span class="btn-act__k">Done</span></button></div>
+      </div>
+    </div>
+
+    <!-- ===== STORY OVERLAY (hội thoại trước/sau trận) ===== -->
+    <div class="story" id="story" hidden>
+      <div class="story__top"><span id="storyWhere">07-A · SCRAPYARD GATE</span><button class="btn-ghost" id="storySkip">SKIP ▸</button></div>
+      <div class="story__cast"><div class="story__spk" id="storySpk"></div></div>
+      <div class="story__box" id="storyBox">
+        <span class="story__name" id="storyName">—</span>
+        <div class="story__text" id="storyText"></div>
+        <span class="story__more" id="storyMore">▼</span>
       </div>
     </div>
 
@@ -1074,32 +1115,136 @@ const ENEMY_POOL = [
   { id:'foreman',    name:'THE FOREMAN',    faction:'rust',   rank:'boss',  atk:125, hp:2600 },
   { id:'motherrust', name:'MOTHER RUST',    faction:'rust',   rank:'boss',  atk:140, hp:3000 },
   { id:'archon',     name:'ARCHON',         faction:'chrome', rank:'boss',  atk:150, hp:2800 },
+  { id:'cantor',     name:'CANTOR',         faction:'chrome', rank:'boss',  atk:160, hp:3400 },   // boss cuối chương 1
 ];
-/* ---- ★ FAKE: danh sách sector PvE. Wave 1: grunt · wave giữa: grunt + elite · wave cuối: grunt + elite + BOSS.
-   bg: ảnh nền sân đấu (xem docs/bg-prompts.md), thiếu thì dùng gradient mặc định ---- */
+/* =====================================================================
+   CHIẾN DỊCH PVE — xem docs/story.md (thế giới, nhân vật, thiết kế màn)
+   Mỗi sector: plan = danh sách wave thiết kế tay (id trong ENEMY_POOL), mult = hệ số nhân
+   ATK/HP kẻ địch theo độ khó, reward = thưởng lần đầu clear. bg: ảnh nền + zoom/dim đo tay.
+   Tiến trình (sector đã clear) lưu trong PLAYER.cleared. ★ số liệu là bản nháp cân bằng.
+   ===================================================================== */
+const CHAPTERS = [
+  { n:1, title:'CHROMEFALL', sub:'DISTRICT 07 · THE SUMP', sectors:['07-A','07-B','07-C','07-D','07-E'] },
+  { n:2, title:'SPIRE',      sub:'DISTRICT 04 · CHROME TIER', sectors:[], soon:true },
+  { n:3, title:'CHOIR',      sub:'THE CANTICLE', sectors:[], soon:true },
+];
 const SECTORS = [
   // bgZoom: ảnh neo đáy sân, phóng theo chiều cao (1.3 = cao bằng 130% sân) để đường chân trời
   // trong ảnh (bgHorizon = % từ mép trên ảnh) lên trên chân của hàng sau (~43% sân). Ảnh 3:4, 1536×2048.
-  { id:'07-A', name:'SCRAPYARD GATE', waves:2, state:'cleared', rec:80,  bg:['bg_07a.jpg','bg_07a.png','bg_battle.jpg','bg_battle.png'], bgZoom:1.33, bgHorizon:.54, bgDim:.12 },
-  { id:'07-B', name:'FOUNDRY ROW',    waves:3, state:'open',    rec:110, bg:['bg_07b.jpg','bg_07b.png','bg_battle.jpg','bg_battle.png'], bgZoom:1.35, bgHorizon:.55, bgDim:.1 },
-  { id:'07-C', name:'CORP PERIMETER', waves:3, state:'locked',  rec:140, bg:['bg_07c.jpg','bg_07c.png','bg_battle.jpg','bg_battle.png'], bgZoom:1.22, bgHorizon:.48, bgDim:.42, boss:'archon' },
+  { id:'07-A', name:'SCRAPYARD GATE', tag:'Kira thức dậy', waves:2, mult:.85, rec:80,  reward:{shards:60, credits:800},
+    plan:[['scav','gutterrat','straydog'],['welder','scav','rigger']],
+    bg:['bg_07a.jpg','bg_07a.png','bg_battle.jpg','bg_battle.png'], bgZoom:1.33, bgHorizon:.54, bgDim:.12 },
+  { id:'07-B', name:'FOUNDRY ROW', tag:'Lò của Foreman', waves:3, mult:1, rec:110, reward:{shards:90, credits:1200}, boss:'foreman',
+    plan:[['rigger','slagger','pipefitter'],['tinman','kiln','welder'],['chopshop','foreman','hollow']],
+    bg:['bg_07b.jpg','bg_07b.png','bg_battle.jpg','bg_battle.png'], bgZoom:1.35, bgHorizon:.55, bgDim:.1 },
+  { id:'07-C', name:'CORP PERIMETER', tag:'Vành đai tập đoàn', waves:3, mult:1.15, rec:140, reward:{shards:120, credits:1600}, boss:'archon',
+    plan:[['drone','glassjaw','drone'],['enforcer','drone','chromehound'],['drone','archon','enforcer']],
+    bg:['bg_07c.jpg','bg_07c.png','bg_battle.jpg','bg_battle.png'], bgZoom:1.22, bgHorizon:.48, bgDim:.42 },
+  { id:'07-D', name:'DRAINAGE CATHEDRAL', tag:'Giáo phái Mother Rust', waves:3, mult:1.3, rec:170, reward:{shards:150, credits:2000}, boss:'motherrust',
+    plan:[['hollow','gutterrat','hollow'],['drillbit','hollow','kiln'],['slagger','motherrust','drillbit']],
+    bg:['bg_07d.jpg','bg_07d.png','bg_battle.jpg','bg_battle.png'], bgZoom:1.3, bgHorizon:.5, bgDim:.15 },
+  { id:'07-E', name:'THE LIFT', tag:'Cantor chặn thang', waves:4, mult:1.5, rec:200, reward:{shards:240, credits:3000}, boss:'cantor',
+    plan:[['chromehound','drone','chromehound'],['enforcer','enforcer','drone'],['chromehound','archon','enforcer'],['enforcer','cantor','chromehound']],
+    bg:['bg_07e.jpg','bg_07e.png','bg_battle.jpg','bg_battle.png'], bgZoom:1.3, bgHorizon:.5, bgDim:.2 },
 ];
 const BG_FALLBACK = { zoom:1.22, horizon:.49, dim:.05 };   // tham số cho bg_battle.* khi sector chưa có ảnh riêng
-let SECTOR = SECTORS[1];
+let SECTOR = SECTORS[0];
+const sectorById = id => SECTORS.find(x=>x.id===id);
+/* Trạng thái sector suy từ tiến trình: đã clear → cleared; sector đầu chưa clear → open; còn lại locked */
+function syncSectorStates(){
+  let opened=false;
+  SECTORS.forEach(sec=>{ if(PLAYER.cleared.includes(sec.id)) sec.state='cleared'; else if(!opened){ sec.state='open'; opened=true; } else sec.state='locked'; });
+  if(SECTOR.state==='locked') SECTOR = SECTORS.find(x=>x.state==='open') || SECTORS[0];
+}
+
+/* ---- CỐT TRUYỆN — hội thoại trước (intro) và sau (outro) mỗi sector. who = id trong ROSTER/ENEMY_POOL, null = dẫn truyện ---- */
+const STORY = {
+  '07-A': {
+    intro:[
+      { who:null,     text:'Sump, tầng −7. Ba giờ sau cơn mưa axit. Một vật thể rơi từ Spire xuống bãi phế liệu Cổng Đông.' },
+      { who:'ronin',  text:'Thứ này không phải xác xe. Vỏ Choir, hạng S. Còn ấm.' },
+      { who:'ash',    text:'Tháo lấy lõi rồi bán. Canticle sẽ lùng cái Halo đó trước sáng mai.' },
+      { who:'kira',   text:'…Chỉ thị bị ngắt. Không có Halo. Không có Choir. Tôi ở đâu?' },
+      { who:'psalm',  text:'Dưới đáy, Kira. Tôi đưa cô xuống đây. Đứng dậy — cổng có khách.' },
+      { who:'muzzle', text:'Scav đánh hơi được kim loại mới. Operator, cho tôi thứ tự.' },
+    ],
+    outro:[
+      { who:'ronin',  text:'Nó chém như máy. Dĩ nhiên rồi.' },
+      { who:'psalm',  text:'Cô ấy chém như người từng bị dạy phải quên mình là ai.' },
+      { who:'kira',   text:'Halo hỏng. Ký ức bị khoá theo. Tôi cần một lò đủ nóng để mở nó.' },
+      { who:'ash',    text:'Foundry Row. Nhưng lò của Foreman không rèn cho người lạ.' },
+    ]},
+  '07-B': {
+    intro:[
+      { who:null,      text:'Foundry Row. Lò cũ của Canticle, giờ là xưởng của băng Foreman.' },
+      { who:'foreman', text:'Chrome rơi xuống đáy vẫn là chrome. Ta nấu chảy các ngươi, đúc thành cửa.' },
+      { who:'muzzle',  text:'Hắn có ba tổ. Đi qua lò là đi qua cả ba.' },
+      { who:'kira',    text:'Vậy đi qua cả ba.' },
+    ],
+    outro:[
+      { who:'foreman', text:'…Lò là của các ngươi. Nhưng lửa này sẽ gọi Spire xuống.' },
+      { who:'psalm',   text:'Nó đã gọi rồi. Tôi nghe thấy Choir hát trong mạng. Họ biết tôi ở đây.' },
+      { who:'kira',    text:'Halo mở được một phần. Tôi nhớ một cái tên: CANTOR.' },
+    ]},
+  '07-C': {
+    intro:[
+      { who:null,     text:'Vành đai tập đoàn. Nơi Sump chạm vào chân Spire. Cổng kính, sàn sạch, và drone.' },
+      { who:'archon', text:'ĐƠN VỊ PSALM. MÃ APOSTASY GHI NHẬN. TRỞ VỀ, HOẶC BỊ THU HỒI.' },
+      { who:'psalm',  text:'Tôi đã trả lời câu đó khi tự cắt Halo của mình.' },
+      { who:'ronin',  text:'Chúng nó đông. Nhưng chúng nó không biết đánh trong bẩn.' },
+    ],
+    outro:[
+      { who:'ash',    text:'Archon im rồi. Vành đai thủng một lỗ.' },
+      { who:'kira',   text:'Nó gọi tôi là "tài sản 07". Tôi từng được đánh số.' },
+      { who:'psalm',  text:'Từng thôi. Bên dưới, người ta gọi cô bằng tên.' },
+      { who:'muzzle', text:'Đừng mừng vội. Cống phía dưới đang hát. Tụi cuồng đạo.' },
+    ]},
+  '07-D': {
+    intro:[
+      { who:null,         text:'Nhà thờ cống. Giáo phái Mother Rust thờ chrome rơi — và muốn "thánh hoá" Kira bằng cách tháo rời cô.' },
+      { who:'motherrust', text:'Thiên thần rơi. Ngươi thuộc về bàn thờ, không thuộc về bọn nhặt rác.' },
+      { who:'kira',       text:'Tôi không thuộc về ai.' },
+      { who:'ronin',      text:'Tốt. Nhớ câu đó khi chém.' },
+    ],
+    outro:[
+      { who:'motherrust', text:'…Ngươi từ chối được cứu rỗi. Vậy hãy leo lên. Spire đang chờ.' },
+      { who:'psalm',      text:'Bà ta nói đúng một điều. Cantor đang chờ. Ở thang máy hàng.' },
+      { who:'kira',       text:'Vậy ta lên.' },
+    ]},
+  '07-E': {
+    intro:[
+      { who:null,     text:'Thang máy hàng số 3. Nửa đường giữa đáy và đỉnh. Choir chặn cả bốn tầng.' },
+      { who:'cantor', text:'Psalm. Kira. Các con hát lạc điệu. Ta đến để chỉnh lại.' },
+      { who:'psalm',  text:'Ông chỉnh bằng cách xoá. Tôi nhớ.' },
+      { who:'kira',   text:'Halo vừa mở hết. Tôi nhớ tất cả. Cả cái ngày ông cho tôi rơi.' },
+      { who:'muzzle', text:'Bốn wave. Operator, đây là trận dài nhất.' },
+    ],
+    outro:[
+      { who:'cantor', text:'…Chromefall. Đó là tên chúng ta đặt cho các con. Nhưng có lẽ… nó là tên của chính chúng ta.' },
+      { who:'kira',   text:'Thang máy vẫn chạy. Lên hay xuống?' },
+      { who:'ronin',  text:'Lên. Đáy đã hết chỗ để rơi.' },
+      { who:null,     text:'HẾT CHƯƠNG 1. Chương 2 · SPIRE — đang phát triển.' },
+    ]},
+};
 const shuffle = a => a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(p=>p[1]);
 function rollWave(n){
-  const pick=(rank,k)=>shuffle(ENEMY_POOL.filter(e=>e.rank===rank)).slice(0,k);
-  const last = n>=SECTOR.waves;
-  let w = n===1 ? pick('grunt',3) : !last ? [...pick('grunt',2),...pick('elite',1)]
-        : [...pick('grunt',1),...pick('elite',1), SECTOR.boss ? ENEMY_POOL.find(e=>e.id===SECTOR.boss) : pick('boss',1)[0]];
+  let w;
+  if(SECTOR.plan && SECTOR.plan[n-1]) w = SECTOR.plan[n-1].map(id=>ENEMY_POOL.find(e=>e.id===id));   // wave thiết kế tay
+  else {                                                                                            // dự phòng: random theo rank
+    const pick=(rank,k)=>shuffle(ENEMY_POOL.filter(e=>e.rank===rank)).slice(0,k);
+    const last = n>=SECTOR.waves;
+    w = n===1 ? pick('grunt',3) : !last ? [...pick('grunt',2),...pick('elite',1)]
+      : [...pick('grunt',1),...pick('elite',1), SECTOR.boss ? ENEMY_POOL.find(e=>e.id===SECTOR.boss) : pick('boss',1)[0]];
+  }
   const boss=w.find(e=>e.rank==='boss'); if(boss){ const r=w.filter(e=>e!==boss); w=[r[0],boss,r[1]]; }   // boss đứng giữa
-  return w;
+  const m=SECTOR.mult||1;                                                                           // độ khó theo sector
+  return w.map(d=>({ ...d, atk:Math.round(d.atk*m), hp:Math.round(d.hp*m) }));
 }
 const RULES = { critChance:.15, critMult:1.5, variance:.08 };     // ★ FAKE: công thức tạm
 
 /* ---- ★ FAKE: hồ sơ người chơi, lưu localStorage. owned = nhân vật đã có (đội hình chỉ chọn trong đây) ---- */
 const PLAYER_KEY='chromefall.player.v1';
-const PLAYER = Object.assign({ name:'OPERATOR-77', level:12, credits:12480, shards:900, owned:['kira','psalm','ronin','ash','muzzle'], pity:0, pulls:0 },
+const PLAYER = Object.assign({ name:'OPERATOR-77', level:12, credits:12480, shards:900, owned:['kira','psalm','ronin','ash','muzzle'], pity:0, pulls:0, cleared:[] },
   (()=>{ try{ return JSON.parse(localStorage.getItem(PLAYER_KEY)||'{}'); }catch(e){ return {}; } })());
 const savePlayer = () => { try{ localStorage.setItem(PLAYER_KEY, JSON.stringify(PLAYER)); }catch(e){} };
 const owns = id => PLAYER.owned.includes(id);
@@ -1210,14 +1355,20 @@ function initBattle(){
   UI.log.innerHTML=''; UI.result.hidden=true; UI.fx.innerHTML=''; turnTiles.clear();
   UI.sectorNo.textContent=SECTOR.id;
   UI.stage.classList.remove('has-bg'); UI.stage.style.removeProperty('--bgimg');
-  loadFirst(SECTOR.bg).then(src=>{ if(!src) return;
-    const fb = /bg_battle\./.test(src);            // ảnh dự phòng → dùng tham số riêng của nó
-    UI.stage.style.setProperty('--bgimg',`url("${src}")`);
-    UI.stage.style.setProperty('--bgzoom', fb ? BG_FALLBACK.zoom : (SECTOR.bgZoom||1.3));
-    UI.stage.style.setProperty('--bgdim',  fb ? BG_FALLBACK.dim  : (SECTOR.bgDim||0));
-    UI.stage.classList.add('has-bg'); });
+  applyBg(UI.stage, SECTOR).then(ok=>{ if(ok) UI.stage.classList.add('has-bg'); });
   renderSide('ally'); preloadFrames();
-  spawnWave(); newRound();
+  UI.enemies.innerHTML='';
+  const st=STORY[SECTOR.id];
+  (st&&st.intro&&!B.skipIntro ? playStory(st.intro, SECTOR) : Promise.resolve()).then(()=>{ if(!B.over){ spawnWave(); newRound(); } });
+}
+/* Nạp ảnh nền sector vào một phần tử (sân đấu hoặc màn hội thoại) với zoom/dim đúng */
+async function applyBg(elm, sector){
+  const src=await loadFirst(sector.bg); if(!src) return false;
+  const fb=/bg_battle\./.test(src);                 // ảnh dự phòng → dùng tham số riêng của nó
+  elm.style.setProperty('--bgimg',`url("${src}")`);
+  elm.style.setProperty('--bgzoom', fb ? BG_FALLBACK.zoom : (sector.bgZoom||1.3));
+  elm.style.setProperty('--bgdim',  fb ? BG_FALLBACK.dim  : (sector.bgDim||0));
+  return true;
 }
 /* Gọi wave kế: giữ nguyên đội mình (HP/Energy/KIA), thay toàn bộ kẻ địch */
 function spawnWave(){
@@ -1319,16 +1470,18 @@ async function playHurt(u, killed){
   if(!u.alive) return;
   flashSprite(u); setFrame(u, f.idle);
 }
+const animDone = (a, ms) => Promise.race([a.finished.catch(()=>{}), wait(ms+80)]);
 /* Attack: +28px/90ms out (scale 1.02,.96) → giữ 120ms → về 0/180ms. Tổng 390ms */
 async function playAttackAnim(u){
   const f = await B.frames[u.id]; const pose=u.el.querySelector('.unit__pose');
   flashSprite(u);
   if(f&&f.attack) setFrame(u,f.attack);
   if(!reduced()){
+    // animDone: không chỉ chờ .finished — tab nền/bị throttle có thể không tick animation → kèm timeout để trận không treo
     const out = pose.animate([{transform:'translateX(0) scale(1,1)'},{transform:'translateX(28px) scale(1.02,.96)'}],{duration:90,easing:'cubic-bezier(.16,.9,.3,1)',fill:'forwards'});
-    await out.finished; await wait(120);
+    await animDone(out,90); await wait(120);
     const back = pose.animate([{transform:'translateX(28px) scale(1.02,.96)'},{transform:'translateX(0) scale(1,1)'}],{duration:180,easing:'cubic-bezier(.3,0,.4,1)',fill:'forwards'});
-    await back.finished; out.cancel(); back.cancel();
+    await animDone(back,180); out.cancel(); back.cancel();
   } else { await wait(390); }
   flashSprite(u);
   if(f&&f.idle) setFrame(u,f.idle);
@@ -1420,11 +1573,19 @@ function endTurn(){
   B.idx++;
   setTimeout(()=> B.idx>=B.queue.length ? newRound() : startTurn(), 0);
 }
-let finish = function(win){
+let finish = async function(win){
   B.over=true; setInputs(false);
+  let rewardTxt='';
+  if(win){
+    const first=!PLAYER.cleared.includes(SECTOR.id);
+    if(first){ PLAYER.cleared.push(SECTOR.id); PLAYER.shards+=SECTOR.reward.shards; PLAYER.credits+=SECTOR.reward.credits; savePlayer();
+      rewardTxt=`FIRST CLEAR · +${SECTOR.reward.shards} SH · +${SECTOR.reward.credits} CR`; }
+    syncSectorStates();
+    const st=STORY[SECTOR.id]; if(st&&st.outro&&first){ await wait(700); await playStory(st.outro, SECTOR); }
+  }
   UI.result.hidden=false; UI.result.className='result '+(win?'win':'lose');
   $('#resT').textContent = win?'SECTOR CLEARED':'SQUAD LOST';
-  $('#resS').textContent = win?`${SECTOR.waves} wave · round ${B.round} · ${alive('ally').length}/5 sống sót`:`Wave ${B.wave}/${SECTOR.waves} · round ${B.round} · toàn đội KIA`;
+  $('#resS').innerHTML = (win?`${SECTOR.waves} wave · round ${B.round} · ${alive('ally').length}/5 sống sót`:`Wave ${B.wave}/${SECTOR.waves} · round ${B.round} · toàn đội KIA`) + (rewardTxt?`<br><b class="result__rw">${rewardTxt}</b>`:'');
   log(win?'Thắng.':'Thua.', true);
 };
 
@@ -1504,8 +1665,8 @@ async function enemyAct(e){
 }
 UI.btnAttack.addEventListener('click', playerAttack);
 UI.btnUlt.addEventListener('click', playerUlt);
-$('#btnReset').addEventListener('click', initBattle);
-$('#btnAgain').addEventListener('click', initBattle);
+$('#btnReset').addEventListener('click', ()=>{ B.skipIntro=true; initBattle(); B.skipIntro=false; });
+$('#btnAgain').addEventListener('click', ()=>{ B.skipIntro=true; initBattle(); B.skipIntro=false; });
 
 /* =====================================================================
    SCREEN ROUTER — title → home → squad → sector → battle
@@ -1537,8 +1698,10 @@ function renderHome(){
   renderWallet();
   if(!$('#homeAvatar').firstChild) $('#homeAvatar').appendChild(portraitEl(ROSTER.kira));
   if(!$('#heroArt').classList.contains('mounted')){ const p=portraitEl(ROSTER.kira); $('#heroArt').replaceWith(p); p.id='heroArt'; p.classList.add('mounted'); }
-  const sec = SECTORS.find(x=>x.state==='open') || SECTOR;
-  $('#homeSector').textContent=sec.id; $('#homeSectorMeta').textContent=`${sec.name} · ${sec.waves} WAVES · BOSS`;
+  syncSectorStates();
+  const sec = SECTORS.find(x=>x.state==='open') || SECTORS[SECTORS.length-1];
+  SECTOR = sec;
+  $('#homeSector').textContent=sec.id; $('#homeSectorMeta').textContent=`${sec.name} · ${sec.waves} WAVES · ${sec.boss?ENEMY_POOL.find(e=>e.id===sec.boss).name:'NO BOSS'}`;
 }
 
 /* ---- SQUAD: 5 slot + roster 19, bấm thẻ để thêm/bỏ, kéo thả cũng được ---- */
@@ -1612,24 +1775,57 @@ $('#btnPull1').addEventListener('click',()=>doPull(1));
 $('#btnPull10').addEventListener('click',()=>doPull(10));
 $('#btnRefill').addEventListener('click',()=>{ PLAYER.shards+=1000; savePlayer(); renderGacha(); });   // ★ DEV
 
+/* ---- STORY: hội thoại kiểu visual novel, gõ chữ 18ms/ký tự, chạm để hiện hết rồi sang câu kế ---- */
+function speakerDef(id){ return id ? (ROSTER[id] || ENEMY_POOL.find(e=>e.id===id)) : null; }
+function playStory(lines, sector){
+  return new Promise(res=>{
+    const box=$('#story'), spk=$('#storySpk'), name=$('#storyName'), txt=$('#storyText'), dlg=$('#storyBox');
+    let bg=box.querySelector('.story__bg'); if(!bg){ bg=el('div','story__bg'); box.prepend(bg); }
+    bg.style.setProperty('--bgimg','none'); applyBg(bg, sector);
+    $('#storyWhere').textContent=`${sector.id} · ${sector.name}`;
+    box.hidden=false; let i=0, timer=null, typing=false, done=false;
+    const end=()=>{ if(done) return; done=true; clearTimeout(timer); box.hidden=true; dlg.onclick=null; $('#storySkip').onclick=null; res(); };
+    const show=()=>{
+      if(i>=lines.length) return end();
+      const L=lines[i]; const d=speakerDef(L.who);
+      spk.innerHTML=''; spk.classList.remove('is-on');
+      if(d){ spk.appendChild(portraitEl(d)); requestAnimationFrame(()=>spk.classList.add('is-on')); }
+      dlg.classList.toggle('is-narr', !d); dlg.style.setProperty('--fac', d ? (d.faction==='rust'?'var(--rust)':'var(--chrome)') : 'var(--line-3)');
+      name.textContent = d ? d.name : 'SUMP · LOG';
+      txt.textContent=''; typing=true; $('#storyMore').style.visibility='hidden';
+      if(reduced()){ txt.textContent=L.text; typing=false; $('#storyMore').style.visibility='visible'; return; }
+      let k=0; const step=()=>{ txt.textContent=L.text.slice(0,++k); if(k<L.text.length) timer=setTimeout(step,18); else { typing=false; $('#storyMore').style.visibility='visible'; } }; step();
+    };
+    dlg.onclick=()=>{ if(typing){ clearTimeout(timer); txt.textContent=lines[i].text; typing=false; $('#storyMore').style.visibility='visible'; } else { i++; show(); } };
+    $('#storySkip').onclick=end;
+    show();
+  });
+}
+
 /* ---- SECTOR SELECT ---- */
 function renderSectors(){
+  syncSectorStates();
   const list=$('#sectorList'); list.innerHTML='';
-  SECTORS.forEach(sec=>{
-    const r=el('button',`srow is-${sec.state} ${sec===SECTOR?'is-selected':''}`);
-    r.innerHTML=`<span class="srow__id">${sec.id}</span>
-      <span><div class="srow__name">${sec.name}</div><div class="srow__meta">${sec.waves} WAVES · REC ATK ${sec.rec}+ · ${sec.boss?ENEMY_POOL.find(e=>e.id===sec.boss).name:'BOSS ???'}</div>
-      <div class="srow__waves">${Array.from({length:sec.waves},(_,i)=>`<i class="${i===sec.waves-1?'boss':''} ${sec.state==='cleared'?'done':''}"></i>`).join('')}</div></span>
-      <span class="srow__state">${sec.state.toUpperCase()}</span>`;
-    if(sec.state==='locked') r.disabled=true;
-    else r.addEventListener('click',()=>{ SECTOR=sec; renderSectors(); });
-    list.appendChild(r);
+  CHAPTERS.forEach(ch=>{
+    const secs=ch.sectors.map(sectorById);
+    const done=secs.filter(x=>x.state==='cleared').length;
+    list.insertAdjacentHTML('beforeend',`<div class="chap ${ch.soon?'is-soon':''}"><span class="chap__n">CH.${ch.n}</span><span class="chap__t">${ch.title}</span><span class="chap__s">${ch.sub}</span><span class="chap__p mono">${ch.soon?'COMING':done+'/'+secs.length}</span></div>`);
+    secs.forEach(sec=>{
+      const r=el('button',`srow is-${sec.state} ${sec===SECTOR?'is-selected':''}`);
+      const bossName = sec.boss ? ENEMY_POOL.find(e=>e.id===sec.boss).name : (sec.waves>2?'BOSS ???':'NO BOSS');
+      r.innerHTML=`<span class="srow__id">${sec.id}</span>
+        <span><div class="srow__name">${sec.name}</div><div class="srow__meta">${sec.tag} · ${sec.waves} WAVES · REC ATK ${sec.rec}+ · ${sec.state==='cleared'||sec.state==='open'?bossName:'???'}</div>
+        <div class="srow__waves">${Array.from({length:sec.waves},(_,i)=>`<i class="${sec.boss&&i===sec.waves-1?'boss':''} ${sec.state==='cleared'?'done':''}"></i>`).join('')}<span class="srow__rw">+${sec.reward.shards} SH${sec.state==='cleared'?' ✓':''}</span></div></span>
+        <span class="srow__state">${sec.state.toUpperCase()}</span>`;
+      if(sec.state==='locked') r.disabled=true;
+      else r.addEventListener('click',()=>{ SECTOR=sec; renderSectors(); });
+      list.appendChild(r);
+    });
+    if(ch.soon) list.insertAdjacentHTML('beforeend',`<div class="srow is-locked srow--soon"><span class="srow__id">—</span><span><div class="srow__name">ĐANG PHÁT TRIỂN</div><div class="srow__meta">Xem docs/story.md để biết dàn ý chương ${ch.n}</div></span></div>`);
   });
   $('#enterMeta').textContent=`${SECTOR.id} · ${SECTOR.name} · ${SECTOR.waves} WAVES`;
 }
-/* Thắng sector → đánh dấu cleared, mở sector kế */
-const _finish=finish;
-finish=function(win){ _finish(win); if(win){ SECTOR.state='cleared'; const i=SECTORS.indexOf(SECTOR); if(SECTORS[i+1]&&SECTORS[i+1].state==='locked') SECTORS[i+1].state='open'; } };
+syncSectorStates();
 
 go('title');
 
