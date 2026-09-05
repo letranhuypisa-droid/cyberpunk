@@ -1,0 +1,2 @@
+UI sounds: "Sci Fi UI SFX Pack (FREE)" by JDSherbert (https://jdsherbert.itch.io). Used under the pack's free license; attribution kept here and in CONFIG.
+Combat sounds (hit, crit, ult, heal, KIA) are synthesized at runtime with WebAudio in js/audio.js.

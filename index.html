@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark light">
+<title>CHROMEFALL</title>
+<!--
+  CHROMEFALL · prototype
+  css/chromefall.css  — token + toàn bộ giao diện
+  js/core.js          — tiện ích      js/data.js   — nội dung & số liệu (sửa ở đây)
+  js/state.js         — lưu/nạp hồ sơ js/audio.js  — âm thanh
+  js/battle.js        — engine trận   js/app.js    — màn hình & router
+  Mở qua static server (python -m http.server) để ảnh/video/âm thanh load được.
+-->
+<link rel="stylesheet" href="css/chromefall.css">
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="brand"><span class="brand__mark"></span>CHROMEFALL<span class="brand__sub">UI KIT · v0.1</span></div>
+  <div class="topnav__links"><a href="#battle">Play</a><a href="#kit">Components</a><a href="#tokens">Tokens</a></div>
+  <button class="btn-ghost" id="themeBtn" title="Đổi theme để kiểm tra token">THEME: AUTO</button>
+</nav>
+
+<!-- =====================================================================
+     C. MÀN CHIẾN ĐẤU — hiển thị đầy đủ ngay khi load (fit viewport)
+     ===================================================================== -->
+<section id="battle" class="battle" data-screen="title">
+  <div class="screens" id="screens">
+
+    <!-- ===== SCREEN: TITLE ===== -->
+    <div class="screen title is-active" data-screen="title" data-go="home">
+      <div class="title__grid"></div>
+      <img class="title__art" id="titleArt" alt="">
+      <div class="title__wrap">
+        <div class="title__tag">A GACHA TACTICS GAME</div>
+        <div class="title__logo"><b>CHROME</b><i>FALL</i></div>
+        <div class="title__rule"></div>
+        <div class="title__sub">CHROME ABOVE · RUST BELOW</div>
+        <div class="title__cta">TAP TO START</div>
+      </div>
+      <div class="title__ver">v0.1 · BUILD 2026-09-05<br>PROTOTYPE · DỮ LIỆU GIẢ</div>
+      <div class="title__legal">© CHROMEFALL</div>
+    </div>
+
+    <!-- ===== SCREEN: HOME / LOBBY ===== -->
+    <div class="screen home" data-screen="home">
+      <div class="topbar">
+        <div class="topbar__avatar" id="homeAvatar"></div>
+        <div class="topbar__id"><b id="pName" title="Chạm để đổi tên" style="cursor:pointer">OPERATOR-77</b><span id="pLevel">LV 12 · CHROME LICENSE</span></div>   <!-- ★ FAKE hồ sơ người chơi -->
+        <div class="topbar__cur"><span class="pill"><small>CR</small><span id="pCredits">12,480</span></span><span class="pill"><small>SH</small><span id="pShards">900</span></span></div>
+      </div>
+      <div class="hero">
+        <div class="portrait" id="heroArt"></div>
+        <div class="hero__feat" id="heroFeat">SQUAD LEAD<b>RONIN</b></div>
+        <div class="hero__panel">
+          <span class="lbl">Next mission</span>
+          <div class="hero__mission"><b id="homeSector">07-B</b><span id="homeSectorMeta">FOUNDRY ROW · 3 WAVES · BOSS</span></div>
+          <button class="btn-act btn-act--go btn-act--full" data-go="squad"><span class="btn-act__k">Deploy</span><span class="btn-act__v">Chọn đội hình → chọn sector → chiến đấu</span></button>
+        </div>
+      </div>
+      <button class="comms comms--daily" id="daily" hidden><span class="comms__k">DAILY</span><span class="comms__t" id="dailyText"></span><span class="comms__go">▸</span></button>
+      <div class="dl" id="dailyBox" hidden><div class="sh"><span class="sh__title">Daily</span><span class="sh__sub" id="dailyDate"></span><button class="btn-ghost" id="dailyClose">◂ BASE</button></div><div class="dl__list" id="dailyList"></div></div>
+      <button class="comms" id="comms" hidden><span class="comms__k">COMMS</span><span class="comms__t" id="commsText"></span><span class="comms__go">▸</span></button>
+      <div class="menu">
+        <button class="menu__btn" data-go="squad"><b>SQUAD</b><small>5 SLOT</small></button>
+        <button class="menu__btn" data-go="sector"><b>SECTOR</b><small>PVE</small></button>
+        <button class="menu__btn" data-go="gacha"><b>GACHA</b><small>REQUISITION</small></button>
+        <button class="menu__btn" data-go="archive"><b>ARCHIVE</b><small>LORE</small></button>
+        <button class="menu__btn" data-go="config"><b>CONFIG</b><small>SYS</small></button>
+      </div>
+    </div>
+
+    <!-- ===== SCREEN: SQUAD ===== -->
+    <div class="screen squad" data-screen="squad">
+      <div class="sh"><span class="sh__title">Squad</span><span class="sh__sub" id="squadCount"></span><button class="btn-ghost" data-go="home">◂ BASE</button></div>
+      <div class="team" id="squadSlots"></div>
+      <div class="roster" id="squadRoster"></div>
+      <button class="btn-act btn-act--go btn-act--full" id="btnDeploy" data-go="sector"><span class="btn-act__k">Confirm squad</span><span class="btn-act__v">Chọn đủ 5 nhân vật</span></button>
+    </div>
+
+    <!-- ===== SCREEN: SECTOR SELECT ===== -->
+    <div class="screen sector" data-screen="sector">
+      <div class="sh"><span class="sh__title">Sector</span><span class="sh__sub">DISTRICT 07 · PVE</span><button class="btn-ghost" data-go="home">◂ BASE</button></div>
+      <div class="slist" id="sectorList"></div>
+      <button class="btn-act btn-act--go btn-act--full" id="btnEnter" data-go="battle"><span class="btn-act__k">Enter sector</span><span class="btn-act__v" id="enterMeta">—</span></button>
+    </div>
+
+    <!-- ===== SCREEN: ARCHIVE (hồ sơ nhân vật) ===== -->
+    <div class="screen archive" data-screen="archive">
+      <div class="sh"><span class="sh__title">Archive</span><span class="sh__sub" id="archCount"></span><button class="btn-ghost" data-go="home">◂ BASE</button></div>
+      <div class="arch" id="archGrid"></div>
+      <div class="lore" id="lore" hidden>
+        <div class="lore__hero"><div class="portrait" id="loreArt"></div>
+          <button class="btn-ghost lore__close" id="loreClose">◂ ARCHIVE</button>
+          <div class="lore__head"><span class="lore__tags" id="loreTags"></span><b id="loreName">—</b><i id="loreEpithet"></i></div></div>
+        <div class="lore__body" id="loreBody"></div>
+      </div>
+    </div>
+
+    <!-- ===== SCREEN: CONFIG ===== -->
+    <div class="screen config" data-screen="config">
+      <div class="sh"><span class="sh__title">Config</span><span class="sh__sub">DECK 77 · SYSTEM</span><button class="btn-ghost" data-go="home">◂ BASE</button></div>
+      <div class="cfg">
+        <button class="cfg__row" data-cfg="sound"><span><b>ÂM THANH CUT-IN</b><small>Video chiêu cuối có tiếng</small></span><i class="cfg__sw"></i></button>
+        <button class="cfg__row" data-cfg="motion"><span><b>GIẢM CHUYỂN ĐỘNG</b><small>Tắt bob/pulse/quét sáng, giữ chuyển trạng thái</small></span><i class="cfg__sw"></i></button>
+        <button class="cfg__row" data-cfg="sfx"><span><b>ÂM THANH HIỆU ỨNG</b><small>Nút bấm, va chạm, chiêu, gacha</small></span><i class="cfg__sw"></i></button>
+        <button class="cfg__row" data-cfg="skipStory"><span><b>BỎ QUA HỘI THOẠI</b><small>Vào thẳng trận (hồ sơ và thưởng không đổi)</small></span><i class="cfg__sw"></i></button>
+        <div class="cfg__sep"></div>
+        <button class="cfg__row cfg__row--danger" id="cfgReset"><span><b>RESET TIẾN TRÌNH</b><small>Xoá hồ sơ Operator trên máy này</small></span><i>▸</i></button>
+        <div class="cfg__note">CHROMEFALL v0.2 · prototype · dữ liệu ★ FAKE · <a href="#kit">UI kit &amp; tokens</a><br>UI SFX: "Sci Fi UI SFX Pack" © JDSherbert (audio/CREDITS.txt) · âm chiến đấu tổng hợp WebAudio</div>
+      </div>
+    </div>
+
+    <!-- ===== SCREEN: GACHA / REQUISITION ===== -->
+    <div class="screen gacha" data-screen="gacha">
+      <div class="sh"><span class="sh__title">Requisition</span><span class="pill"><small>SH</small><span id="gShards">900</span></span><button class="btn-ghost" data-go="home">◂ BASE</button></div>
+      <div class="gbanner">
+        <div class="portrait" id="gachaArt"></div>
+        <div class="gbanner__tag">RATE-UP · TIER S</div>
+        <div class="gbanner__name" id="gachaFeat">KIRA</div>
+        <div class="gbanner__panel">
+          <div class="grates"><span><b>S</b><em>3%</em></span><span><b>A</b><em>15%</em></span><span><b>B</b><em>82%</em></span><span class="grates__pity"><b>PITY</b><em id="gPity">0/50</em></span></div>
+          <div class="gnote">50% số lần ra S là nhân vật rate-up · ×10 chắc chắn ≥1 A · trùng đổi thành SH <span class="fake">FAKE</span></div>
+        </div>
+      </div>
+      <div class="gpull">
+        <button class="btn-act btn-act--full" id="btnPull1"><span class="btn-act__k">Pull ×1</span><span class="btn-act__v">30 SH</span></button>
+        <button class="btn-act btn-act--go btn-act--full" id="btnPull10"><span class="btn-act__k">Pull ×10</span><span class="btn-act__v">270 SH · ≥1 A</span></button>
+      </div>
+      <div class="gfoot"><span class="lbl">Owned <b id="gOwned">5</b>/19 · Pulls <b id="gPulls">0</b></span><button class="btn-ghost" id="btnRefill" title="Dev: nạp thử">+1000 SH · DEV</button></div>
+      <div class="reveal" id="reveal" hidden>
+        <div class="reveal__grid" id="revealGrid"></div>
+        <div class="reveal__bar"><button class="btn-ghost" id="btnRevealSkip">SKIP ▸</button><button class="btn-act btn-act--go" id="btnRevealDone" hidden><span class="btn-act__k">Done</span></button></div>
+      </div>
+    </div>
+
+    <!-- ===== STORY OVERLAY (hội thoại trước/sau trận) ===== -->
+    <div class="story" id="story" hidden>
+      <div class="story__top"><span id="storyWhere">07-A · SCRAPYARD GATE</span><button class="btn-ghost" id="storySkip">SKIP ▸</button></div>
+      <div class="story__cast"><div class="story__spk" id="storySpk"></div></div>
+      <div class="story__box" id="storyBox">
+        <span class="story__name" id="storyName">—</span>
+        <div class="story__text" id="storyText"></div>
+        <span class="story__more" id="storyMore">▼</span>
+      </div>
+    </div>
+
+    <!-- ===== SCREEN: BATTLE ===== -->
+  <div class="arena screen" data-screen="battle">
+    <header class="hud">
+      <div class="hud__row">
+        <div><span class="lbl">Sector</span><span class="mono" id="sectorNo">07-B</span></div>
+        <div><span class="lbl">Round</span><span class="mono" id="roundNo">01</span></div>
+        <div><span class="lbl">Wave</span><span class="mono" id="waveNo">1/3</span></div>
+        <button class="btn-ghost hud__reset" id="btnReset">RESET</button>
+        <button class="btn-ghost" data-go="home" title="Rút lui về căn cứ">◂ BASE</button>
+      </div>
+      <div class="turn" id="turnbar" style="margin-top:14px"></div>
+      <div class="ticker" id="ticker">Khởi tạo…</div>
+    </header>
+
+    <div class="stage" id="stage">
+      <div class="stage__floor"></div>
+      <div class="stage__horizon"></div>
+      <div class="stage__tag">SQUAD · CHROME/RUST</div>
+      <div class="stage__tag stage__tag--r">HOSTILE · RUST</div>
+      <div class="field field--ally" id="allies"></div>
+      <div class="field field--enemy" id="enemies"></div>
+
+      <div class="stageflash" id="stageflash"></div>
+      <div class="cutin" id="cutin" hidden>
+        <video id="cutinVideo" playsinline preload="auto"></video>
+        <div class="cutin__bar"><span class="cutin__who" id="cutinWho">KIRA</span><span class="cutin__name" id="cutinName">ZERO</span></div>
+        <button class="cutin__skip btn-ghost" id="cutinSkip">SKIP ▸</button>
+      </div>
+      <div class="ultbanner" id="ultBanner"><div class="ultbanner__n" id="ubName">ZERO</div><div class="ultbanner__line"></div><div class="ultbanner__s" id="ubSub"></div></div>
+      <div class="result" id="result" hidden><div class="result__box"><div class="result__t" id="resT"></div><div class="result__s" id="resS"></div><button class="btn-ghost" id="btnAgain">RETRY</button> <button class="btn-ghost" data-go="home">RETURN TO BASE</button></div></div>
+    </div>
+
+    <div class="actions">
+      <button class="btn-act" id="btnAttack"><span class="btn-act__k">Attack</span><span class="btn-act__v">+25 EN · 100% ATK</span></button>
+      <button class="btn-ult" id="btnUlt" data-state="locked">
+        <span class="btn-ult__name" id="ultName">—</span>
+        <span class="btn-ult__meta" id="ultMeta">—</span>
+        <span class="btn-ult__bar"><i id="ultBarFill"></i></span>
+      </button>
+    </div>
+    <div id="fx" style="position:absolute;inset:0;pointer-events:none;z-index:35"></div>
+  </div>
+  </div><!-- /screens -->
+
+  <aside class="side">
+    <div class="side__block"><span class="lbl">Ultimate · đang tới lượt</span><div class="ultinfo" id="ultInfo">—</div></div>
+    <div class="side__block"><span class="lbl">Battle log</span><ol class="log" id="log"></ol></div>
+    <div class="side__block"><span class="lbl">Ghi chú</span><div class="ultinfo">Đội mình bên trái, địch bên phải. Bấm vào kẻ địch để đổi mục tiêu. Kẻ địch tự hành động khi tới lượt. HP về 0 là KIA vĩnh viễn trong trận.<span class="mono">Chỉ số địch, công thức sát thương, thứ tự lượt = ★ FAKE (xem JS)</span></div></div>
+  </aside>
+</section>
+
+<!-- =====================================================================
+     B. COMPONENT LIBRARY
+     ===================================================================== -->
+<main id="kit" class="kit">
+  <div class="kit__h"><h1>COMPONENTS</h1><p>Mọi trạng thái đặt cạnh nhau · mọi màu đọc từ token</p></div>
+
+  <!-- B1 -->
+  <section class="spec">
+    <div class="spec__head"><span class="spec__no">B1</span><span class="spec__title">Character card</span>
+      <span class="spec__note">Chrome: viền liền, chamfer 45°. Rust: viền đứt đoạn, khấc cắt ghép, đinh tán, nhãn lệch. Kéo thẻ thả vào slot ở B4.</span></div>
+    <div class="row" id="cardRow"></div>
+  </section>
+
+  <!-- B2 -->
+  <section class="spec">
+    <div class="spec__head"><span class="spec__no">B2</span><span class="spec__title">HP bar</span>
+      <span class="spec__note">Đầu phải cắt chéo, vạch chia 10%. Dưới 25%: viền + fill đỏ nhấp nháy, số HP nhấp nháy. Mất máu: fill tụt ngay, vệt sáng đuổi theo sau 260ms.</span></div>
+    <div class="row">
+      <div class="sample sample--w"><div class="hpline" data-state="ok"><span class="lbl">HP</span><span class="mono">950 / 950</span></div><div class="bar bar--lg" data-state="ok" style="--v:100%"><div class="bar__track"><i class="bar__ghost"></i><i class="bar__fill"></i><i class="bar__ticks"></i></div></div><span class="sample__cap">Đầy</span></div>
+      <div class="sample sample--w"><div class="hpline" data-state="mid"><span class="lbl">HP</span><span class="mono">475 / 950</span></div><div class="bar bar--lg" data-state="mid" style="--v:50%"><div class="bar__track"><i class="bar__ghost"></i><i class="bar__fill"></i><i class="bar__ticks"></i></div></div><span class="sample__cap">50%</span></div>
+      <div class="sample sample--w"><div class="hpline" data-state="low"><span class="lbl">HP</span><span class="mono">171 / 950</span></div><div class="bar bar--lg" data-state="low" style="--v:18%"><div class="bar__track"><i class="bar__ghost"></i><i class="bar__fill"></i><i class="bar__ticks"></i></div></div><span class="sample__cap">Dưới 25% · cảnh báo</span></div>
+      <div class="sample sample--w"><div class="hpline" id="drainLine" data-state="ok"><span class="lbl">HP</span><span class="mono" id="drainTxt">950 / 950</span></div><div class="bar bar--lg" id="drainBar" data-state="ok" style="--v:100%"><div class="bar__track"><i class="bar__ghost"></i><i class="bar__fill"></i><i class="bar__ticks"></i></div></div><span class="sample__cap">Đang mất máu (lặp demo)</span></div>
+    </div>
+  </section>
+
+  <!-- B3 -->
+  <section class="spec">
+    <div class="spec__head"><span class="spec__no">B3</span><span class="spec__title">Energy bar</span>
+      <span class="spec__note">Mỗi ô = 25. Số ô = cost chiêu cuối (75/100/125). ĐẦY: toàn bộ chuyển trắng nóng, viền + glow, quét sáng, nhãn READY — tín hiệu duy nhất được phép sáng liên tục.</span></div>
+    <div class="row" id="energyRow"></div>
+  </section>
+
+  <!-- B4 -->
+  <section class="spec">
+    <div class="spec__head"><span class="spec__no">B4</span><span class="spec__title">Đội hình 5 slot</span>
+      <span class="spec__note">Trống (viền băm, dấu +), đã điền (viền màu phe), đang kéo thả (viền trắng, DROP). Kéo thẻ từ B1 vào để thử thật; bấm × để gỡ.</span></div>
+    <div class="row">
+      <div class="sample"><div class="team" id="team"></div><span class="sample__cap">Slot 03 đang ở trạng thái drag-over (tĩnh) — sẽ tự cập nhật khi bạn kéo thật</span></div>
+      <div class="sample"><div id="dragGhost"></div><span class="sample__cap">Thẻ ở trạng thái đang kéo</span></div>
+    </div>
+  </section>
+
+  <!-- B5 -->
+  <section class="spec">
+    <div class="spec__head"><span class="spec__no">B5</span><span class="spec__title">Nút chiêu cuối</span>
+      <span class="spec__note">Chưa đủ: mờ, viền băm, số còn thiếu màu đỏ, vạch tiến độ. Sẵn sàng: nền màu phe, viền trắng, nhịp đập 1600ms. Đang phát: vạch chạy 900ms.</span></div>
+    <div class="row">
+      <div class="sample sample--w"><button class="btn-ult" data-state="locked" style="width:100%"><span class="btn-ult__name">Zero</span><span class="btn-ult__meta">−50 EN · 50/100</span><span class="btn-ult__bar"><i style="--p:50%"></i></span></button><span class="sample__cap">Chưa đủ energy</span></div>
+      <div class="sample sample--w"><button class="btn-ult" data-state="ready" style="width:100%"><span class="btn-ult__name">Zero</span><span class="btn-ult__meta">100/100 · 320% ATK</span><span class="btn-ult__bar"><i style="--p:100%"></i></span></button><span class="sample__cap">Sẵn sàng · Chrome</span></div>
+      <div class="sample sample--w"><button class="btn-ult btn-ult--rust" data-state="ready" style="width:100%"><span class="btn-ult__name">Iaido</span><span class="btn-ult__meta">100/100 · 280% ATK</span><span class="btn-ult__bar"><i style="--p:100%"></i></span></button><span class="sample__cap">Sẵn sàng · Rust</span></div>
+      <div class="sample sample--w"><button class="btn-ult" data-state="casting" style="width:100%"><span class="btn-ult__name">Apostasy</span><span class="btn-ult__meta">CASTING…</span><span class="btn-ult__bar"><i id="castDemo"></i></span></button><span class="sample__cap">Đang phát</span></div>
+      <div class="sample sample--w"><button class="btn-act" style="width:100%"><span class="btn-act__k">Attack</span><span class="btn-act__v">+25 EN · 100% ATK</span></button><span class="sample__cap">Nút thường (tham chiếu)</span></div>
+    </div>
+  </section>
+
+  <!-- B6 -->
+  <section class="spec">
+    <div class="spec__head"><span class="spec__no">B6</span><span class="spec__title">Thanh lượt đi</span>
+      <span class="spec__note">Chân dung nhỏ theo thứ tự, viền màu phe. Người tới lượt: nâng lên, viền trắng, nhãn NOW, mũi tên dưới. Sau dấu ngắt là lượt của vòng sau (mờ). Tự chạy demo.</span></div>
+    <div class="row"><div class="sample"><div class="turn" id="turnDemo"></div><span class="sample__cap">Auto-advance mỗi 1.6s</span></div></div>
+  </section>
+
+  <!-- B7 -->
+  <section class="spec">
+    <div class="spec__head"><span class="spec__no">B7</span><span class="spec__title">Số sát thương bay lên</span>
+      <span class="spec__note">Thường: trắng mono. Chí mạng: vàng, to hơn, nghiêng −6°, nhãn CRIT. Hồi máu: xanh, dấu +.</span></div>
+    <div class="row">
+      <div class="sample"><div class="dmg-demo" id="dmgDemo"></div><button class="btn-ghost" id="btnDmg" style="align-self:flex-start">REPLAY</button></div>
+    </div>
+  </section>
+
+  <!-- B8 -->
+  <section class="spec">
+    <div class="spec__head"><span class="spec__no">B8</span><span class="spec__title">Chip trạng thái</span>
+      <span class="spec__note">Buff: tam giác lên, tím Chrome. Debuff: tam giác xuống, cam Rust. Điều khiển (Apostasy): chấm đỏ nháy. Hoàn Energy (Zero): trắng. Số = lượt còn lại / giá trị.</span></div>
+    <div class="chips">
+      <span class="chip chip--buff">ATK UP <em>+20%</em> <em>2T</em></span>
+      <span class="chip chip--buff">GUARD <em>1T</em></span>
+      <span class="chip chip--debuff">ATK DOWN <em>−15%</em> <em>2T</em></span>
+      <span class="chip chip--debuff">BLEED <em>3T</em></span>
+      <span class="chip chip--control">CONTROLLED <em>1T</em></span>
+      <span class="chip chip--refund">EN REFUND <em>+50</em></span>
+      <span class="chip">TAUNT <em>1T</em></span>
+    </div>
+  </section>
+
+  <!-- ROSTER -->
+  <section class="spec">
+    <div class="spec__head"><span class="spec__no">R</span><span class="spec__title">Roster · <span id="rosterCount"></span> nhân vật</span>
+      <span class="spec__note">Toàn bộ roster đọc từ ROSTER (JS). Nhân vật chưa có art hiện silhouette theo phe. Kéo vào đội hình ở B4 được.</span></div>
+    <div class="row" id="rosterRow"></div>
+  </section>
+
+  <!-- BESTIARY -->
+  <section class="spec">
+    <div class="spec__head"><span class="spec__no">E</span><span class="spec__title">Bestiary · <span id="enemyCount"></span> kẻ địch PvE</span>
+      <span class="spec__note">Bể kẻ địch cho sector. Badge: G = grunt, E = elite, B = boss. Wave 1 gọi 3 grunt, wave 2 thêm elite, wave 3 có boss.<span class="fake">FAKE</span></span></div>
+    <div class="row" id="enemyRow"></div>
+  </section>
+
+  <!-- A. TOKENS -->
+  <section class="spec" id="tokens">
+    <div class="spec__head"><span class="spec__no">A</span><span class="spec__title">Design tokens</span>
+      <span class="spec__note">Đổi theme ở góc trên để kiểm tra bộ token sáng/tối. Giá trị hiển thị là giá trị đang được tính (computed).</span></div>
+    <div class="swatches" id="swatches"></div>
+    <div class="typerow" style="margin-top:var(--s-5)">
+      <span class="lbl">Type scale</span>
+      <span style="font-size:var(--fs-2xs)">2xs 10</span><span style="font-size:var(--fs-xs)">xs 11</span><span style="font-size:var(--fs-sm)">sm 12</span><span style="font-size:var(--fs-md)">md 14</span><span style="font-size:var(--fs-lg)">lg 16</span><span style="font-size:var(--fs-xl)">xl 20</span><span style="font-size:var(--fs-2xl)">2xl 26</span><span style="font-size:var(--fs-3xl)">3xl 34</span>
+      <span class="mono">mono 0123456789</span><span class="lbl" style="color:var(--text-1)">LABEL · TRACK .14EM</span>
+    </div>
+    <div class="typerow" style="margin-top:var(--s-4)"><span class="lbl">Spacing</span>
+      <i style="display:inline-block;width:var(--s-1);height:12px;background:var(--line-3)"></i><i style="display:inline-block;width:var(--s-2);height:12px;background:var(--line-3)"></i><i style="display:inline-block;width:var(--s-3);height:12px;background:var(--line-3)"></i><i style="display:inline-block;width:var(--s-4);height:12px;background:var(--line-3)"></i><i style="display:inline-block;width:var(--s-5);height:12px;background:var(--line-3)"></i><i style="display:inline-block;width:var(--s-6);height:12px;background:var(--line-3)"></i><i style="display:inline-block;width:var(--s-7);height:12px;background:var(--line-3)"></i>
+      <span class="mono" style="color:var(--text-3);font-size:var(--fs-2xs)">4 · 8 · 12 · 16 · 24 · 32 · 48</span></div>
+  </section>
+</main>
+
+
+<script src="js/core.js"></script>
+<script src="js/data.js"></script>
+<script src="js/state.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/battle.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
