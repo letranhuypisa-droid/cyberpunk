@@ -26,6 +26,7 @@ rồi mở `http://localhost:8765/index.html`. UI kit và token nằm cuối tra
 | `js/app.js` | Router màn hình, lobby, squad, sector, gacha, archive, config, story overlay |
 | `docs/story.md` | Thế giới, chiến dịch, thiết kế màn, hai kết |
 | `docs/characters.md` | Hồ sơ 19 nhân vật + Operator |
+| `docs/combat-profiles.md` | Hồ sơ chiến đấu: vũ khí, cự ly, chiêu cuối (Anh + Việt), lore |
 | `docs/bg-prompts.md` | Prompt sinh ảnh nền và quy tắc zoom/chân trời |
 
 Mọi số liệu cân bằng đánh dấu `★ FAKE` là bản nháp.
