@@ -113,6 +113,18 @@ const overloadStacks = u => { const c=u.chips.find(c=>c.label===OVERLOAD.label);
 /* MUTE — Echo cắt mục tiêu khỏi bài hát: gây ít sát thương hơn và rụng khỏi HALO LINK.
    Hết hạn ở lượt của chính mục tiêu, mượn nguyên khuôn `controlled` nên không cần bộ đếm lượt */
 const MUTE = { label:'MUTE', dmg:.25, src:'echo' };
+/* SỔ — Stitch ghi mọi sát thương đồng đội phải chịu; SUTURE trả sổ rồi xoá.
+   Bà phải còn sống mới ghi được, xem docs/mechanics.md */
+const LEDGER = { label:'SỔ', src:'stitch' };
+const ledgerKeeper = () => B.units.find(u=>u.id===LEDGER.src && u.side==='ally' && u.alive);
+function noteLedger(dmg){
+  const s=ledgerKeeper(); if(!s) return;
+  const cap=Math.round(s.atk*((s.ult&&s.ult.ledgerMax)||8));
+  s.ledger=Math.min(cap,(s.ledger||0)+dmg);
+  const c=s.chips.find(c=>c.label===LEDGER.label);
+  if(c) c.val=s.ledger; else s.chips.push({ type:'ledger', label:LEDGER.label, val:s.ledger });
+  updateUnit(s);
+}
 function addMute(tgt){
   tgt.muted = true;
   if(!tgt.chips.some(c=>c.label===MUTE.label)) tgt.chips.push({ type:'mute', label:MUTE.label, val:'1T' });
@@ -201,6 +213,7 @@ function dealDamage(src, tgt, mult, opts={}){
   const hush = src.muted ? (1-MUTE.dmg) : 1;                 // câm thì đánh yếu đi
   const dmg = Math.round(src.atk * mult * v * vuln * hush * (crit?RULES.critMult:1));
   tgt.hp = Math.max(0, tgt.hp - dmg);
+  if(tgt.side==='ally' && dmg>0) noteLedger(dmg);          // sổ của Stitch
   spawnNumber(tgt.el.querySelector('.unit__sprite'), dmg, crit?'crit':'');
   const killed = tgt.hp<=0 && tgt.alive;
   if(killed){ tgt.alive=false; tgt.chips=[]; }
@@ -332,7 +345,11 @@ async function playerUlt(){
     if(u.ult.perStack) log(`${u.name} kích nổ toàn bộ ${OVERLOAD.label}`, true);
     await anim;
   } else if(k==='heal'){
-    alive('ally').forEach(t=>heal(u,t,Math.round(u.atk*u.ult.mult))); log(`${u.name} hồi máu toàn đội`, true);
+    const book = u.ult.ledgerShare ? (u.ledger||0) : 0;      // ledgerShare: chỉ Stitch có
+    const amt  = Math.round(u.atk*u.ult.mult + book*(u.ult.ledgerShare||0));
+    alive('ally').forEach(t=>heal(u,t,amt));
+    if(u.ult.ledgerShare){ u.ledger=0; removeChip(u,LEDGER.label); log(`${u.name} trả sổ ${book} → hồi ${amt}/người`, true); }
+    else log(`${u.name} hồi máu toàn đội`, true);
   } else if(k==='control'){
     const t=ensureTarget(); t.controlled=true; addChip(t,'control','CONTROLLED','1T'); log(`${u.name} chiếm quyền điều khiển ${t.name}`, true);
   }

@@ -264,3 +264,81 @@ Cô đang truy một đầu mối cấp cao của The Corp, và lý do thì cô 
 > *"Hop! Skip! Jump! Oh... you're dead already?"*
 
 ---
+
+## STITCH
+
+### 1. Tên nhân vật
+
+**STITCH** — *Bác sĩ của đáy thành phố*
+
+`Rust · hạng S · nhận qua gacha (Requisition)` — ATK 140 · HP 900 · Energy tối đa 100
+
+Stitch là tên nghề, không phải tên khai sinh. Tên khai sinh của bà từng nằm trong danh bạ y tế của cả thành phố, và bị rút ra khỏi đó lúc chín giờ mười sáng một ngày thứ ba. Không phiên toà, không ai giải thích. The Corp không cần làm cái việc dài dòng đó — nó chỉ rút một cái tên khỏi một danh sách.
+
+### 2. Vũ khí
+
+**BỐN TAY** — *four-arm surgical rig, tài sản bệnh viện tầng âm hai, có số kiểm kê*
+
+Một bộ giá đeo lưng mang bốn cánh tay phẫu thuật nhiều khớp: **kim khâu dài, cưa xương, kẹp, mỏ đốt cầm máu**. Bốn tay làm được cùng lúc bốn việc mà một người chỉ làm được hai — ở tầng âm bảy, đó là khác biệt giữa cứu được và không.
+
+Bà ăn cắp nó. Trên đường bị đuổi khỏi bệnh viện, bà rẽ qua kho thiết bị, mở tủ, và lấy. Bà biết mình đang ăn cắp, và bà vẫn lấy, vì cái thứ ở tầng âm bảy không có là cái thứ đó.
+
+> **Một mô-típ chung của roster:** Wire mang sợi cáp hàn lấy khỏi bàn thợ xưởng Halo. Echo mang cái loa The Corp cấp cho cô. Stitch mang giá bốn tay của bệnh viện. **Cả ba đều mang theo dụng cụ của chính nơi đã đuổi mình đi**, và cả ba đều dùng nó ngược lại. Không nên trùng thêm lần thứ tư.
+
+Trong trận, bà không vung tay loạn. Bà làm việc — chính xác, không vội, một dụng cụ một lúc. Đó mới là chỗ đáng sợ: bà đánh nhau y hệt cách bà mổ.
+
+### 3. Đánh xa hay cận chiến
+
+**Cận chiến, tầm với khoảng hai mét** — chiều dài cánh tay cộng chiều với của giá.
+
+Nhưng đây là nhân vật **dễ xếp đội sai nhất bảng**. Chỉ số nói hai điều ngược nhau: ATK 140 là cao nhì roster, mà HP 900 là thấp nhất. Nhìn ATK thì muốn đẩy bà lên tuyến trước. Đừng. Bà là nguồn hồi máu lớn nhất đội, và bà chết trước bất kỳ ai.
+
+Chỗ đứng đúng: **tuyến giữa, sau một người chắn**. Muzzle hoặc Meridian đứng trước. Bà đánh thường rất đau — 140 ATK không phải để trang trí — nhưng mỗi lượt bà đứng trong tầm với của một con boss là một lượt cả đội có thể mất bác sĩ.
+
+### 4. Chiêu cuối
+
+**Nội tại — [SỔ] / THE LEDGER**
+
+Chừng nào Stitch còn sống, **mọi điểm sát thương đồng đội phải chịu đều được ghi vào sổ** — kể cả của chính bà. Con số hiện trên thẻ bà, cộng dồn cho tới khi bà dùng chiêu cuối. Trần sổ là **8 × ATK**.
+
+Bà phải còn sống thì mới ghi được. Bà ngã thì sổ ngừng cộng.
+
+**SUTURE — MŨI KHÂU** · 100 Energy · hồi máu toàn đội · *tên giữ nguyên theo canon*
+
+> **EN — SUTURE**
+> Stitch pays out the ledger. Heals every living ally for **80% ATK plus 35% of everything the squad has bled since the last suture**, then clears the book. The worse the round has been, the more it is worth.
+
+> **VN — MŨI KHÂU**
+> Stitch trả sổ. Hồi cho mỗi đồng đội còn sống **80% ATK cộng 35% toàn bộ sát thương cả đội đã chịu kể từ lần khâu trước**, rồi xoá sổ. Vòng đấu càng tệ thì nó càng đáng tiền.
+
+**Vì sao không phải một chiêu hồi máu phẳng nữa:** roster đã có ba cái rồi — Muzzle `FIELD PATCH` (84/người), Halo `SANCTUM` (161), Meridian `BULWARK PROTOCOL` (85). Thêm cái thứ tư thì Stitch chỉ là số to hơn. Cơ chế sổ làm cô cong theo tình thế:
+
+| Tình huống | Sổ | Hồi mỗi người |
+|---|---|---|
+| Đội còn lành, vừa vào trận | ~0 | **112** — thua Halo |
+| Đội ăn đòn một vòng | ~600 | **322** |
+| Đội sắp vỡ, sổ đầy trần | 1120 | **504** — gấp ba Halo |
+
+Bà là người hồi máu tệ nhất khi mọi thứ đang ổn, và giỏi nhất đúng lúc mọi thứ hỏng. Đó là một bác sĩ.
+
+*Không cần video cut-in mới: `stitch_ult.mp4` chưa có, và cơ chế đã đủ đọc được qua con số nhảy trên thẻ.*
+
+### 5. Lore
+
+*Bản đầy đủ 10 chương: [`docs/chronicles/stitch.md`](chronicles/stitch.md) — đọc trong game ở ARCHIVE sau khi mở khoá.*
+
+Bệnh viện tầng âm hai, hai giờ sáng. Một unit Choir bò vào phòng cấp cứu bằng hai tay, vòng Halo trên đầu gãy làm đôi. Quy trình in trên tường, chữ to, ba bước: không can thiệp, báo The Corp, giữ nguyên hiện trạng. Stitch đã đọc ba bước ấy mỗi ca trực suốt mười một năm và thuộc lòng. Bà kéo rèm lại, cố định đốt sống cổ, nối tạm dây thần kinh chân, khâu bốn mươi hai mũi, rồi ra hành lang sau mở cái cửa dẫn ra đường ống thoát nước.
+
+Sáng hôm sau không có ai tới bắt bà — đó là điều bà nhớ rõ nhất. Chín giờ, giấy phép bị thu. Chín giờ mười, tên biến khỏi danh bạ y tế. Chín giờ hai mươi, thẻ cửa không mở được nữa. Trên đường ra bà rẽ qua kho thiết bị và lấy đi bộ giá bốn tay phẫu thuật, tài sản bệnh viện, có số kiểm kê. Bà biết mình đang ăn cắp. Bà vẫn lấy.
+
+Phòng khám của bà bây giờ là một cái container cạnh bãi xe tầng âm bảy, bàn mổ là tấm cửa xe tải kê lên hai thùng phuy. Bảng giá sơn trắng trên vách, đúng một dòng: *trả được gì thì trả.* Ai không có gì thì bà nhận một câu chuyện. Bà chép hết vào một cuốn sổ bìa cứng buộc dây cao su, và không ai được đọc — không phải để giữ bí mật, mà vì người ta kể thật nhất vào lúc nghĩ mình sắp chết, và cái nhận được lúc ấy thì không phải tiền công. Psalm từng hỏi sao không đốt đi cho xong. Stitch đáp: vì họ trả rồi, đốt đi thì thành ra tôi lấy không.
+
+Bà là người hàn Junker vào chính chiếc xe của anh sau mười chín tiếng liền, cắt cánh tay hoại tử của Toll trong ba tiếng không thuốc giảm đau, và là người duy nhất Psalm cho phép chạm vào vòng Halo đỏ — vì Wire hỏi để chữa, còn Stitch hỏi để biết nó đang làm gì với cái đầu bên dưới, và Psalm phân biệt được hai câu hỏi ấy.
+
+Mỗi lần mất một bệnh nhân bà khâu thêm một mũi lên tay áo trái. Tay áo giờ dày như một tấm giáp. Cả tổ đã thử khuyên bà thay; Ash không khuyên, Ash mua hẳn một cái áo mới để ở cửa, và cái áo ấy vẫn nằm trong container còn nguyên nếp gấp. Bà thuộc từng mũi, chỉ được không cần nhìn, mũi nào là ai. Hỏi vì sao phải xắn tay áo lên trước mỗi ca để mấy cái mũi nằm ngay dưới mắt mình, bà chỉ trả lời một lần, với Operator:
+
+*Vì tôi sợ có ngày tôi thôi đếm.*
+
+> *"Nằm yên. Tôi khâu người còn khéo hơn khâu máy."*
+
+---

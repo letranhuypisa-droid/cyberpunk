@@ -274,3 +274,119 @@ Chip xám, không phải màu phe — vì câm là **mất** một thứ, không
 - **Không cho `[MUTE]` cộng dồn.** Nó là cờ, hết hạn theo lượt của mục tiêu. Cộng dồn thì phải đếm lượt, mà
   engine chưa có bộ đếm lượt cho trạng thái — `controlled` né được chuyện đó bằng cách tự xoá ở lượt của chính unit, và `[MUTE]` đi theo y hệt.
 - **Không cho Echo câm đồng minh** hay câm chính mình. `dealDamage` đọc `src.muted` cho mọi bên, nhưng chỉ Echo mới gắn được cờ, và cô chỉ gắn lên mục tiêu cô đánh.
+
+---
+
+## [SỔ] + SUTURE — Stitch
+
+**Trạng thái: ĐÃ ÁP DỤNG.** Đo trong trận thật (Chromium, tắt crit + variance):
+
+| Kiểm tra | Kỳ vọng | Đo được |
+|---|---|---|
+| Đồng đội ăn đòn → ghi sổ | cộng dồn | 53 → 106 (đòn lên chính Stitch cũng ghi) |
+| Stitch đánh địch | không ghi | không đổi |
+| Trần sổ sau 40 đòn | 1120 | 1120 |
+| SUTURE với sổ 600 | 322/người | **322**, sổ về 0 |
+| Stitch ngã | sổ đứng yên | đứng yên |
+| Hồi quy: Muzzle FIELD PATCH | vẫn phẳng 84 | 84, không có `ledgerShare` |
+
+Con số 322 khớp đúng ô giữa của bảng đường cong ở trên.
+
+### Cơ chế
+
+| | |
+|---|---|
+| Nguồn | Mọi sát thương **đồng đội** phải chịu, kể cả của chính Stitch |
+| Điều kiện | Stitch phải còn sống. Bà ngã thì sổ ngừng cộng |
+| Trần | `8 × ATK` = 1120 |
+| Hiển thị | Chip trên thẻ Stitch, hiện con số đang cộng dồn |
+| Tiêu thụ | `SUTURE` trả hết rồi xoá sổ về 0 |
+
+`SUTURE` = `kind:'heal'`, `mult:.8`, `ledgerShare:.35`, `ledgerMax:8`.
+Hồi mỗi đồng đội còn sống: `ATK × 0.8 + 0.35 × sổ`.
+
+### Vì sao không phải chiêu hồi máu phẳng thứ tư
+
+Roster đã có ba chiêu hồi phẳng: Muzzle `FIELD PATCH` (70 ATK × 1.2 = 84), Halo `SANCTUM` (115 × 1.4 = 161),
+Meridian `BULWARK PROTOCOL` (85 × 1.0 = 85). Cho Stitch một cái nữa thì bà chỉ là con số to hơn, không phải nhân vật khác.
+
+| Tình huống | Sổ | Hồi mỗi người |
+|---|---|---|
+| Vừa vào trận | ~0 | 112 — **thua Halo** |
+| Ăn đòn một vòng | ~600 | 322 |
+| Sắp vỡ, sổ đầy trần | 1120 | 504 |
+
+Đường cong đó là cả nhân vật: tệ nhất lúc mọi thứ đang ổn, giỏi nhất đúng lúc mọi thứ hỏng.
+`heal()` đã tự chặn ở `hpMax` nên phần thừa bị bỏ, không cần cân thêm.
+
+### Đã sửa gì
+
+**1 · `js/data.js` — entry của Stitch (dòng 43)**
+
+```js
+// trước
+ult:{name:'SUTURE',cost:100,kind:'heal',mult:1.5,desc:'★ FAKE'}
+
+// sau
+ult:{ name:'SUTURE', cost:100, kind:'heal', mult:.8, ledgerShare:.35, ledgerMax:8,
+      desc:'Hồi 80% ATK + 35% sổ cho toàn đội, rồi xoá sổ' },
+talent:{ name:'SỔ', max:8 }
+```
+
+**2 · `js/battle.js` — hằng số + helper, cạnh khối MUTE**
+
+```js
+const LEDGER = { label:'SỔ', src:'stitch' };
+const ledgerKeeper = () => B.units.find(u=>u.id===LEDGER.src && u.side==='ally' && u.alive);
+function noteLedger(dmg){
+  const s=ledgerKeeper(); if(!s) return;                       // bà ngã thì thôi ghi
+  const cap=Math.round(s.atk*(s.ult.ledgerMax||8));
+  s.ledger=Math.min(cap,(s.ledger||0)+dmg);
+  const c=s.chips.find(c=>c.label===LEDGER.label);
+  if(c) c.val=s.ledger; else s.chips.push({type:'ledger',label:LEDGER.label,val:s.ledger});
+  updateUnit(s);
+}
+```
+
+**3 · `js/battle.js` — `dealDamage`, ngay sau khi trừ máu**
+
+```js
+  if(tgt.side==='ally' && dmg>0) noteLedger(dmg);
+```
+
+Đặt **sau** `tgt.hp = Math.max(...)` và **trước** khối `killed`, để đòn giết người cuối cùng vẫn được ghi.
+
+**4 · `js/battle.js` — nhánh `heal` trong `playerUlt`**
+
+```js
+// trước
+} else if(k==='heal'){
+  alive('ally').forEach(t=>heal(u,t,Math.round(u.atk*u.ult.mult))); log(`${u.name} hồi máu toàn đội`, true);
+
+// sau
+} else if(k==='heal'){
+  const book = u.ult.ledgerShare ? (u.ledger||0) : 0;
+  const amt  = Math.round(u.atk*u.ult.mult + book*(u.ult.ledgerShare||0));
+  alive('ally').forEach(t=>heal(u,t,amt));
+  if(u.ult.ledgerShare){ u.ledger=0; removeChip(u,LEDGER.label); log(`${u.name} trả sổ ${book} → hồi ${amt}/người`, true); }
+  else log(`${u.name} hồi máu toàn đội`, true);
+```
+
+Muzzle, Halo và Meridian không khai `ledgerShare` nên `book=0`, giữ nguyên hành vi cũ.
+
+**5 · `css/chromefall.css` — chip, cạnh `.chip--mute`**
+
+```css
+.chip--ledger{color:var(--rust-hi);border-color:var(--rust)}
+.chip--ledger::before{border:0;width:5px;height:6px;background:currentColor;
+  clip-path:polygon(0 0,100% 0,100% 100%,50% 82%,0 100%)}
+```
+
+Màu Rust theo phe bà, hình cái dấu trang sổ.
+
+### Không làm
+
+- **Không cho sổ sống qua khi Stitch chết.** `ledgerKeeper` lọc `alive`, nên bà ngã là sổ đứng lại — sổ vẫn còn số cũ,
+  nhưng không ai ghi thêm và không ai trả được. Đó là chủ ý: cả đội phải giữ bà.
+- **Không ghi sát thương lên kẻ địch.** Chỉ `tgt.side==='ally'`.
+- **Không cộng sổ khi Stitch chưa vào đội.** `ledgerKeeper` trả `undefined` thì `noteLedger` thoát ngay, không tốn gì.
