@@ -194,3 +194,73 @@ Dòng đó là: *Đừng nhìn tôi như nhìn chị ấy.* Cả tổ đã nghe 
 > *"Đừng nhìn tôi như nhìn chị ấy."*
 
 ---
+
+## KIRA
+
+### 1. Tên nhân vật
+
+**KIRA** — *Ác ma bé bỏng*
+
+`Chrome · hạng S · thưởng khi clear 07-A SCRAPYARD GATE (tutorial)` — ATK 145 · HP 950 · Energy tối đa 100
+
+The Corp gọi cô là **Tài sản 07**. Không phải mã unit, mà mã tài sản — trên Spire người ta không hỏi tên, người ta phát mã. Kira là tên có từ trước cái mã ấy, và là thứ duy nhất còn lại từ trước.
+
+Ở Free Zone cô không cần hồ sơ. Người ta doạ trẻ con bằng cô: *ác ma bé bỏng sẽ bắt mất linh hồn của con đấy.*
+
+### 2. Vũ khí
+
+**ZERO** — *thanh kiếm không có số hiệu*
+
+Lưỡi dài hơn cả người cầm, không dấu lò, không số hiệu, không một chữ nào khắc trên đó. Dân quận SIS tin nó do một Ripperdoc tên Jack rèn, nhưng đó là niềm tin chứ không phải bằng chứng — người ta cần tin một cái gì đó. Kira có Zero từ năm bảy tuổi và không trả lời được ai đưa.
+
+**Thanh thứ hai — hàng cấp phát của The Corp**
+
+Ngắn hơn, lưỡi phát sáng tím, số hiệu khắc ở chuôi, thay được lưỡi khi mòn. Tốt hơn Zero về mọi thông số đo được. Cô chưa đặt tên cho nó bao giờ, và cũng chưa vứt đi bao giờ.
+
+Ash từng hỏi sao không bán, bán được khối tiền. Kira bảo: *vì em muốn biết em rút thanh nào trước, khi em không kịp nghĩ.*
+
+Hai thanh kiếm ấy là toàn bộ câu hỏi của nhân vật này, đeo trên người. Một cái có từ trước The Corp, một cái do The Corp đưa, và cô không chắc cái nào mới là mình.
+
+### 3. Đánh xa hay cận chiến
+
+**Cận chiến, tuyến trước, và không có phương án B.**
+
+ATK 145 là cao nhì roster; HP 950 là thấp nhất trong đám có art. Kira giết nhanh hơn bất kỳ ai và ngã nhanh hơn bất kỳ ai. Không có kỹ năng phòng thủ, không có đường lùi, không có gì để đổi lấy thời gian.
+
+Cách chơi đúng là dồn cô vào mục tiêu sắp chết chứ không phải mục tiêu to nhất — vì `ZERO` hoàn 50 Energy nếu giết được, nên một cú kết liễu đúng lúc trả lại nửa thanh Energy và mở ra cú kế tiếp. Chơi sai thì cô là 950 máu đứng trước một con boss.
+
+Ghép đội: cô hưởng lợi nhiều nhất từ Wire. Mục tiêu dính 3 stack `[OVERLOAD]` nhận thêm 30% sát thương, mà 30% của 145 ATK là con số lớn nhất bảng.
+
+### 4. Chiêu cuối
+
+**ZERO** · 100 Energy · sát thương đơn mục tiêu · *tên giữ nguyên theo canon*
+
+> **EN — ZERO**
+> One cut, named after the blade. Deals **320% ATK** to a single target. If it kills, **50 Energy comes back** — the sword pays for the next one.
+
+> **VN — ZERO**
+> Một nhát, đặt theo tên thanh kiếm. Gây **320% ATK** lên một mục tiêu. Nếu giết được thì **hoàn 50 Energy** — thanh kiếm tự trả tiền cho nhát sau.
+
+*Đây là chiêu cuối duy nhất trong ba hồ sơ tôi không đổi tên. ZERO đã nằm trong `data.js` từ đầu, cơ chế `refundOnKill` đã chạy trong engine (`battle.js`, nhánh `nuke`), và cái tên trùng với tên thanh kiếm — đó là neo lore, không phải chỗ trống chờ điền.*
+
+**Video cut-in:** `kira_ult.mp4` **đã có sẵn** trong repo, khác Wire và Echo. Không cần viết kịch bản mới.
+
+### 5. Lore
+
+*Bản đầy đủ 10 chương: [`docs/chronicles/kira.md`](chronicles/kira.md) — đọc trong game ở ARCHIVE sau khi mở khoá.*
+
+Năm tên băng Neo Tokyo dồn cô vào một con ngõ cụt sau chợ đêm ở quận SIS. Đứa đứng sau cùng hỏi cô có biết vừa động vào ai không, rồi nói tên Ishi — cái tên đủ để người ta bỏ hàng xuống mà đi. Kira chớp mắt, nhìn thanh kiếm trong tay, và bảo: à, vậy chắc tôi gây chuyện to rồi. Mười phút sau cô bước ra, lau lưỡi Zero bằng một mảnh vải còn dính trên đó, rồi đứng lại giữa vũng nước dưới biển đèn và nhận ra một chuyện: cô đang cười. Không phải cười thắng, không phải cười vui. Chỉ là cười, rất tự nhiên. Cô đưa tay chạm lên môi mình và nói, với không ai cả: lạ thật.
+
+Chuyện Free Zone kể về cô thì ai cũng thuộc. Một con bé bảy tuổi, một thanh kiếm dài hơn cả người nó, và một đêm mà sáng hôm sau không ai chịu nói ra con số. Điều đáng chú ý không phải con số — mà là chuyện đó xảy ra **trước** khi The Corp chạm vào cô. Nên câu hỏi cả quận SIS tránh không hỏi to là: The Corp đã biến một đứa bé thành thứ này, hay The Corp chỉ nhặt được một thứ vốn đã như thế rồi lắp thêm dây cương.
+
+Cái The Corp lắp thêm thì có hồ sơ. Chúng thay nửa người cô bằng chrome, chụp lên đầu một vòng Halo, ghi vào sổ: Tài sản 07. Rồi sáu năm làm việc, không một mảnh ký ức nào — không phải quên, mà là không được phép hình thành. Và trong cấu hình của cái vòng ấy có một tham số giữ nét mặt ở trạng thái cố định, chọn sao cho tài sản vận hành ổn định lâu dài. Trạng thái được chọn là **cười**.
+
+Ca xưng tội thứ ba trăm mười ba, Kira không kể gì cả — muốn kể tội thì phải nhớ mình làm gì, mà cô thì không được phép nhớ. Cô chỉ hỏi Psalm đúng một câu: bà có đếm không. Mười giây sau, Psalm giật vòng Halo của chính mình, bẻ vòng của Kira, rồi đạp bung tấm sàn ống rác.
+
+Vòng Halo từ đó không phát đi đâu nữa. Nụ cười thì ở lại. Đó mới là chuyện đáng sợ, và Kira là người duy nhất trong tổ hiểu vì sao: cái mặt cô đang mang bây giờ không còn ai điều khiển, nghĩa là hoặc nó đã thành của cô, hoặc nó vốn là của cô ngay từ trước cả cái vòng. Một đêm cô sang chỗ Echo xin mở bản thu giọng gốc, cái thu hồi cô bảy tuổi, trước khi có Halo. Nghe xong cô ngồi im rất lâu rồi nói: nó cũng đang cười.
+
+Cô đang truy một đầu mối cấp cao của The Corp, và lý do thì cô nói thẳng: để trả thù cho bố mẹ cô. Nhưng có một việc nữa cô làm mà chỉ nói ra một lần, ở cửa phòng Echo: *tôi không định biết chúng đã lấy đi cái gì. Tôi định biết cái nào chúng chưa từng đưa.*
+
+> *"Hop! Skip! Jump! Oh... you're dead already?"*
+
+---
