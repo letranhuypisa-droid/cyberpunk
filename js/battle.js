@@ -286,6 +286,16 @@ function heal(src, tgt, amount){
 }
 function gainEnergy(u, n){ const was=u.energy; u.energy=Math.min(u.energyMax, u.energy+n); updateUnit(u); if(u===current()) updateUltButton(u); if(was<u.energyMax && u.energy>=u.energyMax) AUDIO.ready(); }
 
+/* Kai bắn loạt: nhiều phát nhỏ, mỗi phát tung chí mạng riêng */
+async function fireBurst(u, t, shots, mult){
+  let last=null;
+  for(let i=0;i<shots;i++){
+    if(!t.alive) break;                                     // chết giữa loạt thì thôi, không bắn vào xác
+    last=dealDamage(u,t,mult);
+    if(i<shots-1) await wait(reduced()?40:90);
+  }
+  return last;
+}
 /* ---- Lượt ---- */
 function buildQueue(){
   // ★ FAKE thứ tự: hệ chỉ có ATK/HP/Energy, chưa có tốc độ → xen kẽ ta/địch theo slot
@@ -317,7 +327,12 @@ function updateUltButton(u){
   UI.btnUlt.classList.toggle('btn-ult--rust', u.faction==='rust');
   UI.ultName.textContent=u.ult.name;
   UI.ultBar.style.setProperty('--p', (u.energy/u.ult.cost*100)+'%');
-  if(u.energy>=u.ult.cost){ UI.btnUlt.dataset.state='ready'; UI.ultMeta.textContent=`${u.energy}/${u.ult.cost} · ${u.ult.kind==='control'?'CONTROL':u.ult.kind==='heal'?'HEAL':Math.round(u.ult.mult*100)+'% ATK'}`; }
+  if(u.energy>=u.ult.cost){ UI.btnUlt.dataset.state='ready'; const meta = u.ult.kind==='control' ? 'CONTROL'
+             : u.ult.kind==='heal'    ? 'HEAL'
+             : u.ult.kind==='barrier' ? 'SHIELD'
+             : u.ult.kind==='burst'   ? `${u.ult.shots}\u00d7${Math.round(u.ult.mult*100)}%`
+             : Math.round(u.ult.mult*100)+'% ATK';
+    UI.ultMeta.textContent=`${u.energy}/${u.ult.cost} · ${meta}`; }
   else { UI.btnUlt.dataset.state='locked'; UI.ultMeta.textContent=`−${u.ult.cost-u.energy} EN · ${u.energy}/${u.ult.cost}`; }
   UI.ultInfo.innerHTML=`<b>${u.name} · ${u.ult.name}</b>${u.ult.desc}<span class="mono">COST ${u.ult.cost} · ENERGY ${u.energy}/${u.energyMax}</span>`;
 }
@@ -369,7 +384,8 @@ async function playerAttack(){
   B.busy=true; setInputs(false);
   const anim=playAttackAnim(u);
   await wait(90);                       // va chạm tại đỉnh của cú lao ra
-  dealDamage(u,t,1);
+  if(u.talent && u.talent.shots) await fireBurst(u,t,u.talent.shots,u.talent.mult);   // BĂNG ĐẠN
+  else dealDamage(u,t,1);
   if(u.id===OVERLOAD.src && t.alive) addOverload(t);   // stack cắm sau, nên đòn này ăn theo số stack đã có
   if(u.id===MUTE.src && t.alive) addMute(t);
   if(u.id===CHARGE.src && t.alive) plantCharge(t);
@@ -412,6 +428,10 @@ async function playerUlt(){
     if(u.ult.mendGuard && u.talent) mendGuard(u, u.talent.guard);
     if(u.ult.ledgerShare){ u.ledger=0; removeChip(u,LEDGER.label); log(`${u.name} trả sổ ${book} → hồi ${amt}/người`, true); }
     else log(`${u.name} hồi máu toàn đội`, true);
+  } else if(k==='burst'){
+    const t=ensureTarget(); const anim=playAttackAnim(u); await wait(90);
+    await fireBurst(u,t,u.ult.shots,u.ult.mult);
+    await anim;
   } else if(k==='barrier'){
     const amt=Math.round(u.atk*u.ult.mult*(1+hoursOf(u)*(u.ult.perHour||0)));
     alive('ally').forEach(t=>setBarrier(t,amt));

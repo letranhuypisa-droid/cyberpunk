@@ -946,3 +946,114 @@ vì nó vẫn tới lượt.
 - **Không cho bộ đếm giảm hay reset giữa wave.** Bà không dừng được, đó là cả nhân vật.
 - **Không đụng `APOSTASY`.** Cùng lý do đã giữ nguyên `ZERO` của Kira: đó là spec thật, không phải chỗ trống chờ điền.
 - **Không cho `[ĐẾM]` chạy khi Psalm đã ngã.** Lọc `alive`.
+
+---
+
+## [BĂNG ĐẠN] + RIPCORD — Kai
+
+**Trạng thái: ĐÃ ÁP DỤNG.** Đo trong trận thật (Chromium):
+
+| Kiểm tra | Kỳ vọng | Đo được |
+|---|---|---|
+| Đòn thường 3 phát (tắt may rủi) | 129 | 129 (một phát đơn: 95) |
+| `RIPCORD` 6 phát | 258 | 258 |
+| Địch chết giữa loạt | dừng loạt | dừng, không bắn vào xác |
+| **Chí mạng riêng từng phát** (bật may rủi) | dải rộng | **30 giá trị khác nhau trong 60 loạt** |
+| Đối chiếu `IAIDO` cùng lúc | đúng một con số | **1 giá trị trong 20 phát** |
+| Nhãn nút ult | đúng theo kind | `6×45%` / `SHIELD` / `280% ATK` / `HEAL` |
+
+Hai dòng giữa là cả trục thiết kế chứng minh bằng số: hai nhân vật, cùng một trận, một người ra 30 kết quả
+khác nhau còn người kia ra đúng một.
+
+> **Sửa lỗi giao diện tìm ra khi làm Kai:** nhãn nút chiêu cuối rơi vào nhánh cuối `mult*100 + % ATK` cho mọi kind
+> chưa liệt kê, nên `BULWARK PROTOCOL` của Meridian hiện *"160% ATK"* — sai, đó là lá chắn chứ không phải sát thương.
+> Đã thêm nhánh cho `barrier` (SHIELD) và `burst` (`6×45%`).
+
+### Cơ chế
+
+| | |
+|---|---|
+| **[BĂNG ĐẠN]** | Đòn thường = **3 phát × 45% ATK**, không phải 1 phát × 100% |
+| Chí mạng | **Mỗi phát tung riêng** |
+| Mục tiêu chết giữa loạt | Dừng loạt, không bắn vào xác |
+| **`RIPCORD`** | **6 phát × 45% ATK** lên một mục tiêu, cũng tung chí mạng riêng từng phát |
+
+`RIPCORD` = **`kind:'burst'`** — loại chiêu cuối thứ sáu, sau `nuke` / `aoe` / `heal` / `control` / `barrier`.
+
+### Đây là nhân vật duy nhất đánh nhiều hơn một phát
+
+Chín cơ chế trước đều đổi **giá trị** của một đòn, hoặc đổi **đích đến**, hoặc thêm/bớt trạng thái. Không cái nào đổi **số lượng đòn**. Kai đổi.
+
+Hệ quả: cậu ăn theo mọi thứ tính riêng từng đòn. Ba lần tung chí mạng thay vì một, và ba lần va vào lá chắn của địch nếu sau này có địch mang chắn.
+
+**Kai và Ronin là hai cực của cùng một trục, xếp thế là cố ý:**
+
+| | Ronin `IAIDO` | Kai `RIPCORD` |
+|---|---|---|
+| Số đòn | một | sáu |
+| Chí mạng | không có | sáu lần tung riêng |
+| Sai số | không có | có, trên từng phát |
+| Kết quả | **đúng một con số mỗi lần** | **dải rộng nhất game** |
+
+Kỳ vọng đòn thường: `95 × 3 × 0.45 × 1.075` ≈ **138**, so với `95 × 1.075` ≈ 102 nếu đánh một phát.
+Đổi lại là phương sai lớn hơn nhiều — đúng một thằng nhóc mười chín tuổi bắn cho tới khi có chuyện đáng kể lại.
+
+### Đã sửa gì
+
+**1 · `js/data.js` — entry của Kai**
+
+```js
+ult:{ name:'RIPCORD', cost:100, kind:'burst', shots:6, mult:.45,
+      desc:'Sáu phát 45% ATK lên một mục tiêu, mỗi phát tính chí mạng riêng' },
+talent:{ name:'BĂNG ĐẠN', shots:3, mult:.45 }
+```
+
+**2 · `js/battle.js` — hàm bắn loạt**
+
+```js
+async function fireBurst(u, t, shots, mult){
+  let last=null;
+  for(let i=0;i<shots;i++){
+    if(!t.alive) break;                          // chết giữa loạt thì thôi, không bắn vào xác
+    last=dealDamage(u,t,mult);
+    if(i<shots-1) await wait(reduced()?40:90);
+  }
+  return last;
+}
+```
+
+**3 · `js/battle.js` — `playerAttack`: rẽ nhánh nếu có `talent.shots`**
+
+```js
+  if(u.talent && u.talent.shots) await fireBurst(u,t,u.talent.shots,u.talent.mult);
+  else dealDamage(u,t,1);
+```
+
+**4 · `js/battle.js` — nhánh chiêu cuối `burst`**
+
+```js
+  } else if(k==='burst'){
+    const t=ensureTarget(); const anim=playAttackAnim(u); await wait(90);
+    await fireBurst(u,t,u.ult.shots,u.ult.mult);
+    await anim;
+```
+
+**5 · `js/battle.js` — `updateUltButton`: sửa nhãn cho `burst` và `barrier`**
+
+Nhãn hiện tại rơi vào nhánh cuối `Math.round(u.ult.mult*100)+'% ATK'`, nên `RIPCORD` sẽ hiện *"45% ATK"* (sai, đó là một phát)
+và `BULWARK PROTOCOL` của Meridian hiện *"160% ATK"* (sai, đó là lá chắn chứ không phải sát thương). Sửa luôn cả hai:
+
+```js
+const meta = u.ult.kind==='control' ? 'CONTROL'
+           : u.ult.kind==='heal'    ? 'HEAL'
+           : u.ult.kind==='barrier' ? 'SHIELD'
+           : u.ult.kind==='burst'   ? `${u.ult.shots}×${Math.round(u.ult.mult*100)}%`
+           : Math.round(u.ult.mult*100)+'% ATK';
+```
+
+**6 · `css/chromefall.css`** — không cần chip mới. `[BĂNG ĐẠN]` là hành vi, không phải trạng thái.
+
+### Không làm
+
+- **Không cho số phát ngẫu nhiên.** Đã cân nhắc "2 đến 4 phát" cho hợp tính khoác lác của cậu, rồi bỏ: đòn thường của người chơi mà số lượng ngẫu nhiên thì đọc như lỗi, không đọc như thiết kế. Phương sai đã nằm ở chí mạng từng phát rồi.
+- **Không cho `RIPCORD` chia mục tiêu.** Dốc cạn băng vào **một** con. Diện rộng đã có Ash và Wire.

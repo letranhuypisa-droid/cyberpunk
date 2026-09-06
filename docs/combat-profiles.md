@@ -743,3 +743,84 @@ Bà vẫn đếm, không dừng lại được, và đã thôi cố. Chỉ là b
 > *"Xưng tội đi. Đùa thôi. Tôi bỏ nghề rồi."*
 
 ---
+
+## KAI
+
+### 1. Tên nhân vật
+
+**KAI** — *Thằng nhóc đánh thuê*
+
+`Rust · hạng B · có sẵn từ đầu game` — ATK 95 · HP 1200 · Energy tối đa 100
+
+Mười chín tuổi. Đây là nhân vật duy nhất trong roster **tự đọc chính tả tên mình** cho Operator, trước cả khi được hỏi: *K, A, I. Sau này người ta viết cho đúng.*
+
+Ở đáy thành phố, chết là chuyện thường. Cái đáng sợ là ba tuần sau không ai nhớ ra mình từng biết người ấy — **lần chết thứ hai**, không có xác, không ai khóc. Mọi thứ Kai làm đều để chống lại nó.
+
+### 2. Vũ khí
+
+**"CHÓ SĂN"** — *súng hỗ trợ tổ đội, nạp băng tròn, nhặt được*
+
+Một khẩu súng to hơn cậu, đúng nghĩa đen: cậu phải tì báng vào hông chứ không vác lên vai được. Nhặt ở đâu thì mỗi lần kể một khác.
+
+Cậu đặt tên nó là **Chó Săn**, theo con Chrome Hound mà cậu vẫn kể là mình hạ bằng tay không. Nghĩa là **vũ khí của cậu mang tên lời nói dối lớn nhất của cậu.** Cả tổ gọi nó là "cái ống".
+
+Đạn thì không bao giờ đủ. Cậu bắn từng loạt ngắn, ba phát một, và cái đó không phải kỹ thuật — cái đó là ngân sách.
+
+> ⚠ **Lệch giữa art và canon, hai chỗ.**
+> **Một:** `Kai.png` vẽ cậu cầm **katana lưỡi phát sáng xanh**, không có khẩu súng nào. Nhưng *"súng to hơn người"* nằm ngay trong câu tóm tắt của bio và *"nhận mọi việc có súng"* là động cơ của cả nhân vật. Tôi viết theo bio.
+> **Hai, nghiêm trọng hơn:** `Kai.png` và `ASH.png` gần như **cùng một thiết kế** — cùng áo da đen, cùng miếng vá đầu lâu ở vai, cùng vòng cổ gai, cùng hình xăm bộ lạc ở bụng và tay, cùng găng hở ngón, cùng điếu thuốc, cùng son đen, cùng thanh đao chuôi quấn dây đỏ. Trong một roster mà người chơi phải nhận ra nhân vật qua một ô thẻ nhỏ, hai người trùng nhau đến thế là một vấn đề thật. Đây là chỗ tôi đề nghị vẽ lại, ưu tiên cao hơn cả chuyện súng.
+
+### 3. Đánh xa hay cận chiến
+
+**Đánh xa.** Loạt ngắn, tuyến sau.
+
+ATK 95 và HP 1200 là bộ chỉ số không nổi bật ở đâu cả, và đó là đúng: cậu mười chín tuổi và cậu chưa giỏi. Giá trị của cậu nằm ở chỗ **cậu bắn nhiều phát**, nên cậu ăn theo mọi thứ tính riêng từng đòn — chí mạng, và lá chắn của địch.
+
+### 4. Chiêu cuối
+
+**Nội tại — [BĂNG ĐẠN] / BURST**
+
+Đòn thường của Kai không phải một phát. Nó là **ba phát, mỗi phát 45% ATK**, và **mỗi phát tính chí mạng riêng**.
+
+Tổng 135% thay vì 100%, nhưng đổi lại là ba lần tung xúc xắc thay vì một. Đây là nhân vật duy nhất trong roster đánh nhiều hơn một phát mỗi lượt.
+
+**RIPCORD — DÂY GIẬT** · 100 Energy · sáu phát một mục tiêu · *tên giữ nguyên theo canon*
+
+> **EN — RIPCORD**
+> Kai empties the drum into one target: **six shots at 45% ATK**, each rolling its own critical. Ripcord is the cord you pull when there is no plan left, and that is exactly how he uses it.
+
+> **VN — DÂY GIẬT**
+> Kai dốc cạn băng đạn vào một mục tiêu: **sáu phát, mỗi phát 45% ATK**, mỗi phát tính chí mạng riêng. Dây giật là sợi dây người ta kéo khi không còn kế hoạch nào nữa, và cậu dùng nó đúng như thế.
+
+**Kai và Ronin là hai cực của cùng một trục, và tôi cố ý xếp thế:**
+
+| | Ronin `IAIDO` | Kai `RIPCORD` |
+|---|---|---|
+| Số đòn | **một** | **sáu** |
+| Chí mạng | **không có** | sáu lần tung riêng |
+| Sai số | **không có** | có, trên từng phát |
+| Kết quả | **đúng một con số, mỗi lần** | dải rộng nhất game |
+
+Ronin là đòn duy nhất trong game không có may rủi nào. Kai là đòn nhiều may rủi nhất. *Mỗi nhát chém là của anh* — còn Kai thì bắn cho tới khi có chuyện đáng kể lại.
+
+### 5. Lore
+
+*Bản đầy đủ 10 chương: [`docs/chronicles/kai.md`](chronicles/kai.md) — đọc trong game ở ARCHIVE sau khi mở khoá.*
+
+Chuyện Kai kể thì thế này: cống quận SIS, ba giờ sáng, một con Chrome Hound cao ngang ngực người, cậu hết đạn, bỏ súng xuống, hạ nó bằng tay không. Cậu kể ít nhất bốn chục lần và mỗi lần con chó lại to hơn một chút. Chuyện thật thì con chó đuổi cậu qua ba tầng cống, cậu chạy được gần hai cây số, rồi rơi xuống một cái hố — cái hố sâu hai thước, vuông vắn, mới đào xong, và **nó được đào cho người khác.**
+
+Cậu lớn lên ở trại trẻ tầng âm tám, nơi có một quy luật không ai viết ra: một đứa biến mất thì tuần đầu người lớn còn nhắc, tuần thứ hai nhắc ít hơn, tuần thứ ba thì thôi hẳn — không phải vì họ ác, mà vì có đứa mới tới và giường thì chỉ có ngần ấy. Kai đếm được bảy đứa như thế trong bốn năm, và cậu nhớ tên cả bảy. Năm mười một tuổi cậu hỏi bà quản trại về thằng ngủ giường trên tên Tí; bà nghĩ một lúc rồi bảo không nhớ có đứa nào tên thế. **Bà không nói dối. Bà thật sự không nhớ.**
+
+Nên cậu ký tên lên mọi bức tường đi qua — K A I, nét thẳng, cao một gang tay, sơn xịt khi có sơn, than khi không có, đinh vít cạo lên thép khi không có cả hai. Ước tính tám trăm chỗ, và cậu kể thành hai nghìn. Chuyện cậu không kể là **cậu có quay lại kiểm tra**, và phần lớn thì chữ không còn — sơn bị phủ, than bị mưa acid ăn, thép bị cạy đi bán. Cậu không nói gì cả, chỉ ký lại, và ký đậm hơn.
+
+Mỗi đêm cậu viết một lá thư, ngắn, bốn năm dòng, chuyện trong ngày. Ở góc đề người nhận, suốt bốn năm là mấy chữ giống nhau: *gửi ai đó sẽ nhớ tôi.* Cậu không biết đó là ai — đó là toàn bộ vấn đề, cậu biết là nó buồn cười, và cậu vẫn viết. Ash đọc trộm đúng một lá, và dòng cuối của lá thư, viết nhỏ hơn phần trên và chẳng liên quan gì tới nó: *hôm nay chị Ash trêu tôi hai lần. Tốt. Chị ấy trêu là chị ấy còn nhớ tôi ở đây.* Cô gấp lại, để đúng chỗ cũ, thôi trêu cậu ba hôm, rồi trêu lại đều đặn ngày hai lần.
+
+Ronin nhận cậu không phải vì chuyện con Chrome Hound — anh không tin chuyện đó lấy một chữ — mà vì ngày thứ năm sau tai nạn, thằng nhóc tự tháo băng và lội ngược ba tầng cống, chân còn tập tễnh, chỉ để nói một tiếng cảm ơn với người mà nó nghĩ sẽ không bao giờ gặp lại. Ash hỏi sao lại nhận. Anh bảo: **nó quay lại.**
+
+Và ở bãi đất sau lò Foundry Row, lão Gravedigger vẫn cất một tấm thép đã khắc sẵn ba chữ K A I — khắc từ hôm kéo cậu lên khỏi hố. Kai xin ba lần trong hai năm; lão từ chối cả ba, cùng một câu: *tấm bia là của đất, không phải của người.* Lần thứ ba bị từ chối, cậu đổi sang xin việc khác: khắc lại những tấm không có tên, những tấm chỉ ghi ngày tháng và ba chữ **từng ở đây**. Lão có sổ, lão nhớ hết. Cậu làm một tuần rưỡi, không ai trả tiền, không ai nhờ, và cậu không kể với tổ — Ash biết vì cô ghi sổ chi tiêu và thấy hụt mất một tuần rưỡi công.
+
+**Cậu khắc được một trăm bốn mươi mốt cái tên. Trên không một tấm nào trong số đó có ba chữ K A I.** Và bãi đất ấy là chỗ duy nhất trong Free Zone cậu không ký, dù đã đi qua hơn hai trăm lần.
+
+> *"Ghi lại nhé Operator: Kai. K, A, I. Sau này người ta viết cho đúng."*
+
+---
