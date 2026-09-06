@@ -161,3 +161,103 @@ Dùng token `--energy` (cyan, định nghĩa ở cả hai theme) cho khớp màu
 
 Hit spark và burst điện là **VFX dùng chung cho cả roster**, không làm riêng cho Wire — nếu không thì 19 nhân vật × 3 hiệu ứng
 = 57 asset bespoke. Chip `[OVERLOAD]` không cần ảnh.
+
+---
+
+## [MUTE] + FEEDBACK — Echo
+
+**Trạng thái: đã spec, CHƯA áp dụng vào code.**
+
+### Cơ chế
+
+| | |
+|---|---|
+| Nguồn | Đòn thường của Echo áp `[MUTE]` lên mục tiêu |
+| Thời hạn | Tới hết lượt kế tiếp của chính mục tiêu (giống hệt `controlled` của Psalm) |
+| Hiệu ứng 1 | Mục tiêu **gây ít hơn 25% sát thương** |
+| Hiệu ứng 2 | Mục tiêu **bị cắt khỏi HALO LINK**: không hồi 8% HP, và không tính là bạn link cho con khác |
+| Cộng dồn | Không. Đây là cờ bật/tắt, không phải stack |
+
+`FEEDBACK` = `kind:'aoe'`, `mult:1.4`, `muteAll:true` — sát thương diện rộng rồi câm toàn sân.
+
+### Vì sao chọn cắt HALO LINK
+
+Engine đã có sẵn `link:true` trên Warden, Exorcist, Organist, Enforcer Prime và The Canticle (`data.js:85-98`),
+và `enemyAct` cho chúng hồi 8% HP mỗi lượt chừng nào còn một con link khác sống (`battle.js:355-357`).
+Đó là cơ chế kéo dài trận của chương 2–3, và hiện **không có nhân vật nào phá được nó**. Echo lấp đúng chỗ trống đó.
+
+Vế "gây ít hơn 25% sát thương" là để cô không vô dụng ở wave lính thường, nơi không con nào có `link` —
+cùng bài học rút ra từ Wire.
+
+### Sửa gì
+
+**1 · `js/data.js` — entry của Echo (dòng 37)**
+
+```js
+// trước
+ult:{name:'RESONANCE',cost:100,kind:'nuke',mult:2.5,desc:'★ FAKE'}
+
+// sau
+ult:{ name:'FEEDBACK', cost:100, kind:'aoe', mult:1.4, muteAll:true,
+      desc:'140% ATK lên toàn bộ kẻ địch và áp [MUTE] lên tất cả' },
+talent:{ name:'MUTE', dmg:.25 }
+```
+
+**2 · `js/battle.js` — hằng số + helper, cạnh khối OVERLOAD**
+
+```js
+const MUTE = { label:'MUTE', dmg:.25, src:'echo' };
+function addMute(tgt){ tgt.muted=true; if(!tgt.chips.some(c=>c.label===MUTE.label)) tgt.chips.push({type:'mute',label:MUTE.label,val:'1T'}); updateUnit(tgt); }
+```
+
+**3 · `js/battle.js` — `dealDamage`, hệ số bên NGƯỜI ĐÁNH (khác Overload, vốn ở bên người chịu)**
+
+```js
+  const hush = src.muted ? (1-MUTE.dmg) : 1;
+  const dmg = Math.round(src.atk * mult * v * vuln * hush * (crit?RULES.critMult:1));
+```
+
+**4 · `js/battle.js` — `playerAttack`, cạnh dòng addOverload**
+
+```js
+  if(u.id===MUTE.src && t.alive) addMute(t);
+```
+
+**5 · `js/battle.js` — `enemyAct`: chặn HALO LINK, rồi hết hạn câm**
+
+```js
+// trước
+if(e.link && e.alive && alive('enemy').some(x=>x!==e && x.link)){
+
+// sau
+if(e.link && !e.muted && e.alive && alive('enemy').some(x=>x!==e && x.link && !x.muted)){
+```
+
+Ngay sau khối HALO LINK, trước phần chọn mục tiêu, thêm:
+
+```js
+  if(e.muted){ e.muted=false; removeChip(e,MUTE.label); }   // câm hết hạn ở lượt của chính nó, giống controlled
+```
+
+**6 · `js/battle.js` — nhánh `aoe` trong `playerUlt`**, trong forEach sẵn có:
+
+```js
+      if(u.ult.muteAll && t.alive) addMute(t);
+```
+
+**7 · `css/chromefall.css` — chip, cạnh `.chip--overload`**
+
+```css
+.chip--mute{color:var(--text-3);border-color:var(--line-3)}
+.chip--mute::before{border:0;width:6px;height:6px;background:currentColor;border-radius:50%;
+  -webkit-mask:linear-gradient(45deg,#000 46%,transparent 46%,transparent 54%,#000 54%);
+  mask:linear-gradient(45deg,#000 46%,transparent 46%,transparent 54%,#000 54%)}
+```
+
+Chip xám, không phải màu phe — vì câm là **mất** một thứ, không phải được thêm.
+
+### Không làm
+
+- **Không cho `[MUTE]` cộng dồn.** Nó là cờ, hết hạn theo lượt của mục tiêu. Cộng dồn thì phải đếm lượt, mà
+  engine chưa có bộ đếm lượt cho trạng thái — `controlled` né được chuyện đó bằng cách tự xoá ở lượt của chính unit, và `[MUTE]` đi theo y hệt.
+- **Không cho Echo câm đồng minh** hay câm chính mình. `dealDamage` đọc `src.muted` cho mọi bên, nhưng chỉ Echo mới gắn được cờ, và cô chỉ gắn lên mục tiêu cô đánh.

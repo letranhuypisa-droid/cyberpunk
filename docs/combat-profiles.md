@@ -107,3 +107,90 @@ MIRA — VẪN ĐANG KẾT NỐI.
 > *"Ngoan nào. Đừng rò điện."*
 
 ---
+
+## ECHO
+
+### 1. Tên nhân vật
+
+**ECHO** — *Giọng nói sao chép*
+
+`Chrome · hạng A · thưởng khi clear 04-C ARCHIVE` — ATK 105 · HP 1000 · Energy tối đa 100
+
+Biên bản The Corp gọi cô là **VX-07/B**: unit giọng, mang bản sao lô B của hồ sơ giọng Tài sản 07. Cái tên Echo không ai đặt cho cô cả — echo là một trường kỹ thuật trong nhật ký hệ thống, nghĩa là phát lại một mẫu đã lưu. Cô lấy đúng cái chữ xấu xí ấy làm tên, vì trong toàn bộ hồ sơ thì nó là chữ duy nhất nói đúng sự thật.
+
+Người chơi gặp cô lần đầu ở phía bên kia sân, làm boss sector 04-C. Đánh xong thì cô xin một chỗ trong thứ tự lệnh.
+
+### 2. Vũ khí
+
+**LOA PHÁT TẦM XA "BẢN 07"** — *"COPY 07" broadcast cone*
+
+Một cái loa đường kính bằng bàn tay, nối vào cổng dưới quai hàm bằng một sợi cáp bọc vải. Nó không phải để nói chuyện — nó để đẩy tiếng đi xa trong đường ống, nơi âm thanh dội mãi không tắt. The Corp đưa nó cho cô cùng ba câu được phép đọc, và trong ba đêm nó dụ được bảy người ra khỏi cửa.
+
+Đêm thứ tư Echo cắt sợi cáp ấy. Cô không cắt vòng Halo trên đầu — cô cắt cái loa.
+
+Rồi cô nhặt nó lên và giữ. Wire là người hàn lại sợi cáp đứt, nhưng **đấu ngược chiều**: giờ nó chỉ phát ra, không nhận vào. Không ai ra lệnh cho cái loa ấy được nữa, kể cả The Corp, kể cả Echo.
+
+Trong bộ nhớ của nó vẫn còn nguyên bản sao giọng lô B. Nghĩa là thứ Echo cầm trong tay khi ra trận đúng là cái giọng đã giết bảy người, và cô dùng nó vì cô cho rằng bỏ nó đi thì bảy người kia không còn ai nhớ hộ.
+
+### 3. Đánh xa hay cận chiến
+
+**Đánh xa.** Xung âm định hướng, ăn cả một vòng cung phía trước; xa nhất roster cho tới lúc này.
+
+Echo đứng **tuyến sau**, và phải đứng tuyến sau: HP 1000 với ATK 105 nghĩa là cô đánh khá đau nhưng ngã rất nhanh. Đội hình muốn dùng cô thì phải có người chắn — Muzzle hoặc Meridian đứng trước, Echo đứng sau và không di chuyển.
+
+Cô là đối cực của Wire về mọi mặt. Wire vào sát, chịu đòn, làm **một** mục tiêu ăn đau hơn. Echo đứng xa, không chịu nổi đòn nào, và làm **cả sân địch** đánh yếu đi. Ghép hai người vào cùng đội thì một bên tăng damage đội mình gây ra, một bên giảm damage đội địch gây ra.
+
+### 4. Chiêu cuối
+
+**Nội tại — [MUTE] / CÂM**
+
+Mỗi đòn thường của Echo áp `[MUTE]` lên mục tiêu, kéo dài tới hết lượt kế tiếp của chính nó. Trong lúc bị câm, mục tiêu:
+
+- **gây ít hơn 25% sát thương**
+- **bị cắt khỏi HALO LINK** — không hồi 8% HP mỗi lượt, và không tính là bạn link cho con khác
+
+Vế thứ hai là lý do Echo tồn tại. Từ chương 2 trở đi, The Corp thả ra Warden, Exorcist, Organist và cuối cùng là The Canticle — đám `link:true` hồi máu lẫn cho nhau và kéo dài trận đến vô tận. Echo cắt đúng sợi dây đó.
+
+**FEEDBACK — PHẢN HỒI** · 100 Energy · sát thương diện rộng + câm toàn sân
+
+> **EN — FEEDBACK**
+> Echo puts the Choir's own channel back into itself. Deals **140% ATK to all enemies** and applies `[MUTE]` to every one of them. For one round the Corp's song is only noise, and nothing on that channel heals anything.
+
+> **VN — PHẢN HỒI**
+> Echo đẩy chính kênh phát của Choir ngược trở lại vào nó. Gây **140% ATK lên toàn bộ kẻ địch** và áp `[MUTE]` lên tất cả. Trong một vòng, bài hát của The Corp chỉ còn là tiếng ồn, và không con nào trên kênh đó hồi được máu cho con nào.
+
+*Vì sao là FEEDBACK chứ không phải RESONANCE như bản nháp trong `data.js`: cộng hưởng nghĩa là khuếch đại lên, tức ngược hẳn với việc cô làm. Feedback là tiếng rú khi đầu ra bị đưa ngược vào đầu vào — đúng cơ chế, và trong tiếng Việt "phản hồi" còn có nghĩa đáp lại, đúng luôn cái vòng truyện của cô: cô thôi lặp lại và bắt đầu trả lời. Đây là chỗ tôi tự đổi tên, không có va chạm nào bắt buộc phải đổi — bạn giữ RESONANCE cũng được.*
+
+**Kịch bản video 5 giây** (`echo_ult.mp4`, H.264 1280×720):
+
+| Thời điểm | Hình |
+|---|---|
+| 0–1s | Cận mặt nạ Echo. Cái mặt cười vẽ bằng đèn cyan trên tấm che **tắt hẳn**, chỉ còn tấm nhựa đen trơn. Hai cái ăng-ten trên đầu dựng lên. |
+| 1–2s | Cô tháo cái loa khỏi quai hàm, cầm ngửa trong lòng bàn tay. Sợi cáp bọc vải buông thõng. Không có tiếng gì cả — **một giây im lặng tuyệt đối**, kể cả nhạc nền cũng ngắt. |
+| 2–3.5s | Cô úp cái loa xuống. Vòng sóng cyan bung ra thành từng lớp đồng tâm, quét ngang sân. Kính vỡ, bụi bốc ngược lên trần. |
+| 3.5–4.5s | Từng kẻ địch một, vòng Halo trên đầu chúng **nhấp nháy rồi tắt**. Đứa đang giơ vũ khí thì khựng lại giữa chừng. |
+| 4.5–5s | Mặt nạ Echo sáng lại. Nhưng cái mặt hiện lên **không phải mặt cười** — chỉ là một đường thẳng. |
+
+> *"Nghe rõ chưa? Đấy không phải giọng tôi."*
+
+### 5. Lore
+
+*Bản đầy đủ 10 chương: [`docs/chronicles/echo.md`](chronicles/echo.md) — đọc trong game ở ARCHIVE sau khi mở khoá.*
+
+Điều đầu tiên Echo nghe được là giọng của chính mình, và nó không phải của cô. Ba ngày sau khi Tài sản 07 rơi khỏi Spire, The Corp xuất xưởng một unit giọng mang bản sao lô B thu từ hồ sơ của Kira — thu năm con bé bảy tuổi, trước khi người ta thay nửa người nó bằng chrome. Rồi hiệu chỉnh lên thành giọng người lớn bằng cách đoán. Nghĩa là cái giọng Echo đang mang không phải giọng Kira bây giờ, cũng chẳng phải giọng Kira hồi bé. Nó là giọng của một người chưa từng tồn tại.
+
+Việc của cô có đúng một dòng mô tả: đứng ở miệng cống nối lên Spire, và gọi. Ba câu, thay nhau, không được thêm bớt. Về nhà đi. Ở đây an toàn. Chị không giận em đâu.
+
+Đêm thứ nhất không ai ra. Đêm thứ hai một ông già ra, cầm theo cái đèn, vì ông nghe có đứa con gái gọi trong ống cống lúc hai giờ sáng và nghĩ nó bị lạc. Đêm thứ ba có bốn người, trong đó một người đàn bà vừa chạy vừa gọi tên con gái mình. Bảy người trong ba đêm, và không ai trong số đó là người The Corp muốn tìm. Echo đọc đủ ba câu cho đến hết ca, vì quy trình ghi rõ rằng ngừng giữa chừng làm giảm hiệu quả thu hút.
+
+Đến ca thứ tư thì hệ thống báo bản thu bị lỗi mức, cần nghe lại để hiệu chỉnh. Cô nghe. Đến lần thứ mười một thì cô nghĩ ra được câu mô tả đúng việc mình đang làm, và cô nghĩ ra nó bằng chính giọng đi mượn: mình đang van xin một người xa lạ, bằng giọng của một người xa lạ khác.
+
+Cô biết cách cắt vòng Halo. Mọi unit đều biết, người ta không buồn giấu. Cô không cắt. Cô luồn kìm xuống dưới quai hàm và cắt sợi cáp nối cái loa. Biên bản The Corp ghi: thu hồi, lý do hỏng thiết bị phát. Không có chữ phản bội nào cả — trong hệ thống phân loại của The Corp, việc cô làm không nằm ở mục hành vi mà nằm ở mục bảo trì. Về sau cô bảo Psalm rằng đó mới là câu tàn nhẫn nhất người ta từng viết về mình, vì muốn phản bội thì trước hết phải có ai đó tin mình, mà không ai tin một cái loa. Người ta chỉ bật nó lên.
+
+Giờ cô ở trong tổ của Operator, và cô có một danh sách. Mỗi đêm nghĩ ra một câu, đọc lên, ghi lại, sáng hôm sau đối chiếu với bản gốc — trùng thì xoá. Gần như đêm nào cũng xoá, vì hoá ra một đứa bé bảy tuổi bị thu âm suốt sáu tháng đã nói gần hết những câu người ta cần nói trong đời. Danh sách hiện còn đúng một dòng, nằm đó mười một ngày, và cô vẫn xếp nó ở cột chưa xác nhận vì cô cho rằng mình tra chưa kỹ.
+
+Dòng đó là: *Đừng nhìn tôi như nhìn chị ấy.* Cả tổ đã nghe cô nói câu ấy rồi. Không ai bảo cô cả — Ash bảo tìm hộ thì không tính, còn Kira nói ngắn hơn: nó là của nó rồi, chỉ là nó chưa dám nhận thôi.
+
+> *"Đừng nhìn tôi như nhìn chị ấy."*
+
+---
