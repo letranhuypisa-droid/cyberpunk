@@ -21,7 +21,7 @@ Chiêu cuối là video 5 giây phát bằng `playCutin`. Không particle system
 
 `Chrome · hạng B · nhận qua gacha (Requisition)` — ATK 80 · HP 1500 · Energy tối đa 75
 
-Tên thật ư? Hồ sơ nhân sự xưởng Halo tầng 40 ghi **KTV-9331**, ca đêm, tổ lắp ráp số 3. Không ai ở Free Zone gọi cô như thế. Người ta gọi cô là Wire, vì thứ bước vào phòng trước cô bao giờ cũng là một sợi dây.
+Tên thật ư? Hồ sơ nhân sự xưởng Halo tầng 40 ghi **KTV-9331**, ca đêm, tổ lắp ráp số 3. Không ai ở Free Zone gọi cô như thế. Cái tên Wire là do em gái cô đặt, năm con bé mười một tuổi, cho một sợi cáp dài hai mươi phân — chuyện ấy ở mục 5.
 
 ### 2. Vũ khí
 
@@ -86,19 +86,21 @@ Nghĩa là người chơi có một quyết định thật trước khi bấm: d
 
 ### 5. Lore
 
-Xưởng Halo, tầng 40, ca đêm. Một unit vừa bị xoá được chở về để tháo vòng, và nhật ký hệ thống của nó còn mở trên màn hình. Dòng cuối ghi: *xin đừng tắt đèn*. Wire đọc dòng đó ba lần. Rồi cô đóng nhật ký lại, tháo sợi arc whip khỏi bàn thợ, nhét hai hộp ốc vít vào túi áo, và đi thang máy hàng xuống đáy. Vì cô không chắc dưới đó có ốc vít.
+Xưởng Halo, tầng 40, ca đêm. Một unit vừa bị xoá được chở về để tháo vòng, và nhật ký hệ thống của nó còn mở trên màn hình. Dòng cuối ghi: xin đừng tắt đèn. Wire đọc dòng đó ba lần. Rồi cô rút trong túi áo ra một data shard đã mòn hết góc, cắm vào cổng tay, nghe lại bảy giây mà đêm nào cô cũng nghe. Nghe xong, cô đóng nhật ký, tháo sợi cáp hàn khỏi bàn thợ, nhét hai hộp ốc vít vào túi, và đi thang máy hàng xuống đáy. Vì cô không chắc dưới đó có ốc vít.
 
-Đêm cô bỏ trốn chẳng có gì gay cấn. Không còi báo động, không truy đuổi, không ai chặn ở cửa. The Corp mất một kỹ thuật viên ca đêm, mà trong biên bản, một kỹ thuật viên ca đêm không đáng viết quá ba dòng.
+Bảy giây ấy là giọng em gái cô. Mira, kém cô tám tuổi, mắc một chứng thần kinh làm tay chân mỗi năm một mất kiểm soát. Con bé thích vẽ. Nên năm mười chín tuổi, Wire ra bãi phế liệu sau nhà nhặt đồ về lắp cho em một cánh tay. Xấu, không nhãn hiệu, không giấy chứng nhận của The Corp, và nó chạy. Trong cánh tay có một sợi cáp nhỏ nối thẳng vào cổng gáy, Mira gọi sợi cáp đó là sợi dây. Con bé bảo: còn sợi dây này thì chị em mình không mất kết nối đâu. Cái tên Wire là câu đùa của một đứa mười một tuổi, và nó theo cô đến tận bây giờ.
 
-Trước đó là tám năm. Chừng chín trăm vòng Halo, và cô ghi số lô từng cái vào một cuốn sổ tay không ai bắt cô ghi. Cô là thợ nhanh nhất ca đêm, lĩnh thưởng đều đặn, không nghĩ nhiều về việc mình làm — quy trình lắp Halo không có bước nào bắt phải nghĩ. Có một bước tên là "kiểm tra phản ứng đau". Ngay cả bước đó cũng chỉ yêu cầu tick vào ô.
+Nhưng linh kiện nuôi một cánh tay như thế thì phải mua, mà thứ đó không bán ở Free Zone. Nên khi The Corp treo bảng tuyển thợ ca đêm cho xưởng Halo tầng 40, Wire ký. Tám năm. Chừng chín trăm vòng. Cô ghi số lô từng cái vào một cuốn sổ tay không ai bắt cô ghi, và cô không nghĩ nhiều về việc mình làm, vì quy trình lắp Halo không có bước nào bắt phải nghĩ. Có một bước tên là "kiểm tra phản ứng đau". Ngay cả bước đó cũng chỉ yêu cầu tick vào ô.
 
-Vậy nên bây giờ cô đi tháo. Cô tháo Halo cho những unit Vixen mang ra khỏi hàng rào, hàn lại vòng gãy của Kira đủ để không rò điện, gỡ bộ đếm ngược khỏi ngực Meridian và bảo: chị muốn ở lại bao lâu thì ở. Riêng vòng Halo đỏ của Psalm thì cô bị cấm chạm vào — vì Wire sẽ muốn sửa, mà Psalm thì muốn nó cứ hỏng.
+Rồi đến lượt Mira. The Corp không giải thích, mà cũng chẳng cần: hồ sơ dân đáy có một ô ghi "chưa xác minh", và trong tay The Corp thì ô ấy muốn nghĩa là gì cũng được. Ba ngày sau Wire đi tra lại. Giấy khai sinh: không có. Hồ sơ khám: không có. Sổ trường: không có. Cái phòng khám dưới cống cũng bảo chưa từng nhận bệnh nhân nào tên đó. Mira Kess chưa từng tồn tại. Thứ duy nhất còn lại nằm trong hệ thống cánh tay cũ của Wire, dài đúng bảy giây: "Chị Wire… em vẽ xong rồi." Rồi tiếng cười.
 
-Có một cái vòng cô không cần mở sổ ra tra. Đêm Halo gia nhập tổ, Wire nhìn lên đầu cô ấy và đọc thuộc lòng số lô. Halo bảo: tôi biết, tôi cảm thấy tay cô run lúc vặn con ốc cuối, cô run từ hồi đó rồi. Wire hỏi lúc ấy cô có đau không. Halo nói có, và nói thêm rằng cô là người duy nhất từng hỏi.
+Vậy nên đêm ấy, đọc đến dòng xin đừng tắt đèn, Wire mới chịu hiểu cái điều mà tám năm liền cô cố tình không hiểu. Chín trăm cái vòng kia cô lắp lên đầu chín trăm người, và mỗi người trong số đó là Mira của một ai đó. Cô bỏ trốn vì hối hận ư? Không. Hối hận là thứ ngồi yên một chỗ. Cô bỏ trốn vì cô còn nợ đúng chín trăm cái.
 
-Cô nói chuyện với máy nhiều hơn với người, và xin lỗi cả hai như nhau. Cô đang đi lên, cùng tổ của Operator, về phía cái nơi mà giọng nói trong ống dẫn gọi là *chỗ Halo được đúc* — và bảo rằng cô sẽ ghét nơi đó. Nó nói đúng. Đứng trước cái lò đã nguội, Wire đứng rất lâu, rồi đặt hai hộp ốc vít xuống đất.
+Giờ cô ở Free Zone, trong tổ của Operator, và cô đi tháo. Tháo Halo cho những unit Vixen mang ra khỏi hàng rào, hàn lại vòng gãy của Kira đủ để không rò điện, gỡ bộ đếm ngược khỏi ngực Meridian rồi bảo: chị muốn ở lại bao lâu thì ở. Riêng vòng đỏ của Psalm thì cô bị cấm chạm vào, vì Wire sẽ muốn sửa mà Psalm thì muốn nó cứ hỏng. Có một cái vòng cô không cần mở sổ ra tra: đêm Halo gia nhập tổ, Wire nhìn lên đầu cô ấy và đọc thuộc lòng số lô. Halo bảo tôi biết, tôi cảm thấy tay cô run lúc vặn con ốc cuối. Wire hỏi lúc ấy cô có đau không. Halo nói có, và nói thêm rằng cô là người duy nhất từng hỏi.
 
-Hoá ra dưới này vẫn có ốc vít. Cô chỉ cần tám năm để tin điều đó.
+Đêm nào cô cũng nghe lại bảy giây đó một lần, vì cô sợ có ngày mình quên mất giọng con bé. Trên vỏ shard, cô lấy mũi dao khắc một dòng: MIRA — MẤT KẾT NỐI. Khắc xong cô ngồi nhìn nó rất lâu. Rồi cô khắc đè lên hai chữ cuối cùng.
+
+MIRA — VẪN ĐANG KẾT NỐI.
 
 > *"Ngoan nào. Đừng rò điện."*
 
