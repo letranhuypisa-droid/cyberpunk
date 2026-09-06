@@ -12,7 +12,9 @@ const UI = {
 };
 
 function makeUnit(def, side, i){
-  return { ...def, side, uid:side+'-'+i, hp:def.hp, hpMax:def.hp, energy:0, alive:true, controlled:false, chips:[], el:null };
+  return { ...def, side, uid:side+'-'+i, hp:def.hp, hpMax:def.hp, energy:0, alive:true, controlled:false,
+           chips: def.talent && def.talent.guard ? [{ type:'guard', label:def.talent.name, val:def.talent.guard }] : [],
+           el:null };
 }
 const alive = side => B.units.filter(u=>u.alive && (!side || u.side===side));
 const current = () => B.queue[B.idx];
@@ -116,6 +118,12 @@ const overloadStacks = u => { const c=u.chips.find(c=>c.label===OVERLOAD.label);
 const MUTE = { label:'MUTE', dmg:.25, src:'echo' };
 /* SỔ — Stitch ghi mọi sát thương đồng đội phải chịu; SUTURE trả sổ rồi xoá.
    Bà phải còn sống mới ghi được, xem docs/mechanics.md */
+const GUARD = { src:'muzzle' };                          // Muzzle đỡ thay đồng đội; Bà Ba chịu ba đòn
+const guardOf = u => u.chips.find(c=>c.type==='guard');
+function mendGuard(m, n){
+  const c=guardOf(m); if(!c || !m.talent) return;
+  c.val=Math.min(m.talent.guard, c.val+n); updateUnit(m);
+}
 const CHARGE = { label:'MÌN', mult:.6, src:'ash' };      // Ash gài mìn; nổ khi kẻ mang nó chết, có dây chuyền
 const hasCharge = u => u.chips.some(c=>c.label===CHARGE.label);
 function plantCharge(tgt){
@@ -255,7 +263,9 @@ function buildQueue(){
   for(let i=0;i<Math.max(a.length,e.length);i++){ if(a[i]) q.push(a[i]); if(e[i]) q.push(e[i]); }
   return q;
 }
-function newRound(){ B.round++; UI.roundNo.textContent=String(B.round).padStart(2,'0'); B.queue=buildQueue(); B.idx=0; startTurn(); }
+function newRound(){ B.round++; UI.roundNo.textContent=String(B.round).padStart(2,'0');
+  const m=B.units.find(u=>u.id===GUARD.src && u.side==='ally' && u.alive); if(m) mendGuard(m,1);   // Bà Ba hồi 1 lượt chắn
+  B.queue=buildQueue(); B.idx=0; startTurn(); }
 /* Ô chân dung trong thanh lượt được tạo một lần rồi tái sử dụng (không reload ảnh mỗi lượt) */
 const turnTiles = new Map();
 function turnTile(u, key){
@@ -368,6 +378,7 @@ async function playerUlt(){
     const book = u.ult.ledgerShare ? (u.ledger||0) : 0;      // ledgerShare: chỉ Stitch có
     const amt  = Math.round(u.atk*u.ult.mult + book*(u.ult.ledgerShare||0));
     alive('ally').forEach(t=>heal(u,t,amt));
+    if(u.ult.mendGuard && u.talent) mendGuard(u, u.talent.guard);
     if(u.ult.ledgerShare){ u.ledger=0; removeChip(u,LEDGER.label); log(`${u.name} trả sổ ${book} → hồi ${amt}/người`, true); }
     else log(`${u.name} hồi máu toàn đội`, true);
   } else if(k==='control'){
@@ -403,7 +414,6 @@ async function enemyAct(e){
   if(e.link && !e.muted && e.alive && alive('enemy').some(x=>x!==e && x.link && !x.muted)){   // HALO LINK — câm thì rụng khỏi mạng
     const amt=Math.round(e.hpMax*.08); if(e.hp<e.hpMax){ heal(e,e,amt); log(`${e.name} hồi ${amt} HP qua HALO LINK`); await wait(reduced()?100:350); }
   }
-  if(e.muted){ e.muted=false; removeChip(e,MUTE.label); }     // câm hết hạn ở lượt của chính nó
   let tgt;
   if(e.controlled){
     e.controlled=false; removeChip(e,'CONTROLLED');
@@ -412,14 +422,21 @@ async function enemyAct(e){
   } else {
     const a=alive('ally'); if(!a.length) return endTurn(); tgt=rand(a);
   }
+  let soak=0;
+  if(tgt.side==='ally' && tgt.id!==GUARD.src){                 // BÀ BA — đổi đích sang Muzzle
+    const m=B.units.find(u=>u.id===GUARD.src && u.side==='ally' && u.alive);
+    const c=m && guardOf(m);
+    if(c && c.val>0){ c.val--; updateUnit(m); log(`${m.name} đỡ thay ${tgt.name}`, true); tgt=m; soak=m.talent.soak; }
+  }
   e.el.classList.add('is-lunge'); setTimeout(()=>e.el.classList.remove('is-lunge'),300);
   await wait(reduced()?0:110);
-  dealDamage(e,tgt,1);
+  dealDamage(e,tgt,soak||1);
   if(tgt.id===RIPOSTE.src && tgt.alive && e.alive){          // ĐÁP — chém trả ngay, không chờ lượt
     addChip(tgt,'riposte',RIPOSTE.label); setTimeout(()=>removeChip(tgt,RIPOSTE.label), 1200);
     await wait(reduced()?60:180);
     dealDamage(tgt,e,RIPOSTE.mult);
   }
+  if(e.muted){ e.muted=false; removeChip(e,MUTE.label); }   // câm hết hạn SAU khi nó đã đánh xong lượt này
   await wait(reduced()?200:520);
   endTurn();
 }

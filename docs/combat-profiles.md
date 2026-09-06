@@ -496,3 +496,84 @@ Và trang cuối cuốn sổ thì bị gấp mép, không bao giờ đưa Ronin 
 > *"Tôi định giá được mọi thứ. Trừ cái tổ này."*
 
 ---
+
+## MUZZLE
+
+### 1. Tên nhân vật
+
+**MUZZLE** — *Tấm khiên tầng âm bảy*
+
+`Rust · hạng B · có sẵn từ đầu game` — ATK 70 · HP 1750 · Energy tối đa 125
+
+Muzzle là cái mặt nạ. Người ta gọi anh theo thứ nhìn thấy trước tiên: mặt nạ lọc khí hai mắt kính vàng, thứ anh đeo từ hồi còn gác cổng và chưa bỏ ra. Tên thật thì có, trong hồ sơ nhân sự của The Corp, ô nhận xét mười bốn năm liền một chữ do phần mềm tự điền: *đạt*.
+
+Chỉ số của anh là hai cực của bảng: **ATK thấp nhất roster, HP cao nhất roster.**
+
+### 2. Vũ khí
+
+**BÀ BA** — *một cánh cửa ô tô*
+
+Không phải khiên. Là cửa ô tô — cắt bớt kính, hàn thêm hai thanh giằng phía trong và một quai xỏ tay, mất một ngày rưỡi. Kai đứng xem suốt rồi bảo trông như một cánh cửa ô tô. Muzzle bảo đúng rồi, nó là một cánh cửa ô tô.
+
+Anh đánh số các bà theo thứ tự, và anh gọi bằng **bà**. Không ai hỏi vì sao; nếu có hỏi anh cũng không giải thích được cho hay, vì lý do rất đơn giản — *thứ đứng chắn trước mặt anh và ăn đòn thay anh thì anh không gọi bằng nó được.*
+
+| | Nguồn gốc | Chịu được | Vỡ ở |
+|---|---|---|---|
+| **Bà Nhất** | cửa xe con | 2 đòn | lò Foundry Row |
+| **Bà Hai** | cửa xe tải, nặng hơn 4 ký | 4 đòn | hàng rào The Corp |
+| **Bà Ba** | cửa xe con, sơn trắng, móp một bên | **3 đòn** | *(đang dùng)* |
+
+Chở hai bà đi chôn là Junker — một người đã bị hàn vào chính chiếc xe của mình, chở hai cánh cửa ô tô ra bãi đất trống để chôn tử tế.
+
+**Bộ giáp The Corp** *(phụ)* — họ không thu, vì làm thủ tục thu hồi một bộ giáp cũ thì tốn giấy hơn giá trị của nó. Ba năm nay anh vẫn mặc, vì không có bộ nào khác.
+
+### 3. Đánh xa hay cận chiến
+
+**Cận chiến, tuyến đầu, và anh đứng ở đó thay cho người khác.**
+
+ATK 70 nghĩa là anh gần như không giết được ai. Đừng tính anh vào sát thương. HP 1750 cộng với nội tại chắn đòn nghĩa là **anh là chỗ sát thương của địch đi tới**, và đó là toàn bộ công việc.
+
+Ghép đội: anh là người chắn cho **Echo** (1000 HP), **Stitch** (900 HP) và **Kira** (950 HP) — cả ba đều mỏng và cả ba đều là lý do đội thắng. Không có Muzzle thì đội hình bốn người kia là bốn tờ giấy.
+
+### 4. Chiêu cuối
+
+**Nội tại — [BÀ BA] / THE DOOR**
+
+Bà Ba mang **3 lượt chắn**, hiện thành số trên thẻ anh.
+
+Khi một kẻ địch nhắm vào **đồng đội bất kỳ không phải Muzzle**, và anh còn lượt chắn: **anh nhận đòn thay, chỉ ăn 50% sát thương**, và tốn một lượt chắn. Hết lượt chắn thì cửa đã chịu đủ phần của nó — *đòn thứ tư là phần của anh*, và đồng đội ăn đòn bình thường.
+
+Đầu mỗi vòng, Bà Ba hồi **+1 lượt chắn**, tối đa 3.
+
+**FIELD PATCH — VÁ TẠI CHỖ** · 125 Energy · hồi máu toàn đội + vá lại khiên · *tên giữ nguyên theo canon*
+
+> **EN — FIELD PATCH**
+> Muzzle patches what is broken, in the order he learned: the door first, the squad second. Heals every living ally for **120% ATK** and restores Bà Ba to **full 3 blocks**.
+> *Field patch: a repair made where the thing broke, because there is no time to carry it home.*
+
+> **VN — VÁ TẠI CHỖ**
+> Muzzle vá thứ đang hỏng, theo đúng thứ tự anh được dạy: cửa trước, người sau. Hồi **120% ATK** cho mỗi đồng đội còn sống và trả Bà Ba về **đủ 3 lượt chắn**.
+
+*Vì sao không đổi tên như các trường hợp khác:* `FIELD PATCH` vốn đã đúng nghĩa — vá ngay tại chỗ hỏng vì không kịp mang về. Cái tôi thêm là **vế thứ hai**: trước đây đó là chiêu hồi máu phẳng thứ tư của roster, giờ nó là nút nạp lại tấm khiên. Hồi máu chỉ còn là phần kèm theo.
+
+125 Energy là trần cao nhất game — 5 lượt mới đầy. Trong 5 lượt đó Bà Ba tự hồi 1 lượt chắn mỗi vòng, nên chiêu cuối là **nút xả khi mọi thứ hỏng cùng lúc**, không phải thứ bấm theo nhịp.
+
+### 5. Lore
+
+*Bản đầy đủ 10 chương: [`docs/chronicles/muzzle.md`](chronicles/muzzle.md) — đọc trong game ở ARCHIVE sau khi mở khoá.*
+
+Chốt gác số bảy, cổng vành đai phía tây: một cái bục xi măng, một mái tôn, một vạch sơn vàng kẻ trên nền bê tông. Việc của Muzzle là đứng trong vạch sơn đó. Mười bốn năm, ca đêm, không sót một ca. Anh không phải người nghĩ nhanh và anh biết mình không phải — nhưng đứng đúng chỗ suốt tám tiếng thì không cần nghĩ nhanh, chỉ cần đứng, và cái đó anh làm giỏi hơn tất cả những người từng đứng ở chốt số bảy.
+
+Đêm ấy xe tiếp tế vào muộn, một thùng thuốc rơi vỡ ra ngoài vạch, và một đứa nhỏ tầng âm bảy chui qua khe cổng. Hai lính Enforcer giương súng — quy trình cho phép. Muzzle bước ra khỏi vạch sơn vàng, đi ba bước, đứng vào giữa, quay lưng về phía đứa nhỏ, vì cái lưng anh thì rộng và anh biết rõ mỗi bộ phận của mình dùng được vào việc gì. Hai khẩu súng hạ xuống — không phải vì ai thương ai, mà vì bắn xuyên qua một nhân viên của The Corp thì phải viết báo cáo, mà viết báo cáo thì lâu hơn là bỏ qua một đứa nhỏ cầm hai vỉ thuốc.
+
+Sáng hôm sau biên bản về, dài đúng một dòng: *hành vi ngoài chỉ thị, chấm dứt hợp đồng.* Không ai gọi anh lên, không ai hỏi vì sao anh bước ra — trong mười bốn năm, câu hỏi vì sao chưa từng xuất hiện ở chốt số bảy. Bộ giáp thì họ không thu, vì làm thủ tục thu hồi một bộ giáp cũ tốn giấy hơn giá trị của nó.
+
+Anh đi bộ mười một tiếng xuống Free Zone, vì thẻ tàu điện gắn với thẻ nhân viên. Ronin cho anh chỗ ngủ mà không hỏi gì. Mãi rất lâu sau anh mới hỏi lại vì sao; Ronin bảo: *vì anh đi bộ xuống, người của The Corp thì có xe.*
+
+Cái anh thiếu suốt mười bốn năm, và không biết là mình thiếu cho tới đêm cổng Đông, là **một mệnh lệnh do một người đang đứng cạnh anh đưa ra**. Chỉ thị thì rõ ràng, đánh số, in ra, dán lên vách — nó bảo anh phải làm gì, nhưng không nói ai cần anh và không quan tâm anh còn hay mất. Đêm ấy Operator nói: *Muzzle lên trước. Còn lại theo tôi.* Ba chữ đầu là một mệnh lệnh; bốn chữ sau nói rõ người ra lệnh sẽ đi ngay phía sau. Anh không phải người nghĩ nhanh, nhưng cái khác nhau giữa hai vế thì anh hiểu ngay từ lần đầu nghe.
+
+Còn câu *"Bà Ba chịu được ba đòn"* thì cả tổ tưởng là nói cho oai. Nó không phải — anh đã đếm, và đó là con số duy nhất trong nghề của anh có ý nghĩa. Bà Ba rồi sẽ vỡ, anh biết, và anh đã biết tấm sau tên gì: anh với Meridian có một giao kèo, thoả thuận trong khoảng ba mươi giây và không ai nhắc lại lần nào — ai ngã trước thì người kia đặt tên tấm khiên kế tiếp theo tên người ấy. Nghĩa là sẽ không có Bà Tư, sẽ có một cái tên. Hỏi anh có sợ chết không, anh cười: *chết trước tổ thì được, chết sau tổ thì không.* Đặt câu ấy cạnh cái giao kèo kia thì nó là một thứ khác hẳn. **Anh muốn ngã trước, để không phải là người đi đặt tên tấm khiên tiếp theo.**
+
+> *"Bà Ba chịu được ba đòn. Đòn thứ tư là phần của tôi."*
+
+---

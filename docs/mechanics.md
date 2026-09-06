@@ -178,6 +178,12 @@ Hit spark và burst điện là **VFX dùng chung cho cả roster**, không làm
 | FEEDBACK câm toàn sân | tất cả | ✓ |
 | Hồi quy: Overload của Wire | 80 / 88 | 80 / 88, stack đúng |
 
+> **Sửa lỗi tìm ra khi làm Muzzle:** dòng hết hạn câm ban đầu đặt ở **đầu** `enemyAct`, tức trước khi địch đánh,
+> nên vế giảm 25% sát thương **chưa bao giờ có tác dụng thật** — chỉ vế chặn HALO LINK chạy. Bài test Echo lúc đó
+> gọi thẳng `dealDamage` với cờ đã bật nên chứng minh được công thức mà không chứng minh được tích hợp.
+> Đã dời dòng đó xuống **sau** khi địch đánh xong. Đo lại qua `enemyAct`: 78 → 59, hết hạn đúng sau một lượt,
+> lượt kế tiếp về lại 78, và HALO LINK vẫn bị chặn khi câm.
+
 Dòng thứ năm là dòng dễ làm sai nhất: câm một con thì con **kia** cũng mất chỗ dựa, vì điều kiện link
 đọc cả hai đầu. Nếu chỉ chặn một đầu thì hai con link nhau vẫn hồi máu qua con đã bị câm.
 
@@ -610,3 +616,118 @@ function detonate(tgt){
 - **Không cho mìn cộng dồn.** Một quả mỗi kẻ địch. Cộng dồn thì thành Wire.
 - **Không cho mìn nổ vào đồng đội.** `alive('enemy')` chặn sẵn.
 - **Không cho mìn nổ vào chính kẻ mang nó.** Nó đã chết rồi; nổ vào xác thì vô nghĩa và làm log rối.
+
+---
+
+## [BÀ BA] + FIELD PATCH — Muzzle
+
+**Trạng thái: ĐÃ ÁP DỤNG.** Đo trong trận thật (Chromium, ép `Math.random` để mục tiêu tất định):
+
+| Kiểm tra | Kỳ vọng | Đo được |
+|---|---|---|
+| Khiên lúc vào trận | 3 lượt chắn | 3, chip hiện sẵn |
+| Địch (ATK 53) nhắm Echo | Muzzle ăn 27, Echo ăn 0 | 27 / 0, chắn còn 2 |
+| **Bốn đòn liên tiếp** | ba đòn Muzzle đỡ, **đòn thứ tư Echo ăn đủ** | 27 / 27 / 27 rồi **Echo ăn 53** |
+| Nhắm thẳng Muzzle | ăn đủ 53, không tốn chắn | 53, chắn vẫn 3 |
+| Ronin `[ĐÁP]` khi Muzzle đỡ thay | không đáp | 0 |
+| Ronin `[ĐÁP]` khi bị nhắm thẳng | 78 | 78 |
+| Sổ Stitch | ghi con số **đã giảm** | 27 |
+| `[MUTE]` × soak | 53×0.75×0.5 = 20 (nhân) | 20 |
+| FIELD PATCH | khiên về 3 + hồi 84/người | đúng cả hai |
+
+Dòng thứ ba là câu thoại của anh đo bằng số.
+
+### Cơ chế
+
+| | |
+|---|---|
+| Sức chứa | **3 lượt chắn**, bắt đầu trận đã đầy |
+| Kích hoạt | Địch nhắm vào **đồng đội không phải Muzzle**, và anh còn lượt chắn |
+| Hiệu ứng | Muzzle **nhận đòn thay**, chỉ ăn **50%** sát thương, tốn 1 lượt chắn |
+| Hồi | **+1 mỗi đầu vòng**, trần 3 |
+| Hết lượt chắn | Đồng đội ăn đòn bình thường — *đòn thứ tư là phần của anh* |
+| `FIELD PATCH` | Hồi `120% ATK` toàn đội **và** trả Bà Ba về đủ 3 |
+
+### Vai này chưa ai làm
+
+Sáu cơ chế trước đều tác động lên **sát thương** — tăng, giảm, hoãn, hoàn. Chưa cái nào **đổi đích đến** của một đòn đánh. `enemyAct` chọn mục tiêu bằng `rand(a)` trên toàn bộ đồng minh còn sống, nên Echo (1000 HP), Stitch (900) và Kira (950) đều có thể ăn đòn boss bất kỳ lúc nào, và không ai chặn được.
+
+Muzzle chặn. Đó là lý do ATK 70 của anh không quan trọng.
+
+`FIELD PATCH` trước đây là chiêu hồi máu phẳng **thứ tư** của roster (84/người). Giờ nó là nút nạp lại khiên, còn hồi máu là phần kèm. Trần Energy 125 là cao nhất game — 5 lượt mới đầy — nên nó là nút xả lúc mọi thứ hỏng cùng lúc, không phải thứ bấm theo nhịp.
+
+### Đã sửa gì
+
+**1 · `js/data.js` — entry của Muzzle**
+
+```js
+ult:{ name:'FIELD PATCH', cost:125, kind:'heal', mult:1.2, mendGuard:true,
+      desc:'Hồi 120% ATK toàn đội và vá Bà Ba về đủ 3 lượt chắn' },
+talent:{ name:'BÀ BA', guard:3, soak:.5 }
+```
+
+**2 · `js/battle.js` — `makeUnit`: khiên có sẵn từ lúc dựng unit**
+
+```js
+return { ...def, side, uid:side+'-'+i, hp:def.hp, hpMax:def.hp, energy:0, alive:true, controlled:false,
+         chips: def.talent && def.talent.guard ? [{ type:'guard', label:def.talent.name, val:def.talent.guard }] : [],
+         el:null };
+```
+
+Đặt chip ngay trong `makeUnit` thì nó hiện từ đầu trận, không cần móc thêm chỗ nào.
+
+**3 · `js/battle.js` — hằng số + helper**
+
+```js
+const GUARD = { src:'muzzle' };
+const guardOf = u => u.chips.find(c=>c.type==='guard');
+function mendGuard(m, n){
+  const c=guardOf(m); if(!c || !m.talent) return;
+  c.val=Math.min(m.talent.guard, c.val+n); updateUnit(m);
+}
+```
+
+**4 · `js/battle.js` — `enemyAct`: đổi đích, ngay sau khi chọn `tgt`**
+
+```js
+  let soak=false;
+  if(tgt.side==='ally' && tgt.id!==GUARD.src){
+    const m=B.units.find(u=>u.id===GUARD.src && u.side==='ally' && u.alive);
+    const c=m && guardOf(m);
+    if(c && c.val>0){ c.val--; updateUnit(m); log(`${m.name} đỡ thay ${tgt.name}`, true); tgt=m; soak=true; }
+  }
+  ...
+  dealDamage(e, tgt, soak ? m.talent.soak : 1);
+```
+
+**5 · `js/battle.js` — `newRound`: hồi 1 lượt chắn**
+
+```js
+const m=B.units.find(u=>u.id===GUARD.src && u.side==='ally' && u.alive); if(m) mendGuard(m,1);
+```
+
+**6 · `js/battle.js` — nhánh `heal`: vá khiên**
+
+```js
+    if(u.ult.mendGuard && u.talent) mendGuard(u, u.talent.guard);
+```
+
+**7 · `css/chromefall.css` — chip, cạnh `.chip--charge`**
+
+```css
+.chip--guard{color:var(--hp);border-color:var(--hp)}
+.chip--guard::before{border:0;width:6px;height:7px;background:currentColor;
+  clip-path:polygon(0 0,100% 0,100% 62%,50% 100%,0 62%)}
+```
+
+### Tương tác đã tính trước
+
+- **Ronin `[ĐÁP]` không kích hoạt khi Muzzle đỡ thay anh.** Điều kiện đáp trả đọc `tgt.id===RIPOSTE.src` *sau* khi đổi đích, mà lúc đó `tgt` đã là Muzzle. Đúng như phải thế: Ronin không bị chạm thì Ronin không đáp. Nếu địch nhắm thẳng Ronin thì không có đổi đích nào cả — anh vẫn đáp bình thường.
+- **Sổ của Stitch vẫn ghi đủ.** Đòn rơi vào Muzzle vẫn là `tgt.side==='ally'`, ghi đúng con số đã giảm 50%.
+- **Echo `[MUTE]` cộng dồn với soak.** Địch bị câm đánh Muzzle: `0.75 × 0.5` = 37.5% sát thương gốc. Cố ý cho nhân, không cho cộng.
+
+### Không làm
+
+- **Không chắn cho chính Muzzle.** Điều kiện `tgt.id!==GUARD.src` chặn. Anh nhắm thẳng thì ăn đủ.
+- **Không chắn khi Muzzle đã ngã.** Lọc `alive`.
+- **Không cho khiên chặn sát thương mìn hay nổ dây chuyền.** Những thứ đó đánh vào địch, không đi qua `enemyAct`.
