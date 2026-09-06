@@ -106,6 +106,16 @@ function updateUnit(u){
 }
 function addChip(u,type,label,val){ u.chips.push({type,label,val}); updateUnit(u); }
 function removeChip(u,label){ u.chips=u.chips.filter(c=>c.label!==label); updateUnit(u); }
+/* OVERLOAD — Wire cắm stack bằng đòn thường; mỗi stack +10% sát thương mục tiêu phải nhận (mọi nguồn).
+   Không tự nổ: chỉ DEAD SHORT mới ăn stack, xem docs/mechanics.md */
+const OVERLOAD = { label:'OVERLOAD', max:3, vuln:.10, src:'wire' };
+const overloadStacks = u => { const c=u.chips.find(c=>c.label===OVERLOAD.label); return c ? c.val : 0; };
+function addOverload(tgt){
+  const c=tgt.chips.find(c=>c.label===OVERLOAD.label);
+  if(c){ if(c.val>=OVERLOAD.max) return c.val; c.val++; }
+  else tgt.chips.push({ type:'overload', label:OVERLOAD.label, val:1 });
+  updateUnit(tgt); return overloadStacks(tgt);
+}
 
 /* ---- Sprite: preload frame idle/attack cho cả đội ---- */
 function preloadFrames(){
@@ -179,7 +189,8 @@ function spawnNumber(targetEl, text, kind){
 function dealDamage(src, tgt, mult, opts={}){
   const crit = Math.random() < RULES.critChance;
   const v = 1 + (Math.random()*2-1)*RULES.variance;
-  const dmg = Math.round(src.atk * mult * v * (crit?RULES.critMult:1));
+  const vuln = 1 + overloadStacks(tgt)*OVERLOAD.vuln;
+  const dmg = Math.round(src.atk * mult * v * vuln * (crit?RULES.critMult:1));
   tgt.hp = Math.max(0, tgt.hp - dmg);
   spawnNumber(tgt.el.querySelector('.unit__sprite'), dmg, crit?'crit':'');
   const killed = tgt.hp<=0 && tgt.alive;
@@ -277,7 +288,9 @@ async function playerAttack(){
   B.busy=true; setInputs(false);
   const anim=playAttackAnim(u);
   await wait(90);                       // va chạm tại đỉnh của cú lao ra
-  dealDamage(u,t,1); gainEnergy(u,25); dailyProgress('attacks');
+  dealDamage(u,t,1);
+  if(u.id===OVERLOAD.src && t.alive) addOverload(t);   // stack cắm sau, nên đòn này ăn theo số stack đã có
+  gainEnergy(u,25); dailyProgress('attacks');
   await anim; await wait(reduced()?80:160);
   B.busy=false; endTurn();
 }
@@ -300,7 +313,13 @@ async function playerUlt(){
     await anim;
   } else if(k==='aoe'){
     const anim=playAttackAnim(u); await wait(90);
-    alive('enemy').forEach(t=>dealDamage(u,t,u.ult.mult)); await anim;
+    alive('enemy').forEach(t=>{                      // perStack: chỉ Wire có, người khác st=0 nên giữ nguyên hành vi cũ
+      const st = u.ult.perStack ? overloadStacks(t) : 0;
+      dealDamage(u, t, u.ult.mult + st*(u.ult.perStack||0));
+      if(st) removeChip(t, OVERLOAD.label);
+    });
+    if(u.ult.perStack) log(`${u.name} kích nổ toàn bộ ${OVERLOAD.label}`, true);
+    await anim;
   } else if(k==='heal'){
     alive('ally').forEach(t=>heal(u,t,Math.round(u.atk*u.ult.mult))); log(`${u.name} hồi máu toàn đội`, true);
   } else if(k==='control'){

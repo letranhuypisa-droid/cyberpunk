@@ -7,7 +7,19 @@ Phần chữ dành cho người chơi nằm ở `docs/combat-profiles.md`.
 
 ## [OVERLOAD] + DEAD SHORT — Wire
 
-**Trạng thái: đã spec, CHƯA áp dụng vào code.** Số dòng tính theo commit hiện tại.
+**Trạng thái: ĐÃ ÁP DỤNG.** Đo trong trận thật (Chromium, sector 07-A, tắt crit + variance để số sạch):
+
+| Kiểm tra | Kỳ vọng | Đo được |
+|---|---|---|
+| Đòn 1 (0 stack) | 80 | 80 |
+| Đòn 2 (1 stack, +10%) | 88 | 88 |
+| Đòn 3 (2 stack, +20%) | 96 | 96 |
+| Đòn 4 (3 stack, +30%) | 104 | 104 — stack kẹt trần 3 |
+| DEAD SHORT ăn 3 stack | 291 | 291, stack về 0 |
+| Ronin (ATK 130) đánh mục tiêu 3 stack | 169 | 169 (không stack: 130) |
+
+Dòng cuối là điều đáng giá nhất: **vuln chạy cho cả đồng đội**, nên Wire vẫn có ích ở wave lính thường
+kể cả khi mục tiêu chết trước lúc cô kịp dùng chiêu cuối.
 
 ### Cơ chế
 
@@ -43,7 +55,7 @@ Phần vuln 10%/stack vẫn có ích ở wave thường vì nó buff cho cả đ
 *Van xả nếu playtest thấy cô vô dụng ở wave lính:* cho **đồng đội cũng cộng stack khi đánh vào mục tiêu đã có
 `[OVERLOAD]`** — Wire đánh dấu, cả tổ kích nổ. Một điều kiện trong `dealDamage`, và hợp lore hơn (cô là thợ, không phải sát thủ).
 
-### Sửa gì
+### Đã sửa gì
 
 **1 · `js/data.js` — entry của Wire (dòng 38)**
 
