@@ -110,6 +110,14 @@ function removeChip(u,label){ u.chips=u.chips.filter(c=>c.label!==label); update
    Không tự nổ: chỉ DEAD SHORT mới ăn stack, xem docs/mechanics.md */
 const OVERLOAD = { label:'OVERLOAD', max:3, vuln:.10, src:'wire' };
 const overloadStacks = u => { const c=u.chips.find(c=>c.label===OVERLOAD.label); return c ? c.val : 0; };
+/* MUTE — Echo cắt mục tiêu khỏi bài hát: gây ít sát thương hơn và rụng khỏi HALO LINK.
+   Hết hạn ở lượt của chính mục tiêu, mượn nguyên khuôn `controlled` nên không cần bộ đếm lượt */
+const MUTE = { label:'MUTE', dmg:.25, src:'echo' };
+function addMute(tgt){
+  tgt.muted = true;
+  if(!tgt.chips.some(c=>c.label===MUTE.label)) tgt.chips.push({ type:'mute', label:MUTE.label, val:'1T' });
+  updateUnit(tgt);
+}
 function addOverload(tgt){
   const c=tgt.chips.find(c=>c.label===OVERLOAD.label);
   if(c){ if(c.val>=OVERLOAD.max) return c.val; c.val++; }
@@ -190,7 +198,8 @@ function dealDamage(src, tgt, mult, opts={}){
   const crit = Math.random() < RULES.critChance;
   const v = 1 + (Math.random()*2-1)*RULES.variance;
   const vuln = 1 + overloadStacks(tgt)*OVERLOAD.vuln;
-  const dmg = Math.round(src.atk * mult * v * vuln * (crit?RULES.critMult:1));
+  const hush = src.muted ? (1-MUTE.dmg) : 1;                 // câm thì đánh yếu đi
+  const dmg = Math.round(src.atk * mult * v * vuln * hush * (crit?RULES.critMult:1));
   tgt.hp = Math.max(0, tgt.hp - dmg);
   spawnNumber(tgt.el.querySelector('.unit__sprite'), dmg, crit?'crit':'');
   const killed = tgt.hp<=0 && tgt.alive;
@@ -290,6 +299,7 @@ async function playerAttack(){
   await wait(90);                       // va chạm tại đỉnh của cú lao ra
   dealDamage(u,t,1);
   if(u.id===OVERLOAD.src && t.alive) addOverload(t);   // stack cắm sau, nên đòn này ăn theo số stack đã có
+  if(u.id===MUTE.src && t.alive) addMute(t);
   gainEnergy(u,25); dailyProgress('attacks');
   await anim; await wait(reduced()?80:160);
   B.busy=false; endTurn();
@@ -317,6 +327,7 @@ async function playerUlt(){
       const st = u.ult.perStack ? overloadStacks(t) : 0;
       dealDamage(u, t, u.ult.mult + st*(u.ult.perStack||0));
       if(st) removeChip(t, OVERLOAD.label);
+      if(u.ult.muteAll && t.alive) addMute(t);
     });
     if(u.ult.perStack) log(`${u.name} kích nổ toàn bộ ${OVERLOAD.label}`, true);
     await anim;
@@ -352,9 +363,10 @@ async function playCutin(u){
   v.pause(); box.hidden=true; v.removeAttribute('src'); v.load();
 }
 async function enemyAct(e){
-  if(e.link && e.alive && alive('enemy').some(x=>x!==e && x.link)){            // HALO LINK
+  if(e.link && !e.muted && e.alive && alive('enemy').some(x=>x!==e && x.link && !x.muted)){   // HALO LINK — câm thì rụng khỏi mạng
     const amt=Math.round(e.hpMax*.08); if(e.hp<e.hpMax){ heal(e,e,amt); log(`${e.name} hồi ${amt} HP qua HALO LINK`); await wait(reduced()?100:350); }
   }
+  if(e.muted){ e.muted=false; removeChip(e,MUTE.label); }     // câm hết hạn ở lượt của chính nó
   let tgt;
   if(e.controlled){
     e.controlled=false; removeChip(e,'CONTROLLED');

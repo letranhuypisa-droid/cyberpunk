@@ -166,7 +166,20 @@ Hit spark và burst điện là **VFX dùng chung cho cả roster**, không làm
 
 ## [MUTE] + FEEDBACK — Echo
 
-**Trạng thái: đã spec, CHƯA áp dụng vào code.**
+**Trạng thái: ĐÃ ÁP DỤNG.** Đo trong trận thật (Chromium, tắt crit + variance):
+
+| Kiểm tra | Kỳ vọng | Đo được |
+|---|---|---|
+| Đòn thường Echo gắn `[MUTE]` | chip hiện | ✓ `MUTE 1T` |
+| Địch ATK 53 bị câm | 40 (−25%) | 40 |
+| HALO LINK bình thường | +80 HP | +80 |
+| Chính nó bị câm | +0 | +0, và câm hết hạn đúng lượt của nó |
+| **Bạn link bị câm** | +0 | +0 |
+| FEEDBACK câm toàn sân | tất cả | ✓ |
+| Hồi quy: Overload của Wire | 80 / 88 | 80 / 88, stack đúng |
+
+Dòng thứ năm là dòng dễ làm sai nhất: câm một con thì con **kia** cũng mất chỗ dựa, vì điều kiện link
+đọc cả hai đầu. Nếu chỉ chặn một đầu thì hai con link nhau vẫn hồi máu qua con đã bị câm.
 
 ### Cơ chế
 
@@ -189,7 +202,7 @@ và `enemyAct` cho chúng hồi 8% HP mỗi lượt chừng nào còn một con 
 Vế "gây ít hơn 25% sát thương" là để cô không vô dụng ở wave lính thường, nơi không con nào có `link` —
 cùng bài học rút ra từ Wire.
 
-### Sửa gì
+### Đã sửa gì
 
 **1 · `js/data.js` — entry của Echo (dòng 37)**
 
