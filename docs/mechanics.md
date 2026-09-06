@@ -390,3 +390,102 @@ Màu Rust theo phe bà, hình cái dấu trang sổ.
   nhưng không ai ghi thêm và không ai trả được. Đó là chủ ý: cả đội phải giữ bà.
 - **Không ghi sát thương lên kẻ địch.** Chỉ `tgt.side==='ally'`.
 - **Không cộng sổ khi Stitch chưa vào đội.** `ledgerKeeper` trả `undefined` thì `noteLedger` thoát ngay, không tốn gì.
+
+---
+
+## [ĐÁP] + miễn nhiễm VERSE + IAIDO — Ronin
+
+**Trạng thái: ĐÃ ÁP DỤNG.** Đo trong trận thật (Chromium):
+
+| Kiểm tra | Kỳ vọng | Đo được |
+|---|---|---|
+| Địch (ATK 53) đánh Ronin | ăn trả 78 | **78** |
+| Địch đánh Muzzle | ăn trả 0 | 0 |
+| **IAIDO ×40, crit + variance BẬT** | đúng 364 mỗi lần | **364 cả 40 lần, một giá trị duy nhất** |
+| Đòn thường cùng hệ số ×40 | dao động | 336–589 |
+| VERSE wave 2 | Ronin 100, còn lại 75 | Ronin 100, bốn người còn lại 75 |
+| Hồi quy: sổ Stitch | ghi đòn lên Ronin, bỏ nhát đáp | đúng cả hai |
+
+Dòng thứ ba là cả nhân vật gói trong một phép đo: bật hết may rủi lên, đòn của anh vẫn không đổi.
+
+### Cơ chế
+
+| | |
+|---|---|
+| **[ĐÁP]** | Kẻ địch đánh trúng Ronin → ăn ngay `60% ATK` chém trả. Không tốn Energy, không chờ lượt |
+| Điều kiện | Cả hai còn sống sau đòn của địch. Không kích hoạt khi Ronin bị đồng đội bị chiếm quyền đánh trúng |
+| **Miễn VERSE** | VERSE trừ 25 Energy toàn đội mỗi wave ở chương 3. Ronin không bị trừ |
+| **IAIDO** | `280% ATK` **chính xác** — bỏ cả chí mạng lẫn sai số |
+
+### Ba thứ này nói cùng một câu
+
+Nhân vật này chỉ có một ý: *mỗi nhát chém phải là của anh, không phải của một bài ca viết sẵn.* Cả ba cơ chế đều là câu đó viết bằng số.
+
+- **Miễn VERSE** — bài hát đi qua vòng Halo và qua deck. Anh không có cái nào. VERSE phủ **toàn bộ chương 3** (`01-A`→`01-E`), nên đây không phải trang trí: anh là người duy nhất giữ nguyên Energy suốt chương cuối.
+- **IAIDO không chí mạng, không sai số** — mọi đòn khác nhân `variance ±8%` và có `critChance .15 × 1.5`, kỳ vọng ×1.075. Anh bỏ cả hai, đổi ~7% sát thương trung bình lấy sự chắc chắn. Không có may rủi nào trong nhát chém của anh.
+- **[ĐÁP]** — anh không né, không đỡ, không chờ lượt mình. Ai chạm vào thì ăn trả ngay.
+
+Và `dealDamage` có sẵn tham số `opts={}` bỏ trống từ commit đầu tiên của repo. `IAIDO` là thứ đầu tiên dùng tới nó.
+
+### Đã sửa gì
+
+**1 · `js/data.js` — entry của Ronin**
+
+```js
+ult:{ name:'IAIDO', cost:100, kind:'nuke', mult:2.8, exact:true,
+      desc:'Đúng 280% ATK lên một mục tiêu. Không chí mạng, không sai số' },
+talent:{ name:'ĐÁP', mult:.6, verseImmune:true }
+```
+
+**2 · `js/battle.js` — hằng số, cạnh khối LEDGER**
+
+```js
+const RIPOSTE = { label:'ĐÁP', mult:.6, src:'ronin' };
+```
+
+**3 · `js/battle.js` — `dealDamage`: đường "đúng con số"**
+
+```js
+function dealDamage(src, tgt, mult, opts={}){
+  const crit = !opts.exact && Math.random() < RULES.critChance;
+  const v = opts.exact ? 1 : 1 + (Math.random()*2-1)*RULES.variance;
+```
+
+**4 · `js/battle.js` — nhánh `nuke` trong `playerUlt`, truyền cờ xuống**
+
+```js
+const r=dealDamage(u,t,u.ult.mult,{exact:u.ult.exact});
+```
+
+**5 · `js/battle.js` — `enemyAct`, ngay sau đòn của địch**
+
+```js
+  dealDamage(e,tgt,1);
+  if(tgt.id===RIPOSTE.src && tgt.alive && e.alive){        // ĐÁP — chém trả ngay
+    addChip(tgt,'riposte',RIPOSTE.label); setTimeout(()=>removeChip(tgt,RIPOSTE.label), 1200);
+    await wait(reduced()?60:180);
+    dealDamage(tgt,e,RIPOSTE.mult);
+  }
+```
+
+**6 · `js/battle.js` — VERSE trong `spawnWave`, bỏ qua Ronin**
+
+```js
+// trước
+alive('ally').forEach(u=>{ if(u.energy>0){ ...
+// sau
+alive('ally').forEach(u=>{ if(u.energy>0 && u.id!==RIPOSTE.src){ ...
+```
+
+**7 · `css/chromefall.css` — chip, cạnh `.chip--ledger`**
+
+```css
+.chip--riposte{color:var(--rust-hi);border-color:var(--rust-hi)}
+.chip--riposte::before{border:0;width:7px;height:2px;background:currentColor;transform:rotate(-35deg)}
+```
+
+### Không làm
+
+- **Không cho [ĐÁP] kích hoạt dây chuyền.** Nhát chém trả gọi `dealDamage` với mục tiêu là kẻ địch, mà điều kiện chỉ bắt khi mục tiêu là Ronin, nên không có vòng lặp.
+- **Không cho [ĐÁP] tính vào sổ của Stitch.** Sổ chỉ ghi `tgt.side==='ally'`; nhát trả đánh vào địch nên không ghi. Nhưng đòn địch đánh Ronin thì **có** ghi — đúng như phải thế.
+- **Không cho IAIDO xuyên giáp hay thêm hiệu ứng gì.** Nó cố tình là chiêu cuối không có mẹo.

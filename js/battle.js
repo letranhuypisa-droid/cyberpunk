@@ -48,7 +48,8 @@ async function applyBg(elm, sector){
 function spawnWave(){
   B.wave++; UI.waveNo.textContent=`${B.wave}/${SECTOR.waves}`;
   if(SECTOR.verse && B.wave>1){                                             // VERSE: bài hát gốc át deck
-    alive('ally').forEach(u=>{ if(u.energy>0){ u.energy=Math.max(0,u.energy-25); u.chips=u.chips.filter(c=>c.label!=='VERSE'); u.chips.push({type:'debuff',label:'VERSE',val:'−25'}); updateUnit(u); setTimeout(()=>removeChip(u,'VERSE'),2500); } });
+    // Ronin không Halo, không nhận lệnh qua deck → bài hát không với tới anh
+    alive('ally').forEach(u=>{ if(u.energy>0 && u.id!==RIPOSTE.src){u.energy=Math.max(0,u.energy-25); u.chips=u.chips.filter(c=>c.label!=='VERSE'); u.chips.push({type:'debuff',label:'VERSE',val:'−25'}); updateUnit(u); setTimeout(()=>removeChip(u,'VERSE'),2500); } });
     log('VERSE — bài hát gốc át deck: toàn đội −25 Energy', true);
   }
   B.units = [ ...B.units.filter(u=>u.side==='ally'), ...rollWave(B.wave).map((d,i)=>makeUnit(d,'enemy',i)) ];
@@ -115,6 +116,7 @@ const overloadStacks = u => { const c=u.chips.find(c=>c.label===OVERLOAD.label);
 const MUTE = { label:'MUTE', dmg:.25, src:'echo' };
 /* SỔ — Stitch ghi mọi sát thương đồng đội phải chịu; SUTURE trả sổ rồi xoá.
    Bà phải còn sống mới ghi được, xem docs/mechanics.md */
+const RIPOSTE = { label:'ĐÁP', mult:.6, src:'ronin' };   // Ronin chém trả ngay khi bị đánh; cũng là người miễn VERSE
 const LEDGER = { label:'SỔ', src:'stitch' };
 const ledgerKeeper = () => B.units.find(u=>u.id===LEDGER.src && u.side==='ally' && u.alive);
 function noteLedger(dmg){
@@ -207,8 +209,8 @@ function spawnNumber(targetEl, text, kind){
 
 /* ---- Sát thương ---- */
 function dealDamage(src, tgt, mult, opts={}){
-  const crit = Math.random() < RULES.critChance;
-  const v = 1 + (Math.random()*2-1)*RULES.variance;
+  const crit = !opts.exact && Math.random() < RULES.critChance;      // exact: đúng con số, không may rủi
+  const v = opts.exact ? 1 : 1 + (Math.random()*2-1)*RULES.variance;
   const vuln = 1 + overloadStacks(tgt)*OVERLOAD.vuln;
   const hush = src.muted ? (1-MUTE.dmg) : 1;                 // câm thì đánh yếu đi
   const dmg = Math.round(src.atk * mult * v * vuln * hush * (crit?RULES.critMult:1));
@@ -331,7 +333,7 @@ async function playerUlt(){
   const k=u.ult.kind;
   if(k==='nuke'){
     const t=ensureTarget(); const anim=playAttackAnim(u); await wait(90);
-    const r=dealDamage(u,t,u.ult.mult);
+    const r=dealDamage(u,t,u.ult.mult,{exact:u.ult.exact});
     if(r.killed && u.ult.refundOnKill){ gainEnergy(u,u.ult.refundOnKill); addChip(u,'refund','EN REFUND','+'+u.ult.refundOnKill); log(`${u.name} hoàn ${u.ult.refundOnKill} Energy (kill)`, true); setTimeout(()=>removeChip(u,'EN REFUND'), 2500); }
     await anim;
   } else if(k==='aoe'){
@@ -395,6 +397,11 @@ async function enemyAct(e){
   e.el.classList.add('is-lunge'); setTimeout(()=>e.el.classList.remove('is-lunge'),300);
   await wait(reduced()?0:110);
   dealDamage(e,tgt,1);
+  if(tgt.id===RIPOSTE.src && tgt.alive && e.alive){          // ĐÁP — chém trả ngay, không chờ lượt
+    addChip(tgt,'riposte',RIPOSTE.label); setTimeout(()=>removeChip(tgt,RIPOSTE.label), 1200);
+    await wait(reduced()?60:180);
+    dealDamage(tgt,e,RIPOSTE.mult);
+  }
   await wait(reduced()?200:520);
   endTurn();
 }

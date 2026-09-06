@@ -342,3 +342,77 @@ Mỗi lần mất một bệnh nhân bà khâu thêm một mũi lên tay áo tr�
 > *"Nằm yên. Tôi khâu người còn khéo hơn khâu máy."*
 
 ---
+
+## RONIN
+
+### 1. Tên nhân vật
+
+**RONIN** — *Trưởng tổ nhặt sắt*
+
+`Rust · hạng A · có sẵn từ đầu game` — ATK 130 · HP 1050 · Energy tối đa 100
+
+Ronin không có mã của The Corp, không có số hiệu, không có hồ sơ nào để tra. Đó là nhân vật duy nhất trong bốn hồ sơ trước không mang theo dụng cụ của nơi đã đuổi mình — vì chưa nơi nào nhận anh vào để mà đuổi.
+
+Anh là người đầu tiên gật đầu ở cổng Đông, cho một kẻ không Halo, không kiếm, ra lệnh cho cả tổ.
+
+### 2. Vũ khí
+
+**THANH THÉP TẦNG ÂM BỐN** — *không tên, không số hiệu, không phát sáng*
+
+Kiếm của chị anh, rèn ở tầng âm bốn, đưa lại cho anh vào hôm chị được The Corp tuyển lên Spire cùng một câu dặn: *đừng bán thứ gì còn ấm.* Rồi chị đi, rồi không về.
+
+Trong một thành phố mà ai cũng cầm thứ gì đó phát sáng, anh cầm một miếng thép. Nó không sắc hơn, không nhẹ hơn, không có gì hơn cả. Cái nó có là nó không cần cắm vào đâu.
+
+**Đồ anh đeo, không phải đồ anh lắp:** mặt nạ lọc khí có đèn báo bộ lọc, và một tấm ốp cẳng tay bằng thép buộc dây. Đây là chỗ người ta hay hiểu sai về anh — anh không sống trần trụi, anh chỉ không cho thứ gì đi vào dưới da. Mặt nạ tháo ra được. Mắt hồng ngoại thì không.
+
+> ⚠ **Lệch giữa art và canon.** `RONIN.png` vẽ anh cầm một thanh kiếm **phát sáng trắng-hồng**, trong khi cả bio lẫn hồ sơ này đều dựa trên việc thanh kiếm là thép trần. Mặt nạ và tấm ốp tay thì hoà giải được (đeo, không lắp), riêng lưỡi kiếm phát sáng thì không. Cần bạn quyết: sửa mô tả cho khớp art, hay coi ánh sáng đó là phản chiếu neon và giữ thép trần. Tôi đề nghị giữ thép trần — nó là toàn bộ nhân vật.
+
+### 3. Đánh xa hay cận chiến
+
+**Cận chiến, tuyến trước, và anh muốn đứng đó.**
+
+ATK 130 / HP 1050 là chỉ số cân nhất bảng — không xuất sắc chỗ nào, không thủng chỗ nào. Sau bốn nhân vật chuyên môn hoá gắt (Wire chịu đòn, Echo giấy, Kira thuỷ tinh, Stitch bác sĩ mỏng), anh là người đứng được ở bất cứ đâu.
+
+Và nội tại của anh **thưởng cho việc bị đánh**, nên chỗ đứng đúng là ngay tuyến đầu, cạnh Muzzle.
+
+### 4. Chiêu cuối
+
+**Nội tại — [ĐÁP] / RIPOSTE**
+
+Kẻ địch nào đánh trúng Ronin thì **ăn ngay một nhát trả bằng 60% ATK**, không cần chờ lượt, không tốn Energy. Anh không né, không đỡ. Anh đáp.
+
+**Nội tại — miễn nhiễm VERSE**
+
+`VERSE` là cơ chế của **toàn bộ chương 3** (01-A → 01-E): từ wave 2 trở đi, bài hát gốc át deck và cả đội mất 25 Energy mỗi wave. Nó đi qua vòng Halo và qua deck.
+
+Ronin không có vòng Halo, và không nhận lệnh qua deck. **Bài hát không với tới anh.** Anh là người duy nhất trong roster giữ nguyên Energy suốt chương cuối.
+
+**IAIDO** · 100 Energy · sát thương đơn mục tiêu · *tên giữ nguyên theo canon*
+
+> **EN — IAIDO**
+> One draw, one cut. Deals **exactly 280% ATK** to a single target — no critical hit, no variance, no luck. The only attack in the game that lands on the same number every time.
+
+> **VN — IAIDO**
+> Một lần rút, một nhát. Gây **đúng 280% ATK** lên một mục tiêu — không chí mạng, không sai số, không may rủi. Đòn duy nhất trong game rơi vào cùng một con số mỗi lần.
+
+*Đây là chiêu cuối cố tình không có mẹo, và đó chính là điểm.* Mọi đòn khác trong game nhân với sai số ±8% và có 15% cơ hội chí mạng ×1.5, tức kỳ vọng ×1.075. `IAIDO` bỏ cả hai: anh đánh đổi khoảng 7% sát thương trung bình để lấy sự chắc chắn tuyệt đối. Đó là một đánh đổi thật, và nó là câu *"mỗi nhát chém phải là của anh, không phải của một bài ca nào đó viết sẵn"* viết bằng số.
+
+### 5. Lore
+
+*Bản đầy đủ 10 chương: [`docs/chronicles/ronin.md`](chronicles/ronin.md) — đọc trong game ở ARCHIVE sau khi mở khoá.*
+
+Hai gã kéo tới bãi xe một cái xe đẩy phủ bạt, và dưới lớp bạt là một người còn thở. Chúng nói giá luôn: thằng này sắp đi rồi, trong người có bộ lọc gan còn tốt với một cặp mắt hồng ngoại loại khá, tổ nào cũng nhận, chia đôi. Ronin nhìn cái xe đẩy rồi bảo: mang nó vào trong, chỗ Stitch, tôi trả tiền chuyến. Một gã cười bảo anh điên; gã kia tính nhanh hơn, hỏi thẳng thế bọn tôi được gì. Anh nói: không được gì. Tuần đó tổ ăn đồ hộp hết hạn, Ash ghi vào sổ chi tiêu ba chữ và gạch chân hai lần.
+
+Luật của tổ chỉ có một điều: **không tháo người.** Nó đến từ một câu dặn. Chị anh — người duy nhất trong xóm được The Corp tuyển lên Spire — đưa anh thanh kiếm thép rèn ở tầng âm bốn và nói: *đừng bán thứ gì còn ấm.* Rồi đi. Rồi không về, không thư, không một dòng nào trong bất kỳ hệ thống nào để tra.
+
+Chuyện anh không kể với ai là anh **không chắc mình hiểu đúng câu ấy**. Rất có thể chị chỉ đang dặn về cái chuôi kiếm bọc da, đem cầm đồ thì được kha khá — một câu dặn hết sức bình thường của người sắp đi xa, mà anh đã dựng cả một đời lên trên nó. Nhưng một cái xác thì cũng ấm, trong vài giờ, và ở tầng âm bảy thứ ấm ấy có giá cụ thể tính theo bộ phận. Anh chọn cách hiểu thứ hai. Không phải vì anh chắc, mà vì trong hai cách hiểu chỉ có một cách khiến anh chịu được việc phải nhìn mặt mình mỗi sáng.
+
+Người ta chào hàng anh nhiều lần và món nào cũng hợp lý — mắt hồng ngoại nhìn được trong đường ống, khớp gối nhảy được hai tầng giàn giáo, cấy phản xạ nhanh hơn một phần mười giây mà một phần mười giây thì đủ để không chết. Anh từ chối hết. Anh **không ghét máy móc**: anh hàn cho Junker, anh giữ Muzzle dù nửa người Muzzle là đồ The Corp. Cái anh không muốn chỉ gọn trong một câu — mỗi nhát chém phải là của anh, không phải của một bài ca nào đó viết sẵn. Anh đã nhìn lính Choir đánh nhau. Chúng đánh giỏi hơn anh, đồng đều hơn anh, không mệt như anh. Và không có nhát nào trong đó là của chúng cả.
+
+Đêm cổng Đông, khi kẻ lạ cầm deck bước ra, bốn người trong tổ quay sang nhìn anh — vì mười năm nay trong tổ ai ra lệnh thì đã rõ. Anh nhìn kẻ lạ, nhìn chiếc deck, nhìn cái đầu không có vòng Halo nào của kẻ ấy, rồi gật. Nếu ai hỏi thì anh sẽ bảo lúc ấy không còn lựa chọn nào khác. Chuyện đó đúng, nhưng không phải lý do. Lý do là anh vừa nhìn thấy một người ra lệnh cho cả một tổ mà không cần lắp vòng lên đầu ai cả, và anh đã đợi mười năm để biết chuyện đó có làm được không.
+
+Bây giờ tổ đang đi lên từng tầng một. Trên Spire có một danh sách những người được tuyển lên, danh sách ấy có tên chị anh, và chỉ có một cách để đọc nó. Anh không nói với ai rằng anh đang đi tìm chị — anh nói anh đang chém. Cả tổ đều biết. Và có một chuyện anh đã chắc từ lâu, đủ để chịu được cái không chắc kia: *nếu hiểu sai, thì anh sai theo hướng ít người chết hơn.*
+
+> *"Cậu quyết đi, Operator. Tôi chém."*
+
+---
