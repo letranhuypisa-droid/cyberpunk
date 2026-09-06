@@ -859,3 +859,90 @@ tickHours();
 - **Không cho lá chắn cộng dồn.** Dựng lần hai lấy giá trị lớn hơn, không cộng vào.
 - **Không cho lá chắn chặn đòn của đồng đội bị chiếm quyền.** `drainBarrier` chạy cho mọi mục tiêu — đó là chủ ý, tường không phân biệt ai đánh.
 - **Không cho `[GIỜ]` giảm.** Không có cách nào lấy lại giờ đã tiêu. Đó là cả nhân vật.
+
+---
+
+## [ĐẾM] — Psalm
+
+**Trạng thái: ĐÃ ÁP DỤNG.** Đo trong trận thật (Chromium, 3 địch):
+
+| Kiểm tra | Kỳ vọng | Đo được |
+|---|---|---|
+| Một lượt địch | đếm +1, Energy +5 | 0→1, 0→5 |
+| Ba lượt địch | đếm 3, Energy 15 | 3 / 15 |
+| Psalm ngã | đếm đứng yên | đứng yên |
+| `APOSTASY` còn nguyên | kind `control`, chiếm quyền 1 lượt | kind đúng, địch đánh đồng bọn, hết hiệu lực sau 1 lượt |
+
+Dòng cuối là dòng quan trọng nhất của mục này: mục tiêu ở đây là **không đụng vào chiêu cuối**, và phép đo xác nhận
+nó vẫn chạy y như trước.
+
+### Cơ chế
+
+| | |
+|---|---|
+| Kích hoạt | **Mỗi lượt của một kẻ địch bất kỳ** |
+| Hiệu ứng | Bộ đếm trên thẻ Psalm +1, và bà nhận **+5 Energy** |
+| Điều kiện | Psalm còn sống và đang trong đội |
+| Trần | Không có. Bộ đếm chỉ đi lên |
+| `APOSTASY` | **Không đổi một chữ nào** |
+
+### Vì sao chỉ có nội tại, không đụng chiêu cuối
+
+`APOSTASY` là chiêu cuối **duy nhất trong roster đã có spec thật từ đầu** — `data.js` không đánh dấu ★ FAKE, và
+nhánh `control` đã chạy trong `playerUlt` từ trước phiên này. Việc cần làm không phải thiết kế lại nó, mà là làm cho
+cái giá **125 Energy** trả được: trần cao nhất game, 5 lượt nếu chỉ trông vào đòn thường, trên một nhân vật 1100 HP.
+
+`[ĐẾM]` cũng là **cơ chế sinh Energy đầu tiên** trong roster. Trước nó, Energy chỉ có ba đường:
+`+25` mỗi đòn thường, `refundOnKill` của Kira, và `VERSE` **trừ** 25 ở chương 3.
+
+| Số địch trên sân | Energy thêm mỗi vòng | `APOSTASY` sẵn sàng |
+|---|---|---|
+| 0 (chỉ đòn thường) | 0 | vòng 5 |
+| 2 | +10 | vòng ~4 |
+| 3 | +15 | **vòng ~3** |
+| 5 | +25 | vòng ~2 |
+
+Bà mạnh nhất đúng lúc có nhiều tiếng nói nhất, và đó là câu chuyện của bà viết bằng số.
+
+### Đã sửa gì
+
+**1 · `js/data.js` — entry của Psalm: chỉ thêm `talent`, giữ nguyên `ult`**
+
+```js
+talent:{ name:'ĐẾM', energy:5 }
+```
+
+**2 · `js/battle.js` — hằng số + helper**
+
+```js
+const COUNT = { label:'ĐẾM', src:'psalm', energy:5 };
+function noteCount(){
+  const p=B.units.find(u=>u.id===COUNT.src && u.side==='ally' && u.alive); if(!p) return;
+  const c=p.chips.find(x=>x.label===COUNT.label);
+  if(c) c.val++; else p.chips.push({ type:'count', label:COUNT.label, val:1 });
+  gainEnergy(p, COUNT.energy);          // gainEnergy đã tự gọi updateUnit
+}
+```
+
+**3 · `js/battle.js` — `enemyAct`, dòng đầu tiên**
+
+```js
+async function enemyAct(e){
+  noteCount();                          // bà nghe từ lúc nó mở miệng
+```
+
+Đặt ở **đầu** chứ không phải cuối: bà đếm cái lượt, không đếm cái kết quả. Kẻ địch bị Psalm chiếm quyền vẫn tính,
+vì nó vẫn tới lượt.
+
+**4 · `css/chromefall.css`**
+
+```css
+.chip--count{color:var(--chrome-hi);border-color:var(--chrome)}
+.chip--count::before{border:0;width:2px;height:7px;background:currentColor;box-shadow:3px 0 0 currentColor}
+```
+
+### Không làm
+
+- **Không cho bộ đếm giảm hay reset giữa wave.** Bà không dừng được, đó là cả nhân vật.
+- **Không đụng `APOSTASY`.** Cùng lý do đã giữ nguyên `ZERO` của Kira: đó là spec thật, không phải chỗ trống chờ điền.
+- **Không cho `[ĐẾM]` chạy khi Psalm đã ngã.** Lọc `alive`.

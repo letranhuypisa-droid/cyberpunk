@@ -665,3 +665,81 @@ Còn cái giao kèo với Muzzle thì mất khoảng ba mươi giây và có m�
 > *"Còn bốn trăm linh chín giờ. Đủ cho trận này. Đứng sau mẹ."*
 
 ---
+
+## PSALM
+
+### 1. Tên nhân vật
+
+**PSALM** — *Người nghe xưng tội*
+
+`Chrome · hạng S · thưởng khi clear 07-C` — ATK 110 · HP 1100 · Energy tối đa 125
+
+Psalm là chức danh, không phải tên. Sáu năm bà ngồi ở tầng ba mươi mốt của Spire, trong một căn buồng cuối hành lang không có biển chỉ dẫn, và lính Choir sợ căn buồng ấy hơn sợ lò tái chế — hợp lý, vì ở lò tái chế thì unit biết chuyện gì sẽ xảy ra.
+
+Cái tên duy nhất The Corp từng viết về bà mà bà thấy đúng là một mã lỗi: **APOSTASY**.
+
+### 2. Vũ khí
+
+**LƯ HƯƠNG TREO XÍCH** — *Choir liturgical burner, hợp chất pha sẵn của The Corp*
+
+Một cái lư đồng treo trên xích, đốt một hợp chất làm **vòng Halo của unit đối diện mềm đi** — không mê man, chỉ là dễ bảo. Trong buồng xưng tội, đó là phần một của quy trình: đung đưa ba nhịp khi unit vừa ngồi xuống.
+
+Đây chính là thứ giải thích chiêu cuối của bà. `APOSTASY` không phải phép thuật — bà làm lại đúng cái nghi thức bà đã làm ba trăm mười hai lần, và cái vòng Halo trên đầu kẻ địch **vâng lời theo thói quen.**
+
+Trong cận chiến thì cái lư là một quả nặng đầu xích. Bà không tập đánh nhau bao giờ; bà chỉ có một thứ nặng và một sợi xích.
+
+> **Mô-típ lặp lần thứ tư — nhưng đảo chiều.** Wire mang sợi cáp hàn của xưởng Halo, Echo mang cái loa The Corp cấp, Stitch mang bộ giá bốn tay ăn cắp của bệnh viện. **Cả ba đều dùng đồ cũ để làm ngược lại việc nó sinh ra để làm.** Psalm thì không: cái lư vẫn đốt đúng hợp chất ấy, vẫn ba nhịp ấy, vẫn làm đúng việc thiết kế của nó. Echo từng hỏi sao không sửa nó thành cái gì khác, và bà đáp: *nó không hỏng. Tôi chỉ đổi người ngồi đối diện.* Đó là chỗ bà khác ba người kia, và cũng là lý do tôi để mô-típ lặp lần này.
+
+### 3. Đánh xa hay cận chiến
+
+**Cận chiến, tầm xích — nhưng đừng dùng bà để đánh.**
+
+ATK 110 tầm trung, HP 1100 mỏng vừa. Bà không phải nguồn sát thương và cũng không phải tường. Bà là nhân vật **đổi phe một kẻ địch trong một lượt**, và giá trị của bà đo bằng việc lượt đó rơi vào đúng con nào.
+
+Chỗ đứng: **tuyến giữa**, sau Muzzle hoặc Meridian. Bà cần sống đủ lâu để tích đủ 125 Energy, và nội tại của bà lo phần đó.
+
+### 4. Chiêu cuối
+
+**Nội tại — [ĐẾM] / THE COUNT**
+
+**Mỗi lượt của một kẻ địch bất kỳ, bộ đếm trên thẻ Psalm cộng 1, và bà nhận +5 Energy.** Bà đang nghe. Bà luôn luôn đang nghe.
+
+Không ai bắt bà đếm — trong buồng xưng tội, hệ thống tự đánh số ca bằng chuỗi mười bốn ký tự, không phải bằng số đếm. Bà vẫn đếm, trong đầu, và bà không dừng lại được kể cả những hôm bà cố. Con bé mã Tài sản 07 hỏi bà một câu mà ba trăm mười hai người trước không ai nghĩ tới việc hỏi ngược lại, và bộ đếm trên thẻ bà là câu trả lời — **nó vẫn đang chạy.**
+
+*Đây cũng là cơ chế sinh Energy đầu tiên trong roster.* Nó phải tồn tại, vì `APOSTASY` giá 125 — trần cao nhất game, 5 lượt nếu chỉ trông vào đòn thường. Với 3 kẻ địch trên sân, `[ĐẾM]` cộng thêm 15 Energy mỗi vòng, kéo chiêu cuối về khoảng **vòng 3**. Wave càng đông thì bà càng nhanh — **bà mạnh nhất đúng lúc có nhiều tiếng nói nhất.**
+
+**APOSTASY — KẺ BỘI GIÁO** · 125 Energy · chiếm quyền điều khiển · *giữ nguyên hoàn toàn*
+
+> **EN — APOSTASY**
+> Psalm swings the censer three times, the way she did three hundred and twelve times before. The target's Halo obeys out of habit: **for one turn it belongs to her, and on its next turn it attacks its own side.**
+
+> **VN — KẺ BỘI GIÁO**
+> Psalm đung đưa cái lư ba nhịp, đúng như ba trăm mười hai lần trước. Vòng Halo của mục tiêu vâng lời theo thói quen: **một lượt nó thuộc về bà, và lượt tới nó đánh vào đồng bọn.**
+
+*Đây là chiêu cuối duy nhất trong chín hồ sơ tôi không đụng vào một chữ nào.* `APOSTASY` đã có spec thật trong `data.js` từ đầu — không đánh dấu ★ FAKE — và nhánh `control` đã chạy trong engine. Việc cần làm ở đây không phải thiết kế lại chiêu cuối, mà là làm cho cái giá 125 của nó **trả được**. Đó là toàn bộ nhiệm vụ của `[ĐẾM]`.
+
+**Video cut-in:** `psalm_ult.mp4` **đã có sẵn** trong repo.
+
+### 5. Lore
+
+*Bản đầy đủ 10 chương: [`docs/chronicles/psalm.md`](chronicles/psalm.md) — đọc trong game ở ARCHIVE sau khi mở khoá.*
+
+Quy trình có tên chính thức là **hiệu chỉnh hành vi** và nó gồm ba phần. Phần một là cái lư. Phần hai là nghe — không có kịch bản, vì ba năm đầu The Corp thử dùng kịch bản in sẵn và kết quả kém hơn. Phần ba là cái nút, nằm dưới mặt bàn phía bên phải, và Psalm không phải nhìn để tìm nó. Hồ sơ ghi: ba trăm mười hai ca, không sai sót.
+
+Không phần nào trong ba phần yêu cầu ghi số. Hệ thống tự đánh số ca bằng chuỗi mười bốn ký tự. **Psalm vẫn đếm** — trong đầu, một, hai, ba — và bà không kể chuyện đó với ai suốt sáu năm, vì kể ra thì nó thành một triệu chứng, mà một unit có triệu chứng thì được đưa xuống tầng ba mươi mốt và ngồi vào cái ghế bên kia bàn.
+
+Ca thứ ba trăm mười ba không kể gì cả. Không phải bướng — Psalm nhận ra trong hai phút đầu là nó **không có gì để kể**: muốn xưng tội thì phải nhớ mình đã làm gì, mà hồ sơ của nó ghi sáu năm không một mảnh ký ức nào được phép hình thành. Rồi con bé ngẩng lên và hỏi: *bà có đếm không.*
+
+Trong mười giây sau đó không có gì kịch tính xảy ra. Bà là unit; hệ thống của bà không dựng lại hình ảnh khi không được lệnh. Cái xảy ra chỉ có hai bước. **Bước một:** câu trả lời là có. **Bước hai:** bà hiểu ra vì sao suốt sáu năm chưa ai hỏi bà câu ấy — căn buồng được thiết kế để chỉ một người được phép hỏi, và người đó là bà; ba trăm mười hai người đã ngồi ở cái ghế kia và không ai nghĩ tới việc hỏi ngược lại. Ngay khi bà trả lời trong đầu, con số ba trăm mười hai thôi là một bản ghi. **Nó thành một khoản nợ.**
+
+Phần còn lại thì nhanh: giật vòng Halo của chính mình, bẻ vòng con bé, đạp bung tấm sàn ở góc phòng — cái tấm dùng để đưa unit xuống lò sau khi xong việc.
+
+Cái vòng đỏ gãy trên đầu bà thì Wire xin sửa, bà lắc đầu; Stitch xin xem, bà gật. Wire hỏi để chữa, Stitch hỏi để biết nó đang làm gì với cái đầu bên dưới — Psalm cần vế thứ hai và không cần vế thứ nhất, vì **cái vòng ấy hỏng là đúng**: nó là bản ghi duy nhất còn lại chứng minh chuyện đã xảy ra, và bà không định xoá bản ghi nào nữa, kể cả bản ghi về chính mình.
+
+Trên áo choàng bà có mấy chục mảnh giấy trắng chữ đỏ. Ai không biết thì tưởng là bùa. Trong buồng xưng tội, mỗi ca được cấp một mảnh giấy như thế in mã ca; ba trăm mười hai mảnh, và bà không giữ mảnh nào — chúng đi theo hồ sơ, hồ sơ đi theo unit xuống lò. Mấy chục mảnh trên áo bà là giấy mới, bà tự cắt tự viết, và trên mỗi mảnh là **một cái tên của người đã đi ra được**. Không phải người bà mất — đó là việc của Stitch, khâu lên tay áo trái, một mũi một người. Psalm làm chuyện ngược lại.
+
+Bà vẫn đếm, không dừng lại được, và đã thôi cố. Chỉ là bây giờ con số đi theo chiều khác: **ba trăm mười hai người vào một căn buồng và không ai đi ra; từ hôm rơi xuống đáy, bà đếm chiều ngược lại, và bà định đếm cho tới lúc hai con số gặp nhau.** Ai hỏi bà đang ở đâu rồi, bà nói thẳng con số. Bà không làm tròn.
+
+> *"Xưng tội đi. Đùa thôi. Tôi bỏ nghề rồi."*
+
+---

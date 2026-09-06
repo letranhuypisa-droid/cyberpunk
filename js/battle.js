@@ -118,6 +118,13 @@ const overloadStacks = u => { const c=u.chips.find(c=>c.label===OVERLOAD.label);
 const MUTE = { label:'MUTE', dmg:.25, src:'echo' };
 /* SỔ — Stitch ghi mọi sát thương đồng đội phải chịu; SUTURE trả sổ rồi xoá.
    Bà phải còn sống mới ghi được, xem docs/mechanics.md */
+const COUNT = { label:'ĐẾM', src:'psalm', energy:5 };     // Psalm nghe mỗi lượt địch, và nhận Energy vì nghe
+function noteCount(){
+  const p=B.units.find(u=>u.id===COUNT.src && u.side==='ally' && u.alive); if(!p) return;
+  const c=p.chips.find(x=>x.label===COUNT.label);
+  if(c) c.val++; else p.chips.push({ type:'count', label:COUNT.label, val:1 });
+  gainEnergy(p, COUNT.energy);                            // gainEnergy đã tự gọi updateUnit
+}
 const HOURS  = { label:'GIỜ',  src:'meridian' };         // giờ Meridian đã tiêu; chỉ đi lên
 const SHIELD = { label:'TƯỜNG' };                        // lá chắn: ăn sát thương TRƯỚC máu
 const hoursOf = u => { const c=u.chips.find(x=>x.label===HOURS.label); return c?c.val:0; };
@@ -439,6 +446,7 @@ async function playCutin(u){
   v.pause(); box.hidden=true; v.removeAttribute('src'); v.load();
 }
 async function enemyAct(e){
+  noteCount();                                              // bà nghe từ lúc nó mở miệng
   if(e.link && !e.muted && e.alive && alive('enemy').some(x=>x!==e && x.link && !x.muted)){   // HALO LINK — câm thì rụng khỏi mạng
     const amt=Math.round(e.hpMax*.08); if(e.hp<e.hpMax){ heal(e,e,amt); log(`${e.name} hồi ${amt} HP qua HALO LINK`); await wait(reduced()?100:350); }
   }
