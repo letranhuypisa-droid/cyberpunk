@@ -27,6 +27,7 @@ rồi mở `http://localhost:8765/index.html`. UI kit và token nằm cuối tra
 | `docs/story.md` | Thế giới, chiến dịch, thiết kế màn, hai kết |
 | `docs/characters.md` | Hồ sơ 19 nhân vật + Operator |
 | `docs/bg-prompts.md` | Prompt sinh ảnh nền và quy tắc zoom/chân trời |
+| `docs/ult-prompts.md` | Quy cách video cut-in chiêu cuối + prompt Seedance từng nhân vật |
 
 Mọi số liệu cân bằng đánh dấu `★ FAKE` là bản nháp.
 
