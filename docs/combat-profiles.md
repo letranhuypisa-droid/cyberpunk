@@ -416,3 +416,83 @@ Bây giờ tổ đang đi lên từng tầng một. Trên Spire có một danh s
 > *"Cậu quyết đi, Operator. Tôi chém."*
 
 ---
+
+## ASH
+
+### 1. Tên nhân vật
+
+**ASH** — *Thợ nổ*
+
+`Rust · hạng A · có sẵn từ đầu game` — ATK 120 · HP 1000 · Energy tối đa 75
+
+Ash lớn lên dưới một tấm bảng gỗ treo ở xưởng tháo dỡ tầng âm sáu. Cột trái ghi bộ phận, cột phải ghi giá, và trên cùng một tấm bảng ấy có cả trục truyền lẫn giác mạc, vì kế toán thì chỉ có một cuốn sổ.
+
+Cô là người giữ sổ chi tiêu của tổ. Không ai giao, cô tự nhận.
+
+### 2. Vũ khí
+
+**MÌN ĐẶT TAY** — *charges, tự cuốn, kíp hẹn bằng dây*
+
+Không phải lựu đạn ném. Ash **đặt** mìn — áp vào chỗ cô chọn, đúng lượng thuốc cô tính, rồi lùi ra. Nghề này đo bằng giây và bằng độ dày vách, và cô đã tính sai đúng một lần trong đời: sai bốn giây, và bốn giây đó là quãng đường Muzzle chưa ra khỏi hầm.
+
+Cô bới bằng tay trần mười bảy phút. Muzzle sống. Hai bàn tay cô thì không lành lại như cũ.
+
+**Găng hở ngón** — Stitch bảo cô đeo, không phải để giấu sẹo mà để da đỡ nứt. Hở ngón vì phải sờ được dây.
+
+**Đao nhặt được** *(phụ)* — một thanh đao đeo chéo sau lưng, chuôi quấn dây đỏ, đổi được trong một chuyến hàng. Dùng khi hết mìn hoặc khi cự ly sai. Cô không đặt tên cho nó và không giữ gìn nó.
+
+> *Ghi chú art:* `ASH.png` vẽ rõ thanh đao sau lưng, nên tôi đưa nó vào làm vũ khí phụ thay vì lờ đi. Găng hở ngón trong art cũng khớp luôn với sẹo bỏng trong bio. Không có xung đột nào ở đây — khác trường hợp Ronin.
+
+### 3. Đánh xa hay cận chiến
+
+**Trung — cô đặt mìn rồi lùi.** Không ném từ xa, cũng không ở lại trong bán kính nổ.
+
+ATK 120 / HP 1000 xếp cô vào **tuyến giữa**, và cách chơi đúng là kiên nhẫn: mìn của cô **không nổ ngay**, nên ba lượt đầu trông như cô đang đánh hụt. Người chơi nào chỉ nhìn con số sát thương nhảy lên sẽ tưởng cô yếu.
+
+Cô không yếu. Cô đang đặt.
+
+### 4. Chiêu cuối
+
+**Nội tại — [MÌN] / CHARGE**
+
+Đòn thường của Ash **gắn một quả mìn** lên mục tiêu — tối đa một quả mỗi kẻ địch, không cộng dồn. Quả mìn không gây sát thương gì cả khi được đặt.
+
+Nó nổ khi **kẻ mang nó chết** — chết vì bất cứ ai, bất cứ thứ gì. Lúc đó nó gây **60% ATK lên toàn bộ kẻ địch còn lại**.
+
+Và đây là chỗ đáng chơi: nếu vụ nổ ấy giết thêm một kẻ đang mang mìn, **quả mìn đó cũng nổ theo**. Dây chuyền chạy tới khi hết mìn hoặc hết địch. Ash gọi đó là phá dỡ, không phải đánh nhau.
+
+Mìn đã đặt thì nổ kể cả khi Ash đã ngã. Cô đặt rồi thì nó nổ.
+
+**FLASHOVER — BÙNG BUỒNG** · 75 Energy · sát thương diện rộng + kích nổ toàn bộ
+
+> **EN — FLASHOVER**
+> Every charge on the field goes at once. Deals **150% ATK to all enemies**, then detonates every remaining charge simultaneously. Flashover is the fire term: the moment a room stops burning in one place and starts burning everywhere.
+
+> **VN — BÙNG BUỒNG**
+> Toàn bộ mìn trên sân nổ cùng lúc. Gây **150% ATK lên tất cả kẻ địch**, rồi kích nổ mọi quả mìn còn lại đồng thời. Flashover là thuật ngữ chữa cháy: khoảnh khắc một căn buồng thôi cháy ở một chỗ và bắt đầu cháy ở mọi chỗ.
+
+Đòn thường cho 25 Energy, Ash có trần 75 — **ba lượt đặt mìn cũng vừa đúng ba lượt đầy thanh**. Y như Wire, hai cái đồng hồ chạy song song.
+
+*So với Wire, đây là cơ chế đặt-rồi-nổ thứ hai trong roster, nên tôi cố ý tách khác: stack của Wire **không làm gì cả** cho tới khi cô dùng chiêu cuối, còn mìn của Ash **tự trả tiền qua mỗi mạng địch** — cô không cần ult vẫn có tác dụng. Một người tích, một người gài.*
+
+### 5. Lore
+
+*Bản đầy đủ 10 chương: [`docs/chronicles/ash.md`](chronicles/ash.md) — đọc trong game ở ARCHIVE sau khi mở khoá.*
+
+Ở xưởng tháo dỡ tầng âm sáu, xe hỏng thì tháo và người hết giá thì cũng tháo, cả hai nằm trên cùng một tấm bảng. Ash học đọc bằng tấm bảng ấy. Năm mười hai tuổi cô đã làm được cái việc thợ cả mất mười năm mới làm được: nhìn một thứ và thấy giá của nó trước, rồi mới thấy nó là cái gì. Người ta khen cô có mắt.
+
+Cái ngày cô hiểu ra vấn đề là một buổi chiều bình thường. Người ta kéo vào một ông thợ hàn ca sáng bị điện giật. Cái nhìn của cô tự làm việc của nó trước khi cô kịp ngăn: giác mạc còn tốt, khớp gối trái thay rồi, bộ lọc gan hỏng vì ông uống nhiều. Đọc xong ba dòng ấy cô mới nhận ra dòng thứ tư — đây là ông Khảm, người suốt bốn năm tháng nào cũng cho cô nửa cái bánh trong hộp cơm và chưa lần nào nói gì. Cô đứng đó đợi cái bảng giá trong đầu tắt đi. Nó không tắt. **Cái mắt ấy không phải kỹ năng cô học, nó đã lắp vào cô rồi, và nó chạy kể cả khi cô không muốn.**
+
+Mười bảy tuổi cô bỏ xưởng, mang theo hai thứ: nghề nổ và tấm bảng giá không tắt được. Thằng nhóc mười chín ở bãi xe có một chiếc xe kéo gãy trục và một cái luật đúng một điều. Cô hỏi anh có biết luật đó làm tổ nghèo hơn mọi băng khác không; anh bảo biết; cô hỏi thế sao vẫn làm; anh không trả lời được. Lẽ ra cô phải đi — một tổ do thằng nhóc không giải thích nổi luật của chính nó cầm đầu thì định giá rất thấp. Cô ở lại, và mười năm sau vẫn chưa giải thích được vì sao.
+
+Cô giữ sổ chi tiêu, và trong sổ có một quy ước chỉ mình cô hiểu: khoản nào tổ mất tiền vì cái luật một điều thì **gạch chân hai lần**. Mười năm, mấy trăm dòng, cô cộng lại được và đã cộng lại nhiều lần vào những đêm không ngủ. Nhưng có một chuyện chưa xảy ra lần nào: cô chưa một lần đề nghị bỏ cái luật.
+
+Sáng tổ tìm thấy Kira, cái mắt lại làm việc của nó — vòng Halo hạng S nuôi cả tổ nửa năm. Cô nói to, không giấu chữ nào: tháo lõi, bán. Ronin lắc đầu. Cô im, và cả tổ tưởng cô chịu thua. Cô không chịu thua — cô im vì vừa nhận ra một chuyện đáng sợ hơn nhiều: **nếu người nằm trên đống xác xe kia là Ronin, cô đã nói ngược lại.** Nghĩa là cái bảng giá trong đầu cô có ngoại lệ, mà một bảng giá có ngoại lệ thì không còn là bảng giá nữa. Cô ghét việc đó, và vẫn ghét tới giờ.
+
+Tối nào cô cũng ra sau bãi xe cho lũ chó hoang ăn. Ai hỏi thì cô bảo cho chúng no để chúng không cắn hàng. Sau bãi xe không còn hàng nữa, kho ấy dọn từ ba năm trước. Cô vẫn ra.
+
+Và trang cuối cuốn sổ thì bị gấp mép, không bao giờ đưa Ronin xem. Trên đó là một phép tính viết bằng bút chì, xoá đi viết lại đến mức giấy mỏng hẳn, liệt kê từng người trong tổ theo đúng cách tấm bảng gỗ đã dạy cô — chrome của Kira, vòng đỏ của Psalm, khung gầm của Junker, cả hai bàn tay sẹo bỏng của chính cô, định giá rất thấp. Con số ấy cô cộng xong từ lâu. Nó là **dòng duy nhất trong cả cuốn sổ không được gạch chân**, vì gạch chân nghĩa là tổ đã mất tiền, mà tới dòng này thì cô không quyết được là mất hay được. Ronin có lần nhìn thấy trang đó và hỏi cô đang tính gì. Cô bảo: đang tính.
+
+> *"Tôi định giá được mọi thứ. Trừ cái tổ này."*
+
+---

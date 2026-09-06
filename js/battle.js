@@ -116,6 +116,20 @@ const overloadStacks = u => { const c=u.chips.find(c=>c.label===OVERLOAD.label);
 const MUTE = { label:'MUTE', dmg:.25, src:'echo' };
 /* SỔ — Stitch ghi mọi sát thương đồng đội phải chịu; SUTURE trả sổ rồi xoá.
    Bà phải còn sống mới ghi được, xem docs/mechanics.md */
+const CHARGE = { label:'MÌN', mult:.6, src:'ash' };      // Ash gài mìn; nổ khi kẻ mang nó chết, có dây chuyền
+const hasCharge = u => u.chips.some(c=>c.label===CHARGE.label);
+function plantCharge(tgt){
+  if(hasCharge(tgt)) return;
+  tgt.chips.push({ type:'charge', label:CHARGE.label }); updateUnit(tgt);
+}
+function detonate(tgt){
+  removeChip(tgt, CHARGE.label);                                    // gỡ TRƯỚC → dây chuyền chắc chắn dừng
+  const src=B.units.find(u=>u.id===CHARGE.src && u.side==='ally');  // nổ kể cả khi Ash đã ngã
+  const others=alive('enemy').filter(x=>x!==tgt);
+  if(!src || !others.length) return;
+  log(`MÌN nổ trên ${tgt.name}`, true);
+  others.forEach(x=>{ if(x.alive) dealDamage(src, x, CHARGE.mult); });
+}
 const RIPOSTE = { label:'ĐÁP', mult:.6, src:'ronin' };   // Ronin chém trả ngay khi bị đánh; cũng là người miễn VERSE
 const LEDGER = { label:'SỔ', src:'stitch' };
 const ledgerKeeper = () => B.units.find(u=>u.id===LEDGER.src && u.side==='ally' && u.alive);
@@ -217,6 +231,7 @@ function dealDamage(src, tgt, mult, opts={}){
   tgt.hp = Math.max(0, tgt.hp - dmg);
   if(tgt.side==='ally' && dmg>0) noteLedger(dmg);          // sổ của Stitch
   spawnNumber(tgt.el.querySelector('.unit__sprite'), dmg, crit?'crit':'');
+  const mined = tgt.side==='enemy' && hasCharge(tgt);      // đọc TRƯỚC dòng tgt.chips=[]
   const killed = tgt.hp<=0 && tgt.alive;
   if(killed){ tgt.alive=false; tgt.chips=[]; }
   if(killed) AUDIO.kia(); else if(crit) AUDIO.crit(); else AUDIO.hit();
@@ -224,6 +239,7 @@ function dealDamage(src, tgt, mult, opts={}){
   updateUnit(tgt);
   log(`${src.name} → ${tgt.name} · ${dmg}${crit?' CRIT':''}${killed?' · KIA':''}`, crit||killed);
   if(killed && B.target===tgt) B.target=null;
+  if(killed && mined) detonate(tgt);                       // dây chuyền phá dỡ
   return {dmg,crit,killed};
 }
 function heal(src, tgt, amount){
@@ -315,6 +331,7 @@ async function playerAttack(){
   dealDamage(u,t,1);
   if(u.id===OVERLOAD.src && t.alive) addOverload(t);   // stack cắm sau, nên đòn này ăn theo số stack đã có
   if(u.id===MUTE.src && t.alive) addMute(t);
+  if(u.id===CHARGE.src && t.alive) plantCharge(t);
   gainEnergy(u,25); dailyProgress('attacks');
   await anim; await wait(reduced()?80:160);
   B.busy=false; endTurn();
@@ -344,6 +361,7 @@ async function playerUlt(){
       if(st) removeChip(t, OVERLOAD.label);
       if(u.ult.muteAll && t.alive) addMute(t);
     });
+    if(u.ult.blowCharges) alive('enemy').filter(hasCharge).forEach(t=>detonate(t));   // con chết vì aoe đã nổ theo đường chết
     if(u.ult.perStack) log(`${u.name} kích nổ toàn bộ ${OVERLOAD.label}`, true);
     await anim;
   } else if(k==='heal'){

@@ -489,3 +489,124 @@ alive('ally').forEach(u=>{ if(u.energy>0 && u.id!==RIPOSTE.src){ ...
 - **Không cho [ĐÁP] kích hoạt dây chuyền.** Nhát chém trả gọi `dealDamage` với mục tiêu là kẻ địch, mà điều kiện chỉ bắt khi mục tiêu là Ronin, nên không có vòng lặp.
 - **Không cho [ĐÁP] tính vào sổ của Stitch.** Sổ chỉ ghi `tgt.side==='ally'`; nhát trả đánh vào địch nên không ghi. Nhưng đòn địch đánh Ronin thì **có** ghi — đúng như phải thế.
 - **Không cho IAIDO xuyên giáp hay thêm hiệu ứng gì.** Nó cố tình là chiêu cuối không có mẹo.
+
+---
+
+## [MÌN] + FLASHOVER — Ash
+
+**Trạng thái: ĐÃ ÁP DỤNG.** Đo trong trận thật (Chromium, 3 địch, tắt crit + variance):
+
+| Kiểm tra | Kỳ vọng | Đo được |
+|---|---|---|
+| Đặt mìn | không sát thương, không cộng dồn | đúng cả hai, 1 quả |
+| Giết kẻ mang mìn | toé 72 lên hai con còn lại | 72 / 72 |
+| **Dây chuyền** | A nổ giết B → mìn B nổ tiếp → C ăn 144 | **C còn đúng 856/1000 HP, và sống** |
+| FLASHOVER, cả ba mang mìn | 180 + 72×2 = 324 mỗi con | 324 / 324 / 324, sạch mìn |
+| Ash đã ngã | mìn vẫn nổ | vẫn nổ |
+| Tràn stack | không | không lỗi console |
+
+Dây chuyền là chỗ rủi ro nhất: nó đệ quy qua `dealDamage`. Ba lớp bảo vệ ở mục trên giữ nó dừng đúng chỗ.
+
+### Cơ chế
+
+| | |
+|---|---|
+| Nguồn | Đòn thường của Ash gắn một quả mìn lên mục tiêu |
+| Cộng dồn | **Không.** Một quả mỗi kẻ địch |
+| Khi đặt | Không gây sát thương gì cả |
+| Ngòi nổ 1 | **Kẻ mang mìn chết** — vì bất cứ ai, bất cứ thứ gì |
+| Ngòi nổ 2 | `FLASHOVER` kích nổ mọi quả còn lại cùng lúc |
+| Sát thương nổ | `60% ATK` lên **toàn bộ kẻ địch còn sống khác** |
+| Dây chuyền | Vụ nổ giết thêm một kẻ mang mìn → quả đó nổ theo |
+| Ash ngã | Mìn **vẫn nổ**. Cô đặt rồi thì nó nổ |
+
+`FLASHOVER` = `kind:'aoe'`, `mult:1.5`, `blowCharges:true`.
+
+### Vì sao tách khỏi Wire
+
+Đây là cơ chế đặt-rồi-nổ **thứ hai** trong roster, nên phải khác Wire ở chỗ căn bản, không chỉ khác con số:
+
+| | Wire `[OVERLOAD]` | Ash `[MÌN]` |
+|---|---|---|
+| Khi chưa dùng ult | Cho vuln +10%/stack | **Không làm gì cả** |
+| Ngòi nổ | Chỉ chiêu cuối | **Cái chết của mục tiêu**, hoặc chiêu cuối |
+| Cần ult để có tác dụng | Có | **Không** |
+| Hình dạng | Tích trên một mục tiêu | Gài khắp sân, nổ dây chuyền |
+
+Wire tích, Ash gài. Wire thưởng cho việc dồn; Ash thưởng cho việc rải rồi chọn đúng đứa để giết trước.
+
+Trần Energy của Ash là 75, đòn thường cho 25 → **ba lượt đặt mìn cũng vừa đúng ba lượt đầy thanh**.
+
+### Chống đệ quy vô hạn
+
+Dây chuyền gọi `dealDamage` lồng nhau, nên phải chắc nó dừng:
+
+1. `detonate()` **gỡ chip trước** rồi mới gây sát thương.
+2. Đường chết trong `dealDamage` đã `tgt.chips=[]`, nên đọc cờ `mined` **trước** dòng đó.
+3. Mỗi kẻ địch chỉ chết được một lần, và số kẻ địch hữu hạn → độ sâu tối đa bằng số địch trên sân.
+
+### Đã sửa gì
+
+**1 · `js/data.js` — entry của Ash**
+
+```js
+ult:{ name:'FLASHOVER', cost:75, kind:'aoe', mult:1.5, blowCharges:true,
+      desc:'150% ATK lên toàn bộ kẻ địch, rồi kích nổ mọi quả mìn còn lại' },
+talent:{ name:'MÌN', mult:.6 }
+```
+
+**2 · `js/battle.js` — hằng số + helper, cạnh khối RIPOSTE**
+
+```js
+const CHARGE = { label:'MÌN', mult:.6, src:'ash' };
+const hasCharge = u => u.chips.some(c=>c.label===CHARGE.label);
+function plantCharge(tgt){
+  if(hasCharge(tgt)) return;
+  tgt.chips.push({ type:'charge', label:CHARGE.label }); updateUnit(tgt);
+}
+function detonate(tgt){
+  removeChip(tgt, CHARGE.label);                                  // gỡ TRƯỚC → dây chuyền chắc chắn dừng
+  const src=B.units.find(u=>u.id===CHARGE.src && u.side==='ally'); // nổ kể cả khi Ash đã ngã
+  const others=alive('enemy').filter(x=>x!==tgt);
+  if(!src || !others.length) return;
+  log(`MÌN nổ trên ${tgt.name}`, true);
+  others.forEach(x=>{ if(x.alive) dealDamage(src, x, CHARGE.mult); });
+}
+```
+
+**3 · `js/battle.js` — `dealDamage`: đọc cờ trước khi xoá chip, nổ sau khi xong sổ sách**
+
+```js
+  const mined = tgt.side==='enemy' && hasCharge(tgt);   // đọc TRƯỚC dòng tgt.chips=[]
+  const killed = tgt.hp<=0 && tgt.alive;
+  ...
+  if(killed && B.target===tgt) B.target=null;
+  if(killed && mined) detonate(tgt);                    // dây chuyền
+```
+
+**4 · `js/battle.js` — `playerAttack`, cạnh addOverload/addMute**
+
+```js
+  if(u.id===CHARGE.src && t.alive) plantCharge(t);
+```
+
+**5 · `js/battle.js` — nhánh `aoe`, sau vòng forEach sẵn có**
+
+```js
+    if(u.ult.blowCharges) alive('enemy').filter(hasCharge).forEach(t=>detonate(t));
+```
+
+Đặt **sau** sát thương diện rộng: con nào chết vì đòn aoe thì mìn đã nổ theo đường chết rồi, ở đây chỉ còn những con sống sót.
+
+**6 · `css/chromefall.css` — chip, cạnh `.chip--riposte`**
+
+```css
+.chip--charge{color:var(--crit);border-color:var(--crit)}
+.chip--charge::before{border:0;width:6px;height:6px;background:currentColor;border-radius:50% 50% 50% 0}
+```
+
+### Không làm
+
+- **Không cho mìn cộng dồn.** Một quả mỗi kẻ địch. Cộng dồn thì thành Wire.
+- **Không cho mìn nổ vào đồng đội.** `alive('enemy')` chặn sẵn.
+- **Không cho mìn nổ vào chính kẻ mang nó.** Nó đã chết rồi; nổ vào xác thì vô nghĩa và làm log rối.
