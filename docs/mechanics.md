@@ -731,3 +731,131 @@ const m=B.units.find(u=>u.id===GUARD.src && u.side==='ally' && u.alive); if(m) m
 - **Không chắn cho chính Muzzle.** Điều kiện `tgt.id!==GUARD.src` chặn. Anh nhắm thẳng thì ăn đủ.
 - **Không chắn khi Muzzle đã ngã.** Lọc `alive`.
 - **Không cho khiên chặn sát thương mìn hay nổ dây chuyền.** Những thứ đó đánh vào địch, không đi qua `enemyAct`.
+
+---
+
+## [GIỜ] + [TƯỜNG] + BULWARK PROTOCOL — Meridian
+
+**Trạng thái: ĐÃ ÁP DỤNG.** Đo trong trận thật (Chromium, tắt crit + variance):
+
+| Kiểm tra | Kỳ vọng | Đo được |
+|---|---|---|
+| `[GIỜ]` cộng mỗi vòng | +4 sau 4 vòng | +4, chip hiện số |
+| Lá chắn ở giờ 5 | 85×1.6×1.4 = 190 | **190**, mỗi đồng đội đều nhận |
+| Địch ATK 53 đánh người có tường | máu mất 0, tường mất 53 | 0 / 53 |
+| **Sổ Stitch khi bị chắn hết** | **0** | **0** |
+| Tường chỉ còn 10 | máu mất 43, sổ ghi 43 | 43 / 43, tường về 0 |
+| Không cộng dồn | 100 rồi 50 → giữ 100 | 100; rồi 300 → 300 |
+
+Dòng thứ tư là chỗ ba lớp phòng thủ phải khớp nhau: tường chặn **trước** khi chảy máu, nên sổ của Stitch
+không có gì để ghi. Nếu ghi thì Stitch được thưởng cho một vết thương không tồn tại.
+
+### Cơ chế
+
+| | |
+|---|---|
+| **[GIỜ]** | Bộ đếm trên thẻ Meridian, bắt đầu 0, **+1 mỗi vòng**, không bao giờ giảm |
+| **[TƯỜNG]** | Lá chắn trên từng đồng minh, **hấp thụ sát thương trước khi trừ máu** |
+| Nguồn tường | Chỉ `BULWARK PROTOCOL` |
+| Kích cỡ | `ATK × 1.6 × (1 + 0.08 × giờ)` cho **mỗi đồng đội còn sống** |
+| Chồng lá chắn | Không cộng dồn — lấy giá trị **lớn hơn** |
+| Sổ Stitch | **Không ghi phần bị chắn.** Sổ ghi máu, tường thì không cho chảy máu |
+
+`BULWARK PROTOCOL` = **`kind:'barrier'`** — loại chiêu cuối thứ năm, sau `nuke` / `aoe` / `heal` / `control`.
+
+### Ba lớp phòng thủ, ba bản chất khác nhau
+
+| | Cơ chế | Thời điểm |
+|---|---|---|
+| Muzzle `[BÀ BA]` | đổi **đích đến** của đòn | *trong lúc* đòn bay tới |
+| Meridian `[TƯỜNG]` | hấp thụ **trước** khi chạm máu | *trước* khi máu mất |
+| Stitch `[SỔ]` | hồi lại **sau** khi đã mất | *sau* khi máu mất |
+
+Ba người cùng đội thì ba lớp xếp chồng theo đúng thứ tự đó, không cái nào che cái nào.
+
+| Vòng | Giờ | Lá chắn/người |
+|---|---|---|
+| 1 | 0 | 136 |
+| 5 | 4 | 180 |
+| 10 | 9 | 234 |
+
+Trần Energy 125 = 5 lượt mới đầy, nên lần dựng đầu rơi vào khoảng vòng 5.
+
+### Đã sửa gì
+
+**1 · `js/data.js` — entry của Meridian**
+
+```js
+ult:{ name:'BULWARK PROTOCOL', cost:125, kind:'barrier', mult:1.6, perHour:.08,
+      desc:'Lá chắn 160% ATK + 8% mỗi giờ đã tiêu cho toàn đội, chặn trước khi mất máu' },
+talent:{ name:'GIỜ', perHour:.08 }
+```
+
+**2 · `js/battle.js` — hằng số + helper**
+
+```js
+const HOURS  = { label:'GIỜ',   src:'meridian' };
+const SHIELD = { label:'TƯỜNG' };
+const hoursOf = u => { const c=u.chips.find(x=>x.label===HOURS.label); return c?c.val:0; };
+function tickHours(){
+  const m=B.units.find(u=>u.id===HOURS.src && u.side==='ally' && u.alive); if(!m) return;
+  const c=m.chips.find(x=>x.label===HOURS.label);
+  if(c) c.val++; else m.chips.push({ type:'hours', label:HOURS.label, val:1 });
+  updateUnit(m);
+}
+function setBarrier(u, n){
+  u.barrier=Math.max(u.barrier||0, n);
+  const c=u.chips.find(x=>x.label===SHIELD.label);
+  if(c) c.val=u.barrier; else u.chips.push({ type:'shield', label:SHIELD.label, val:u.barrier });
+  updateUnit(u);
+}
+function drainBarrier(u, dmg){                 // trả phần còn lại sau khi tường ăn
+  if(!u.barrier) return dmg;
+  const soak=Math.min(u.barrier, dmg); u.barrier-=soak;
+  const c=u.chips.find(x=>x.label===SHIELD.label);
+  if(u.barrier<=0){ u.barrier=0; removeChip(u,SHIELD.label); } else if(c){ c.val=u.barrier; }
+  updateUnit(u); return dmg-soak;
+}
+```
+
+**3 · `js/battle.js` — `dealDamage`: tường ăn trước máu, và sổ chỉ ghi phần chảy máu thật**
+
+```js
+  const dealt = drainBarrier(tgt, dmg);        // ← thêm
+  tgt.hp = Math.max(0, tgt.hp - dealt);
+  if(tgt.side==='ally' && dealt>0) noteLedger(dealt);
+  ...
+  spawnNumber(tgt.el.querySelector('.unit__sprite'), dealt>0?dealt:dmg, dealt>0?(crit?'crit':''):'heal');
+```
+
+Khi bị chắn hết thì hiện con số đã chặn với kiểu `heal` (xanh) thay vì hiện `0`.
+
+**4 · `js/battle.js` — nhánh chiêu cuối mới**
+
+```js
+  } else if(k==='barrier'){
+    const amt=Math.round(u.atk*u.ult.mult*(1+hoursOf(u)*(u.ult.perHour||0)));
+    alive('ally').forEach(t=>setBarrier(t,amt));
+    log(`${u.name} dựng vách — lá chắn ${amt}/người (giờ ${hoursOf(u)})`, true);
+```
+
+**5 · `js/battle.js` — `newRound`: cộng giờ**
+
+```js
+tickHours();
+```
+
+**6 · `css/chromefall.css`**
+
+```css
+.chip--hours{color:var(--text-3);border-color:var(--line-3)}
+.chip--hours::before{border:0;width:6px;height:6px;border-radius:50%;background:none;box-shadow:inset 0 0 0 1px currentColor}
+.chip--shield{color:var(--chrome-hi);border-color:var(--chrome)}
+.chip--shield::before{border:0;width:6px;height:7px;background:currentColor;clip-path:polygon(0 0,100% 0,100% 60%,50% 100%,0 60%)}
+```
+
+### Không làm
+
+- **Không cho lá chắn cộng dồn.** Dựng lần hai lấy giá trị lớn hơn, không cộng vào.
+- **Không cho lá chắn chặn đòn của đồng đội bị chiếm quyền.** `drainBarrier` chạy cho mọi mục tiêu — đó là chủ ý, tường không phân biệt ai đánh.
+- **Không cho `[GIỜ]` giảm.** Không có cách nào lấy lại giờ đã tiêu. Đó là cả nhân vật.

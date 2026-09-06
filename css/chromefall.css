@@ -380,6 +380,10 @@ a{color:inherit;text-decoration:none}
 .chip--guard{color:var(--hp);border-color:var(--hp)}
 .chip--guard::before{border:0;width:6px;height:7px;background:currentColor;
   clip-path:polygon(0 0,100% 0,100% 62%,50% 100%,0 62%)}
+.chip--hours{color:var(--text-3);border-color:var(--line-3)}
+.chip--hours::before{border:0;width:6px;height:6px;border-radius:50%;background:none;box-shadow:inset 0 0 0 1px currentColor}
+.chip--shield{color:var(--chrome-hi);border-color:var(--chrome)}
+.chip--shield::before{border:0;width:6px;height:7px;background:currentColor;clip-path:polygon(0 0,100% 0,100% 60%,50% 100%,0 60%)}
 .chips{display:flex;flex-wrap:wrap;gap:4px}
 
 /* =====================================================================

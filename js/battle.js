@@ -118,6 +118,28 @@ const overloadStacks = u => { const c=u.chips.find(c=>c.label===OVERLOAD.label);
 const MUTE = { label:'MUTE', dmg:.25, src:'echo' };
 /* SỔ — Stitch ghi mọi sát thương đồng đội phải chịu; SUTURE trả sổ rồi xoá.
    Bà phải còn sống mới ghi được, xem docs/mechanics.md */
+const HOURS  = { label:'GIỜ',  src:'meridian' };         // giờ Meridian đã tiêu; chỉ đi lên
+const SHIELD = { label:'TƯỜNG' };                        // lá chắn: ăn sát thương TRƯỚC máu
+const hoursOf = u => { const c=u.chips.find(x=>x.label===HOURS.label); return c?c.val:0; };
+function tickHours(){
+  const m=B.units.find(u=>u.id===HOURS.src && u.side==='ally' && u.alive); if(!m) return;
+  const c=m.chips.find(x=>x.label===HOURS.label);
+  if(c) c.val++; else m.chips.push({ type:'hours', label:HOURS.label, val:1 });
+  updateUnit(m);
+}
+function setBarrier(u, n){
+  u.barrier=Math.max(u.barrier||0, n);
+  const c=u.chips.find(x=>x.label===SHIELD.label);
+  if(c) c.val=u.barrier; else u.chips.push({ type:'shield', label:SHIELD.label, val:u.barrier });
+  updateUnit(u);
+}
+function drainBarrier(u, dmg){
+  if(!u.barrier) return dmg;
+  const soak=Math.min(u.barrier, dmg); u.barrier-=soak;
+  if(u.barrier<=0){ u.barrier=0; removeChip(u,SHIELD.label); }
+  else { const c=u.chips.find(x=>x.label===SHIELD.label); if(c) c.val=u.barrier; updateUnit(u); }
+  return dmg-soak;
+}
 const GUARD = { src:'muzzle' };                          // Muzzle đỡ thay đồng đội; Bà Ba chịu ba đòn
 const guardOf = u => u.chips.find(c=>c.type==='guard');
 function mendGuard(m, n){
@@ -236,9 +258,10 @@ function dealDamage(src, tgt, mult, opts={}){
   const vuln = 1 + overloadStacks(tgt)*OVERLOAD.vuln;
   const hush = src.muted ? (1-MUTE.dmg) : 1;                 // câm thì đánh yếu đi
   const dmg = Math.round(src.atk * mult * v * vuln * hush * (crit?RULES.critMult:1));
-  tgt.hp = Math.max(0, tgt.hp - dmg);
-  if(tgt.side==='ally' && dmg>0) noteLedger(dmg);          // sổ của Stitch
-  spawnNumber(tgt.el.querySelector('.unit__sprite'), dmg, crit?'crit':'');
+  const dealt = drainBarrier(tgt, dmg);                    // TƯỜNG ăn trước máu
+  tgt.hp = Math.max(0, tgt.hp - dealt);
+  if(tgt.side==='ally' && dealt>0) noteLedger(dealt);      // sổ chỉ ghi phần chảy máu thật
+  spawnNumber(tgt.el.querySelector('.unit__sprite'), dealt>0?dealt:dmg, dealt>0?(crit?'crit':''):'heal');
   const mined = tgt.side==='enemy' && hasCharge(tgt);      // đọc TRƯỚC dòng tgt.chips=[]
   const killed = tgt.hp<=0 && tgt.alive;
   if(killed){ tgt.alive=false; tgt.chips=[]; }
@@ -265,6 +288,7 @@ function buildQueue(){
 }
 function newRound(){ B.round++; UI.roundNo.textContent=String(B.round).padStart(2,'0');
   const m=B.units.find(u=>u.id===GUARD.src && u.side==='ally' && u.alive); if(m) mendGuard(m,1);   // Bà Ba hồi 1 lượt chắn
+  tickHours();                                                                                   // Meridian tiêu thêm một giờ
   B.queue=buildQueue(); B.idx=0; startTurn(); }
 /* Ô chân dung trong thanh lượt được tạo một lần rồi tái sử dụng (không reload ảnh mỗi lượt) */
 const turnTiles = new Map();
@@ -381,6 +405,10 @@ async function playerUlt(){
     if(u.ult.mendGuard && u.talent) mendGuard(u, u.talent.guard);
     if(u.ult.ledgerShare){ u.ledger=0; removeChip(u,LEDGER.label); log(`${u.name} trả sổ ${book} → hồi ${amt}/người`, true); }
     else log(`${u.name} hồi máu toàn đội`, true);
+  } else if(k==='barrier'){
+    const amt=Math.round(u.atk*u.ult.mult*(1+hoursOf(u)*(u.ult.perHour||0)));
+    alive('ally').forEach(t=>setBarrier(t,amt));
+    log(`${u.name} dựng vách — lá chắn ${amt}/người (giờ ${hoursOf(u)})`, true);
   } else if(k==='control'){
     const t=ensureTarget(); t.controlled=true; addChip(t,'control','CONTROLLED','1T'); log(`${u.name} chiếm quyền điều khiển ${t.name}`, true);
   }

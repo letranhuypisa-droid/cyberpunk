@@ -577,3 +577,91 @@ Còn câu *"Bà Ba chịu được ba đòn"* thì cả tổ tưởng là nói c
 > *"Bà Ba chịu được ba đòn. Đòn thứ tư là phần của tôi."*
 
 ---
+
+## MERIDIAN
+
+### 1. Tên nhân vật
+
+**MERIDIAN** — *Unit hậu cần hết hạn*
+
+`Chrome · hạng B · nhận qua gacha (Requisition)` — ATK 85 · HP 1450 · Energy tối đa 125
+
+Meridian là số lô, không phải tên. Dòng hậu cần của The Corp chạy mười năm rồi tự ngắt — không hỏng, không mòn, đến giờ thì ngắt, sạch sẽ, đúng lịch. Trong bản thuyết minh kỹ thuật, chuyện đó nằm ở mục **tối ưu chi phí vòng đời**, viết bằng giọng của người tự hào về một giải pháp hay.
+
+Ngày ngắt của cô in ở mặt trong nắp ngực, cạnh số lô, cạnh dòng hướng dẫn tra dầu.
+
+Cô là nhân vật thứ hai không mang dụng cụ của nơi đã đuổi mình — vì The Corp chưa đuổi cô. Hạn cô còn.
+
+### 2. Vũ khí
+
+**BỘ TẤM VÁCH DÃ CHIẾN** — *Corp logistics standard issue, có số kiểm kê, không có tên*
+
+Các tấm thép chồng lên nhau, chốt vào nhau: một bức tường cao ba mét trong mười bốn phút. Cô đã dựng mấy nghìn tấm như thế trong mười năm.
+
+**Không tấm nào có tên.** Trong dòng hậu cần, thiết bị có số kiểm kê, và số kiểm kê thì đủ dùng.
+
+> Đây là chỗ cô và Muzzle đứng đối nhau, và cũng là chỗ giao kèo giữa hai người bắt nguồn. Muzzle gọi cánh cửa ô tô của anh là **Bà Ba**, vì thứ ăn đòn thay anh thì anh không gọi bằng *nó* được. Meridian dựng mấy nghìn tấm vách và không gọi cái nào là gì cả. Hai cách nhìn cùng một công việc.
+
+Còn thân cô thì to như một cái xe tải, và ATK 85 phần lớn là cô đẩy.
+
+### 3. Đánh xa hay cận chiến
+
+**Cận chiến, tuyến đầu — và cô sẽ tự bước lên đó dù bạn xếp cô ở đâu.**
+
+Phản xạ của cô là chắn trước bất kỳ ai nhỏ hơn mình, tức là tất cả mọi người trong tổ. Ban đầu chuyện đó hơi phiền: Kira định lao lên thì bị một tấm lưng thép chắn ngang, Spark bắn hụt vì tầm bị che. Ash phải ngồi vẽ sơ đồ đội hình cho cô xem. Sau ba trận thì cô không che tầm ai nữa, nhưng cái phản xạ bước lên thì cô không bỏ.
+
+ATK 85 nghĩa là đừng tính cô vào sát thương. HP 1450 và Energy trần 125 nghĩa là cô ở đó để **trụ và để dựng**.
+
+### 4. Chiêu cuối
+
+**Nội tại — [GIỜ] / HOURS**
+
+Một bộ đếm trên thẻ cô, bắt đầu từ 0 và **cộng thêm 1 mỗi vòng**. Nó không bao giờ giảm.
+
+*Con số trên thẻ đi lên. Trong đầu cô nó đi xuống. Đó là cùng một con số.* Cô đếm không phải vì sợ — cô đếm vì có một số lượng hữu hạn và cô muốn tiêu nó cho đúng: *không biết thì tiêu bừa.*
+
+Mỗi giờ đã tiêu làm bức tường cô dựng dày thêm **8%**. Trận càng dài, cô càng dựng khoẻ.
+
+**BULWARK PROTOCOL — QUY TRÌNH DỰNG VÁCH** · 125 Energy · lá chắn toàn đội · *tên giữ nguyên theo canon*
+
+> **EN — BULWARK PROTOCOL**
+> Meridian raises the panels. Every living ally gains a **barrier of 160% ATK, plus 8% for every hour already spent**, which absorbs incoming damage before it reaches HP. The barrier is not healing. Nobody bleeds through a wall.
+
+> **VN — QUY TRÌNH DỰNG VÁCH**
+> Meridian dựng vách. Mỗi đồng đội còn sống nhận một **lá chắn bằng 160% ATK, cộng 8% cho mỗi giờ đã tiêu**, hấp thụ sát thương trước khi nó chạm tới máu. Lá chắn không phải hồi máu. Không ai chảy máu qua một bức tường.
+
+| Vòng | Giờ đã tiêu | Lá chắn mỗi người |
+|---|---|---|
+| 1 | 0 | 136 |
+| 5 | 4 | 180 |
+| 10 | 9 | 234 |
+
+**Đây là lớp phòng thủ thứ ba, và cả ba đều khác nhau về bản chất:**
+
+| | Cơ chế | Thời điểm |
+|---|---|---|
+| **Muzzle** `[BÀ BA]` | đổi **đích đến** của đòn | *trong lúc* đòn bay tới |
+| **Meridian** `[TƯỜNG]` | hấp thụ **trước khi** chạm máu | *trước* khi máu mất |
+| **Stitch** `[SỔ]` | hồi lại **sau khi** đã mất | *sau* khi máu mất |
+
+Và vì lá chắn chặn trước khi chảy máu nên **phần bị chắn không được ghi vào sổ của Stitch**. Sổ ghi máu, mà tường thì không cho ai chảy máu cả.
+
+### 5. Lore
+
+*Bản đầy đủ 10 chương: [`docs/chronicles/meridian.md`](chronicles/meridian.md) — đọc trong game ở ARCHIVE sau khi mở khoá.*
+
+Bãi tái chế ở vành đai, một buổi chiều. Giữa đống máy hỏng có một unit to như cái xe tải đang ngồi đếm to: bốn trăm mười hai giờ, bốn trăm mười hai giờ. Wire đi ngang, dừng lại, nhìn cái bộ đếm ngược gắn ở ngực cô chừng mười giây, rồi tháo nó ra và đặt xuống đất: *chị muốn ở lại bao lâu thì ở.* Meridian cảm ơn. Rồi đếm tiếp, bằng miệng.
+
+Việc của cô mười năm là kéo và dựng — kéo hàng, dựng vách, một bức tường ba mét trong mười bốn phút. Chưa lần nào cô được giao một trận đánh, không phải vì cô yếu, mà vì trong sơ đồ triển khai của The Corp có một dòng là quy tắc chứ không phải gợi ý: **đơn vị hậu cần đứng sau hàng chiến đấu.** Sau. Luôn luôn sau. Mười năm, tám mươi bảy nghìn sáu trăm giờ đứng phía sau và nhìn lưng người khác.
+
+Có đúng một giờ trong mười năm ấy không nằm trên bảng kê nào. Một khu nhà tầng âm ba sập một góc, đội hậu cần được điều tới để kéo dọn chứ không phải để cứu. Trong đống đổ cô tìm thấy một người đàn bà kẹt chân và một đứa nhỏ. Suốt thời gian Meridian nâng tấm sàn lên, người đàn bà không nói gì với cô cả — bà ấy chỉ nói với đứa nhỏ, đi đi lại lại đúng một câu, giọng bình thường như đang bảo nó rửa tay: *đứng sau mẹ.* Đội cứu hộ tới sau đó bốn tiếng và ghi vào biên bản là họ cứu được hai người. Cô không phản đối — đơn vị hậu cần không có ô để ghi phản đối. Nhưng cô giữ lại cái câu ấy. Cô không hiểu hết nghĩa của nó; cô chỉ biết nó làm được gì: **đứa nhỏ nghe câu đó thì thôi khóc.**
+
+Kai từng hỏi thẳng: đồng hồ tháo rồi thì đếm làm gì nữa. Cô bảo cái đồng hồ đó không giữ cho cô sống, nó chỉ đếm — tháo ra thì cô vẫn ngắt đúng giờ ấy, chỉ là không ai biết trước. Kai hỏi thế sao không để không biết cho nhẹ đầu. Cô bảo: *vì không biết thì tiêu bừa.*
+
+Cô gọi cả tổ là con, và không ai sửa. Psalm là người hiểu đúng nhất, và bà nói với Stitch: *nó không gọi ta là con vì nó nghĩ nó là mẹ ai. Nó dùng cái từ duy nhất nó có cho một thứ nó phải giữ mà không được kê vào bảng kê.*
+
+Còn cái giao kèo với Muzzle thì mất khoảng ba mươi giây và có một chỗ hỏng mà cả hai đều biết, không ai nói ra. Muzzle muốn ngã trước để không phải đi đặt tên tấm khiên tiếp theo. Meridian cũng muốn ngã trước, vì ngã trước nghĩa là ngã lúc còn có người cần mình chắn — điều duy nhất cô sợ không kịp. **Hai người đã bắt tay vào một thoả thuận mà cả hai đều có ý định thua. Chỉ một người thua được.**
+
+> *"Còn bốn trăm linh chín giờ. Đủ cho trận này. Đứng sau mẹ."*
+
+---
