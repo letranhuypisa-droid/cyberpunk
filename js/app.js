@@ -138,9 +138,22 @@ function openLore(id){
   $('#loreBody').innerHTML = stats + `
     <div class="lore__sec"><span class="lbl">Tiểu sử</span><p class="lead">${L.profile}</p></div>
     <div class="lore__sec"><span class="lbl">Câu chuyện</span>${L.story.split('\n\n').map(x=>`<p>${x}</p>`).join('')}</div>
-    <div class="lore__sec"><p class="voice">${L.voice}</p></div>`;
+    <div class="lore__sec"><p class="voice">${L.voice}</p></div>
+    ${L.chronicle?`<button class="btn-act btn-act--go lore__read" id="loreRead"><span class="btn-act__k">Ngoại truyện</span><span class="btn-act__v">${L.chronicleTitle} · ${L.chronicle.length} chương</span></button>`:''}`;
   $('#loreBody').scrollTop=0; box.hidden=false;
+  const rd=$('#loreRead'); if(rd) rd.addEventListener('click',()=>{ sfx('open',.5); openChronicle(id); });
   const up=$('#loreUp'); if(up) up.addEventListener('click',()=>{ const r=upgrade(id); if(r==='ok'){ sfx('open',.5); renderWallet(); const sc=$('#loreBody').scrollTop; openLore(id); $('#loreBody').scrollTop=sc; } else sfx('error',.4); });
+}
+/* Ngoại truyện: bài dài đọc trong chính panel hồ sơ, quay lại được */
+function openChronicle(id){
+  const L=LORE[id]; if(!L||!L.chronicle) return;
+  const body=$('#loreBody');
+  body.innerHTML = `<button class="btn-ghost chron__back" id="loreBack">\u25c2 H\u1ed2 S\u01a0</button>
+    <div class="chron"><b class="chron__t">${L.chronicleTitle}</b>`
+    + L.chronicle.map(c=>`<section class="chron__ch"><span class="lbl">${c.t}</span>${c.p.map(x=>`<p>${x}</p>`).join('')}</section>`).join('')
+    + `</div>`;
+  body.scrollTop=0;
+  $('#loreBack').addEventListener('click',()=>{ sfx('cancel',.5); openLore(id); });
 }
 $('#loreClose').addEventListener('click',()=>{ $('#lore').hidden=true; });
 /* Đổi tên Operator: chạm vào tên ở Lobby */
