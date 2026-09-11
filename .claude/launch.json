@@ -1,0 +1,101 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "static",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8765",
+        "--bind",
+        "127.0.0.1"
+      ],
+      "port": 8765
+    },
+    {
+      "name": "static-fx",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8766",
+        "--bind",
+        "127.0.0.1"
+      ],
+      "port": 8766
+    },
+    {
+      "name": "static-art",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8768",
+        "--bind",
+        "127.0.0.1"
+      ],
+      "port": 8768
+    },
+    {
+      "name": "static-docs",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8781",
+        "--bind",
+        "127.0.0.1"
+      ],
+      "port": 8781
+    },
+    {
+      "name": "static-lore",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8790",
+        "--bind",
+        "127.0.0.1"
+      ],
+      "port": 8790
+    },
+    {
+      "name": "static-codex",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8793",
+        "--bind",
+        "127.0.0.1"
+      ],
+      "port": 8793
+    },
+    {
+      "name": "static-sfx",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8791",
+        "--bind",
+        "127.0.0.1"
+      ],
+      "port": 8791
+    },
+    {
+      "name": "static-foeult",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8767",
+        "--bind",
+        "127.0.0.1"
+      ],
+      "port": 8767
+    }
+  ]
+}

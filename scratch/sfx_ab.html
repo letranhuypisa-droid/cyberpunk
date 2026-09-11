@@ -1,0 +1,127 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>CHROMEFALL — nghe đối chiếu SFX (đợt 2 · 11/09)</title>
+<!-- Trang nghe A/B: bấm hai nút cạnh nhau để so bản đang dùng với bản kia.
+     Mở bằng: preview static-sfx (cổng 8791) → /scratch/sfx_ab.html
+     Âm lượng mỗi nút đã bù theo đỉnh dBFS của chính file đó (data-peak) nên hai bản nghe cùng cỡ,
+     không bị "cái nào to hơn thì hay hơn". Bảng và lý do: docs/sfx-prompts.md §8. -->
+<style>
+  :root{ color-scheme:dark; --line:#2a2f3a; --dim:#8a93a6; --hot:#ff6b3d; --cold:#4dd2ff; }
+  body{ background:#0d1015; color:#e6e9ef; font:14px/1.55 ui-sans-serif,system-ui,'Segoe UI',sans-serif; margin:0; padding:28px 22px 60px; }
+  h1{ font-size:19px; letter-spacing:.06em; margin:0 0 4px; }
+  h2{ font-size:15px; letter-spacing:.08em; margin:34px 0 10px; padding-bottom:6px; border-bottom:1px solid var(--line); }
+  p{ max-width:78ch; color:#c3cad6; }
+  .dim{ color:var(--dim); }
+  table{ border-collapse:collapse; width:100%; max-width:1100px; }
+  th,td{ text-align:left; padding:7px 10px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th{ color:var(--dim); font-weight:600; font-size:12px; letter-spacing:.08em; text-transform:uppercase; }
+  td.slot{ font-weight:700; letter-spacing:.04em; white-space:nowrap; }
+  button{ font:inherit; font-size:13px; padding:5px 12px; border-radius:5px; cursor:pointer; white-space:nowrap;
+          background:#161b24; color:#e6e9ef; border:1px solid var(--line); }
+  button:hover{ border-color:#4a5466; }
+  button.now{ border-color:var(--cold); color:var(--cold); }
+  button.alt{ border-color:var(--hot); color:var(--hot); }
+  button.playing{ background:#22293a; }
+  code{ background:#161b24; border:1px solid var(--line); border-radius:4px; padding:1px 6px; font-size:12.5px; }
+  .cmd{ display:block; margin-top:4px; color:var(--dim); }
+</style>
+
+<h1>NGHE ĐỐI CHIẾU SFX — đợt 2 (11/09)</h1>
+<p><b class="dim">Xanh</b> = tiếng đang chạy trong game. <b style="color:var(--hot)">Cam</b> = bản kia. Hai nút đã được
+cân về cùng mức to nhỏ để so cho công bằng — trong game thì âm lượng theo số <code>vol</code> ở
+<code>js/audio.js</code>, không theo trang này.</p>
+
+<h2>A · TÁM TIẾNG ĐÃ THAY (+ bản 2 của đòn thường)</h2>
+<p>Nghe lại để xác nhận. Không ưng cái nào thì nói tên, tôi trả về bản cũ bằng một lệnh
+(<code>MAP</code> trong <code>scratch/sfx_install.py</code> → chạy lại script).</p>
+<table id="tblA"></table>
+
+<h2>B · NĂM TIẾNG CHƯA THAY + MỘT CÁI TÔI KHUYÊN ĐỪNG</h2>
+<p>File mới có ứng viên nhưng bản đang dùng hợp quy cách hơn (xem cột lý do). Bạn nghe thấy bản mới hay hơn
+thì bảo tôi, hoặc tự chạy lệnh dưới mỗi dòng.</p>
+<table id="tblB"></table>
+
+<h2>C · CHƯA CÓ CHỖ DÙNG</h2>
+<p>Năm file không khớp tiếng nào trong game hiện tại. Muốn dùng thì phải thêm chỗ gọi trong code —
+xem <code>docs/sfx-prompts.md</code> §8.</p>
+<table id="tblC"></table>
+
+<script>
+/* [tên, khi nào kêu, {file,peak} đang dùng, {file,peak} bản kia, ghi chú] */
+const A = [
+  ['cursor','nút phụ, thẻ, lật thẻ thường, bong bóng truyện', ['../audio/cursor.ogg',0.0], ['../audio/jdsherbert/cursor.ogg',-14.5],
+   'click.mp3 · 0,25 s (đích 0,15) — bỏ được một file mượn'],
+  ['select','ATTACK, ULT, nút menu, dòng chọn màn', ['../audio/select.ogg',0.0], ['../audio/jdsherbert/select.ogg',-2.1],
+   'select 2.mp3 · 0,77 s so với 0,88 s — bỏ được một file mượn'],
+  ['open','mở hộp video, nhận thưởng ngày, lật thẻ tier S', ['../audio/open.ogg',0.0], ['../audio/jdsherbert/open.ogg',-5.8],
+   'select.mp3 · 1,40 s so với 1,42 s, cùng dải sáng — bỏ được một file mượn'],
+  ['heal','được hồi máu (Psalm, nghỉ giữa wave)', ['../audio/heal.ogg',-0.2], ['../art-src/SFX/heal_v1.mp3',-12.2],
+   'bản cũ 2,25 s và đỉnh tiếng rơi ở giây 1,70 — kêu xong thì số máu đã bay mất rồi. Bản mới 1,32 s, đỉnh ở 0,35 s'],
+  ['explode','mìn FLASHOVER của Ash · lá chắn vỡ', ['../audio/explode.ogg',0.0], ['../art-src/SFX/explode.mp3',-0.1],
+   'đuôi vang 0,90 s so với 1,56 s — đòn diện rộng đánh 3 địch liên tiếp nên đuôi ngắn mới sạch'],
+  ['upgrade','nâng cấp CR xong', ['../audio/upgrade.ogg',0.0], ['../art-src/SFX/upgrade.mp3',-2.2],
+   'level up.mp3 · 0,91 s (đích 0,8) so với 1,08 s'],
+  ['victory','bảng THẮNG', ['../audio/victory.ogg',0.0], ['../art-src/SFX/victory.mp3',0.0],
+   'win.mp3 · 1,32 s so với 1,38 s — đổi theo ý bạn đặt tên file, không phải vì bản cũ sai cỡ'],
+  ['wave','banner WAVE 02 · ĐỢT ĐỊCH MỚI', ['../audio/wave.ogg',0.0], ['../art-src/SFX/wave_v1.mp3',-5.8],
+   'wave.mp3 · 0,57 s, một nhịp gọn thay cho 1,18 s tiếng nhiễu kéo dài'],
+  ['hit / hit2','đòn thường — đợt 3 bốc ngẫu nhiên một trong hai bản', ['../audio/hit.ogg',-1.0], ['../audio/hit2.ogg',0.0],
+   'bản 2 lấy từ attack.mp3 của bạn (0,78 s so với 0,42 s). Bấm qua lại hai nút để nghe cặp này có hợp nhau không — thấy lệch quá thì bỏ bản 2 hoặc đổi bản khác'],
+];
+const B = [
+  ['crit','đòn chí mạng', ['../audio/crit.ogg',-0.9], ['../art-src/SFX/attack.mp3',0.0],
+   'attack.mp3 giờ đang là bản 2 của đòn thường (hit2). Nếu nghe thấy nó "đắt" hơn thì chuyển hẳn sang crit cũng được: 0,74 s so với 0,66 s, cùng cỡ', "'crit': 'attack'"],
+  ['ult','mở màn chiêu cuối (chớp sân + video holo)', ['../audio/ult.ogg',0.0], ['../art-src/SFX/hero skill.mp3',-3.0],
+   'bản đang dùng là tiếng nạp rồi mới nổ (đỉnh ở 1,36 s) — đúng ý đồ cut-in. hero skill.mp3 dồn hết vào đầu', "'ult': 'hero skill'"],
+  ['ready','Energy đầy, chiêu cuối mở khoá', ['../audio/ready.ogg',0.0], ['../art-src/SFX/gain.mp3',-7.3],
+   'bản đang dùng 2,25 s, đỉnh ở 1,66 s — lệch quy cách nhất bộ (đích 0,5 s), nhưng hôm 11/09 bạn dặn giữ nguyên nên tôi không tự đổi', "'ready': 'gain'"],
+  ['shock','súng điện Kai, drone, APOSTASY của Psalm', ['../audio/shock.ogg',0.0], ['../art-src/SFX/plasma.mp3',-3.0],
+   'plasma.mp3 0,92 s so với 0,63 s. Từ đợt 3 tiếng này thay hẳn cho tiếng đấm chứ không đè lên nữa, nên dài hơn cũng không bết — nghe rồi quyết', "'shock': 'plasma'"],
+  ['burn','dính cháy và mỗi lượt cháy trừ máu', ['../audio/burn.ogg',0.0], ['../art-src/SFX/fire.mp3',-1.7],
+   'fire.mp3 0,91 s so với 0,49 s. burn kêu MỖI LƯỢT khi còn dính nên càng ngắn càng đỡ mệt tai (fire 2 cũng vậy: 0,96 s)', "'burn': 'fire'"],
+  ['kia','một unit gục — cả ta lẫn địch', ['../audio/kia.ogg',0.0], ['../art-src/SFX/male die.mp3',-1.4],
+   'tiếng rên của đàn ông: kia còn kêu cho drone, cho máy, và cho Yuki/Psalm/Echo/Vesper. Muốn dùng thì phải tách tiếng gục theo từng unit — code chưa có', "'kia': 'male die'"],
+];
+const C = [
+  ['electric.mp3','5,10 s — dài gấp 8 lần shock, không nhét vào chỗ nào được'],
+  ['iced.mp3','game không có trạng thái đóng băng (chỉ có choáng · độc · cháy)'],
+  ['dark magic.mp3 · dark magic 2.mp3','1,53 s. Chỗ hợp nhất là fx <code>zero</code> — nhát chém ZERO của Yuki hiện đang câm vì chưa có <code>AUDIO.zero()</code>'],
+  ['gun.mp3','tiếng súng riêng cho Muzzle/Kai: đòn thường chưa tách tiếng theo nhân vật (cùng cảnh với laser gun.m4a để dành từ 11/09)'],
+  ['male die 2 · 3 · 4.mp3','đợt 3 đã có cơ chế nhiều bản (<code>SFX_VARIANTS</code>) nên dùng được ngay — nhưng vẫn vướng chỗ cũ: <code>kia</code> kêu cho cả drone, máy móc và Yuki/Psalm/Echo/Vesper'],
+];
+
+let cur=null;
+function play(btn, src, peak, floor){
+  if(cur){ cur.a.pause(); cur.b.classList.remove('playing'); }
+  const a=new Audio(src); a.volume=Math.min(1, Math.pow(10,(floor-peak)/20));
+  a.onerror=()=>{ btn.textContent='THIẾU FILE'; btn.classList.remove('playing'); };
+  a.play().catch(e=>{ if(e.name!=='AbortError') btn.textContent='LỖI'; });   // bấm nút khác = cắt ngang, không phải lỗi
+  btn.classList.add('playing'); cur={a,b:btn};
+  a.onended=()=>btn.classList.remove('playing');
+}
+function cell(label, cls, src, peak, floor){
+  const b=document.createElement('button'); b.className=cls; b.textContent=label;
+  b.onclick=()=>play(b,src,peak,floor);
+  const td=document.createElement('td'); td.appendChild(b); return td;
+}
+function build(tbl, rows, withCmd){
+  tbl.innerHTML='<tr><th>tiếng</th><th>kêu khi nào</th><th>đang dùng</th><th>bản kia</th><th>vì sao</th></tr>';
+  rows.forEach(r=>{
+    const [name,when,now,alt,why,cmd]=r, floor=Math.min(now[1],alt[1]);
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td class="slot">${name}</td><td class="dim">${when}</td>`;
+    tr.appendChild(cell('▶ ĐANG DÙNG','now',now[0],now[1],floor));
+    tr.appendChild(cell('▶ '+alt[0].split('/').pop(),'alt',alt[0],alt[1],floor));
+    const td=document.createElement('td'); td.innerHTML=why+(withCmd&&cmd
+      ? `<span class="cmd">đổi: sửa <code>MAP</code> thành <code>${cmd.replace(/'/g,'&#39;')}</code> rồi chạy
+         <code>python scratch/sfx_install.py ${name}</code></span>` : '');
+    tr.appendChild(td); tbl.appendChild(tr);
+  });
+}
+build(document.getElementById('tblA'), A, false);
+build(document.getElementById('tblB'), B, true);
+const tc=document.getElementById('tblC');
+tc.innerHTML='<tr><th>file</th><th>vì sao chưa dùng</th></tr>';
+C.forEach(([f,why])=>{ const tr=document.createElement('tr');
+  tr.innerHTML=`<td class="slot">${f}</td><td class="dim">${why}</td>`; tc.appendChild(tr); });
+</script>

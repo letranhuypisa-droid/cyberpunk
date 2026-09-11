@@ -1,0 +1,826 @@
+{
+ "yuki": {
+  "idle": {
+   "file": "art/sprite/yuki_idle.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  },
+  "attack": {
+   "file": "art/sprite/yuki_attack.png",
+   "box": {
+    "w": 844,
+    "h": 682,
+    "ax": 422
+   }
+  },
+  "crit": {
+   "file": "art/sprite/yuki_crit.png",
+   "box": {
+    "w": 829,
+    "h": 682,
+    "ax": 414
+   }
+  },
+  "hurt": {
+   "file": "art/sprite/yuki_hurt.png",
+   "box": {
+    "w": 924,
+    "h": 682,
+    "ax": 641
+   }
+  },
+  "die": {
+   "file": "art/sprite/yuki_die.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  }
+ },
+ "psalm": {
+  "idle": {
+   "file": "art/sprite/psalm_idle.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  },
+  "attack": {
+   "file": "art/sprite/psalm_attack.png",
+   "box": {
+    "w": 852,
+    "h": 682,
+    "ax": 426
+   }
+  },
+  "crit": {
+   "file": "art/sprite/psalm_crit.png",
+   "box": {
+    "w": 899,
+    "h": 682,
+    "ax": 449
+   }
+  },
+  "hurt": {
+   "file": "art/sprite/psalm_hurt.png",
+   "box": {
+    "w": 811,
+    "h": 682,
+    "ax": 382
+   }
+  },
+  "die": {
+   "file": "art/sprite/psalm_die.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  }
+ },
+ "ash": {
+  "idle": {
+   "file": "art/sprite/ash_idle.png",
+   "box": {
+    "w": 796,
+    "h": 682,
+    "ax": 521
+   }
+  },
+  "attack": {
+   "file": "art/sprite/ash_attack.png",
+   "box": {
+    "w": 1179,
+    "h": 682,
+    "ax": 385
+   }
+  },
+  "hurt": {
+   "file": "art/sprite/ash_hurt.png",
+   "box": {
+    "w": 861,
+    "h": 682,
+    "ax": 574
+   }
+  },
+  "die": {
+   "file": "art/sprite/ash_die.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  }
+ },
+ "kai": {
+  "idle": {
+   "file": "art/sprite/kai_idle.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  },
+  "attack": {
+   "file": "art/sprite/kai_attack.png",
+   "box": {
+    "w": 1031,
+    "h": 682,
+    "ax": 515
+   }
+  },
+  "crit": {
+   "file": "art/sprite/kai_crit.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  },
+  "hurt": {
+   "file": "art/sprite/kai_hurt.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  }
+ },
+ "ronin": {
+  "idle": {
+   "file": "art/sprite/ronin_idle.png",
+   "box": null
+  },
+  "attack": {
+   "file": "art/sprite/ronin_attack.png",
+   "box": null
+  }
+ },
+ "muzzle": {
+  "idle": {
+   "file": "art/sprite/muzzle_idle.png",
+   "box": null
+  },
+  "attack": {
+   "file": "art/sprite/muzzle_attack.png",
+   "box": null
+  }
+ },
+ "echo": {
+  "idle": {
+   "file": "art/sprite/echo_idle.png",
+   "box": null
+  },
+  "attack": {
+   "file": "art/sprite/echo_attack.png",
+   "box": null
+  }
+ },
+ "wire": {
+  "idle": {
+   "file": "art/sprite/wire_idle.png",
+   "box": null
+  },
+  "attack": {
+   "file": "art/sprite/wire_attack.png",
+   "box": null
+  }
+ },
+ "stitch": {
+  "idle": {
+   "file": "art/sprite/stitch_idle.png",
+   "box": null
+  },
+  "attack": {
+   "file": "art/sprite/stitch_attack.png",
+   "box": null
+  }
+ },
+ "vesper": {
+  "idle": {
+   "file": "art/sprite/vesper_idle.png",
+   "box": null
+  },
+  "attack": {
+   "file": "art/sprite/vesper_attack.png",
+   "box": null
+  },
+  "hurt": {
+   "file": "art/sprite/vesper_hurt.png",
+   "box": null
+  }
+ },
+ "nyx": {
+  "idle": {
+   "file": "art/sprite/nyx_idle.png",
+   "box": null
+  },
+  "attack": {
+   "file": "art/sprite/nyx_attack.png",
+   "box": null
+  },
+  "hurt": {
+   "file": "art/sprite/nyx_hurt.png",
+   "box": null
+  }
+ },
+ "halo": {
+  "idle": {
+   "file": "art/sprite/halo_idle.png",
+   "box": null
+  },
+  "attack": {
+   "file": "art/sprite/halo_attack.png",
+   "box": null
+  },
+  "hurt": {
+   "file": "art/sprite/halo_hurt.png",
+   "box": null
+  }
+ },
+ "cipher": {
+  "idle": {
+   "file": "art/sprite/cipher_idle.png",
+   "box": null
+  },
+  "attack": {
+   "file": "art/sprite/cipher_attack.png",
+   "box": null
+  },
+  "hurt": {
+   "file": "art/sprite/cipher_hurt.png",
+   "box": null
+  }
+ },
+ "meridian": {
+  "idle": {
+   "file": "art/sprite/meridian_idle.png",
+   "box": null
+  },
+  "attack": {
+   "file": "art/sprite/meridian_attack.png",
+   "box": null
+  },
+  "hurt": {
+   "file": "art/sprite/meridian_hurt.png",
+   "box": null
+  }
+ },
+ "toll": {
+  "idle": {
+   "file": "art/sprite/toll_idle.png",
+   "box": null
+  },
+  "attack": {
+   "file": "art/sprite/toll_attack.png",
+   "box": null
+  },
+  "hurt": {
+   "file": "art/sprite/toll_hurt.png",
+   "box": null
+  }
+ },
+ "spark": {
+  "idle": {
+   "file": "art/sprite/spark_idle.png",
+   "box": null
+  },
+  "attack": {
+   "file": "art/sprite/spark_attack.png",
+   "box": null
+  },
+  "hurt": {
+   "file": "art/sprite/spark_hurt.png",
+   "box": null
+  }
+ },
+ "vixen": {
+  "idle": {
+   "file": "art/sprite/vixen_idle.png",
+   "box": null
+  },
+  "attack": {
+   "file": "art/sprite/vixen_attack.png",
+   "box": null
+  },
+  "hurt": {
+   "file": "art/sprite/vixen_hurt.png",
+   "box": null
+  }
+ },
+ "junker": {
+  "idle": {
+   "file": "art/sprite/junker_idle.png",
+   "box": null
+  },
+  "attack": {
+   "file": "art/sprite/junker_attack.png",
+   "box": null
+  },
+  "hurt": {
+   "file": "art/sprite/junker_hurt.png",
+   "box": null
+  }
+ },
+ "gravedigger": {
+  "idle": {
+   "file": "art/sprite/gravedigger_idle.png",
+   "box": null
+  },
+  "attack": {
+   "file": "art/sprite/gravedigger_attack.png",
+   "box": null
+  },
+  "hurt": {
+   "file": "art/sprite/gravedigger_hurt.png",
+   "box": null
+  }
+ },
+ "scav": {
+  "idle": {
+   "file": "art/sprite/scav_idle.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  },
+  "attack": {
+   "file": "art/sprite/scav_attack.png",
+   "box": {
+    "w": 954,
+    "h": 682,
+    "ax": 477
+   }
+  },
+  "crit": {
+   "file": "art/sprite/scav_crit.png",
+   "box": {
+    "w": 744,
+    "h": 705,
+    "ax": 372
+   }
+  }
+ },
+ "rigger": {
+  "idle": {
+   "file": "art/sprite/rigger_idle.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  },
+  "attack": {
+   "file": "art/sprite/rigger_attack.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  },
+  "crit": {
+   "file": "art/sprite/rigger_crit.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  },
+  "die": {
+   "file": "art/sprite/rigger_die.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  }
+ },
+ "straydog": {
+  "idle": {
+   "file": "art/sprite/straydog_idle.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  },
+  "attack": {
+   "file": "art/sprite/straydog_attack.png",
+   "box": {
+    "w": 896,
+    "h": 682,
+    "ax": 448
+   }
+  },
+  "crit": {
+   "file": "art/sprite/straydog_crit.png",
+   "box": {
+    "w": 840,
+    "h": 682,
+    "ax": 420
+   }
+  }
+ },
+ "welder": {
+  "idle": {
+   "file": "art/sprite/welder_idle.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  },
+  "die": {
+   "file": "art/sprite/welder_die.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  }
+ },
+ "gutterrat": {
+  "idle": {
+   "file": "art/sprite/gutterrat_idle.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  }
+ },
+ "chopshop": {
+  "idle": {
+   "file": "art/sprite/chopshop_idle.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  },
+  "attack": {
+   "file": "art/sprite/chopshop_attack.png",
+   "box": {
+    "w": 813,
+    "h": 682,
+    "ax": 406
+   }
+  },
+  "crit": {
+   "file": "art/sprite/chopshop_crit.png",
+   "box": {
+    "w": 836,
+    "h": 682,
+    "ax": 418
+   }
+  }
+ },
+ "tinman": {
+  "idle": {
+   "file": "art/sprite/tinman_idle.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  },
+  "attack": {
+   "file": "art/sprite/tinman_attack.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  },
+  "crit": {
+   "file": "art/sprite/tinman_crit.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  }
+ },
+ "slagger": {
+  "idle": {
+   "file": "art/sprite/slagger_idle.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  },
+  "attack": {
+   "file": "art/sprite/slagger_attack.png",
+   "box": {
+    "w": 755,
+    "h": 682,
+    "ax": 377
+   }
+  },
+  "crit": {
+   "file": "art/sprite/slagger_crit.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  }
+ },
+ "pipefitter": {
+  "idle": {
+   "file": "art/sprite/pipefitter_idle.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  }
+ },
+ "hollow": {
+  "idle": {
+   "file": "art/sprite/hollow_idle.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  }
+ },
+ "glassjaw": {
+  "idle": {
+   "file": "art/sprite/glassjaw_idle.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  },
+  "attack": {
+   "file": "art/sprite/glassjaw_attack.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  },
+  "crit": {
+   "file": "art/sprite/glassjaw_crit.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  }
+ },
+ "drone": {
+  "idle": {
+   "file": "art/sprite/drone_idle.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  },
+  "die": {
+   "file": "art/sprite/drone_die.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  }
+ },
+ "bulwark": {
+  "idle": {
+   "file": "art/sprite/bulwark_idle.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  },
+  "die": {
+   "file": "art/sprite/bulwark_die.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  }
+ },
+ "kiln": {
+  "idle": {
+   "file": "art/sprite/kiln_idle.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  },
+  "attack": {
+   "file": "art/sprite/kiln_attack.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  },
+  "crit": {
+   "file": "art/sprite/kiln_crit.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  }
+ },
+ "drillbit": {
+  "idle": {
+   "file": "art/sprite/drillbit_idle.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  },
+  "attack": {
+   "file": "art/sprite/drillbit_attack.png",
+   "box": {
+    "w": 1512,
+    "h": 682,
+    "ax": 756
+   }
+  },
+  "crit": {
+   "file": "art/sprite/drillbit_crit.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  },
+  "die": {
+   "file": "art/sprite/drillbit_die.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  }
+ },
+ "enforcer": {
+  "idle": {
+   "file": "art/sprite/enforcer_idle.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  },
+  "attack": {
+   "file": "art/sprite/enforcer_attack.png",
+   "box": {
+    "w": 752,
+    "h": 682,
+    "ax": 376
+   }
+  },
+  "crit": {
+   "file": "art/sprite/enforcer_crit.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  },
+  "die": {
+   "file": "art/sprite/enforcer_die.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  }
+ },
+ "chromehound": {
+  "idle": {
+   "file": "art/sprite/chromehound_idle.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  }
+ },
+ "foreman": {
+  "idle": {
+   "file": "art/sprite/foreman_idle.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  },
+  "die": {
+   "file": "art/sprite/foreman_die.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  }
+ },
+ "motherrust": {
+  "idle": {
+   "file": "art/sprite/motherrust_idle.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  },
+  "die": {
+   "file": "art/sprite/motherrust_die.png",
+   "box": {
+    "w": 857,
+    "h": 682,
+    "ax": 428
+   }
+  }
+ },
+ "archon": {
+  "idle": {
+   "file": "art/sprite/archon_idle.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  },
+  "attack": {
+   "file": "art/sprite/archon_attack.png",
+   "box": {
+    "w": 787,
+    "h": 682,
+    "ax": 393
+   }
+  },
+  "crit": {
+   "file": "art/sprite/archon_crit.png",
+   "box": {
+    "w": 863,
+    "h": 682,
+    "ax": 431
+   }
+  },
+  "die": {
+   "file": "art/sprite/archon_die.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  }
+ },
+ "cantor": {
+  "idle": {
+   "file": "art/sprite/cantor_idle.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  },
+  "attack": {
+   "file": "art/sprite/cantor_attack.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  },
+  "crit": {
+   "file": "art/sprite/cantor_crit.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  },
+  "die": {
+   "file": "art/sprite/cantor_die.png",
+   "box": {
+    "w": 744,
+    "h": 682,
+    "ax": 372
+   }
+  }
+ }
+}

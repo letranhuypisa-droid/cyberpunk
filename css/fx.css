@@ -1,0 +1,163 @@
+/* =====================================================================
+   FX — overlay hiệu ứng trên sprite (js/fx.js) + hộp holo video chiêu cuối (js/battle.js → playHolo).
+   Tách khỏi chromefall.css để dễ thay: mỗi hiệu ứng là một khối .fx--<kind>. Ảnh thật (art/fx/<kind>.webp) thay
+   placeholder qua .fx--sheet. Nạp sau chromefall.css ở index.html và kit.html.
+   ===================================================================== */
+
+/* ---- Lớp chứa: nằm trong .unit__pose nên đi theo sprite khi lao tới / nhấp nhô ---- */
+.unit__fx{position:absolute;inset:0;pointer-events:none;z-index:3}
+.fx{position:absolute;left:50%;top:var(--fy,48%);width:var(--fw,110%);aspect-ratio:1;transform:translate(-50%,-50%);pointer-events:none;container-type:inline-size}
+.fx--flip{transform:translate(-50%,-50%) scaleX(-1)}
+.fx b{display:block}
+/* Ảnh thật: sprite sheet, JS đổi --fxpos từng frame */
+.fx--sheet{background:var(--fxsheet) no-repeat;background-size:var(--fxsize);background-position:var(--fxpos)}
+.fx--sheet b,.fx--sheet::before,.fx--sheet::after{display:none;content:none}
+
+/* ---- HIT: một nhát chém trắng + loé sáng ---- */
+.fx--hit b{position:absolute;left:-8%;top:47%;width:116%;height:6%;--r:-30deg;transform-origin:50% 50%;
+  background:linear-gradient(90deg,transparent,#fff 28% 72%,transparent);filter:drop-shadow(0 0 5px #fff);
+  animation:fx-slash 300ms var(--ease-hit-out) forwards}
+.fx--hit::after{content:"";position:absolute;inset:28%;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.95),rgba(255,255,255,0) 62%);animation:fx-burst 360ms ease-out forwards}
+
+/* ---- CRIT: hai nhát chéo màu vàng chí mạng + vòng loé. Placeholder — thả art/fx/crit.webp là thay ---- */
+.fx--crit b,.fx--crit b::after{position:absolute;left:-10%;top:47%;width:120%;height:7%;transform-origin:50% 50%;
+  background:linear-gradient(90deg,transparent,var(--crit) 22% 78%,transparent);filter:drop-shadow(0 0 7px var(--crit));
+  animation:fx-slash 380ms var(--ease-hit-out) forwards}
+.fx--crit b{--r:-32deg}
+.fx--crit b::after{content:"";left:0;top:0;width:100%;height:100%;--r:64deg;animation-delay:60ms}
+.fx--crit::before{content:"";position:absolute;inset:22%;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.95),rgba(255,178,36,0) 60%);animation:fx-burst 420ms ease-out forwards}
+.fx--crit::after{content:"";position:absolute;inset:14%;border-radius:50%;border:2px solid var(--crit);animation:fx-ring 460ms ease-out forwards}
+
+/* ---- ZERO: chiêu cuối của Yuki. Một nhát DỌC (crit là hai nhát chéo, hit là một nhát ngang) và tím chrome
+   thay vì vàng — để chiêu của nhân vật chính không đội hình với ai. Dùng lại đúng ba keyframe của crit,
+   chỉ xoay --r về gần đứng. Thả art/fx/zero.webp là thay như mọi kind khác. ---- */
+.fx--zero b{position:absolute;left:-10%;top:46%;width:120%;height:7%;transform-origin:50% 50%;--r:80deg;
+  background:linear-gradient(90deg,transparent,#fff 18% 82%,transparent);
+  filter:drop-shadow(0 0 8px var(--chrome-hi)) drop-shadow(0 0 18px var(--chrome));
+  animation:fx-slash 440ms var(--ease-hit-out) forwards}
+.fx--zero::before{content:"";position:absolute;inset:20%;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.95),color-mix(in srgb,var(--chrome) 45%,transparent) 42%,transparent 64%);
+  animation:fx-burst 480ms ease-out forwards}
+.fx--zero::after{content:"";position:absolute;inset:12%;border-radius:50%;border:2px solid var(--chrome-hi);animation:fx-ring 540ms ease-out forwards}
+
+/* ---- EXPLODE: vòng sóng + cầu lửa + khói ---- */
+.fx--explode::before{content:"";position:absolute;inset:0;border-radius:50%;border:3px solid #ffe0b0;box-shadow:0 0 12px #ff8a3d,inset 0 0 12px #ff8a3d;animation:fx-ring 520ms ease-out forwards}
+.fx--explode b{position:absolute;inset:16%;border-radius:50%;background:radial-gradient(circle at 50% 58%,#fff6dc 0 10%,#ffc255 28%,#ff6a1f 52%,rgba(70,20,10,0) 72%);animation:fx-fireball 620ms ease-out forwards}
+.fx--explode::after{content:"";position:absolute;inset:8%;border-radius:50%;background:radial-gradient(circle,rgba(40,30,30,.55),transparent 60%);animation:fx-smoke 640ms ease-out forwards}
+
+/* ---- SHOCK: tia sét (SVG) nhấp nháy + quầng xanh ---- */
+.fx--shock{filter:drop-shadow(0 0 6px #8fe3ff)}
+.fx--shock b{position:absolute;inset:0;animation:fx-flicker 480ms steps(5,end) forwards;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M48 2 38 40l14 4-12 54 32-64-16-3z' fill='%23e8fbff'/%3E%3Cpath d='M78 20 60 48l10 3-14 30 30-42-12-2z' fill='%23b7efff' opacity='.8'/%3E%3Cpath d='M20 30 12 58l9 1-6 30 24-42-11-1z' fill='%23b7efff' opacity='.7'/%3E%3C/svg%3E") center/contain no-repeat}
+.fx--shock::after{content:"";position:absolute;inset:14%;border-radius:50%;background:radial-gradient(circle,rgba(143,227,255,.6),transparent 65%);animation:fx-burst 480ms ease-out forwards}
+
+/* ---- POISON: giọt axit xanh bắn ra; bản lặp = bọt nổi lên ---- */
+.fx--poison b{position:absolute;inset:22%;border-radius:45% 55% 50% 50%;background:radial-gradient(circle at 45% 40%,#d9ff7a,#7bd334 45%,rgba(60,140,20,0) 72%);animation:fx-splat 520ms ease-out forwards}
+.fx--poison::after{content:"";position:absolute;inset:0;animation:fx-drops 560ms ease-out forwards;background:
+  radial-gradient(circle,#a6f04a 0 40%,transparent 45%) 30% 60%/12% 12% no-repeat,
+  radial-gradient(circle,#a6f04a 0 40%,transparent 45%) 62% 50%/10% 10% no-repeat,
+  radial-gradient(circle,#c8ff7a 0 40%,transparent 45%) 48% 38%/10% 10% no-repeat,
+  radial-gradient(circle,#c8ff7a 0 40%,transparent 45%) 70% 70%/8% 8% no-repeat}
+.fx--loop.fx--poison b{inset:30% 25% 20%;border-radius:50%;background:radial-gradient(circle,rgba(120,220,60,.35),transparent 68%);animation:fx-pulse 1400ms ease-in-out infinite}
+.fx--loop.fx--poison::after{animation:fx-bubbles 1600ms linear infinite}
+
+/* ---- BURN: lửa dưới chân; bản lặp bập bùng ---- */
+.fx--burn b{position:absolute;left:8%;right:8%;bottom:8%;height:74%;transform-origin:50% 100%;animation:fx-flame-once 600ms ease-out forwards;
+  background:
+    radial-gradient(ellipse at 50% 100%,#fff3b0 0 6%,#ffc247 22%,#ff6a1f 45%,rgba(255,60,20,0) 68%),
+    radial-gradient(ellipse at 22% 100%,#ffb347 0 10%,rgba(255,80,20,0) 45%),
+    radial-gradient(ellipse at 78% 100%,#ffb347 0 10%,rgba(255,80,20,0) 45%);
+  -webkit-mask:radial-gradient(ellipse at 50% 100%,#000 50%,transparent 72%);mask:radial-gradient(ellipse at 50% 100%,#000 50%,transparent 72%)}
+.fx--burn::after{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 50% 80%,rgba(255,120,40,.45),transparent 65%);animation:fx-burst 600ms ease-out forwards}
+.fx--loop.fx--burn b{animation:fx-flame 420ms ease-in-out infinite alternate}
+.fx--loop.fx--burn::after{animation:fx-pulse 900ms ease-in-out infinite}
+
+/* ---- STUN: vòng sao quay trên đầu (lặp) / vòng vàng loé (một lần) ---- */
+.fx--stun b{position:absolute;left:8%;right:8%;top:38%;height:28%;border:2px dashed #ffd84a;border-radius:50%;filter:drop-shadow(0 0 4px #ffd84a);animation:fx-ring 520ms ease-out forwards}
+.fx--stun::after{content:"✦ ✦ ✦";position:absolute;left:0;right:0;top:26%;text-align:center;font:900 20cqw/1 var(--font-ui);letter-spacing:.3em;color:#ffe680;text-shadow:0 0 6px #ffb224;animation:fx-blink 700ms steps(2,end) infinite}
+.fx--loop.fx--stun b{animation:fx-spin 1100ms linear infinite}
+
+/* ---- HEAL: đốm sáng xanh bay lên + quầng ---- */
+.fx--heal::before{content:"";position:absolute;inset:10%;border-radius:50%;background:radial-gradient(circle,rgba(114,231,169,.5),transparent 65%);animation:fx-burst 700ms ease-out forwards}
+.fx--heal b{position:absolute;inset:0;animation:fx-rise 700ms ease-out forwards;background:
+  radial-gradient(circle,#b8ffd9 0 40%,transparent 45%) 30% 70%/14% 14% no-repeat,
+  radial-gradient(circle,#72e7a9 0 40%,transparent 45%) 55% 80%/12% 12% no-repeat,
+  radial-gradient(circle,#b8ffd9 0 40%,transparent 45%) 72% 60%/10% 10% no-repeat,
+  radial-gradient(circle,#72e7a9 0 40%,transparent 45%) 42% 50%/9% 9% no-repeat}
+
+/* ---- SHIELD: vòm lửa/kính bao quanh unit — một lần khi dựng và khi chặn đòn; bản lặp thở nhẹ khi còn khiên.
+   Placeholder CSS: thả art/fx/shield.webp (+ shield_loop.webp) là game tự dùng ảnh, không phải sửa code ---- */
+.fx--shield b{position:absolute;inset:6%;border-radius:48% 48% 46% 46%;border:2px solid #ffd08a;
+  background:radial-gradient(ellipse at 50% 62%,rgba(255,180,80,.28),rgba(255,120,40,.16) 55%,rgba(255,90,30,0) 78%);
+  box-shadow:0 0 14px rgba(255,150,60,.55),inset 0 0 18px rgba(255,190,110,.45);animation:fx-shield-up 700ms var(--ease-hit-out) forwards}
+.fx--shield::after{content:"";position:absolute;inset:2%;border-radius:50%;border:1px solid rgba(255,220,170,.6);animation:fx-ring 620ms ease-out forwards}
+.fx--loop.fx--shield b{animation:fx-shield-idle 2200ms ease-in-out infinite}
+.fx--loop.fx--shield::after{content:"";position:absolute;inset:6%;border-radius:48% 48% 46% 46%;border:0;
+  background:repeating-conic-gradient(from 0deg,rgba(255,190,110,.14) 0 12deg,transparent 12deg 30deg);
+  -webkit-mask:radial-gradient(circle,transparent 58%,#000 72%);mask:radial-gradient(circle,transparent 58%,#000 72%);
+  animation:fx-spin 9s linear infinite}
+
+@keyframes fx-shield-up{0%{transform:scale(.6);opacity:0}35%{transform:scale(1.06);opacity:1}100%{transform:scale(1);opacity:.85}}
+@keyframes fx-shield-idle{0%,100%{transform:scale(.98);opacity:.5}50%{transform:scale(1.02);opacity:.8}}
+@keyframes fx-slash{0%{transform:rotate(var(--r,-30deg)) scaleX(0);opacity:1}40%{transform:rotate(var(--r,-30deg)) scaleX(1);opacity:1}100%{transform:rotate(var(--r,-30deg)) scaleX(1.06);opacity:0}}
+@keyframes fx-burst{0%{transform:scale(.2);opacity:1}100%{transform:scale(1.5);opacity:0}}
+@keyframes fx-ring{0%{transform:scale(.1);opacity:1}100%{transform:scale(1.15);opacity:0}}
+@keyframes fx-fireball{0%{transform:scale(.25);opacity:1;filter:blur(0)}45%{transform:scale(1);opacity:1}100%{transform:scale(1.3);opacity:0;filter:blur(4px)}}
+@keyframes fx-smoke{0%{transform:scale(.4) translateY(0);opacity:0}30%{opacity:.8}100%{transform:scale(1.5) translateY(-25%);opacity:0}}
+@keyframes fx-flicker{0%{opacity:1;transform:scaleX(1)}20%{opacity:.25;transform:scaleX(-1)}40%{opacity:1;transform:scaleX(1) scale(1.06)}60%{opacity:.3;transform:scaleX(-1)}80%{opacity:.9}100%{opacity:0}}
+@keyframes fx-splat{0%{transform:scale(.3);opacity:1}60%{transform:scale(1.05);opacity:.95}100%{transform:scale(1.15) translateY(8%);opacity:0}}
+@keyframes fx-drops{0%{transform:translateY(0);opacity:1}100%{transform:translateY(-30%);opacity:0}}
+@keyframes fx-bubbles{0%{transform:translateY(20%);opacity:0}20%{opacity:1}100%{transform:translateY(-35%);opacity:0}}
+@keyframes fx-pulse{0%,100%{opacity:.55;transform:scale(.95)}50%{opacity:1;transform:scale(1.05)}}
+@keyframes fx-flame{0%{transform:scaleY(.85) skewX(-4deg)}100%{transform:scaleY(1.1) skewX(5deg)}}
+@keyframes fx-flame-once{0%{transform:scale(.4,.3);opacity:1}50%{transform:scale(1,1.15);opacity:1}100%{transform:scale(1.1,1.4);opacity:0}}
+@keyframes fx-spin{to{transform:rotate(360deg)}}
+@keyframes fx-blink{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes fx-rise{0%{transform:translateY(15%);opacity:0}25%{opacity:1}100%{transform:translateY(-35%);opacity:0}}
+
+/* ---- Chip trạng thái: choáng / độc / cháy (thêm màu cho .chip--debuff sẵn có) ---- */
+.chip--stun{color:#ffd84a;border-color:#b58f1a}
+.chip--stun::before{border:0;width:5px;height:5px;background:currentColor;border-radius:50%;animation:hp-warn 700ms steps(2,end) infinite}
+.chip--poison{color:#b8f05a;border-color:#6d9a1f}
+.chip--burn{color:#ff9a4a;border-color:#b5541a}
+/* Lá chắn: chip KHIÊN <số còn lại> (js/battle.js shieldChip) */
+.chip--shield{color:#ffd08a;border-color:#c07a2a}
+.chip--shield::before{border:0;width:5px;height:6px;background:currentColor;clip-path:polygon(50% 0,100% 22%,100% 62%,50% 100%,0 62%,0 22%)}
+
+/* =====================================================================
+   HOLO — video chiêu cuối chiếu trên đầu người phát chiêu (thay cut-in phủ kín sân).
+   Tỉ lệ cố định 16:9 (RULES.holo trong js/data.js; JS đặt --hx/--hy/--hw/--tx). Sân mờ đi, chạm sân hoặc SKIP để bỏ qua.
+   ===================================================================== */
+.stagedim{position:absolute;inset:0;z-index:28;background:rgba(6,7,10,.55);opacity:0;pointer-events:none;transition:opacity 200ms}
+.stage.is-holo .stagedim{opacity:1;pointer-events:auto;cursor:pointer}
+.stage.is-holo .field .unit{filter:saturate(.6)}
+.stage.is-holo .unit.is-casting{z-index:29;filter:none}
+.holo{position:absolute;z-index:30;left:var(--hx,50%);top:var(--hy,10%);width:var(--hw,260px);--accent:var(--chrome);animation:holo-in 220ms var(--ease-hit-out)}
+.holo[hidden]{display:none}
+.holo__frame{position:relative;aspect-ratio:var(--holo-ratio,16/9);background:#000;overflow:hidden;
+  border:1px solid color-mix(in srgb,var(--accent) 70%,#fff 30%);
+  box-shadow:0 0 0 1px rgba(0,0,0,.6),0 0 18px color-mix(in srgb,var(--accent) 60%,transparent),0 12px 30px rgba(0,0,0,.6);
+  clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px)}
+.holo video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;background:#000}
+.holo__scan{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 1px,transparent 1px 3px);mix-blend-mode:screen}
+.holo__tail{position:absolute;left:var(--tx,50%);top:100%;width:0;height:0;transform:translateX(-50%);border-left:9px solid transparent;border-right:9px solid transparent;border-top:12px solid color-mix(in srgb,var(--accent) 70%,#fff 30%);filter:drop-shadow(0 4px 6px rgba(0,0,0,.6))}
+.holo .cutin__bar{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:5px 10px 5px 8px;background:linear-gradient(90deg,rgba(6,7,10,.92),rgba(6,7,10,.3));border-left:3px solid var(--accent)}
+.holo .cutin__who{display:block;font:var(--fs-2xs) var(--font-mono);font-size:8px;letter-spacing:.28em;color:var(--text-2)}
+.holo .cutin__name{display:block;font:900 var(--fs-md)/1 var(--font-ui);letter-spacing:.26em;color:#fff;margin-top:2px}
+.holo .cutin__skip{position:absolute;right:4px;top:4px;z-index:2;height:20px;padding:0 6px;font-size:8px}
+@keyframes holo-in{from{opacity:0;transform:translateY(8px) scale(.9)}}
+
+/* ---- Giảm chuyển động: hiệu ứng một lần không sinh ra (js), bản lặp đứng yên, holo hiện thẳng ---- */
+.rm-forced .fx,.rm-forced .fx b,.rm-forced .fx::before,.rm-forced .fx::after,.rm-forced .holo{animation:none}
+@media (prefers-reduced-motion: reduce){
+  .fx,.fx b,.fx::before,.fx::after,.holo{animation:none}
+  .stagedim{transition:none}
+}
+
+/* ---- Số bay lên cho độc/cháy (spawnNumber kind = tên trạng thái) + demo ở kit.html B9 ---- */
+.dmg--poison{color:#b8f05a;font-size:var(--fs-lg)}
+.dmg--burn{color:#ff9a4a;font-size:var(--fs-lg)}
+.dmg--shield{color:#ffd08a;font-size:var(--fs-lg)}   /* phần sát thương bị lá chắn hút + số khiên vừa dựng */
+.fxdemo{position:relative;width:280px;height:230px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:14px;background:var(--surface-1);border:1px solid var(--line-1)}
+#fxBtns .chip{cursor:pointer;height:22px;font-size:9px}
+#fxBtns .chip.is-on{background:var(--text-1);color:var(--text-inv);border-color:var(--text-1)}

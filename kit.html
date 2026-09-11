@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark light">
+<title>CHROMEFALL · UI kit</title>
+<!--
+  CHROMEFALL · UI kit & design tokens — tách khỏi bản chơi (index.html) ngày 09/09/2026.
+  Cần js/core.js (tiện ích, thẻ nhân vật), js/data.js (ROSTER, ENEMY_POOL) và js/kit.js (demo). Không nạp engine trận.
+-->
+<link rel="stylesheet" href="css/chromefall.css">
+<link rel="stylesheet" href="css/fx.css">
+</head>
+<body>
+<nav class="topnav">
+  <div class="brand"><span class="brand__mark"></span>CHROMEFALL<span class="brand__sub">UI KIT · v0.3</span></div>
+  <div class="topnav__links"><a href="index.html">Play</a><a href="#kit">Components</a><a href="#tokens">Tokens</a></div>
+  <button class="btn-ghost" id="themeBtn" title="Đổi theme để kiểm tra token">THEME: AUTO</button>
+</nav>
+
+<!-- =====================================================================
+     B. COMPONENT LIBRARY
+     ===================================================================== -->
+<main id="kit" class="kit">
+  <div class="kit__h"><h1>COMPONENTS</h1><p>Mọi trạng thái đặt cạnh nhau · mọi màu đọc từ token</p></div>
+
+  <!-- B1 -->
+  <section class="spec">
+    <div class="spec__head"><span class="spec__no">B1</span><span class="spec__title">Character card</span>
+      <span class="spec__note">Chrome: viền liền, chamfer 45°. Rust: viền đứt đoạn, khấc cắt ghép, đinh tán, nhãn lệch. Kéo thẻ thả vào slot ở B4.</span></div>
+    <div class="row" id="cardRow"></div>
+  </section>
+
+  <!-- B2 -->
+  <section class="spec">
+    <div class="spec__head"><span class="spec__no">B2</span><span class="spec__title">HP bar</span>
+      <span class="spec__note">Đầu phải cắt chéo, vạch chia 10%. Dưới 25%: viền + fill đỏ nhấp nháy, số HP nhấp nháy. Mất máu: fill tụt ngay, vệt sáng đuổi theo sau 260ms.</span></div>
+    <div class="row">
+      <div class="sample sample--w"><div class="hpline" data-state="ok"><span class="lbl">HP</span><span class="mono">950 / 950</span></div><div class="bar bar--lg" data-state="ok" style="--v:100%"><div class="bar__track"><i class="bar__ghost"></i><i class="bar__fill"></i><i class="bar__ticks"></i></div></div><span class="sample__cap">Đầy</span></div>
+      <div class="sample sample--w"><div class="hpline" data-state="mid"><span class="lbl">HP</span><span class="mono">475 / 950</span></div><div class="bar bar--lg" data-state="mid" style="--v:50%"><div class="bar__track"><i class="bar__ghost"></i><i class="bar__fill"></i><i class="bar__ticks"></i></div></div><span class="sample__cap">50%</span></div>
+      <div class="sample sample--w"><div class="hpline" data-state="low"><span class="lbl">HP</span><span class="mono">171 / 950</span></div><div class="bar bar--lg" data-state="low" style="--v:18%"><div class="bar__track"><i class="bar__ghost"></i><i class="bar__fill"></i><i class="bar__ticks"></i></div></div><span class="sample__cap">Dưới 25% · cảnh báo</span></div>
+      <div class="sample sample--w"><div class="hpline" id="drainLine" data-state="ok"><span class="lbl">HP</span><span class="mono" id="drainTxt">950 / 950</span></div><div class="bar bar--lg" id="drainBar" data-state="ok" style="--v:100%"><div class="bar__track"><i class="bar__ghost"></i><i class="bar__fill"></i><i class="bar__ticks"></i></div></div><span class="sample__cap">Đang mất máu (lặp demo)</span></div>
+    </div>
+  </section>
+
+  <!-- B3 -->
+  <section class="spec">
+    <div class="spec__head"><span class="spec__no">B3</span><span class="spec__title">Energy bar</span>
+      <span class="spec__note">Mỗi ô = 25. Số ô = cost chiêu cuối (75/100/125). ĐẦY: toàn bộ chuyển trắng nóng, viền + glow, quét sáng, nhãn READY — tín hiệu duy nhất được phép sáng liên tục.</span></div>
+    <div class="row" id="energyRow"></div>
+  </section>
+
+  <!-- B4 -->
+  <section class="spec">
+    <div class="spec__head"><span class="spec__no">B4</span><span class="spec__title">Đội hình 3 slot</span>
+      <span class="spec__note">Trống (viền băm, dấu +), đã điền (viền màu phe), đang kéo thả (viền trắng, DROP). Kéo thẻ từ B1 vào để thử thật; bấm × để gỡ.</span></div>
+    <div class="row">
+      <div class="sample"><div class="team" id="team"></div><span class="sample__cap">Slot 03 đang ở trạng thái drag-over (tĩnh) — sẽ tự cập nhật khi bạn kéo thật</span></div>
+      <div class="sample"><div id="dragGhost"></div><span class="sample__cap">Thẻ ở trạng thái đang kéo</span></div>
+    </div>
+  </section>
+
+  <!-- B5 -->
+  <section class="spec">
+    <div class="spec__head"><span class="spec__no">B5</span><span class="spec__title">Nút chiêu cuối</span>
+      <span class="spec__note">Chưa đủ: mờ, viền băm, số còn thiếu màu đỏ, vạch tiến độ. Sẵn sàng: nền màu phe, viền trắng, nhịp đập 1600ms. Đang phát: vạch chạy 900ms.</span></div>
+    <div class="row">
+      <div class="sample sample--w"><button class="btn-ult" data-state="locked" style="width:100%"><span class="btn-ult__name">Zero</span><span class="btn-ult__meta">−50 EN · 50/100</span><span class="btn-ult__bar"><i style="--p:50%"></i></span></button><span class="sample__cap">Chưa đủ energy</span></div>
+      <div class="sample sample--w"><button class="btn-ult" data-state="ready" style="width:100%"><span class="btn-ult__name">Zero</span><span class="btn-ult__meta">100/100 · 320% ATK</span><span class="btn-ult__bar"><i style="--p:100%"></i></span></button><span class="sample__cap">Sẵn sàng · Chrome</span></div>
+      <div class="sample sample--w"><button class="btn-ult btn-ult--rust" data-state="ready" style="width:100%"><span class="btn-ult__name">Iaido</span><span class="btn-ult__meta">100/100 · 280% ATK</span><span class="btn-ult__bar"><i style="--p:100%"></i></span></button><span class="sample__cap">Sẵn sàng · Rust</span></div>
+      <div class="sample sample--w"><button class="btn-ult" data-state="casting" style="width:100%"><span class="btn-ult__name">Apostasy</span><span class="btn-ult__meta">CASTING…</span><span class="btn-ult__bar"><i id="castDemo"></i></span></button><span class="sample__cap">Đang phát</span></div>
+      <div class="sample sample--w"><button class="btn-act" style="width:100%"><span class="btn-act__k">Attack</span><span class="btn-act__v">+25 EN · 100% ATK</span></button><span class="sample__cap">Nút thường (tham chiếu)</span></div>
+    </div>
+  </section>
+
+  <!-- B6 -->
+  <section class="spec">
+    <div class="spec__head"><span class="spec__no">B6</span><span class="spec__title">Thanh lượt đi</span>
+      <span class="spec__note">Chân dung nhỏ theo thứ tự, viền màu phe. Người tới lượt: nâng lên, viền trắng, nhãn NOW, mũi tên dưới. Sau dấu ngắt là lượt của vòng sau (mờ). Tự chạy demo.</span></div>
+    <div class="row"><div class="sample"><div class="turn" id="turnDemo"></div><span class="sample__cap">Auto-advance mỗi 1.6s</span></div></div>
+  </section>
+
+  <!-- B7 -->
+  <section class="spec">
+    <div class="spec__head"><span class="spec__no">B7</span><span class="spec__title">Số sát thương bay lên</span>
+      <span class="spec__note">Thường: trắng mono. Chí mạng: vàng, to hơn, nghiêng −6°, nhãn CRIT. Hồi máu: xanh, dấu +.</span></div>
+    <div class="row">
+      <div class="sample"><div class="dmg-demo" id="dmgDemo"></div><button class="btn-ghost" id="btnDmg" style="align-self:flex-start">REPLAY</button></div>
+    </div>
+  </section>
+
+  <!-- B8 -->
+  <section class="spec">
+    <div class="spec__head"><span class="spec__no">B8</span><span class="spec__title">Chip trạng thái</span>
+      <span class="spec__note">Buff: tam giác lên, tím Chrome. Debuff: tam giác xuống, cam Rust. Điều khiển (Apostasy): chấm đỏ nháy. Hoàn Energy (Zero): trắng. Số = lượt còn lại / giá trị.</span></div>
+    <div class="chips">
+      <span class="chip chip--buff">ATK UP <em>+20%</em> <em>2T</em></span>
+      <span class="chip chip--buff">GUARD <em>1T</em></span>
+      <span class="chip chip--debuff">ATK DOWN <em>−15%</em> <em>2T</em></span>
+      <span class="chip chip--debuff">BLEED <em>3T</em></span>
+      <span class="chip chip--control">CONTROLLED <em>1T</em></span>
+      <span class="chip chip--refund">EN REFUND <em>+50</em></span>
+      <span class="chip">TAUNT <em>1T</em></span>
+    </div>
+  </section>
+
+  <!-- B9 -->
+  <section class="spec">
+    <div class="spec__head"><span class="spec__no">B9</span><span class="spec__title">Overlay hiệu ứng đòn đánh</span>
+      <span class="spec__note">Bấm để phát một lần lên sprite (hit, crit, nổ, điện giật, độc, cháy, choáng, hồi máu); ba nút LẶP bật/tắt bản chạy suốt theo trạng thái. Mặc định vẽ bằng CSS (css/fx.css); có <code>art/fx/&lt;kind&gt;.webp</code> thì game tự dùng ảnh — làm bằng <code>scratch/fx_sheet.py</code>, quy cách ở <code>docs/fx-prompts.md</code>.</span></div>
+    <div class="row">
+      <div class="sample"><div class="fxdemo" id="fxDemo"></div><span class="sample__cap">Yuki idle · hộp 744×682 như trong trận</span></div>
+      <div class="sample" style="max-width:420px"><div class="chips" id="fxBtns"></div><label class="sample__cap" style="margin-top:8px;cursor:pointer"><input type="checkbox" id="fxFlip"> lật hướng (đòn đến từ bên phải)</label><span class="sample__cap" id="fxFiles">—</span></div>
+    </div>
+  </section>
+
+  <!-- ROSTER -->
+  <section class="spec">
+    <div class="spec__head"><span class="spec__no">R</span><span class="spec__title">Roster · <span id="rosterCount"></span> nhân vật</span>
+      <span class="spec__note">Toàn bộ roster đọc từ ROSTER (JS). Nhân vật chưa có art hiện silhouette theo phe. Kéo vào đội hình ở B4 được.</span></div>
+    <div class="row" id="rosterRow"></div>
+  </section>
+
+  <!-- BESTIARY -->
+  <section class="spec">
+    <div class="spec__head"><span class="spec__no">E</span><span class="spec__title">Bestiary · <span id="enemyCount"></span> kẻ địch PvE</span>
+      <span class="spec__note">Bể kẻ địch cho sector. Badge: G = grunt, E = elite, B = boss. Wave 1 gọi 3 grunt, wave 2 thêm elite, wave 3 có boss.<span class="fake">FAKE</span></span></div>
+    <div class="row" id="enemyRow"></div>
+  </section>
+
+  <!-- A. TOKENS -->
+  <section class="spec" id="tokens">
+    <div class="spec__head"><span class="spec__no">A</span><span class="spec__title">Design tokens</span>
+      <span class="spec__note">Đổi theme ở góc trên để kiểm tra bộ token sáng/tối. Giá trị hiển thị là giá trị đang được tính (computed).</span></div>
+    <div class="swatches" id="swatches"></div>
+    <div class="typerow" style="margin-top:var(--s-5)">
+      <span class="lbl">Type scale</span>
+      <span style="font-size:var(--fs-2xs)">2xs 10</span><span style="font-size:var(--fs-xs)">xs 11</span><span style="font-size:var(--fs-sm)">sm 12</span><span style="font-size:var(--fs-md)">md 14</span><span style="font-size:var(--fs-lg)">lg 16</span><span style="font-size:var(--fs-xl)">xl 20</span><span style="font-size:var(--fs-2xl)">2xl 26</span><span style="font-size:var(--fs-3xl)">3xl 34</span>
+      <span class="mono">mono 0123456789</span><span class="lbl" style="color:var(--text-1)">LABEL · TRACK .14EM</span>
+    </div>
+    <div class="typerow" style="margin-top:var(--s-4)"><span class="lbl">Spacing</span>
+      <i style="display:inline-block;width:var(--s-1);height:12px;background:var(--line-3)"></i><i style="display:inline-block;width:var(--s-2);height:12px;background:var(--line-3)"></i><i style="display:inline-block;width:var(--s-3);height:12px;background:var(--line-3)"></i><i style="display:inline-block;width:var(--s-4);height:12px;background:var(--line-3)"></i><i style="display:inline-block;width:var(--s-5);height:12px;background:var(--line-3)"></i><i style="display:inline-block;width:var(--s-6);height:12px;background:var(--line-3)"></i><i style="display:inline-block;width:var(--s-7);height:12px;background:var(--line-3)"></i>
+      <span class="mono" style="color:var(--text-3);font-size:var(--fs-2xs)">4 · 8 · 12 · 16 · 24 · 32 · 48</span></div>
+  </section>
+</main>
+
+<script src="js/core.js"></script>
+<script src="js/data.js"></script>
+<script src="js/fx.js"></script>
+<script src="js/kit.js"></script>
+</body>
+</html>

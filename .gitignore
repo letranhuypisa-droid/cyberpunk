@@ -1,0 +1,18 @@
+# Gói SFX/UI bên thứ ba (free pack, chưa rõ giấy phép phân phối lại) — không đưa lên repo
+SFX/
+UI/
+# File tạm
+Thumbs.db
+desktop.ini
+*.tmp
+_test_*
+# Ảnh gốc độ phân giải cao (đã có bản web .jpg)
+art-src/
+comic char/
+
+# Rác thử nghiệm — vẫn giữ script .js/.py/.html trong scratch/
+scratch/lol/
+scratch/_bak_*/
+scratch/__pycache__/
+scratch/*.png
+scratch/*.jpg
