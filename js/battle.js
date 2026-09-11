@@ -128,7 +128,7 @@ const FORMATION = {
   enemy: [{row:3,x:42},{row:2,x:58},{row:1,x:46}],
 };
 /* Chỉ TRÙM mới được phóng to quá khung hàng (phần tràn trổ lên khoảng trời trên sân — xem sidePositions + css .field).
-   Elite không phóng nữa: cỡ của nó đã nằm trong art rồi (FOE_BODY_H.elite trong js/data.js), phóng thêm là đầu nó
+   Elite không phóng nữa: cỡ của nó đã khai ở bảng SIZE trong js/data.js rồi, phóng thêm là đầu nó
    thò lên đè vào bảng chỉ số của người đứng hàng trong. */
 const RANK_SC = { boss:1.15 };
 function unitEl(u,pos){

@@ -850,6 +850,7 @@ button.hero__mission:hover i{color:var(--text-1)}
 .field{position:absolute;top:7%;bottom:1%;display:grid;grid-template-rows:repeat(3,1fr);
   --u:clamp(84px,24cqh,168px);      /* cỡ chuẩn của một ô */
   --plate:50px;                     /* bảng chỉ số + khe 3px, cao cố định (đo được 48.9px) — chip trạng thái nổi lên trên, không tính vào đây */
+  --bob:6px;                        /* biên độ nhún idle: phải trừ vào chỗ của ô, không thì lúc nhún lên đỉnh đầu thò qua hàng trên */
   --rowh:calc(92cqh / 3)}
 /* 7% chừa trên đầu = chỗ cho trùm: người cao nhất vừa khít hàng của mình, trùm phóng to RANK_SC.boss quanh gót chân
    nên tràn thêm 15% chiều cao hàng (= 4.6% chiều cao sân) lên trên — trùm luôn được đẩy về hàng trong cùng
@@ -858,7 +859,7 @@ button.hero__mission:hover i{color:var(--text-1)}
 .field--enemy{right:0;width:49%}
 .unit{grid-row:var(--row,1);grid-column:1;justify-self:start;align-self:end;
   position:relative;left:var(--x);z-index:var(--z,1);--fac:var(--line-3);
-  --uw:min(var(--u), calc((var(--rowh) - var(--plate)) * 744 / 682 / var(--big,1)));width:var(--uw);
+  --uw:min(var(--u), calc((var(--rowh) - var(--plate) - var(--bob)) * 744 / 682 / var(--big,1)));width:var(--uw);
   transform:translateX(-50%) scale(var(--sc,1));transform-origin:50% 100%;display:flex;flex-direction:column;align-items:center}
 .unit--chrome{--fac:var(--chrome)} .unit--rust{--fac:var(--rust)}
 .unit--enemy{cursor:pointer}
@@ -949,7 +950,7 @@ button.hero__mission:hover i{color:var(--text-1)}
 @keyframes hit-recoil{0%{transform:translateX(0)}20%{transform:translateX(-9px) skewX(4deg)}55%{transform:translateX(3px)}100%{transform:translateX(0)}}
 @keyframes hit-recoil-r{0%{transform:translateX(0)}20%{transform:translateX(9px) skewX(-4deg)}55%{transform:translateX(-3px)}100%{transform:translateX(0)}}
 @keyframes lunge{0%{transform:translateX(0)}40%{transform:translateX(-16px) scale(1.04,.97)}100%{transform:translateX(0)}}
-@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(calc(-1 * var(--bob,6px)))}}
 
 /* Banner chiêu cuối */
 .ultbanner{position:absolute;left:0;right:0;top:44%;z-index:20;padding:10px 0;background:linear-gradient(90deg,transparent,rgba(0,0,0,.75) 20% 80%,transparent);text-align:center;pointer-events:none;opacity:0}
