@@ -6,6 +6,14 @@ const fs = require('fs'), path = require('path'), vm = require('vm');
 const ROOT = path.join(__dirname, '..');
 const read = f => fs.readFileSync(path.join(ROOT, f), 'utf8');
 
+/* --json: nuốt bảng kiểm kê, chỉ in {issues} — mỗi thứ còn thiếu một dòng — cho scratch/check.js.
+   Đặt trước sandbox vì sandbox dùng chung đúng object console này. Chương 1 vốn còn thiếu art thật, nên
+   script này luôn đỏ; check.js so với bản nền để chỉ báo khi có cái MỚI mất (xoá nhầm, đổi tên file). */
+const JSON_OUT = process.argv.includes('--json');
+const out = console.log.bind(console);
+if (JSON_OUT) console.log = () => {};
+const MISSING = [];
+
 const sandbox = {
   console, Math, Date, JSON, Object, Array, String, Number, Boolean,
   localStorage: { getItem: () => null, setItem: () => {} },
@@ -75,9 +83,16 @@ const line = a => [
   a.ultDeclared ? 'ult-video ' + mark(a.ult) : 'ult-video —',
 ].join('  ');
 
+function record(a) {
+  if (!a.card) MISSING.push(`${a.id}: thiếu thẻ art/card/${a.id}.png`);
+  if (!a.portrait) MISSING.push(`${a.id}: thiếu chân dung`);
+  const thieu = POSES.filter(p => !a.poses.includes(p));
+  if (thieu.length) MISSING.push(`${a.id}: thiếu sprite ${thieu.join(',')}`);
+  if (a.ultDeclared && !a.ult) MISSING.push(`${a.id}: khai ultVideo nhưng không có file`);
+}
 function section(title, ids, defOf) {
   console.log('\n=== ' + title + ' ===');
-  [...ids].sort().forEach(id => console.log(line(audit(defOf(id), id))));
+  [...ids].sort().forEach(id => { const a = audit(defOf(id), id); console.log(line(a)); record(a); });
 }
 const heroDef = id => ROSTER[id];
 const foeDef = id => ENEMY_POOL.find(e => e.id === id);
@@ -90,8 +105,10 @@ section('NGƯỜI NÓI TRONG COMIC CHƯƠNG 0-1', [...speakers].filter(id => !he
 
 /* ---- nền + bản đồ ---- */
 console.log('\n=== NỀN / BẢN ĐỒ ===');
-secs.forEach(s => console.log(s.id.padEnd(6) + ' bg ' + mark(has(s.bg)) + '  (' + (s.bg || []).join(', ') + ')'));
+secs.forEach(s => { console.log(s.id.padEnd(6) + ' bg ' + mark(has(s.bg)) + '  (' + (s.bg || []).join(', ') + ')');
+  if (!has(s.bg)) MISSING.push(`${s.id}: thiếu nền (${(s.bg || []).join(', ') || 'không khai bg'})`); });
 console.log('map    ' + mark(has(sandbox.MAP_IMG)) + '  (' + (sandbox.MAP_IMG || []).join(', ') + ')');
+if (!has(sandbox.MAP_IMG)) MISSING.push('map: thiếu ảnh bản đồ');
 
 /* ---- panel comic ---- */
 const comicFiles = fs.existsSync(path.join(ROOT, 'art/comic')) ? fs.readdirSync(path.join(ROOT, 'art/comic')) : [];
@@ -100,3 +117,9 @@ ch1.forEach(id => { const st = STORY && STORY[id]; if (!st) return;
   Object.values(st).forEach(part => { if (!Array.isArray(part)) return; part.forEach(pg => { pages++; panels += (pg.panels || pg || []).length || 0; }); }); });
 console.log('\n=== COMIC ===');
 console.log('trang (ước tính): ' + pages + '  ·  panel: ' + panels + '  ·  file trong art/comic: ' + comicFiles.length);
+
+if (JSON_OUT) {
+  const issues = [...new Set(MISSING)];   // một id có thể vào hai mục (vừa là địch vừa chiêu mộ được)
+  out(JSON.stringify({ issues, notes: [] }));
+  process.exit(issues.length ? 1 : 0);
+}
