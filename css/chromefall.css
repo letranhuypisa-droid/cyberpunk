@@ -841,13 +841,24 @@ button.hero__mission:hover i{color:var(--text-1)}
 .stage__tag--r{left:auto;right:10px;text-align:right}
 
 /* ---- Đội hình side-by-side: đội mình trái (quay phải), địch phải ----
-   Vị trí từng unit do FORMATION (JS) đặt qua --x/--y/--z/--sc. Kích thước unit
-   tính theo chiều cao sân (cqh) nên tự co giãn theo màn hình. */
+   LƯỚI: mỗi nửa sân chia 3 hàng ngang bằng nhau, mỗi người một hàng (FORMATION trong battle.js đặt --row/--x).
+   Hàng nào cũng cao bằng nhau và không dính nhau, nên sprite lẫn bảng chỉ số của hai người không bao giờ chồng lên nhau.
+   Bề ngang ô = nhỏ hơn trong hai cái: cỡ chuẩn theo chiều cao sân, và chỗ còn lại của hàng sau khi trừ bảng chỉ số.
+   --big (battle.js stageScale, đặt trên #stage) = NÉT VẼ cao nhất của trận vượt hộp 682 bao nhiêu lần
+   (js/data.js, ART_H); chia cho nó thì người cao nhất vẫn nằm gọn trong hàng của mình. */
 .stage{container-type:size;min-height:0}
-.field{position:absolute;top:7%;bottom:2%}
-.field--ally{left:0;width:57%}
-.field--enemy{right:0;width:43%}
-.unit{position:absolute;left:var(--x);bottom:var(--y);z-index:var(--z,1);width:var(--uw);--uw:clamp(84px,23cqh,160px);--fac:var(--line-3);
+.field{position:absolute;top:7%;bottom:1%;display:grid;grid-template-rows:repeat(3,1fr);
+  --u:clamp(84px,24cqh,168px);      /* cỡ chuẩn của một ô */
+  --plate:50px;                     /* bảng chỉ số + khe 3px, cao cố định (đo được 48.9px) — chip trạng thái nổi lên trên, không tính vào đây */
+  --rowh:calc(92cqh / 3)}
+/* 7% chừa trên đầu = chỗ cho trùm: người cao nhất vừa khít hàng của mình, trùm phóng to RANK_SC.boss quanh gót chân
+   nên tràn thêm 15% chiều cao hàng (= 4.6% chiều cao sân) lên trên — trùm luôn được đẩy về hàng trong cùng
+   (battle.js sidePositions) nên phần tràn đó rơi vào khoảng trời này chứ không đè lên ai. */
+.field--ally{left:0;width:49%}      /* chừa 2% ở giữa làm rãnh phân tuyến: mũi kiếm Ronin không thò sang bảng chỉ số của địch */
+.field--enemy{right:0;width:49%}
+.unit{grid-row:var(--row,1);grid-column:1;justify-self:start;align-self:end;
+  position:relative;left:var(--x);z-index:var(--z,1);--fac:var(--line-3);
+  --uw:min(var(--u), calc((var(--rowh) - var(--plate)) * 744 / 682 / var(--big,1)));width:var(--uw);
   transform:translateX(-50%) scale(var(--sc,1));transform-origin:50% 100%;display:flex;flex-direction:column;align-items:center}
 .unit--chrome{--fac:var(--chrome)} .unit--rust{--fac:var(--rust)}
 .unit--enemy{cursor:pointer}
@@ -883,7 +894,7 @@ button.hero__mission:hover i{color:var(--text-1)}
   -webkit-mask:var(--mask) 50% 100%/contain no-repeat;mask:var(--mask) 50% 100%/contain no-repeat}
 .unit__frame.is-sheet .unit__flash{-webkit-mask:var(--mask) var(--f,0 0)/var(--msize) no-repeat;mask:var(--mask) var(--f,0 0)/var(--msize) no-repeat}
 /* Bảng thông tin dưới chân */
-.unit__plate{position:relative;width:100%;margin-top:3px;padding:3px 5px 4px;background:var(--surface-1);border:1px solid var(--line-1);
+.unit__plate{position:relative;width:100%;min-width:86px;margin-top:3px;padding:3px 5px 4px;background:var(--surface-1);border:1px solid var(--line-1);   /* min-width: máy hẹp (320px) ô co lại nhưng tên vẫn phải đọc được */
   clip-path:polygon(5px 0,100% 0,100% calc(100% - 5px),calc(100% - 5px) 100%,0 100%,0 5px);transition:border-color var(--t-state)}
 .unit__name{display:flex;justify-content:space-between;align-items:baseline;gap:3px;margin-bottom:3px;font:700 8px/1 var(--font-ui);letter-spacing:.14em;text-transform:uppercase;color:var(--text-2);white-space:nowrap}
 .unit__name>span:first-child{overflow:hidden;text-overflow:ellipsis}
@@ -899,8 +910,14 @@ button.hero__mission:hover i{color:var(--text-1)}
 .unit .bar{height:5px;margin-bottom:3px}
 .unit .ebar{height:4px}
 .unit__hp{font:8px/1 var(--font-mono);color:var(--text-3);margin-top:3px;text-align:right}
-.unit .chips{margin-top:3px;gap:2px}
-.unit .chip{height:13px;font-size:7px;padding:0 3px;gap:3px}
+/* Chip trạng thái nổi NGAY TRÊN bảng chỉ số (đè lên chân sprite) chứ không nằm trong bảng: ô lưới chỉ tính được
+   khi bảng cao cố định (--plate), mà chip thì lúc có lúc không và có khi xuống hai dòng. Neo đáy nên mọc lên trên.
+   Nằm ngoài .unit__plate trong DOM (battle.js) vì bảng có clip-path — cái gì ló ra khỏi bảng là bị cắt mất. */
+.unit .chips{position:absolute;left:-8px;right:-8px;bottom:calc(var(--plate) + 2px);justify-content:center;align-items:flex-end;gap:2px;pointer-events:none}
+.unit .chip{height:13px;font-size:7px;padding:0 3px;gap:3px;pointer-events:auto}
+.chip--info{cursor:pointer}                                   /* chip nội tại: chạm để đọc nội tại đó làm gì */
+.chip--info::after{content:"›";margin-left:1px;font-weight:800;opacity:.8}
+.chip--info:hover,.chip--info:active{background:var(--chrome);color:var(--text-inv)}
 .unit__ready{display:none;position:absolute;top:0;right:0;padding:2px 3px;font:800 7px/1 var(--font-mono);letter-spacing:.2em;background:var(--energy-full);color:var(--text-inv)}
 .unit.is-ready .unit__ready{display:block}
 .unit.is-ready .unit__plate{border-color:var(--energy-full)}
@@ -1057,6 +1074,23 @@ button.hero__mission:hover i{color:var(--text-1)}
 .hint__t{flex:1;min-width:0}
 .hint__x{pointer-events:auto;flex:none;height:22px;padding:0 6px}
 @keyframes hint-in{from{opacity:0;transform:translateY(8px)}}
+
+/* ---- Bảng nội tại trong trận: chạm vào chip nội tại (hoặc vào người của đội mình) trên sân ----
+   Dùng lại thẻ .pas của trang hồ sơ ở ARCHIVE, bỏ cột chân dung cho vừa sân. */
+.pasbox{position:absolute;left:8px;right:8px;bottom:8px;max-height:76%;z-index:24;display:flex;flex-direction:column;
+  background:rgba(6,7,10,.96);border:1px solid var(--chrome);
+  clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);animation:hint-in 200ms var(--ease-hit-out)}
+.pasbox[hidden]{display:none}
+.pasbox__hd{display:flex;align-items:center;gap:8px;padding:7px 8px 7px 10px;border-bottom:1px solid var(--line-1)}
+.pasbox__who{font:800 var(--fs-xs)/1 var(--font-ui);letter-spacing:.16em;color:var(--text-1)}
+.pasbox__k{font:800 8px/1 var(--font-mono);letter-spacing:.2em;color:var(--text-inv);background:var(--chrome);padding:3px 5px}
+.pasbox__x{margin-left:auto;height:22px;padding:0 7px}
+.pasbox__body{overflow:auto;padding:8px;-webkit-overflow-scrolling:touch}
+.pasbox .pas{grid-template-columns:minmax(0,1fr) auto;padding:8px;margin-bottom:6px}
+.pasbox .pas:last-child{margin-bottom:0}
+.pasbox .pas__desc{font-size:var(--fs-xs)}
+.pasbox .pas.is-locked{opacity:.7}
+.pasbox .pas.is-focus{box-shadow:0 0 0 1px var(--chrome) inset}
 
 /* ---- COMIC: trang truyện tranh ---- */
 .comic{position:absolute;inset:0;z-index:60;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;background:#0b0b0d;overflow:hidden;user-select:none;cursor:pointer;color:var(--text-1)}

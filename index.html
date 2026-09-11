@@ -240,6 +240,11 @@
       <div class="field field--enemy" id="enemies"></div>
       <span class="stage__pick">CHỌN MỤC TIÊU · CHẠM VÀO KẺ ĐỊCH</span>
       <div class="hint" id="hint" hidden><span class="hint__k">HINT</span><span class="hint__t" id="hintText"></span><button class="hint__x btn-ghost" id="hintClose" title="Đóng">✕</button></div>
+      <!-- bảng nội tại: chạm vào chip nội tại trên bảng chỉ số, hoặc chạm vào người của đội mình (battle.js openPassive) -->
+      <div class="pasbox" id="pasBox" hidden>
+        <div class="pasbox__hd"><span class="pasbox__who" id="pasWho">—</span><span class="pasbox__k">NỘI TẠI</span><button class="pasbox__x btn-ghost" id="pasClose" title="Đóng">✕</button></div>
+        <div class="pasbox__body" id="pasBody"></div>
+      </div>
 
       <div class="stageflash" id="stageflash"></div>
       <div class="stagedim" id="stagedim"></div><!-- mờ sân khi holo chạy; chạm vào để bỏ qua video -->

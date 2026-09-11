@@ -582,20 +582,38 @@ CHAPTERS.forEach(ch => ch.sectors.forEach(sid => {
   (sec.plan||[]).flat().forEach(id => { const n=Math.max(1, ch.n); if(FOE_DEBUT[id]==null || n<FOE_DEBUT[id]) FOE_DEBUT[id]=n; });
 }));
 /* ---- Cỡ người trên sân ----
-   Đo bằng `python scratch/sprite_size.py` (hộp bao phần không trong suốt của <id>_idle.png, % của hộp 682):
-   nhân vật 98% · lính 86.1% · elite 94.0% · trùm 99.4%. Đứng bên kia sân thì chênh lệch đó là CHỦ Ý
-   (lính nhỏ, trùm to). Nhưng chiêu mộ về làm ĐỒNG ĐỘI đứng cùng hàng với Yuki thì một con Scav thấp hơn
-   13% trông như trẻ con — nên bản chiêu mộ kéo về đúng cỡ người.
+   Mỗi bộ sprite được vẽ/cắt ở một cỡ hơi khác nhau, nên đứng cạnh nhau là lệch. Chỗ này kéo tất cả về
+   đúng một thang chiều cao: lính thấp hơn nhân vật, elite ngang ngửa, trùm to hẳn — chênh lệch đó là CHỦ Ý,
+   còn chênh lệch do art thì không.
+   BODY_H = chiều cao NGƯỜI đo được của <id>_idle.png, tính theo hộp chuẩn 682px, in ra bởi
+   `python scratch/sprite_size.py` (cột NGUOI). Phải đo NGƯỜI chứ không đo hộp bao: hộp của Kai cao bằng
+   hộp của Ash (668px) nhưng tính cả khẩu pháo thò lên sau lưng, nên người Kai thấp hơn Ash 2% — cộng
+   thêm hàng sau bị thu nhỏ nữa là ra cảnh "Kai bé hơn Ash" trên sân.
    Không cắt lại art: nhân w/h/ax của box lên cùng một hệ số là sprite to đều, chân vẫn chạm đất
    (.unit__frame neo bottom) và tâm không đổi (left tính từ ax). Muốn bỏ chuẩn hoá thì đặt HERO_BODY_H = 0.
    Hệ số lớn hơn thì vẫn phải nhân ĐỦ CẢ BA: h vượt 682 chỉ vẽ cao thêm lên trên (đúng), nhưng w vượt 744
-   mà ax giữ nguyên là neo chân lệch sang một bên.
-   RIGGER: từng cắt ở cỡ lính (86.1%) dù đã lên boss ngày 11/09 — đã cắt lại đủ 5 pose ở cỡ boss, nên
-   KHÔNG còn ngoại lệ ở đây nữa; bản cũ cất ở scratch/_bak_rigger/. */
-const HERO_BODY_H = .98;
-const RECRUIT_BODY_H = { grunt:.861, elite:.94, boss:.994 };
-const RECRUIT_BODY_FIX = {};
-const RECRUIT_NO_SCALE = ['straydog','drone','chromehound'];   // bốn chân và máy bay: thấp là đúng, đừng kéo cao bằng người
+   mà ax giữ nguyên là neo chân lệch sang một bên. Sprite vẽ cao quá ô lưới thì css/chromefall.css lo, theo
+   --big mà battle.js đặt trên #stage (tính từ ART_H bên dưới). */
+const BODY_H = {
+  yuki:.928, kai:.949, psalm:.943, ash:.969, ronin:.830,
+  scav:.855, welder:.855, tinman:.855, slagger:.853, chopshop:.852, hollow:.850, glassjaw:.850, gutterrat:.840, pipefitter:.831,
+  bulwark:.933, enforcer:.900, kiln:.867, drillbit:.861,
+  rigger:.994, foreman:.993, cantor:.963, archon:.916, motherrust:.913,
+  straydog:.570, drone:.460, chromehound:.594 };                 // ba con này đo thấp là ĐÚNG (bốn chân / bay)
+/* ART_H = từ mặt sàn lên tới nét vẽ CAO NHẤT (hào quang, nòng súng, và cả khoảng hụt của con bay lơ lửng),
+   cũng in ra bởi scratch/sprite_size.py (cột VOI). Khác BODY_H: đây là chiều cao ô lưới phải chừa chỗ,
+   BODY_H là chiều cao để so người với người. Ronin là ví dụ rõ nhất — art của anh nhỏ nên phải kéo lên 18%,
+   nhưng vẽ ra chỉ chiếm 0.849×1.18 ≈ 1.0 hộp, không việc gì phải bắt cả sân teo lại 18% vì anh. */
+const ART_H = {
+  yuki:.982, kai:.985, psalm:.991, ash:.981, ronin:.849,
+  scav:.867, welder:.867, tinman:.867, slagger:.867, chopshop:.867, hollow:.867, glassjaw:.867, gutterrat:.867, pipefitter:.867,
+  bulwark:.946, enforcer:.946, kiln:.946, drillbit:.946,
+  rigger:1, foreman:1, cantor:1, archon:1, motherrust:1,
+  straydog:.587, drone:.696, chromehound:.666 };
+const HERO_BODY_H = .95;                                          // cỡ người chuẩn của đội mình
+const HERO_SIZE = { psalm:1.03, ronin:1.03 };                     // ★ ai cao/thấp hơn chuẩn bao nhiêu (1 = đúng chuẩn)
+const FOE_BODY_H = { grunt:.85, elite:.97, boss:.99 };            // cỡ người chuẩn của địch theo rank (trùm còn được phóng thêm RANK_SC)
+const NO_BODY_SCALE = ['straydog','drone','chromehound'];   // bốn chân và máy bay: thấp là đúng, đừng kéo cao bằng người
 /* Bản sao box đã nhân hệ số. PHẢI clone: sprites/box dùng chung tham chiếu với def gốc trong ENEMY_POOL,
    sửa tại chỗ là kẻ địch trong 6 màn chương 1 cũng to theo. */
 function scaleSprites(s, k){
@@ -604,13 +622,21 @@ function scaleSprites(s, k){
   for(const p in (s.box||{})){ const b=s.box[p]; out.box[p]={ w:Math.round(b.w*k), h:Math.round(b.h*k), ax:Math.round(b.ax*k) }; }
   return out;
 }
+/* Chuẩn hoá cỡ người: địch kéo về cỡ chuẩn của rank nó, nhân vật đội mình kéo về cùng một cỡ người.
+   Chạy TRƯỚC khối chiêu mộ bên dưới, nên bản chiêu mộ chỉ còn phải bù từ cỡ rank lên cỡ nhân vật. */
+const bodyScale = (id, target) => { const b=BODY_H[id]; return (b && target && !NO_BODY_SCALE.includes(id)) ? target/b : 1; };
+ENEMY_POOL.forEach(e => { if(e.sprites) e.sprites = scaleSprites(e.sprites, bodyScale(e.id, FOE_BODY_H[e.rank])); });
+Object.keys(ROSTER).forEach(id => { const d=ROSTER[id];
+  if(d.sprites) d.sprites = scaleSprites(d.sprites, bodyScale(id, HERO_BODY_H*(HERO_SIZE[id]||1))); });
+
 const RECRUITABLE = Object.keys(FOE_DEBUT).filter(id => !RECRUIT_SKIP.includes(id));
 RECRUITABLE.forEach(id => {
   const e = ENEMY_POOL.find(x => x.id===id); if(!e || ROSTER[id]) return;
   const b = RECRUIT_BAND[e.rank], f = RECRUIT_FIX[id] || {};
   const ult = e.ult ? { ...e.ult, ...(f.ult||{}) } : RECRUIT_ULT[id];
-  const bodyH = RECRUIT_BODY_FIX[id] || RECRUIT_BODY_H[e.rank];
-  const k = (HERO_BODY_H && bodyH && !RECRUIT_NO_SCALE.includes(id)) ? HERO_BODY_H/bodyH : 1;
+  // e.sprites đã được kéo về cỡ rank ở trên → chỉ còn bù từ cỡ rank lên cỡ người của đội mình
+  const bodyH = FOE_BODY_H[e.rank];
+  const k = (HERO_BODY_H && bodyH && !NO_BODY_SCALE.includes(id)) ? HERO_BODY_H/bodyH : 1;
   ROSTER[id] = {
     ...e, recruit:true, debut:1, foeRank:e.rank, rank:undefined,
     sprites: scaleSprites(e.sprites, k),
