@@ -1,11 +1,6 @@
 {
   "comic_lint": [
-    "art/comic/00t_i3_p1.jpg: khổ trong doc 9:16 ≠ layout v2 → 1:1",
-    "art/comic/00t_i3_p2.jpg: khổ trong doc 9:16 ≠ layout v2 → 1:1",
-    "art/comic/00t_o1_p1.jpg: khổ trong doc 1:1 ≠ layout v3 → 3:2",
-    "art/comic/00t_o1_p2.jpg: khổ trong doc 9:16 ≠ layout v3 → 3:2",
     "art/comic/00t_o1_p2.jpg: speech ash 32 chữ > 25: \"Hàng cực phẩm… Halo cấp S, gãy vòng ngoài nhưng lõi còn nguyên tem. Cạy được cục này đem bán thì hai chị em tao húp thịt hộp nhòe mồm nửa năm!\"",
-    "art/comic/00t_o1_p3.jpg: khổ trong doc 9:16 ≠ layout v3 → 3:2",
     "art/comic/00t_o2_p2.jpg: speech ash 44 chữ > 25: \"Lò đúc của lão Foreman. Chỉ có lửa ở đấy mới luộc nổi hợp kim của Tháp. Mà đời này không ai nuôi báo cô ai đâu cưng — muốn gỡ vòng thì vác xác về làm culi trừ nợ cho băng của tao.\"",
     "art/comic/07a_i1_p1.jpg: speech ronin 27 chữ > 25: \"Ở đây tao chỉ lượm sắt vụn, không xẻ thịt đồng loại. Muốn nhập bọn thì tự chứng minh mày không phải một cục nợ vô dụng.\"",
     "art/comic/07b_i1_p1.jpg: caption 41 chữ > 40: \"Xưởng đúc bỏ hoang cắm sâu dưới lòng đất. Từng thuộc sở hữu của Canticle, nay là hang ổ của băng Foreman — nơi sở hữu ngọn lửa duy nhất ở Khu Đáy đủ nhiệt để bẻ khóa một chiếc Halo.\"",
