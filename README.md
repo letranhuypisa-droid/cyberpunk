@@ -34,8 +34,8 @@ rồi mở `http://localhost:8765/index.html`. UI kit và token: `kit.html`. Nú
 | `js/app.js` | Router màn hình, lobby, squad (3 slot, lưu đội, khoá người đang đồn trú), sector, thang tầng dẹp loạn (`renderRiot`), gacha hai bể, archive (tab Kỹ năng / Passive / Hồ sơ), config, COMMS |
 | `js/riot.js` | **DẸP LOẠN — chiếm bãi**: 9 cái bãi ở District 07 (`RIOT_YARDS`), kinh tế (`RIOT_ECON`), sức mạnh ổ neo vào số đo `m50`, đồn trú, kiện hàng theo chu kỳ, phản kích, nâng bãi, hợp đồng tuần. Số liệu sửa ở đây |
 | `js/riotui.js` | Màn bản đồ Khu Đáy + tờ chi tiết một bãi + chọn quân đồn trú + báo cáo vắng mặt; bản đồ dự phòng vẽ bằng SVG. Bọc `winReward`/`finish` của `battle.js` để cộng thưởng trận chiếm bãi (không sửa `battle.js`) |
-| `js/cyber.js` | **CYBERWARE**: 15 món cấy ghép (5 ô × 3 hạng), giá, bậc, ví **LINH KIỆN (LK)**, phân tách bản dư. Nối vào chỉ số qua `cyberBonus(id)` — `unitStats` gọi đúng một chỗ này |
-| `js/cyberui.js` | Màn CYBERWARE: chọn nhân vật → chọn ô → chọn món → lắp / nâng bậc / tháo, tờ phân tách bản dư; icon 5 ô vẽ bằng SVG |
+| `js/cyber.js` | **CYBERWARE**: 6 ô × thang 10 bậc = 60 món (`CYBER_SLOTS`), đường cong chỉ số, giá, ví **LINH KIỆN (LK)**, phân tách bản dư, trần của RONIN. Nối vào chỉ số qua `cyberBonus(id)` — `unitStats` gọi đúng một chỗ này |
+| `js/cyberui.js` | Màn CYBERWARE: chọn nhân vật → chọn ô → xem cả thang 10 bậc → nâng bậc; tờ phân tách bản dư. Ảnh món `art/cyber/`, chưa có thì vẽ icon SVG của ô |
 | `js/data_later.js` | Dữ liệu chương 2–3 bản cũ (không nạp), giữ để viết lại quanh Yuki |
 | `scratch/key_frame.py` | Tách nền frame sprite (idle/attack/hurt), in `box` để dán vào `ROSTER` |
 | `scratch/ult_lint.js` | Soát chiêu cuối: số trong `desc` có khớp `mult`/`hits`/`shieldPct`/`healPct`/`flat`/`drainEnergy` không, `energyMax` có bằng `ult.cost` không, và bản chiêu mộ có còn viết theo giọng phía địch không. Thoát mã 1 nếu lệch |
@@ -47,6 +47,7 @@ rồi mở `http://localhost:8765/index.html`. UI kit và token: `kit.html`. Nú
 | `scratch/sfx_ab.html` | Trang nghe đối chiếu SFX: bản đang dùng cạnh bản kia, âm lượng đã cân — mở bằng preview `static-sfx` |
 | `scratch/key_enemy.py` | Tách nền hàng loạt ảnh idle kẻ địch (`art-src/ENEMY/<id>.png` → `art/sprite/<id>_idle.png`), tự chọn cỡ theo rank, in `box` cho `FOE_SPRITE` |
 | `scratch/sim.js` | Mô phỏng trận bằng Node để cân bằng `mult` từng sector (cùng luật SPD/crit/trạng thái; `SIM_PATCH` để thử số khác) |
+| `scratch/cyber_sheet.py` | Cắt 6 tấm contact sheet CYBERWARE (lưới 5×2) → 60 PNG nền trong `art/cyber/<ô><bậc>.png`; tự dò nền xanh hay nền trắng |
 | `scratch/comic_lint.js` | Soát comic: người nói, bong bóng, tên file panel so với `docs/comic-prompts.md` |
 | `scratch/comic_measure.js` | Đo chữ trong bong bóng/caption từng panel |
 | `scratch/art_audit.js` | Kiểm kê art/animation còn thiếu cho chương 1 (thẻ, chân dung, pose sprite, video ult, nền, panel) |
@@ -60,7 +61,7 @@ rồi mở `http://localhost:8765/index.html`. UI kit và token: `kit.html`. Nú
 | `docs/ult-prompts.md` | Quy cách video cut-in chiêu cuối + prompt từng nhân vật |
 | `docs/plan-2026-09.md` | Đánh giá hiện trạng 07/09 + kế hoạch tháng 9 (mục tiêu: hoàn thành chương 1 trước 30/09) |
 | `docs/dep-loan.md` | **DẸP LOẠN**: thiết kế 9 cái bãi, đóng quân, kiện hàng, phản kích, nâng bãi, hợp đồng tuần + số cân bằng đo được + đặc tả giao diện + prompt bản đồ District 07 |
-| `docs/cyberware.md` | **CYBERWARE**: 5 ô cấy ghép, 15 món, giá LK/CR, phân tách bản dư, ngoại lệ RONIN, prompt icon |
+| `docs/cyberware.md` | **CYBERWARE**: 6 ô × 10 bậc = 60 món, đường cong chỉ số, giá LK/CR, phân tách bản dư, trần của RONIN, quy cách 6 tấm contact sheet |
 | `docs/enemy-prompts.md` | Prompt art 21 kẻ địch chương 1 + đề xuất nội tại/lore cho địch |
 | `docs/hero-prompts.md` | Prompt art 10 nhân vật gacha chưa có ảnh (thẻ + sprite nền xanh), kèm đề xuất tạo hình từng người |
 | `docs/fx-prompts.md` | Overlay hiệu ứng: cách chạy, tên file thay thế, quy cách sheet + prompt; luật trạng thái; SPD/CRIT; hộp holo; di chuyển kiểu Idle Heroes |
@@ -178,19 +179,25 @@ chiếm bãi (đánh) → đóng quân 1–3 người → bãi đẻ KIỆN HÀN
 Đặc tả đầy đủ: `docs/cyberware.md`. Nút **CYBERWARE** ở HOME (và nút tắt trong hồ sơ nhân vật ở ARCHIVE).
 
 ```
-lá trùng gacha → PHÂN TÁCH → LINH KIỆN (LK) → chế tạo + nâng bậc cyberware → đội mạnh hơn
+lá trùng gacha → PHÂN TÁCH → LINH KIỆN (LK) → nâng bậc 6 ô cyberware → đội mạnh hơn
 ```
 
-- **5 ô cho từng nhân vật**: NÃO · MẮT · TAY · NGỰC · CHÂN. Mỗi ô có **3 hạng** (B/A/S), mỗi món nâng được
-  **3 bậc** (×1 → ×1.5 → ×2). Chế tạo là lắp thẳng vào ô — **không có kho đồ rời**.
+- **6 ô, mỗi ô một thang 10 bậc** (ĐẦU · THÂN · TAY · CHÂN · PHỤ KIỆN A · PHỤ KIỆN B) = **60 món**,
+  đúng bộ art 6 tấm contact sheet. Một trục duy nhất: người chơi đọc "TAY 06/10" là biết mình ở đâu.
+  Độ hiếm theo bậc: `01 02` COMMON · `03 04` UNCOMMON · `05 06` RARE · `07 08` EPIC · `09` LEGENDARY · `10` MYTHIC.
+  **Thang chỉ đi lên** — không tháo, không hoàn.
 - **Cộng đúng 4 chỉ số `unitStats` đang trả về** (ATK% · HP% · SPD · CRIT) và nối vào **một chỗ duy nhất**:
   `unitStats(id)` gọi `cyberBonus(id)`. Thẻ nhân vật, `power()`, hồ sơ và chỉ số lúc vào trận vì thế luôn khớp.
   Cấp nâng cấp nhân **trước**, cyberware nhân sau — hai nguồn nhân nhau, không cộng dồn phần trăm.
+  Đủ 6 ô bậc 10 = **+44% ATK · +52% HP · +30 SPD · +34 CRIT**.
 - **LINH KIỆN (LK)** chỉ đến từ **phân tách bản dư** (`PLAYER.extra`) — đóng lời hứa treo từ đợt 1 của gacha.
   Bậc B 10 LK · A 25 LK · S 60 LK. Phân tách **không đụng `PLAYER.owned`**, không có đường nào mất nhân vật.
-  Bãi ở DẸP LOẠN vẫn chỉ đẻ CR + SH.
-- **RONIN không lắp được** (`noChrome:true` — lore: "không một khớp nối kim loại"). Đổi lại anh mang sẵn
-  **THÉP TRẦN** = một bộ hạng A bậc 1 (`CYBER.bare`).
-- **Icon vẽ bằng SVG trong code**, không cần file nào. Thả `art/cyber/<id>.png` (256×256, nền trong) vào là tự thay.
+  Bãi ở DẸP LOẠN vẫn chỉ đẻ CR + SH. Một nhân vật kịch cả 6 ô ≈ 2 208 LK + 132 480 CR ≈ 9 ngày cày.
+- **RONIN (`noChrome:true`)** đi lên như mọi người rồi **dừng ở món cuối cùng còn là đồ mặc vào** — vì bậc
+  thấp của mọi ô đều không phải cấy ghép (găng da, áo khoác, mũ lưỡi trai, giày vải). TAY dừng ở 02, các ô
+  khác 07–08; tổng 41/60 bậc. Đổi lại món ở đúng bậc trần cho **×1.5** chỉ số (THÉP TRẦN).
+- **Ảnh món**: thả 6 tấm contact sheet vào `art-src/CYBER/<ô>.png` rồi chạy `python scratch/cyber_sheet.py`
+  → 60 PNG `art/cyber/<ô><bậc>.png`. Chưa có thì ô hiện icon SVG, game vẫn chạy.
 
 > `scratch/sim.js` **chưa mô phỏng cyberware** — bảng tỉ lệ thắng ở `docs/dep-loan.md` §F1 là **sàn**.
+

@@ -1,12 +1,18 @@
 /* =====================================================================
-   CYBERWARE — chọn nhân vật, 5 ô cấy ghép, tờ chọn món, tờ phân tách bản dư.
+   CYBERWARE — chọn nhân vật, 6 ô, thang 10 bậc mỗi ô, tờ phân tách bản dư.
    Đọc token của css/chromefall.css, không tự đặt màu mới. Đặc tả: docs/cyberware.md §E.
    ===================================================================== */
 .cyber{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr) auto;gap:8px;padding:10px}
 .cyber .sh__title{flex:none;white-space:nowrap}
 .cyber .sh .pill{margin-left:auto} .cyber .sh .pill+.pill{margin-left:0} .cyber .sh .btn-ghost{margin-left:0}
 
-/* Màu theo hạng món — dùng chung cho ô, thẻ món, dòng phân tách */
+/* Sáu độ hiếm, đúng bộ nhãn in trên art. Tất cả lấy từ token có sẵn. */
+.r-c{--cbt:var(--text-2)}
+.r-u{--cbt:var(--hp)}
+.r-r{--cbt:var(--tier-a)}
+.r-e{--cbt:var(--chrome-hi)}
+.r-l{--cbt:var(--tier-s)}
+.r-m{--cbt:var(--danger)}
 .t-b{--cbt:var(--tier-b)} .t-a{--cbt:var(--tier-a)} .t-s{--cbt:var(--tier-s)}
 
 /* ---- Dải chọn nhân vật (cuộn ngang) ---- */
@@ -34,37 +40,48 @@
 .cbhero__p .portrait{position:absolute;inset:0;--pos:50% 6%}
 .cbhero__i{min-width:0}
 .cbhero__i>b{display:block;font:900 var(--fs-lg)/1 var(--font-ui);letter-spacing:.16em}
-.cbhero__i>em{display:block;margin:5px 0 8px;font:8px/1 var(--font-mono);letter-spacing:.12em;font-style:normal;color:var(--text-3)}
+.cbhero__i>em{display:block;margin:5px 0 8px;font:8px/1 var(--font-mono);letter-spacing:.1em;font-style:normal;color:var(--text-3)}
 .cbstat{display:grid;grid-template-columns:42px auto 14px auto;align-items:baseline;gap:4px;margin-bottom:3px}
 .cbstat .lbl{font-size:8px}
 .cbstat b{font:700 var(--fs-xs)/1 var(--font-mono);color:var(--text-2)}
 .cbstat i{font-style:normal;font-size:8px;color:var(--text-3);text-align:center}
 .cbstat b.is-up{color:var(--energy)} .cbstat i.is-flat,.cbstat b.is-flat{color:var(--text-3)}
 
-/* ---- 5 ô ---- */
+/* ---- Ô ảnh món: icon SVG cho tới khi có art/cyber/<ô><bậc>.png ---- */
+.cbpic{position:relative;display:flex;align-items:center;justify-content:center;width:100%;height:100%;color:var(--cbt,var(--text-3))}
+.cbpic .cbic{width:60%;height:60%;max-width:26px;max-height:26px}
+.cbpic img{width:100%;height:100%;object-fit:contain;display:block}
+.cbpic.has-img{background:radial-gradient(circle at 50% 55%, color-mix(in srgb, var(--cbt,var(--text-3)) 22%, transparent), transparent 68%)}
+
+/* ---- 6 ô ---- */
 .cbslots{display:flex;flex-direction:column;gap:6px}
-.cbslot{display:grid;grid-template-columns:26px 40px minmax(0,1fr) auto 12px;align-items:center;gap:8px;padding:8px 9px;
+.cbslot{display:grid;grid-template-columns:44px minmax(0,1fr) 12px;align-items:center;gap:9px;padding:7px 9px;
   border:1px solid var(--line-1);background:var(--surface-1);color:var(--text-1);text-align:left;cursor:pointer;
   clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px);transition:border-color var(--t-state)}
 .cbslot:hover{border-color:var(--line-3)}
 .cbslot.is-on{border-color:var(--cbt);background:var(--surface-2)}
-.cbslot__ic{display:block;color:var(--text-3)} .cbslot.is-on .cbslot__ic{color:var(--cbt)}
-.cbic{display:block;width:22px;height:22px}
-.cbslot__k{font:800 8px/1 var(--font-mono);letter-spacing:.14em;color:var(--text-3)}
-.cbslot.is-on .cbslot__k{color:var(--text-2)}
+.cbslot__pic{display:block;aspect-ratio:1;width:44px}
 .cbslot__i{min-width:0}
-.cbslot__i b{display:block;font:700 var(--fs-2xs)/1.2 var(--font-ui);letter-spacing:.1em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cbslot__k{display:block;font:800 8px/1 var(--font-mono);letter-spacing:.16em;color:var(--text-3)}
+.cbslot.is-on .cbslot__k{color:var(--cbt)}
+.cbslot__i b{display:block;margin-top:4px;font:700 var(--fs-2xs)/1.2 var(--font-ui);letter-spacing:.08em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cbslot__i b.is-empty{color:var(--text-3);letter-spacing:.16em}
-.cbslot__i em{display:block;margin-top:3px;font:8px/1 var(--font-mono);letter-spacing:.06em;font-style:normal;color:var(--energy)}
+.cbslot__i em{display:block;margin-top:3px;font:8px/1 var(--font-mono);letter-spacing:.04em;font-style:normal;color:var(--energy)}
 .cbslot__i b.is-empty+em{color:var(--text-3)}
-.cbslot__t{padding:2px 4px;border:1px solid var(--cbt);font:800 8px/1.2 var(--font-mono);color:var(--cbt);white-space:nowrap}
-.cbslot__t u{text-decoration:none;margin-left:2px;color:var(--text-1)}
 .cbslot__go{font-style:normal;font-size:10px;color:var(--text-3)}
+/* Thanh 10 vạch = cả con đường của ô đó, nhìn một cái biết đang ở đâu */
+.cbpips{display:flex;align-items:center;gap:2px;margin-top:5px}
+.cbpips i{width:9px;height:4px;background:var(--surface-4);clip-path:var(--poly-slant)}
+.cbpips i.on{background:var(--cbt,var(--text-2))}
+.cbpips i.off{background:transparent;box-shadow:inset 0 0 0 1px var(--line-1)}
+.cbpips u{margin-left:auto;text-decoration:none;font:800 8px/1 var(--font-mono);letter-spacing:.08em;color:var(--text-3)}
+
 .cbnote{margin:0;padding:7px 9px;border-left:2px solid var(--line-2);background:var(--surface-1);
   font:var(--fs-2xs)/1.5 var(--font-mono);color:var(--text-3)}
 .cbnote b{color:var(--energy)}
 
-/* ---- RONIN: không cấy ghép ---- */
+/* ---- RONIN: thép trần ---- */
 .cbbare{padding:10px 12px;border:1px solid var(--rust-lo);background:var(--surface-1);
   clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px)}
 .cbbare h4{margin:0 0 7px;font:800 8px/1 var(--font-mono);letter-spacing:.24em;color:var(--rust-hi)}
@@ -73,32 +90,44 @@
 .cbbare b{color:var(--text-2)}
 .cbbare__fx b{color:var(--rust-acid)}
 
-/* ---- Tờ chọn món ---- */
+/* =====================================================================
+   TỜ MỘT Ô — cả thang 10 bậc
+   ===================================================================== */
 .cb__panel{z-index:60;grid-template-rows:auto minmax(0,1fr) auto}
-.cblist{display:flex;flex-direction:column;gap:8px;overflow:auto;overscroll-behavior:contain}
-.cbitem{padding:9px 10px;border:1px solid var(--line-1);background:var(--surface-1);
-  clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px)}
-.cbitem.is-on{border-color:var(--cbt);background:var(--surface-2)}
-.cbitem__h{display:grid;grid-template-columns:26px minmax(0,1fr) auto;align-items:center;gap:9px}
-.cbitem__ic{display:block;color:var(--cbt)}
-.cbitem__n b{display:block;font:700 var(--fs-xs)/1.2 var(--font-ui);letter-spacing:.12em}
-.cbitem__n em{display:block;margin-top:4px;font:800 8px/1 var(--font-mono);letter-spacing:.08em;font-style:normal;color:var(--energy)}
-.cbitem__t{padding:2px 4px;border:1px solid var(--cbt);font:800 8px/1.2 var(--font-mono);color:var(--cbt);white-space:nowrap}
-.cbitem__t u{text-decoration:none;margin-left:2px;color:var(--text-1)}
-.cbitem__d{margin:8px 0 0;font:var(--fs-2xs)/1.5 var(--font-mono);color:var(--text-3)}
-.cbitem__math{margin:6px 0 0;padding:4px 6px;border-left:2px solid var(--line-2);background:var(--surface-2);
-  font:8px/1.5 var(--font-mono);letter-spacing:.04em;color:var(--text-2)}
-.cbitem__act{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
-.cbbtn{flex:1 1 150px;height:44px}
-.cbbtn--off{flex:0 1 auto;height:44px;padding:0 12px;font-size:9px}
-.cbmax{flex:1 1 150px;display:flex;align-items:center;justify-content:center;height:44px;border:1px dashed var(--line-2);
-  font:800 8px/1 var(--font-mono);letter-spacing:.18em;color:var(--tier-s)}
+.cblist{display:flex;flex-direction:column;gap:6px;overflow:auto;overscroll-behavior:contain}
+.cbstep{display:grid;grid-template-columns:56px minmax(0,1fr) auto;align-items:center;gap:10px;padding:7px 9px;
+  border:1px solid var(--line-1);background:var(--surface-1);
+  clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px)}
+.cbstep__pic{display:block;aspect-ratio:1;width:56px}
+.cbstep__i{min-width:0}
+.cbstep__h{display:flex;align-items:center;gap:6px}
+.cbstep__h>b{font:800 var(--fs-xs)/1 var(--font-mono);color:var(--cbt)}
+.cbstep__r{font:800 8px/1 var(--font-mono);letter-spacing:.16em;color:var(--cbt)}
+.cbstep__now{padding:1px 4px;font:800 8px/1.3 var(--font-mono);font-style:normal;letter-spacing:.1em;
+  color:var(--text-inv);background:var(--energy-full)}
+.cbstep__lock{padding:1px 4px;border:1px solid var(--rust-lo);font:800 8px/1.3 var(--font-mono);font-style:normal;
+  letter-spacing:.1em;color:var(--rust-hi)}
+.cbstep__n{display:block;margin-top:4px;font:700 var(--fs-2xs)/1.2 var(--font-ui);letter-spacing:.08em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cbstep__d{display:block;margin-top:3px;font:8px/1.3 var(--font-mono);font-style:normal;color:var(--text-3)}
+.cbstep__fx{display:block;margin-top:4px;font:800 8px/1 var(--font-mono);letter-spacing:.04em;color:var(--energy)}
+.cbstep__go{flex:none;width:104px;height:46px}
+.cbstep__cost{font:700 8px/1.4 var(--font-mono);color:var(--text-3);text-align:right;white-space:nowrap}
+
+.cbstep.is-past{opacity:.42}
+.cbstep.is-past .cbstep__fx{color:var(--text-3)}
+.cbstep.is-cur{border-color:var(--cbt);background:var(--surface-2);box-shadow:inset 2px 0 0 var(--cbt)}
+.cbstep.is-next{border-color:var(--line-3)}
+.cbstep.is-far{opacity:.6}
+.cbstep.is-locked{opacity:.34}
+.cbstep.is-locked .cbstep__fx{color:var(--text-3)}
 
 /* ---- Tờ phân tách ---- */
 .cbscrap{border-left:2px solid var(--cbt)}
 .cbscrap__p{position:relative;flex:none;width:34px;aspect-ratio:3/4;overflow:hidden;background:var(--surface-3)}
 .cbscrap__p .portrait{position:absolute;inset:0;--pos:50% 6%}
 .cbscrap .dl__info b{display:flex;align-items:center;gap:6px}
+.cbscrap__t{padding:2px 4px;border:1px solid var(--cbt);font:800 8px/1.2 var(--font-mono);color:var(--cbt)}
 .cbscrap .dl__info .mono b{display:inline;color:var(--energy)}
 
 @media (max-height:720px){

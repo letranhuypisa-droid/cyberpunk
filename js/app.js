@@ -81,7 +81,7 @@ function renderHome(){
   const cb=$('#cyberMenuSub');
   if(cb && typeof scrapTotal==='function'){
     const t=scrapTotal();
-    cb.textContent = PLAYER.parts ? `${PLAYER.parts.toLocaleString('en-US')} LK` : t.n ? `${t.n} LÁ DƯ` : '5 Ô';
+    cb.textContent = PLAYER.parts ? `${PLAYER.parts.toLocaleString('en-US')} LK` : t.n ? `${t.n} LÁ DƯ` : '6 Ô';
     const cd=$('#cyberMenuDot'); if(cd) cd.hidden = !t.n;
   }
   const sec = SECTORS.find(x=>x.state==='open') || SECTORS[SECTORS.length-1];
@@ -198,10 +198,9 @@ $('#codexClose').addEventListener('click',()=>{ $('#codex').hidden=true; });
 const LORE_TAB = { cur:'skill' };
 /* Dòng dưới nút CYBERWARE trong hồ sơ — guard typeof vì kit.html không nạp js/cyber.js */
 function cyberBtnTxt(id){
-  if(typeof cyberNoFit!=='function') return '5 ô cấy ghép';
-  if(cyberNoFit(id)) return 'KHÔNG CẤY GHÉP · THÉP TRẦN';
-  const n=cyberCount(id);
-  return n ? `${n}/5 Ô ĐÃ LẮP · ${PLAYER.parts.toLocaleString('en-US')} LK` : `CHƯA LẮP Ô NÀO · ${PLAYER.parts.toLocaleString('en-US')} LK`;
+  if(typeof cyberProgress!=='function') return '6 ô trang bị';
+  const p=cyberProgress(id), lk=PLAYER.parts.toLocaleString('en-US');
+  return `${p.now}/${p.max} BẬC${cyberNoFit(id)?' · THÉP TRẦN':''} · ${lk} LK`;
 }
 const fxText = e => [ e.atkPct&&`${e.atkPct>0?'+':''}${e.atkPct}% ATK`, e.hpPct&&`${e.hpPct>0?'+':''}${e.hpPct}% HP`, e.energyStart&&`VÀO TRẬN ${e.energyStart} EN`,
   e.dmgPct&&`${e.dmgPct>0?'+':''}${e.dmgPct}% SÁT THƯƠNG`, e.dmgTakenPct&&`${e.dmgTakenPct}% SÁT THƯƠNG NHẬN`, e.critPct&&`+${e.critPct}% CRIT`, e.energyGainPct&&`+${e.energyGainPct}% ENERGY` ].filter(Boolean).join(' · ');

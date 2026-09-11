@@ -1,26 +1,37 @@
 'use strict';
 /* =====================================================================
-   CYBERWARE — màn hình. Chọn nhân vật → chọn ô → chọn món → lắp / nâng bậc / tháo, và tờ phân tách bản dư.
+   CYBERWARE — màn hình. Chọn nhân vật → chọn ô → xem thang 10 bậc → nâng bậc; và tờ phân tách bản dư.
    Số liệu + logic ở js/cyber.js. Đặc tả: docs/cyberware.md §E.
-   Nạp sau js/app.js (cần go/renderWallet/portraitEl).
+   Nạp sau js/app.js (cần go/renderWallet/portraitEl/rn ở js/riotui.js).
+
+   Ảnh món: art/cyber/<ô><bậc>.png (cắt từ 6 tấm contact sheet bằng scratch/cyber_sheet.py).
+   Chưa có file thì vẽ icon SVG của ô — luôn có hình, không bao giờ là ô trống.
    ===================================================================== */
 
-/* ---- Icon 5 ô: vẽ trong code, chưa cần một file ảnh nào. Thả art/cyber/<id>.png vào là tự thay. ---- */
 const CB_ICON = {
-  neu:'<rect x="5" y="5" width="14" height="14" rx="2"/><rect x="9" y="9" width="6" height="6" fill="currentColor" stroke="none"/><path d="M12 5V2M12 22v-3M5 12H2M22 12h-3M8 5V3M16 5V3M8 21v-2M16 21v-2"/>',
-  opt:'<path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6-10-6-10-6Z"/><circle cx="12" cy="12" r="3.4"/><path d="M12 6V3M18.5 8.5 20.6 6.4"/>',
-  arm:'<rect x="2" y="4.5" width="3.5" height="5" rx="1"/><path d="M5.5 7h4l3 4"/><circle cx="13.6" cy="11.6" r="2.4"/><path d="M15.4 13.2 19 17.2"/><path d="M19 17.2l2.2-1.4M19 17.2l-1.4 2.2"/>',
-  cor:'<path d="M12 3v18"/><path d="M6 7c3 1.4 9 1.4 12 0M5.5 12c3.4 1.6 9.6 1.6 13 0M6.5 17c3 1.4 8 1.4 11 0"/><path d="M4 5v14M20 5v14"/>',
-  leg:'<path d="M9 3h5l-1 7 3 5-2 6H8l-1-6 3-5Z"/><path d="M9.2 10h5.6M7 21h11"/><circle cx="11.5" cy="6" r="1.3" fill="currentColor" stroke="none"/>',
+  head:'<path d="M4.5 14a7.5 7.5 0 0 1 15 0v3.5a1.5 1.5 0 0 1-1.5 1.5h-2.5"/><path d="M4.5 14v4a1.5 1.5 0 0 0 1.5 1.5h2"/><path d="M7 11.5h10"/><circle cx="9.5" cy="15" r="1.2" fill="currentColor" stroke="none"/>',
+  body:'<path d="M9 3 5 5.5 3.5 12l2.5.8V21h12v-8.2l2.5-.8L19 5.5 15 3"/><path d="M9 3l3 3.5L15 3"/><path d="M12 6.5V21"/>',
+  arm: '<rect x="2" y="4.5" width="3.5" height="5" rx="1"/><path d="M5.5 7h4l3 4"/><circle cx="13.6" cy="11.6" r="2.4"/><path d="M15.4 13.2 19 17.2"/><path d="M19 17.2l2.2-1.4M19 17.2l-1.4 2.2"/>',
+  legs:'<path d="M9 3h5l-1 7 3 5-2 6H8l-1-6 3-5Z"/><path d="M9.2 10h5.6M7 21h11"/><circle cx="11.5" cy="6" r="1.3" fill="currentColor" stroke="none"/>',
+  ac1: '<circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v3M12 17.5v3M3.5 12h3M17.5 12h3"/><circle cx="12" cy="12" r="2.6" fill="currentColor" stroke="none"/>',
+  ac2: '<rect x="4" y="7" width="16" height="11" rx="2"/><path d="M8 7V5.5A1.5 1.5 0 0 1 9.5 4h5A1.5 1.5 0 0 1 16 5.5V7"/><path d="M4 12h16"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/>',
 };
-const cbIcon = (slot, cls='') => `<svg class="cbic ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${CB_ICON[slot]||''}</svg>`;
-const cbTier = t => t.toLowerCase();
+const cbIcon = slot => `<svg class="cbic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${CB_ICON[slot]||''}</svg>`;
+/* Ô ảnh món: icon SVG trước, thay bằng art/cyber/<ô><bậc>.png ngay khi file có */
+function cbPic(slot, step, cls=''){
+  const p=el('span','cbpic '+cls);
+  p.innerHTML=cbIcon(slot);
+  if(step) loadFirst(cyberArt(slot, step)).then(src=>{ if(src){ p.innerHTML=`<img src="${src}" alt="">`; p.classList.add('has-img'); } });
+  return p;
+}
 /* "+9% ATK · +3 CRIT" — cùng thứ tự ở mọi chỗ, để mắt quen */
 function cbFxText(fx){
-  return [ fx.atkPct&&`+${fx.atkPct}% ATK`, fx.hpPct&&`+${fx.hpPct}% HP`, fx.spd&&`+${fx.spd} SPD`, fx.crit&&`+${fx.crit} CRIT` ]
+  const n = v => Number.isInteger(v) ? v : v.toFixed(1);
+  return [ fx.atkPct&&`+${n(fx.atkPct)}% ATK`, fx.hpPct&&`+${n(fx.hpPct)}% HP`, fx.spd&&`+${n(fx.spd)} SPD`, fx.crit&&`+${n(fx.crit)} CRIT` ]
     .filter(Boolean).join(' · ') || '—';
 }
 const cbCostText = c => `${rn(c.lk)} LK · ${rn(c.cr)} CR`;
+const cbRar = step => CYBER_RARITY[CYBER_STEP_RARITY[step-1]];
 
 const CB = { hero:null, slot:null };
 
@@ -39,18 +50,18 @@ function renderCyber(){
   if(!$('#cbSlotBox').hidden && CB.slot) renderCbSlot();
 }
 
-/* Dải chọn nhân vật: ai đã sở hữu, người trong đội lên trước, huy hiệu = số ô đã lắp */
+/* Dải chọn nhân vật: ai đã sở hữu, người trong đội lên trước, huy hiệu = tổng bậc đang có */
 function renderCbPick(owned){
   const box=$('#cbPick'); box.innerHTML='';
-  const rank = id => (TEAM.includes(id)?2:0) + (cyberCount(id)?1:0);
+  const rank = id => (TEAM.includes(id)?2:0) + (cyberProgress(id).now?1:0);
   [...owned].sort((a,b)=> rank(b)-rank(a) || 'SAB'.indexOf(ROSTER[a].tier)-'SAB'.indexOf(ROSTER[b].tier)).forEach(id=>{
-    const d=ROSTER[id], n=cyberCount(id), bare=cyberNoFit(id);
+    const d=ROSTER[id], p=cyberProgress(id), bare=cyberNoFit(id);
     const b=el('button',`cbp cbp--${d.faction} ${id===CB.hero?'is-on':''}`);
     b.dataset.id=id;
     b.appendChild(portraitEl(d));
     b.insertAdjacentHTML('beforeend',
       `<span class="cbp__n">${d.name}</span>`
-      + (bare ? `<em class="cbp__b cbp__b--bare">TRẦN</em>` : n ? `<em class="cbp__b">${n}/5</em>` : '')
+      + (p.now ? `<em class="cbp__b${bare?' cbp__b--bare':''}">${p.now}/${p.max}</em>` : bare ? '<em class="cbp__b cbp__b--bare">TRẦN</em>' : '')
       + (TEAM.includes(id)?'<i class="cbp__team"></i>':''));
     b.addEventListener('click',()=>{ CB.hero=id; sfx('cursor',.08); renderCyber(); });
     box.appendChild(b);
@@ -68,44 +79,52 @@ function cbStatRow(lbl, a, b, suffix=''){
 function renderCbBody(){
   const id=CB.hero, d=ROSTER[id], body=$('#cbBody');
   if(!d){ body.innerHTML='<p class="cbempty">Chưa sở hữu nhân vật nào.</p>'; return; }
-  const base=baseStats(id), fin=unitStats(id), bo=cyberBonus(id), bare=cyberNoFit(id);
+  const base=baseStats(id), fin=unitStats(id), bo=cyberBonus(id), bare=cyberNoFit(id), pr=cyberProgress(id);
   const H=[];
   H.push(`<div class="cbhero cbhero--${d.faction}">
     <div class="cbhero__p" id="cbHeroPic"></div>
     <div class="cbhero__i">
-      <b>${d.name}</b><em>TIER ${d.tier} · LV ${lvl(id)} · ${bare?'KHÔNG CẤY GHÉP':`${cyberCount(id)}/5 Ô`}</em>
+      <b>${d.name}</b><em>TIER ${d.tier} · LV ${lvl(id)} · ${pr.now}/${pr.max} BẬC${bare?' · KHÔNG CẤY GHÉP':''}</em>
       ${cbStatRow('ATK', base.atk, fin.atk)}${cbStatRow('HP', base.hp, fin.hp)}
       ${cbStatRow('SPD', base.spd, fin.spd)}${cbStatRow('CRIT', base.crit, fin.crit, '%')}
     </div>
   </div>`);
 
+  H.push('<div class="cbslots">' + CYBER_SLOTS.map(s=>{
+    const step=cyberStep(id, s.id), cap=cyberCap(id, s.id), it=cyberItem(s.id, step), fx=cyberSlotFx(id, s.id);
+    const r=step?cbRar(step):null;
+    const pips=Array.from({length:CYBER.maxStep},(_,i)=>
+      `<i class="${i<step?'on':''}${i>=cap?' off':''}"></i>`).join('');
+    return `<button class="cbslot ${step?'is-on '+r.css:''}" data-slot="${s.id}">
+      <span class="cbslot__pic" data-pic="${s.id}" data-step="${step}"></span>
+      <span class="cbslot__i">
+        <span class="cbslot__k">${s.name}</span>
+        <b${step?'':' class="is-empty"'}>${it?it.name:'— TRỐNG —'}</b>
+        <em>${step?cbFxText(fx):'chạm để lắp bậc 1'}</em>
+        <span class="cbpips">${pips}<u>${String(step).padStart(2,'0')}/${cap}</u></span>
+      </span>
+      <i class="cbslot__go">▸</i>
+    </button>`;
+  }).join('') + '</div>');
+
+  H.push(`<p class="cbnote">Tổng cyberware đang mang: <b>${cbFxText(bo)}</b>.
+    Cấp nâng cấp nhân trước, cyberware nhân sau — hai nguồn nhân nhau, không cộng dồn phần trăm.</p>`);
+
   if(bare){
+    const left=cyberRemaining(id);
     H.push(`<div class="cbbare">
       <h4>THÉP TRẦN</h4>
-      <p>${d.name} không có một khớp nối kim loại nào — cả người là máu thịt nguyên bản, đó là lý do anh còn
-         sống theo luật của mình. <b>Không lắp cyberware được.</b></p>
-      <p class="cbbare__fx">Đổi lại, anh luôn mang sẵn: <b>${cbFxText(CYBER.bare)}</b></p>
+      <p>${d.name} không có một khớp nối kim loại nào. Anh mặc được đồ, nhưng dừng lại ở món cuối cùng còn là
+         <b>thứ khoác lên người</b> — găng tay thì được, tay máy thì không.</p>
+      <p>Đổi lại, món đang đứng đúng bậc trần của anh cho <b>×${CYBER.bareBonus}</b> chỉ số: đồ trần trong tay
+         anh ăn đứt đồ cấy trong tay người khác.</p>
+      <p class="cbbare__fx">Trần từng ô: ${CYBER_SLOTS.map(s=>`${s.name} ${CYBER.bareCap[s.id]}`).join(' · ')}.
+        Còn phải bỏ ra <b>${rn(left.lk)} LK + ${rn(left.cr)} CR</b> để đi hết.</p>
     </div>`);
-  } else {
-    H.push('<div class="cbslots">' + CYBER_SLOTS.map(s=>{
-      const it=cyberAt(id, s.id), c=it&&cyberById(it.id);
-      const fx=it?cyberFx(it.id, it.lv):null;
-      return `<button class="cbslot ${c?'is-on t-'+cbTier(c.tier):''}" data-slot="${s.id}">
-        <i class="cbslot__ic">${cbIcon(s.id)}</i>
-        <span class="cbslot__k">${s.name}</span>
-        <span class="cbslot__i">${c
-          ? `<b>${c.name}</b><em>${cbFxText(fx)}</em>`
-          : `<b class="is-empty">— TRỐNG —</b><em>chạm để lắp</em>`}</span>
-        ${c?`<span class="cbslot__t">${c.tier}${it.lv>1?`<u>+${it.lv-1}</u>`:''}</span>`:''}
-        <i class="cbslot__go">▸</i>
-      </button>`;
-    }).join('') + '</div>');
-    const tot=cbFxText(bo);
-    H.push(`<p class="cbnote">Tổng cyberware đang mang: <b>${tot}</b>.
-      Cấp nâng cấp nhân trước, cyberware nhân sau — hai nguồn nhân nhau, không cộng dồn phần trăm.</p>`);
   }
   body.innerHTML=H.join('');
   const pic=$('#cbHeroPic'); if(pic) pic.appendChild(portraitEl(d));
+  body.querySelectorAll('[data-pic]').forEach(sp=>sp.appendChild(cbPic(sp.dataset.pic, +sp.dataset.step)));
   body.scrollTop=0;
 }
 $('#cbBody').addEventListener('click', e=>{
@@ -114,47 +133,41 @@ $('#cbBody').addEventListener('click', e=>{
 });
 
 /* =====================================================================
-   TỜ CHỌN MÓN CHO MỘT Ô — ba hạng của ô đó, món đang lắp lên đầu
+   TỜ MỘT Ô — cả thang 10 bậc, bậc đang dùng sáng, bậc kế có nút nâng.
+   Bộ art xếp 01→10 nên màn hình bày đúng như thế: người chơi thấy cả con đường, không chỉ bước kế.
    ===================================================================== */
 function renderCbSlot(){
-  const id=CB.hero, s=CYBER_SLOTS.find(x=>x.id===CB.slot); if(!s) return;
-  const cur=cyberAt(id, s.id), curDef=cur&&cyberById(cur.id);
+  const id=CB.hero, s=cyberSlot(CB.slot); if(!s) return;
+  const step=cyberStep(id, s.id), cap=cyberCap(id, s.id);
   $('#cbSlotTitle').textContent=s.name;
-  $('#cbSlotSub').textContent=`${ROSTER[id].name} · ${s.sub.toUpperCase()} · ${rn(PLAYER.parts)} LK`;
+  $('#cbSlotSub').textContent=`${ROSTER[id].name} · ${String(step).padStart(2,'0')}/${cap} · ${rn(PLAYER.parts)} LK`;
   const list=$('#cbSlotList'); list.innerHTML='';
-  const defs=cyberOfSlot(s.id).slice().sort((a,b)=>
-    (cur&&cur.id===b.id?1:0)-(cur&&cur.id===a.id?1:0) || 'BAS'.indexOf(a.tier)-'BAS'.indexOf(b.tier));
 
-  defs.forEach(c=>{
-    const on = cur && cur.id===c.id, lv = on ? cur.lv : 1;
-    const fx = cyberFx(c.id, lv), craft = cyberCraftCost(c);
-    const row=el('div',`cbitem t-${cbTier(c.tier)} ${on?'is-on':''}`);
-    const acts=[];
-    if(on){
-      if(lv < CYBER.maxLv){ const up=cyberUpCost(c, lv);
-        acts.push(`<button class="btn-act btn-act--go cbbtn" data-act="up" ${canPay(up)?'':'disabled'}><span class="btn-act__k">Nâng bậc ${lv+1}</span><span class="btn-act__v">${cbCostText(up)}${canPay(up)?'':' · KHÔNG ĐỦ'}</span></button>`); }
-      else acts.push(`<div class="cbmax">KỊCH BẬC ${CYBER.maxLv}/${CYBER.maxLv}</div>`);
-      acts.push(`<button class="btn-ghost cbbtn cbbtn--off" data-act="off">Tháo · hoàn ${rn(Math.round(cyberSunkLk(c,lv)*CYBER.refund))} LK</button>`);
-    } else {
-      acts.push(`<button class="btn-act cbbtn" data-act="fit" data-id="${c.id}" ${canPay(craft)?'':'disabled'}><span class="btn-act__k">${curDef?'Thay':'Lắp'}</span><span class="btn-act__v">${cbCostText(craft)}${canPay(craft)?'':' · KHÔNG ĐỦ'}</span></button>`);
-    }
-    row.innerHTML=`<div class="cbitem__h"><i class="cbitem__ic">${cbIcon(s.id)}</i>
-        <div class="cbitem__n"><b>${c.name}</b><em>${cbFxText(fx)}</em></div>
-        <span class="cbitem__t">${c.tier}${on&&lv>1?`<u>+${lv-1}</u>`:''}</span></div>
-      <p class="cbitem__d">${c.desc}</p>
-      <p class="cbitem__math">gốc ${cbFxText(c.fx)} × bậc ${CYBER.lvMult[lv-1].toFixed(2)}${on&&lv<CYBER.maxLv?` → bậc ${lv+1} cho ${cbFxText(cyberFx(c.id, lv+1))}`:''}</p>
-      <div class="cbitem__act">${acts.join('')}</div>`;
+  for(let k=1;k<=CYBER.maxStep;k++){
+    const it=cyberItem(s.id, k), r=cbRar(k), fx=cyberStepFx(id, s.id, k);
+    const state = k<step ? 'past' : k===step ? 'cur' : k===step+1 && k<=cap ? 'next' : k>cap ? 'locked' : 'far';
+    const row=el('div',`cbstep ${r.css} is-${state}`);
+    const cost=cyberCost(k), afford=canPay(cost);
+    row.innerHTML=`<span class="cbstep__pic" data-pic="${s.id}" data-step="${k}"></span>
+      <div class="cbstep__i">
+        <div class="cbstep__h"><b class="mono">${String(k).padStart(2,'0')}</b><span class="cbstep__r">${r.label}</span>
+          ${k===step?'<em class="cbstep__now">ĐANG DÙNG</em>':''}${k>cap?'<em class="cbstep__lock">CẤY GHÉP</em>':''}</div>
+        <b class="cbstep__n">${it.name}</b>
+        <em class="cbstep__d">${it.sub}</em>
+        <span class="cbstep__fx">${cbFxText(fx)}</span>
+      </div>
+      ${state==='next' ? `<button class="btn-act btn-act--go cbstep__go" data-up="1" ${afford?'':'disabled'}><span class="btn-act__k">Nâng</span><span class="btn-act__v">${cbCostText(cost)}${afford?'':' · THIẾU'}</span></button>`
+        : state==='far' ? `<span class="cbstep__cost mono">${cbCostText(cost)}</span>` : ''}`;
     list.appendChild(row);
-  });
+  }
+  list.querySelectorAll('[data-pic]').forEach(sp=>sp.appendChild(cbPic(sp.dataset.pic, +sp.dataset.step)));
+  const cur=list.querySelector('.is-cur, .is-next');
+  if(cur) cur.scrollIntoView({block:'center', behavior:'auto'});
 }
 $('#cbSlotList').addEventListener('click', e=>{
-  const b=e.target.closest('[data-act]'); if(!b || b.disabled) return;
-  const id=CB.hero, slot=CB.slot;
-  let r;
-  if(b.dataset.act==='fit') r=cyberFit(id, b.dataset.id);
-  else if(b.dataset.act==='up') r=cyberUp(id, slot);
-  else if(b.dataset.act==='off') r=cyberRemove(id, slot);
-  if(r==='ok'){ sfx('open',.24); renderCbSlot(); renderCyber(); }
+  const b=e.target.closest('[data-up]'); if(!b || b.disabled) return;
+  const r=cyberUp(CB.hero, CB.slot);
+  if(r==='ok'){ AUDIO.upgrade ? AUDIO.upgrade() : sfx('open',.24); renderCbSlot(); renderCyber(); }
   else sfx('error',.35);
 });
 $('#cbSlotClose').addEventListener('click',()=>{ $('#cbSlotBox').hidden=true; CB.slot=null; sfx('cancel',.25); });
@@ -171,11 +184,11 @@ function renderCbScrap(){
   }
   rows.forEach(x=>{
     const d=ROSTER[x.id];
-    const r=el('div',`dl__row cbscrap t-${cbTier(d.tier)}`);
+    const r=el('div',`dl__row cbscrap t-${d.tier.toLowerCase()}`);
     const pic=el('span','cbscrap__p'); pic.appendChild(portraitEl(d));
     r.appendChild(pic);
     r.insertAdjacentHTML('beforeend',
-      `<div class="dl__info"><b>${d.name} <span class="cbitem__t">${d.tier}</span></b>
+      `<div class="dl__info"><b>${d.name} <span class="cbscrap__t">${d.tier}</span></b>
         <span class="mono">DƯ ×${x.n} · ${x.each} LK mỗi lá → <b>+${rn(x.lk)} LK</b></span></div>
        <button class="btn-ghost dl__claim" data-id="${x.id}">PHÂN TÁCH</button>`);
     list.appendChild(r);
