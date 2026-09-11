@@ -106,7 +106,7 @@ const ROSTER = {
                desc:'Cực kỳ căm ghét những kẻ rã xác người đổi tiền, nhát chém của Ronin gây sát thương tàn bạo lên tên trùm Foreman.' },
            ],
            sprites:{ idle:['art/sprite/ronin_idle.png'], attack:['art/sprite/ronin_attack.png'], hurt:['art/sprite/ronin_hurt.png'],
-                     box:{ idle:{w:744,h:682,ax:372}, attack:{w:744,h:682,ax:372}, hurt:{w:744,h:682,ax:372} } },   // ★ idle TẠM = chính frame đòn thường (tấn ngang): bảng pose 11/09 chưa có tư thế đứng
+                     box:{ idle:{w:744,h:682,ax:372}, attack:{w:745,h:682,ax:372}, hurt:{w:744,h:682,ax:372} } },   // hộp thật nằm ở HERO_SPRITE bên dưới (đè lên đây), gồm cả crit/die
            ultVideo:['video/ronin_ult.mp4'],
            portrait:['art/card/ronin_portrait.jpg','art/card/ronin.png'], pos:'50% 8%' },
   muzzle:{ id:'muzzle',name:'MUZZLE',faction:'rust', tier:'B', atk:70,  hp:1750, energyMax:125, spd:80,  crit:5,   // ★ FAKE: cost + hệ số (tên + mô tả chiêu cuối đã chốt, xem docs/skill-naming.md §9)
@@ -213,7 +213,10 @@ const HERO_SPRITE = {
   kai:{attack:{w:744,h:682,ax:372}, crit:{w:744,h:682,ax:372}, die:{w:744,h:682,ax:372}},
   psalm:{attack:{w:852,h:682,ax:426}, crit:{w:899,h:682,ax:449}, die:{w:744,h:682,ax:372}},
   ash:{attack:{w:843,h:693,ax:421}, crit:{w:744,h:682,ax:372}, die:{w:744,h:682,ax:372}},
-  ronin:{attack:{w:744,h:682,ax:372}, crit:{w:744,h:682,ax:372}, die:{w:744,h:682,ax:372}} };
+  // Ronin + Muzzle: cắt lại nguyên bộ 5 pose ngày 11/09 bằng `python scratch/key_enemy.py art-src/HERO --only ronin,muzzle`
+  // (Ronin đã có tư thế ĐỨNG YÊN thật nên không cần --h nữa; Muzzle 4 pose động cắt từ bảng, ô kính trên cánh cửa khử về trong suốt).
+  ronin:{idle:{w:744,h:682,ax:372}, attack:{w:745,h:682,ax:372}, crit:{w:744,h:682,ax:372}, hurt:{w:744,h:682,ax:372}, die:{w:744,h:682,ax:372}},
+  muzzle:{idle:{w:744,h:682,ax:372}, attack:{w:744,h:682,ax:372}, crit:{w:744,h:682,ax:372}, hurt:{w:744,h:682,ax:372}, die:{w:744,h:682,ax:372}} };
 Object.entries(HERO_SPRITE).forEach(([id,poses])=>{ const s=ROSTER[id]&&ROSTER[id].sprites; if(!s) return; s.box=s.box||{};
   for(const p in poses){ s[p]=['art/sprite/'+id+'_'+p+'.png']; s.box[p]=poses[p]; } });
 
@@ -595,7 +598,7 @@ CHAPTERS.forEach(ch => ch.sectors.forEach(sid => {
    mà ax giữ nguyên là neo chân lệch sang một bên. Sprite vẽ cao quá ô lưới thì css/chromefall.css lo, theo
    --big mà battle.js đặt trên #stage (tính từ ART_H bên dưới). */
 const BODY_H = {
-  yuki:.928, kai:.949, psalm:.943, ash:.969, ronin:.830,
+  yuki:.928, kai:.949, psalm:.943, ash:.969, ronin:.963, muzzle:.935,
   scav:.855, welder:.855, tinman:.855, slagger:.853, chopshop:.852, hollow:.850, glassjaw:.850, gutterrat:.840, pipefitter:.831,
   bulwark:.933, enforcer:.900, kiln:.867, drillbit:.861,
   rigger:.994, foreman:.993, cantor:.963, archon:.916, motherrust:.913,
@@ -605,18 +608,16 @@ const BODY_H = {
    BODY_H là chiều cao để so người với người. Con nào hộp bị phóng (h > 682) thì chỗ phải chừa là
    ART_H × hệ số phóng, không phải cả cái hộp — trong hộp thường có sẵn một khoảng trời trống trên đầu. */
 const ART_H = {
-  yuki:.982, kai:.985, psalm:.991, ash:.981, ronin:.849,
+  yuki:.982, kai:.985, psalm:.991, ash:.981, ronin:.985, muzzle:.985,
   scav:.867, welder:.867, tinman:.867, slagger:.867, chopshop:.867, hollow:.867, glassjaw:.867, gutterrat:.867, pipefitter:.867,
   bulwark:.946, enforcer:.946, kiln:.946, drillbit:.946,
   rigger:1, foreman:1, cantor:1, archon:1, motherrust:1,
   straydog:.587, drone:.696, chromehound:.666 };
-/* BODY_FIX = chốt tay, đè lên số đo tự động. Máy đo chiều cao hộp bao nên KHÔNG phân biệt được "người thấp"
-   với "người đang tấn thấp": RONIN chưa có tư thế đứng yên, ảnh idle của anh là mượn tạm frame Light Attack
-   (art-src/HERO/ronin poses.png chỉ có Light Attack · Crit · Khuỵu gối · Hurt), tấn rộng nên đo ra .830 —
-   kéo anh lên cho bằng .95 thì đầu anh to hơn đầu Ash 21% (đo bề ngang đầu: 134 → 158 px so với Ash 131).
-   Cỡ người của anh vốn đã đúng, nên chốt bằng cỡ chuẩn để hệ số = 1, không đụng vào sprite.
-   Bao giờ có tư thế đứng yên thật thì cắt vào, đo lại, và bỏ dòng này. */
-const BODY_FIX = { ronin:.95 };
+/* BODY_FIX = chốt tay, đè lên số đo tự động của BODY_H. Cần đến khi ảnh idle KHÔNG phải tư thế đứng yên:
+   máy đo chiều cao thì không phân biệt được "người thấp" với "người đang tấn thấp", kéo một thế tấn rộng
+   lên cho bằng người đứng thẳng là đầu nó to hơn hẳn mọi người. Ronin từng phải chốt tay vì đúng lý do đó;
+   11/09 có ảnh đứng yên thật, cắt lại là số đo tự khớp (.963) nên bảng này trống trở lại. */
+const BODY_FIX = {};
 const HERO_BODY_H = .95;                                          // cỡ người chuẩn của đội mình
 const HERO_SIZE = { psalm:1.03 };                                 // ★ ai cao/thấp hơn chuẩn bao nhiêu (1 = đúng chuẩn)
 const FOE_BODY_H = { grunt:.85, elite:.97, boss:.99 };            // cỡ người chuẩn của địch theo rank (trùm còn được phóng thêm RANK_SC)

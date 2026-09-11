@@ -17,7 +17,7 @@ ERODE = 41          # bào mòn: bỏ chi tiết mảnh hơn ngần này px (đ�
 HERO_TARGET = .95   # HERO_BODY_H trong js/data.js — in sẵn hệ số phải nhân để mọi người cao bằng nhau
 
 GROUPS = {
-    'NHAN VAT': ['yuki', 'kai', 'psalm', 'ash', 'ronin'],
+    'NHAN VAT': ['yuki', 'kai', 'psalm', 'ash', 'ronin', 'muzzle'],
     'grunt': ['scav', 'straydog', 'gutterrat', 'welder', 'chopshop', 'tinman',
               'slagger', 'pipefitter', 'hollow', 'glassjaw', 'drone'],
     'elite': ['bulwark', 'kiln', 'drillbit', 'enforcer', 'chromehound'],
