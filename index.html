@@ -17,6 +17,7 @@
 -->
 <link rel="stylesheet" href="css/chromefall.css">
 <link rel="stylesheet" href="css/fx.css">
+<link rel="stylesheet" href="css/riot.css">
 </head>
 <body>
 
@@ -63,7 +64,7 @@
       <div class="menu">
         <button class="menu__btn" data-go="squad"><b>SQUAD</b><small>3 SLOT</small></button>
         <button class="menu__btn" data-go="map"><b>MAP</b><small>HALCYON</small></button>
-        <button class="menu__btn" id="btnRiotMenu" data-go="riot"><b>DẸP LOẠN</b><small id="riotMenuSub">KHOÁ</small></button>
+        <button class="menu__btn" id="btnRiotMenu" data-go="riotmap"><b>DẸP LOẠN</b><small id="riotMenuSub">KHOÁ</small><i class="menu__dot" id="riotMenuDot" hidden></i></button>
         <button class="menu__btn" data-go="gacha"><b>GACHA</b><small>REQUISITION</small></button>
         <button class="menu__btn" data-go="archive"><b>ARCHIVE</b><small>LORE</small></button>
         <button class="menu__btn" data-go="config"><b>CONFIG</b><small>SYS</small></button>
@@ -139,9 +140,63 @@
       </div>
     </div>
 
-    <!-- ===== SCREEN: DẸP LOẠN — thang đánh vô hạn, cày tiền giữa chương 1 và chương 2 ===== -->
+    <!-- ===== SCREEN: RIOTMAP — bản đồ Khu Đáy. 9 cái bãi chiếm được + nút xuống HỐ LOẠN (thang tầng).
+         Nội dung do js/riotui.js đổ; ảnh nền là art/map/map_d07.jpg, chưa có thì SVG vẽ trong code. ===== -->
+    <div class="screen riotmap" data-screen="riotmap">
+      <div class="sh"><span class="sh__title">Khu Đáy</span><span class="sh__sub" id="rmSub">DISTRICT 07 · DẸP LOẠN</span><button class="btn-ghost" data-go="home">◂ BASE</button></div>
+      <div class="rm__head">
+        <div class="rm__stats">
+          <div class="rmstat"><span class="lbl">Bãi đang giữ</span><b id="rmOwn">0/9</b></div>
+          <div class="rmstat"><span class="lbl">Thu nhập</span><b id="rmRate">—</b></div>
+          <div class="rmstat"><span class="lbl">Kiện chờ</span><b id="rmCrates">0</b></div>
+        </div>
+        <div class="rm__timer"><span class="lbl">Kiện tiếp theo</span><b class="mono" id="rmNext">—</b><i class="rm__bar"><u id="rmNextBar"></u></i></div>
+        <div class="rm__chips">
+          <button class="rmchip" id="rmFeedBtn">BÁO CÁO <em id="rmFeedN">0</em></button>
+          <button class="rmchip" id="rmWeekBtn">HỢP ĐỒNG TUẦN <em id="rmWeekN">0/3</em></button>
+        </div>
+      </div>
+      <div class="rm__view" id="rmView">
+        <div class="rm__img" id="rmImg">
+          <div class="rm__art" id="rmArt"></div>
+          <div class="rm__fog" id="rmFog"></div>
+          <div class="rm__nodes" id="rmNodes"></div>
+          <span class="map__cred mono" id="rmCred">DISTRICT 07 · MẶT BẰNG</span>
+        </div>
+      </div>
+      <button class="btn-act btn-act--go btn-act--full" id="btnClaimAll"><span class="btn-act__k">Nhận tất cả</span><span class="btn-act__v" id="claimAllMeta">—</span></button>
+
+      <!-- Báo cáo vắng mặt -->
+      <div class="dl rm__panel" id="rmFeedBox" hidden>
+        <div class="sh"><span class="sh__title">Báo cáo</span><span class="sh__sub">CHUYỆN XẢY RA LÚC BẠN ĐI VẮNG</span><button class="btn-ghost" id="rmFeedClose">◂ KHU ĐÁY</button></div>
+        <div class="dl__list" id="rmFeedList"></div>
+      </div>
+      <!-- Hợp đồng tuần -->
+      <div class="dl rm__panel" id="rmWeekBox" hidden>
+        <div class="sh"><span class="sh__title">Hợp đồng tuần</span><span class="sh__sub" id="rmWeekDate">—</span><button class="btn-ghost" id="rmWeekClose">◂ KHU ĐÁY</button></div>
+        <div class="dl__list" id="rmWeekList"></div>
+      </div>
+
+      <!-- ===== Tờ chi tiết một bãi ===== -->
+      <div class="yard" id="yardSheet" hidden>
+        <div class="yard__hero">
+          <div class="yard__img" id="yImg"></div>
+          <button class="btn-ghost yard__close" id="yClose">◂ KHU ĐÁY</button>
+          <div class="yard__head"><span class="yard__tags" id="yTags"></span><b id="yName">—</b><i id="yDesc"></i></div>
+        </div>
+        <div class="yard__body" id="yBody"></div>
+        <button class="btn-act btn-act--go btn-act--full" id="yAction"><span class="btn-act__k" id="yActK">—</span><span class="btn-act__v" id="yActV">—</span></button>
+      </div>
+      <!-- ===== Chọn người đóng quân ===== -->
+      <div class="dl rm__panel" id="yPickBox" hidden>
+        <div class="sh"><span class="sh__title">Đóng quân</span><span class="sh__sub" id="yPickSub">—</span><button class="btn-ghost" id="yPickClose">◂ BÃI</button></div>
+        <div class="ypick" id="yPickList"></div>
+      </div>
+    </div>
+
+    <!-- ===== SCREEN: HỐ LOẠN — thang đánh vô hạn, cày tiền giữa chương 1 và chương 2 ===== -->
     <div class="screen riot" data-screen="riot">
-      <div class="sh"><span class="sh__title">Dẹp loạn</span><span class="sh__sub" id="riotSub">KHU ĐÁY · XUNG ĐỘT TỰ PHÁT</span><button class="btn-ghost" data-go="home">◂ BASE</button></div>
+      <div class="sh"><span class="sh__title">Hố loạn</span><span class="sh__sub" id="riotSub">KHU ĐÁY · XUNG ĐỘT TỰ PHÁT</span><button class="btn-ghost" data-go="riotmap">◂ KHU ĐÁY</button></div>
       <div class="riot__head">
         <div class="riot__best"><span class="lbl">Tầng cao nhất</span><b id="riotBest">—</b></div>
         <div class="riot__next"><span class="lbl">Đang mở</span><b id="riotOpen">—</b></div>
@@ -250,7 +305,7 @@
         <i class="holo__tail"></i>
       </div>
       <div class="ultbanner" id="ultBanner"><div class="ultbanner__n" id="ubName">ZERO</div><div class="ultbanner__line"></div><div class="ultbanner__s" id="ubSub"></div></div>
-      <div class="result" id="result" hidden><div class="result__box"><div class="result__t" id="resT"></div><div class="result__s" id="resS"></div><button class="btn-ghost" id="btnAgain">RETRY</button> <button class="btn-ghost" data-go="home">RETURN TO BASE</button></div></div>
+      <div class="result" id="result" hidden><div class="result__box"><div class="result__t" id="resT"></div><div class="result__s" id="resS"></div><button class="btn-ghost" id="btnAgain">RETRY</button> <button class="btn-ghost" id="btnResRiot" data-go="riotmap" hidden>◂ KHU ĐÁY</button> <button class="btn-ghost" data-go="home">RETURN TO BASE</button></div></div>
     </div>
 
     <div class="actions">
@@ -275,11 +330,13 @@
 <script src="js/core.js"></script>
 <script src="js/data.js"></script>
 <script src="js/state.js"></script>
+<script src="js/riot.js"></script>
 <script src="js/story.js"></script>
 <script src="js/audio.js"></script>
 <script src="js/fx.js"></script>
 <script src="js/battle.js"></script>
 <script src="js/comic.js"></script>
 <script src="js/app.js"></script>
+<script src="js/riotui.js"></script>
 </body>
 </html>

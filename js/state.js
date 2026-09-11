@@ -60,6 +60,7 @@ const DAILY_TASKS = [
   { id:'attacks', label:'Tung 15 đòn thường',        goal:15, reward:30 },
   { id:'ult',     label:'Phát 3 chiêu cuối',         goal:3,  reward:40 },
   { id:'pull',    label:'Quay Requisition 1 lần',    goal:1,  reward:30 },
+  { id:'riotcrate', label:'Nhận 5 kiện ở Khu Đáy',   goal:5,  reward:30 },   // DẸP LOẠN, js/riot.js gọi dailyProgress
 ];
 const today = () => { const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
 function dailyTick(){

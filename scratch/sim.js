@@ -110,6 +110,34 @@ function runSector(sec, teamIds){
   }
   return {win:true, round, survivors:alive(allies).length};
 }
+/* ---- Chế độ CHIẾM BÃI: node scratch/sim.js 300 yuki,ash,kai --yard [--lv 20]
+   Nạp thêm js/state.js (power/unitStats) và js/riot.js rồi chạy runSector trên yardSector(bãi).
+   Cột cuối đối chiếu NHÃN mà giao diện hứa với người chơi (ÁP ĐẢO / NGANG SỨC / NGUY HIỂM / TỰ SÁT) với
+   tỉ lệ thắng thật — lệch quá ±10 điểm thì chỉnh ngưỡng ở powerVerdict() hoặc mult của bãi. ---- */
+if(process.argv.includes('--yard')){
+  const li=process.argv.indexOf('--lv'), LV = li>0 ? +process.argv[li+1]||1 : 1;
+  if(LV>1){ const k=1+.04*(LV-1); TEAM_ARG.forEach(id=>{ const d=ROSTER[id]; if(!d) return; d.atk=Math.round(d.atk*k); d.hp=Math.round(d.hp*k); }); }
+  vm.runInContext(fs.readFileSync(path.join(__dirname,'..','js','state.js'),'utf8'), ctx, {filename:'state.js'});
+  vm.runInContext(fs.readFileSync(path.join(__dirname,'..','js','riot.js'),'utf8'), ctx, {filename:'riot.js'});
+  const { RIOT_YARDS, yardSector, yardPower, powerVerdict, teamPower } = vm.runInContext('({RIOT_YARDS,yardSector,yardPower,powerVerdict,teamPower})', ctx);
+  // --ymult drop=0.8,smelter=0.95 → thử mult khác · --only drop → chỉ chạy một bãi (dùng cho riot_tune.js)
+  const mi=process.argv.indexOf('--ymult');
+  if(mi>0) (process.argv[mi+1]||'').split(',').filter(Boolean).forEach(x=>{ const [id,v]=x.split('='); const y=RIOT_YARDS.find(q=>q.id===id); if(y) y.mult=+v; });
+  const oi=process.argv.indexOf('--only'), ONLY = oi>0 ? process.argv[oi+1] : null;
+  const mine=teamPower(TEAM_ARG);
+  console.log(`team=${TEAM_ARG.join('+')} cấp ${LV} · sức mạnh đội ${mine} · ${N} trận/bãi`);
+  for(const y of RIOT_YARDS){
+    if(ONLY && y.id!==ONLY) continue;
+    const sec=yardSector(y,false), pw=yardPower(y,false), v=powerVerdict(mine,pw);
+    let wins=0, rounds=0, surv=0;
+    for(let i=0;i<N;i++){ const r=runSector(sec,TEAM_ARG); if(r.win){ wins++; surv+=r.survivors; } rounds+=r.round; }
+    const w=wins/N*100;
+    console.log(`${y.id.padEnd(8)} ${y.name.padEnd(16)} mult ${String(sec.mult).padEnd(5)} ổ ${String(pw).padStart(6)}  tỉ lệ ${(mine/pw).toFixed(2)}  `
+      + `win ${w.toFixed(0).padStart(3)}%  round tb ${(rounds/N).toFixed(1).padStart(5)}  sống ${wins?(surv/wins).toFixed(2):'-'}  nhãn ${v.label}`);
+  }
+  process.exit(0);
+}
+
 /* ---- Chế độ DẸP LOẠN: node scratch/sim.js 300 yuki,ash,kai --riot [tầng cuối]
    riotSector(n) trả về object hình dạng sector nên runSector chạy thẳng, không phải viết lại gì.
    Đọc bảng: tầng nào tụt xuống dưới ~40% là chỗ người chơi phải dừng lại nâng cấp — muốn tường đó

@@ -96,6 +96,18 @@
         "127.0.0.1"
       ],
       "port": 8767
+    },
+    {
+      "name": "static-riot",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8802",
+        "--bind",
+        "127.0.0.1"
+      ],
+      "port": 8802
     }
   ]
 }

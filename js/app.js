@@ -10,6 +10,7 @@ function go(name){
   if(name==='battle' && !SECTOR.team){ TEAM=normalizeTeam(TEAM); if(TEAM.includes(null)) return go('squad'); }
   if(APP.dataset.screen==='battle' && name!=='battle'){ B.gen++; exitTargeting(); stopCutin(); comicEnd(); }   // rời trận giữa chừng: huỷ mọi việc đang chờ
   if(APP.dataset.screen==='gacha' && name!=='gacha') stopVideoBox($('#revealCutin'));
+  if(APP.dataset.screen==='riotmap' && name!=='riotmap' && typeof riotTickStop==='function') riotTickStop();   // rời bản đồ Khu Đáy: tắt đồng hồ đếm
   if(APP.dataset.screen!==name && APP.dataset.screen!=='title') sfx('swipe',.35);
   APP.dataset.screen=name;
   document.querySelectorAll('.screen').forEach(sc=>sc.classList.toggle('is-active', sc.dataset.screen===name));
@@ -17,6 +18,7 @@ function go(name){
   if(name==='squad') renderSquad();
   if(name==='map') renderMap();
   if(name==='riot') renderRiot();
+  if(name==='riotmap' && typeof renderRiotMap==='function') renderRiotMap();   // bản đồ Khu Đáy (js/riotui.js)
   if(name==='sector') renderSectors();
   if(name==='home') renderHome();
   if(name==='gacha') renderGacha();
@@ -62,16 +64,26 @@ function renderHome(){
   const feat = ROSTER.yuki;
   if($('#heroArt').dataset.id!==feat.id){ const p=portraitEl(feat); $('#heroArt').replaceWith(p); p.id='heroArt'; p.dataset.id=feat.id; $('#heroFeat').innerHTML=`NHÂN VẬT CHÍNH · TIER ${feat.tier}<b>${feat.name}</b>`; }
   syncSectorStates();
-  /* Nút DẸP LOẠN: khoá tới khi xong màn mở khoá, rồi in tầng đang mở để người chơi biết chỗ cày */
+  /* Nút DẸP LOẠN: khoá tới khi xong màn mở khoá. Mở rồi thì in việc đang chờ ở Khu Đáy (bãi giữ được /
+     kiện chờ nhận), và chấm đỏ khi có kiện, có bãi bị chiếm hoặc có hợp đồng tuần xong — riotHasWork() ở js/riot.js. */
   const rb=$('#btnRiotMenu'); if(rb){ const on=riotUnlocked();
     rb.classList.toggle('is-locked', !on); rb.disabled=!on;
-    $('#riotMenuSub').textContent = on ? `TẦNG ${PLAYER.riot.tier}` : `CẦN XONG ${RIOT.unlock}`; }
+    /* Nút menu chỉ cao 56px và chữ nhỏ chỉ vừa MỘT dòng — in việc gấp nhất, không in cả bảng tổng quan */
+    const o = on && typeof riotSummary==='function' ? riotSummary() : null;
+    $('#riotMenuSub').textContent = !on ? `CẦN XONG ${RIOT.unlock}`
+      : !o ? `TẦNG ${PLAYER.riot.tier}`
+      : o.crates ? `${o.crates} KIỆN CHỜ`
+      : o.contested ? `${o.contested} BÃI MẤT`
+      : `${o.own}/${RIOT_YARDS.length} BÃI`;
+    const dot=$('#riotMenuDot'); if(dot) dot.hidden = !(on && typeof riotHasWork==='function' && riotHasWork()); }
   const sec = SECTORS.find(x=>x.state==='open') || SECTORS[SECTORS.length-1];
   SECTOR = sec;
   $('#homeSector').textContent=sec.id; $('#homeSectorMeta').textContent=`${sec.name} · ${sec.waves} WAVE · ${sec.boss?ENEMY_POOL.find(e=>e.id===sec.boss).name:'KHÔNG BOSS'}`;
 }
 
 /* ---- SQUAD: 3 slot + roster, bấm thẻ để thêm/bỏ, kéo thả cũng được. Đội hình lưu vào hồ sơ. ---- */
+/* "Rảnh" = không đang đồn trú ở bãi nào của DẸP LOẠN (js/riot.js). Guard typeof vì kit.html không nạp riot.js. */
+const isFreeUnit = id => typeof garrisoned!=='function' || !garrisoned(id);
 const SQUAD = { slots: normalizeTeam(TEAM) };
 function renderSquad(){
   const slots=$('#squadSlots'), roster=$('#squadRoster');
@@ -90,17 +102,19 @@ function renderSquad(){
     roster.dataset.built='1';
     Object.values(ROSTER).forEach(d=>{
       const c=cardEl(d,''); c.dataset.id=d.id;
-      c.addEventListener('click',()=>{ if(!owns(d.id)) return; const j=SQUAD.slots.indexOf(d.id); if(j>-1) SQUAD.slots[j]=null; else { const k=SQUAD.slots.indexOf(null); if(k<0) return; SQUAD.slots[k]=d.id; } renderSquad(); });
+      c.addEventListener('click',()=>{ if(!owns(d.id)||!isFreeUnit(d.id)) return; const j=SQUAD.slots.indexOf(d.id); if(j>-1) SQUAD.slots[j]=null; else { const k=SQUAD.slots.indexOf(null); if(k<0) return; SQUAD.slots[k]=d.id; } renderSquad(); });
       roster.appendChild(c);
     });
   }
-  // nhân vật chưa sở hữu → khoá (lấy ở màn GACHA hoặc cốt truyện); đã sở hữu nhưng đang trong đội → SELECTED
-  SQUAD.slots = SQUAD.slots.map(id => id && owns(id) ? id : null);
-  roster.querySelectorAll('.card').forEach(c=>{ const id=c.dataset.id, on=SQUAD.slots.includes(id), locked=!owns(id);
+  // nhân vật chưa sở hữu → khoá (lấy ở màn GACHA hoặc cốt truyện); đang đồn trú ở một cái bãi của DẸP LOẠN → cũng khoá
+  // (quy tắc Q2 ở docs/dep-loan.md: đóng quân là khoá khỏi đội hình, đây là lý do duy nhất khiến roster rộng có giá trị)
+  SQUAD.slots = SQUAD.slots.map(id => id && owns(id) && isFreeUnit(id) ? id : null);
+  roster.querySelectorAll('.card').forEach(c=>{ const id=c.dataset.id, on=SQUAD.slots.includes(id), inGar=!isFreeUnit(id), locked=!owns(id)||inGar;
     c.classList.toggle('is-selected',on); c.classList.toggle('is-locked',locked); c.draggable=!locked;
-    c.querySelector('.card__state').textContent = on?'SELECTED':locked?'LOCKED':''; });
-  // sắp xếp: đã sở hữu lên trước
-  [...roster.querySelectorAll('.card')].sort((a,b)=>owns(b.dataset.id)-owns(a.dataset.id)).forEach(c=>roster.appendChild(c));
+    c.querySelector('.card__state').textContent = on?'SELECTED':inGar?'ĐỒN TRÚ':locked?'LOCKED':''; });
+  // sắp xếp: người dùng được lên trước (đã sở hữu và đang rảnh), rồi tới người đang đồn trú, cuối là chưa sở hữu
+  const rank = id => (owns(id)?2:0) + (owns(id)&&isFreeUnit(id)?1:0);
+  [...roster.querySelectorAll('.card')].sort((a,b)=>rank(b.dataset.id)-rank(a.dataset.id)).forEach(c=>roster.appendChild(c));
   const n=SQUAD.slots.filter(Boolean).length;
   $('#squadCount').innerHTML=`<b>${n}</b>/${TEAM_SIZE} DEPLOYED`;
   const btn=$('#btnDeploy'); btn.disabled = n!==TEAM_SIZE; btn.querySelector('.btn-act__v').textContent = n===TEAM_SIZE ? 'Tiếp → bản đồ HALCYON' : `Chọn thêm ${TEAM_SIZE-n} nhân vật`;

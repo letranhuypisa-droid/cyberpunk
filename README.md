@@ -31,7 +31,9 @@ rồi mở `http://localhost:8765/index.html`. UI kit và token: `kit.html`. Nú
 | `js/audio.js` | SFX giao diện (audio/*.ogg) + âm chiến đấu: có `audio/<tên>.ogg\|mp3\|wav` thì dùng file, thiếu thì tổng hợp WebAudio. Một thao tác = một tiếng (`SFX_ONE`/`SFX_BEAT`); `SFX_VARIANTS` cho tiếng nhiều bản (`hit`, `hit2`…); `SFX_MUTE` cho nút không kêu |
 | `js/fx.js` | Overlay hiệu ứng trên sprite: một lần (hit/crit/nổ/điện/độc/cháy/choáng/hồi máu/lá chắn) và lặp theo trạng thái + lá chắn; tự dùng sprite sheet `art/fx/<kind>.webp` nếu có |
 | `js/battle.js` | Engine trận: passive, lượt theo SPD, chế độ chọn mục tiêu, di chuyển tới mục tiêu kiểu Idle Heroes (`playMoveAttack`), sát thương + chí mạng, lá chắn (`addShield`/`absorbShield`), trạng thái choáng/độc/cháy (`applyStatus`/`tickStatus`), ult + video holo trên đầu nhân vật (`playHolo`), chiêu cuối của địch (`enemyUlt`), wave (hồi máu giữa wave), hint tutorial. `finish()` tách nhánh thưởng theo `SECTOR.mode` (chiến dịch / `'riot'`) |
-| `js/app.js` | Router màn hình, lobby, squad (3 slot, lưu đội), sector, **dẹp loạn** (`renderRiot`), gacha hai bể, archive (tab Kỹ năng / Passive / Hồ sơ), config, COMMS |
+| `js/app.js` | Router màn hình, lobby, squad (3 slot, lưu đội, khoá người đang đồn trú), sector, thang tầng dẹp loạn (`renderRiot`), gacha hai bể, archive (tab Kỹ năng / Passive / Hồ sơ), config, COMMS |
+| `js/riot.js` | **DẸP LOẠN — chiếm bãi**: 9 cái bãi ở District 07 (`RIOT_YARDS`), kinh tế (`RIOT_ECON`), sức mạnh ổ neo vào số đo `m50`, đồn trú, kiện hàng theo chu kỳ, phản kích, nâng bãi, hợp đồng tuần. Số liệu sửa ở đây |
+| `js/riotui.js` | Màn bản đồ Khu Đáy + tờ chi tiết một bãi + chọn quân đồn trú + báo cáo vắng mặt; bản đồ dự phòng vẽ bằng SVG. Bọc `winReward`/`finish` của `battle.js` để cộng thưởng trận chiếm bãi (không sửa `battle.js`) |
 | `js/data_later.js` | Dữ liệu chương 2–3 bản cũ (không nạp), giữ để viết lại quanh Yuki |
 | `scratch/key_frame.py` | Tách nền frame sprite (idle/attack/hurt), in `box` để dán vào `ROSTER` |
 | `scratch/ult_lint.js` | Soát chiêu cuối: số trong `desc` có khớp `mult`/`hits`/`shieldPct`/`healPct`/`flat`/`drainEnergy` không, `energyMax` có bằng `ult.cost` không, và bản chiêu mộ có còn viết theo giọng phía địch không. Thoát mã 1 nếu lệch |
@@ -55,6 +57,7 @@ rồi mở `http://localhost:8765/index.html`. UI kit và token: `kit.html`. Nú
 | `docs/bg-prompts.md` | Prompt sinh ảnh nền và quy tắc zoom/chân trời |
 | `docs/ult-prompts.md` | Quy cách video cut-in chiêu cuối + prompt từng nhân vật |
 | `docs/plan-2026-09.md` | Đánh giá hiện trạng 07/09 + kế hoạch tháng 9 (mục tiêu: hoàn thành chương 1 trước 30/09) |
+| `docs/dep-loan.md` | **DẸP LOẠN**: thiết kế 9 cái bãi, đóng quân, kiện hàng, phản kích, nâng bãi, hợp đồng tuần + số cân bằng đo được + đặc tả giao diện + prompt bản đồ District 07 |
 | `docs/enemy-prompts.md` | Prompt art 21 kẻ địch chương 1 + đề xuất nội tại/lore cho địch |
 | `docs/hero-prompts.md` | Prompt art 10 nhân vật gacha chưa có ảnh (thẻ + sprite nền xanh), kèm đề xuất tạo hình từng người |
 | `docs/fx-prompts.md` | Overlay hiệu ứng: cách chạy, tên file thay thế, quy cách sheet + prompt; luật trạng thái; SPD/CRIT; hộp holo; di chuyển kiểu Idle Heroes |
@@ -113,7 +116,11 @@ Thả file đúng tên vào đúng thư mục là game tự dùng — không c�
 node scratch/sim.js 400                       # đội mặc định yuki,ash,kai
 node scratch/sim.js 400 yuki,ash,psalm        # đội khác
 node scratch/sim.js 400 yuki,ash,kai 07-D=1.0,07-E=1.1   # thử mult khác cho sector
-node scratch/sim.js 200 yuki,ash,kai --riot 20            # dò 20 tầng DẸP LOẠN (đánh dấu ← TƯỜNG khi win < 40%)
+node scratch/sim.js 200 yuki,ash,kai --riot 20            # dò 20 tầng HỐ LOẠN (đánh dấu ← TƯỜNG khi win < 40%)
+node scratch/sim.js 400 yuki,ash,kai --yard [--lv 20]     # dò 9 cái bãi DẸP LOẠN: sức mạnh ổ, tỉ lệ thắng, nhãn
+node scratch/riot_tune.js m50 200 [cấp]                   # đo lại m50 (độ khó thật của đội hình wave) sau khi sửa plan
+node scratch/riot_tune.js plan 200                        # đo ngược `mult` cho đúng tỉ lệ thắng thiết kế
+node scratch/riot_econ.js [hệ số quân] [ưu thế phe]       # thu nhập/giờ, hiệu suất theo số lần vào game, hồi vốn nâng bãi
 node scratch/recruit_table.js                            # bảng quy đổi 20 kẻ địch chiêu mộ
 node scratch/ult_lint.js                                 # chữ mô tả chiêu cuối có khớp số thật không
 ```
@@ -136,8 +143,31 @@ Nhân vật lấy chương từ `HERO_DEBUT` (chép tay theo `docs/story.md`); k
 nên chương 2 cài xong là địch chương 2 tự vào bể. Hai bể: **REQUISITION** (nhân vật, SH) và **CHIÊU MỘ**
 (kẻ địch, CR). Trùng không hoàn SH nữa — giữ thành bản dư trong `PLAYER.extra` để phân tách lấy linh kiện (đợt 3).
 
-**DẸP LOẠN.** Thang đánh vô hạn ở Khu Đáy, mở sau 07-A. `riotSector(n)` dựng object hình dạng SECTOR rồi
+**HỐ LOẠN.** Thang đánh vô hạn ở Khu Đáy, mở sau 07-A. `riotSector(n)` dựng object hình dạng SECTOR rồi
 `go('battle')` — engine trận không biết mình đang ở chế độ nào. Wave của mỗi tầng **cố định** (`riotRng` gieo
 bằng số tầng), không bốc lại mỗi lần vào.
 
-Đợt sau: chiếm bãi (cần art map District 07) · phân tách → linh kiện · cyberware 5 ô.
+## DẸP LOẠN — chiếm bãi (11/09, đợt 2)
+
+Đặc tả đầy đủ: `docs/dep-loan.md`. Nút DẸP LOẠN ở HOME giờ mở **bản đồ Khu Đáy** (`riotmap`) với 9 cái bãi
+chiếm được + một nút xuống HỐ LOẠN (thang tầng cũ, giữ nguyên).
+
+```
+chiếm bãi (đánh) → đóng quân 1–3 người → bãi đẻ KIỆN HÀNG mỗi 45 phút, trần 8 kiện (6 giờ)
+   → quay lại nhận kiện · giữ PHẢN KÍCH (mỗi 4h30) · NÂNG BÃI (5 bậc, ×3 sản lượng)
+```
+
+- **Quân đóng bãi bị khoá khỏi đội hình** — đây là lý do duy nhất khiến roster 39 người có giá trị.
+  Người đang trong đội thì không đóng quân được (đổi ở SQUAD), nên đội không bao giờ bị rút xuống dưới 3.
+- **Sức mạnh ổ loạn** hiện cạnh sức mạnh đội, và nó neo vào **số đo** chứ không phải phép cộng chỉ số:
+  `power(đội mốc) × mult / m50`, với `m50` đo bằng `scratch/riot_tune.js`. Tỉ lệ 1.0 = thắng ~55%.
+  Cộng chỉ số từng xếp SÂN LÒ ĐÚC (0% thắng) dễ hơn HÀNG RÀO GÃY (100% thắng) — xem `docs/dep-loan.md` §D1.
+- **Thua phản kích không mất bãi vĩnh viễn**: bãi thành ĐANG BỊ CHIẾM, ngừng đẻ kiện, kiện đã có **đóng băng
+  chứ không mất**; đánh một trận GIÀNH LẠI (×0.85 độ khó) là nhận lại nguyên vẹn.
+  Đồn trú ≥ 2× ngưỡng thì **không bao giờ** mất bãi.
+- **Ảnh bản đồ** `art/map/map_d07.jpg` chưa có → game vẽ bản đồ tạm bằng SVG (`riotMapSvg()` trong `js/riotui.js`,
+  đúng bố cục 7 dải của prompt). Thả file vào là tự thay, không phải sửa toạ độ.
+  Ảnh minh hoạ từng bãi dùng lại `art/bg/bg_07*.jpg`; thả `art/riot/yard_<id>.jpg` vào là tự thay.
+- Thử không phải chờ 45 phút: mở `index.html?riotfast` → một chu kỳ **15 giây**.
+
+Đợt sau: phân tách → linh kiện · cyberware 5 ô.
