@@ -5,15 +5,17 @@
    danh sách img trong data, rồi về nền gradient + silhouette. */
 
 /* Tỉ lệ ô đo thật ở 375×812 — art phải cắt sẵn đúng số này vì css .panel.has-art bỏ pos/zoom:
-   splash 0.52 · v2 0.997 · h2 0.26 · w3 ô rộng 0.93, ô nhỏ 0.52 · v3 ~1.6 · g4 0.52 */
+   splash 0.52 · v2 0.997 · h2 0.26 · w3 ô rộng 0.93, ô nhỏ 0.52 · v3 ~1.6 · g4 0.52
+   `ar` = khổ ghi trong docs/comic-prompts.md cho ô thường, `arWide` cho ô `wide`. Để ở đây làm bản gốc
+   duy nhất: scratch/comic_lint.js đọc thẳng bảng này, thêm layout mới là lint biết ngay, không phải chép tay. */
 const LAYOUTS = {
-  splash:{ cells:1, css:'1fr / 1fr' },
-  v2:    { cells:2, css:'1fr 1fr / 1fr' },
-  h2:    { cells:2, css:'1fr / 1fr 1fr' },
-  w3:    { cells:3, css:'1.15fr 1fr / 1fr 1fr', wide:0 },
-  w3b:   { cells:3, css:'1fr 1.15fr / 1fr 1fr', wide:2 },   // ngược của w3: hai ô dọc ở trên, một ô rộng ở dưới
-  v3:    { cells:3, css:'1fr 1fr 1fr / 1fr' },   // ba dải ngang xếp chồng — chỗ duy nhất hợp với art khổ 16:9
-  g4:    { cells:4, css:'1fr 1fr / 1fr 1fr' },
+  splash:{ cells:1, css:'1fr / 1fr', ar:'9:16' },
+  v2:    { cells:2, css:'1fr 1fr / 1fr', ar:'1:1' },
+  h2:    { cells:2, css:'1fr / 1fr 1fr', ar:'9:16' },
+  w3:    { cells:3, css:'1.15fr 1fr / 1fr 1fr', wide:0, ar:'9:16', arWide:'1:1' },
+  w3b:   { cells:3, css:'1fr 1.15fr / 1fr 1fr', wide:2, ar:'9:16', arWide:'1:1' },   // ngược của w3: hai ô dọc ở trên, một ô rộng ở dưới
+  v3:    { cells:3, css:'1fr 1fr 1fr / 1fr', ar:'3:2' },   // ba dải ngang xếp chồng — chỗ duy nhất hợp với art khổ ngang
+  g4:    { cells:4, css:'1fr 1fr / 1fr 1fr', ar:'9:16' },
 };
 const TAIL_FOR = { tl:'bl', t:'bl', tr:'br', bl:'tl', b:'tl', br:'tr', c:'bl' };   // đuôi mặc định theo vị trí bong bóng
 const COMIC = { box:null, running:null };
