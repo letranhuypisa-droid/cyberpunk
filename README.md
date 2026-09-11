@@ -27,13 +27,15 @@ rồi mở `http://localhost:8765/index.html`. UI kit và token: `kit.html`. Nú
 | `js/data.js` | **Số liệu & hồ sơ**: roster (ATK/HP/SPD/CRIT, skill + fx/status, passive), kẻ địch (`FOE_STATS`, `FOE_SKILL`, `ult`), **chiêu mộ** (`RECRUIT_*` — nạp kẻ địch chương 1 vào `ROSTER` thành đơn vị chơi được), chương/sector, **`RIOT`** (dẹp loạn), `RULES` (move, holo, foeUltGain), hồ sơ người chơi (v3, tự chuyển từ v2), lore, bonds, **`BANNERS`** (hai bể gacha + khoá theo chương). Sửa ở đây. |
 | `js/story.js` | **Comic từng màn**: trang, panel, bong bóng cho intro/outro của 00-T → 07-E. Sửa lời thoại ở đây. |
 | `js/comic.js` | Renderer trang comic: layout panel, ảnh + fallback, bong bóng hiện dần, lật trang, SKIP |
-| `js/state.js` | Lưu/nạp hồ sơ (`SAVE`, local hoặc remote), nâng cấp (`UPGRADE`), **`unitStats(id)`** — một chỗ duy nhất tính chỉ số cuối, và `power(id)`/`teamPower()`, nhiệm vụ ngày |
+| `js/state.js` | Lưu/nạp hồ sơ (`SAVE`, local hoặc remote), nâng cấp (`UPGRADE`), **`unitStats(id)`** — một chỗ duy nhất tính chỉ số cuối (gốc × cấp × cyberware) và `baseStats(id)`, và `power(id)`/`teamPower()`, nhiệm vụ ngày |
 | `js/audio.js` | SFX giao diện (audio/*.ogg) + âm chiến đấu: có `audio/<tên>.ogg\|mp3\|wav` thì dùng file, thiếu thì tổng hợp WebAudio. Một thao tác = một tiếng (`SFX_ONE`/`SFX_BEAT`); `SFX_VARIANTS` cho tiếng nhiều bản (`hit`, `hit2`…); `SFX_MUTE` cho nút không kêu |
 | `js/fx.js` | Overlay hiệu ứng trên sprite: một lần (hit/crit/nổ/điện/độc/cháy/choáng/hồi máu/lá chắn) và lặp theo trạng thái + lá chắn; tự dùng sprite sheet `art/fx/<kind>.webp` nếu có |
 | `js/battle.js` | Engine trận: passive, lượt theo SPD, chế độ chọn mục tiêu, di chuyển tới mục tiêu kiểu Idle Heroes (`playMoveAttack`), sát thương + chí mạng, lá chắn (`addShield`/`absorbShield`), trạng thái choáng/độc/cháy (`applyStatus`/`tickStatus`), ult + video holo trên đầu nhân vật (`playHolo`), chiêu cuối của địch (`enemyUlt`), wave (hồi máu giữa wave), hint tutorial. `finish()` tách nhánh thưởng theo `SECTOR.mode` (chiến dịch / `'riot'`) |
 | `js/app.js` | Router màn hình, lobby, squad (3 slot, lưu đội, khoá người đang đồn trú), sector, thang tầng dẹp loạn (`renderRiot`), gacha hai bể, archive (tab Kỹ năng / Passive / Hồ sơ), config, COMMS |
 | `js/riot.js` | **DẸP LOẠN — chiếm bãi**: 9 cái bãi ở District 07 (`RIOT_YARDS`), kinh tế (`RIOT_ECON`), sức mạnh ổ neo vào số đo `m50`, đồn trú, kiện hàng theo chu kỳ, phản kích, nâng bãi, hợp đồng tuần. Số liệu sửa ở đây |
 | `js/riotui.js` | Màn bản đồ Khu Đáy + tờ chi tiết một bãi + chọn quân đồn trú + báo cáo vắng mặt; bản đồ dự phòng vẽ bằng SVG. Bọc `winReward`/`finish` của `battle.js` để cộng thưởng trận chiếm bãi (không sửa `battle.js`) |
+| `js/cyber.js` | **CYBERWARE**: 15 món cấy ghép (5 ô × 3 hạng), giá, bậc, ví **LINH KIỆN (LK)**, phân tách bản dư. Nối vào chỉ số qua `cyberBonus(id)` — `unitStats` gọi đúng một chỗ này |
+| `js/cyberui.js` | Màn CYBERWARE: chọn nhân vật → chọn ô → chọn món → lắp / nâng bậc / tháo, tờ phân tách bản dư; icon 5 ô vẽ bằng SVG |
 | `js/data_later.js` | Dữ liệu chương 2–3 bản cũ (không nạp), giữ để viết lại quanh Yuki |
 | `scratch/key_frame.py` | Tách nền frame sprite (idle/attack/hurt), in `box` để dán vào `ROSTER` |
 | `scratch/ult_lint.js` | Soát chiêu cuối: số trong `desc` có khớp `mult`/`hits`/`shieldPct`/`healPct`/`flat`/`drainEnergy` không, `energyMax` có bằng `ult.cost` không, và bản chiêu mộ có còn viết theo giọng phía địch không. Thoát mã 1 nếu lệch |
@@ -58,6 +60,7 @@ rồi mở `http://localhost:8765/index.html`. UI kit và token: `kit.html`. Nú
 | `docs/ult-prompts.md` | Quy cách video cut-in chiêu cuối + prompt từng nhân vật |
 | `docs/plan-2026-09.md` | Đánh giá hiện trạng 07/09 + kế hoạch tháng 9 (mục tiêu: hoàn thành chương 1 trước 30/09) |
 | `docs/dep-loan.md` | **DẸP LOẠN**: thiết kế 9 cái bãi, đóng quân, kiện hàng, phản kích, nâng bãi, hợp đồng tuần + số cân bằng đo được + đặc tả giao diện + prompt bản đồ District 07 |
+| `docs/cyberware.md` | **CYBERWARE**: 5 ô cấy ghép, 15 món, giá LK/CR, phân tách bản dư, ngoại lệ RONIN, prompt icon |
 | `docs/enemy-prompts.md` | Prompt art 21 kẻ địch chương 1 + đề xuất nội tại/lore cho địch |
 | `docs/hero-prompts.md` | Prompt art 10 nhân vật gacha chưa có ảnh (thẻ + sprite nền xanh), kèm đề xuất tạo hình từng người |
 | `docs/fx-prompts.md` | Overlay hiệu ứng: cách chạy, tên file thay thế, quy cách sheet + prompt; luật trạng thái; SPD/CRIT; hộp holo; di chuyển kiểu Idle Heroes |
@@ -170,4 +173,24 @@ chiếm bãi (đánh) → đóng quân 1–3 người → bãi đẻ KIỆN HÀN
   Ảnh minh hoạ từng bãi dùng lại `art/bg/bg_07*.jpg`; thả `art/riot/yard_<id>.jpg` vào là tự thay.
 - Thử không phải chờ 45 phút: mở `index.html?riotfast` → một chu kỳ **15 giây**.
 
-Đợt sau: phân tách → linh kiện · cyberware 5 ô.
+## CYBERWARE + phân tách bản dư (11/09, đợt 3+4)
+
+Đặc tả đầy đủ: `docs/cyberware.md`. Nút **CYBERWARE** ở HOME (và nút tắt trong hồ sơ nhân vật ở ARCHIVE).
+
+```
+lá trùng gacha → PHÂN TÁCH → LINH KIỆN (LK) → chế tạo + nâng bậc cyberware → đội mạnh hơn
+```
+
+- **5 ô cho từng nhân vật**: NÃO · MẮT · TAY · NGỰC · CHÂN. Mỗi ô có **3 hạng** (B/A/S), mỗi món nâng được
+  **3 bậc** (×1 → ×1.5 → ×2). Chế tạo là lắp thẳng vào ô — **không có kho đồ rời**.
+- **Cộng đúng 4 chỉ số `unitStats` đang trả về** (ATK% · HP% · SPD · CRIT) và nối vào **một chỗ duy nhất**:
+  `unitStats(id)` gọi `cyberBonus(id)`. Thẻ nhân vật, `power()`, hồ sơ và chỉ số lúc vào trận vì thế luôn khớp.
+  Cấp nâng cấp nhân **trước**, cyberware nhân sau — hai nguồn nhân nhau, không cộng dồn phần trăm.
+- **LINH KIỆN (LK)** chỉ đến từ **phân tách bản dư** (`PLAYER.extra`) — đóng lời hứa treo từ đợt 1 của gacha.
+  Bậc B 10 LK · A 25 LK · S 60 LK. Phân tách **không đụng `PLAYER.owned`**, không có đường nào mất nhân vật.
+  Bãi ở DẸP LOẠN vẫn chỉ đẻ CR + SH.
+- **RONIN không lắp được** (`noChrome:true` — lore: "không một khớp nối kim loại"). Đổi lại anh mang sẵn
+  **THÉP TRẦN** = một bộ hạng A bậc 1 (`CYBER.bare`).
+- **Icon vẽ bằng SVG trong code**, không cần file nào. Thả `art/cyber/<id>.png` (256×256, nền trong) vào là tự thay.
+
+> `scratch/sim.js` **chưa mô phỏng cyberware** — bảng tỉ lệ thắng ở `docs/dep-loan.md` §F1 là **sàn**.

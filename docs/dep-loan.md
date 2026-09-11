@@ -58,7 +58,7 @@ Anh dặn "cần hỏi gì thì cứ mặc định chọn cái bạn khuyến ng
 | Q4 | Thua phản kích thì mất gì? | Bãi thành **ĐANG BỊ CHIẾM**: ngừng đẻ kiện, **kiện đang chờ bị đóng băng chứ không mất**, phải đánh một trận GIÀNH LẠI | Mất sạch của người đi vắng một đêm là trừng phạt cuộc sống thật, không phải trừng phạt lựa chọn. Ngừng sản xuất đã đủ đau. |
 | Q5 | Có mất bãi vĩnh viễn không? | **Không.** Giành lại được mãi mãi | Prototype một người chơi, không có lý do gì để xoá tiến trình. |
 | Q6 | Quân đủ mạnh thì có bao giờ mất bãi không? | **Không.** Phản kích mạnh trần **×2 ngưỡng giữ bãi** | Phải có một cái đích "đầu tư đủ thì ngủ yên", nếu không thì mọi bãi đều rơi và người chơi bỏ cuộc. |
-| Q7 | Tài nguyên thứ ba (linh kiện)? | **Chưa.** Chỉ CR + SH | Linh kiện là đợt 3 (phân tách + màn UNIT). Thêm một loại tiền chưa có chỗ tiêu là rác trong ví. Bãi đã chừa sẵn ô `parts` trong định nghĩa, bật sau bằng một số. |
+| Q7 | Tài nguyên thứ ba (linh kiện)? | **Bãi chỉ đẻ CR + SH** | Linh kiện (LK) đã có từ `docs/cyberware.md` (cùng ngày), nhưng nguồn của nó là **phân tách bản dư**, không phải bãi. Thêm một vòi nữa vào bãi là phải cân lại cả bảng thu nhập ở §F2. Giữ nguyên. |
 | Q8 | Đồng hồ chạy khi tắt game? | **Có**, tính bằng `Date.now()` | Cả điểm của chế độ. Người chơi vặn đồng hồ máy thì gian lận được — chấp nhận, đây là bản chạy trên máy người chơi, không có server. |
 | Q9 | Ảnh bản đồ District 07? | **Vẽ bằng SVG trong code trước** (không phải ô trống), prompt ảnh thật ở §H | Đúng yêu cầu "thử code trước". Thả `art/map/map_d07.jpg` vào là game tự thay. |
 | Q10 | Ảnh riêng cho từng bãi? | **Dùng lại `art/bg/bg_07*.jpg`** đang có | 9 ảnh mới chỉ để làm hình minh hoạ nhỏ là phí. Prompt cho bản riêng vẫn viết ở §H, thả vào là tự thay. |

@@ -19,6 +19,7 @@ function go(name){
   if(name==='map') renderMap();
   if(name==='riot') renderRiot();
   if(name==='riotmap' && typeof renderRiotMap==='function') renderRiotMap();   // bản đồ Khu Đáy (js/riotui.js)
+  if(name==='cyber'   && typeof renderCyber==='function')   renderCyber();     // cấy ghép 5 ô (js/cyberui.js)
   if(name==='sector') renderSectors();
   if(name==='home') renderHome();
   if(name==='gacha') renderGacha();
@@ -76,6 +77,13 @@ function renderHome(){
       : o.contested ? `${o.contested} BÃI MẤT`
       : `${o.own}/${RIOT_YARDS.length} BÃI`;
     const dot=$('#riotMenuDot'); if(dot) dot.hidden = !(on && typeof riotHasWork==='function' && riotHasWork()); }
+  /* Nút CYBERWARE: in ví linh kiện; chấm đỏ khi còn lá trùng chưa phân tách (lời hứa treo từ gacha) */
+  const cb=$('#cyberMenuSub');
+  if(cb && typeof scrapTotal==='function'){
+    const t=scrapTotal();
+    cb.textContent = PLAYER.parts ? `${PLAYER.parts.toLocaleString('en-US')} LK` : t.n ? `${t.n} LÁ DƯ` : '5 Ô';
+    const cd=$('#cyberMenuDot'); if(cd) cd.hidden = !t.n;
+  }
   const sec = SECTORS.find(x=>x.state==='open') || SECTORS[SECTORS.length-1];
   SECTOR = sec;
   $('#homeSector').textContent=sec.id; $('#homeSectorMeta').textContent=`${sec.name} · ${sec.waves} WAVE · ${sec.boss?ENEMY_POOL.find(e=>e.id===sec.boss).name:'KHÔNG BOSS'}`;
@@ -188,6 +196,13 @@ function openCodex(g, it){
 }
 $('#codexClose').addEventListener('click',()=>{ $('#codex').hidden=true; });
 const LORE_TAB = { cur:'skill' };
+/* Dòng dưới nút CYBERWARE trong hồ sơ — guard typeof vì kit.html không nạp js/cyber.js */
+function cyberBtnTxt(id){
+  if(typeof cyberNoFit!=='function') return '5 ô cấy ghép';
+  if(cyberNoFit(id)) return 'KHÔNG CẤY GHÉP · THÉP TRẦN';
+  const n=cyberCount(id);
+  return n ? `${n}/5 Ô ĐÃ LẮP · ${PLAYER.parts.toLocaleString('en-US')} LK` : `CHƯA LẮP Ô NÀO · ${PLAYER.parts.toLocaleString('en-US')} LK`;
+}
 const fxText = e => [ e.atkPct&&`${e.atkPct>0?'+':''}${e.atkPct}% ATK`, e.hpPct&&`${e.hpPct>0?'+':''}${e.hpPct}% HP`, e.energyStart&&`VÀO TRẬN ${e.energyStart} EN`,
   e.dmgPct&&`${e.dmgPct>0?'+':''}${e.dmgPct}% SÁT THƯƠNG`, e.dmgTakenPct&&`${e.dmgTakenPct}% SÁT THƯƠNG NHẬN`, e.critPct&&`+${e.critPct}% CRIT`, e.energyGainPct&&`+${e.energyGainPct}% ENERGY` ].filter(Boolean).join(' · ');
 /* Điều kiện passive → nhãn, chân dung, trạng thái hiện tại */
@@ -215,7 +230,8 @@ function openLore(id){
     <div class="lore__tabs"><button class="lore__tab" data-tab="skill">Kỹ năng</button><button class="lore__tab" data-tab="passive">Passive</button><button class="lore__tab" data-tab="lore">Hồ sơ</button></div>
     <div class="lore__pane lore__pane--skill">
       <div class="lore__stats"><span class="pill"><small>LV</small>${L1}</span><span class="pill"><small>ATK</small>${st.atk}</span><span class="pill"><small>HP</small>${st.hp}</span><span class="pill"><small>EN</small>${d.energyMax}</span><span class="pill"><small>SPD</small>${st.spd}</span><span class="pill"><small>CRIT</small>${st.crit+(sk.critPct||0)}%</span>
-        <button class="btn-act btn-act--go lore__up" id="loreUp" ${L1>=UPGRADE.maxLevel||PLAYER.credits<UPGRADE.cost(L1)?'disabled':''}><span class="btn-act__k">Upgrade</span><span class="btn-act__v">${upTxt} · +${Math.round(UPGRADE.statPerLevel*100)}% ATK/HP</span></button></div>
+        <button class="btn-act btn-act--go lore__up" id="loreUp" ${L1>=UPGRADE.maxLevel||PLAYER.credits<UPGRADE.cost(L1)?'disabled':''}><span class="btn-act__k">Upgrade</span><span class="btn-act__v">${upTxt} · +${Math.round(UPGRADE.statPerLevel*100)}% ATK/HP</span></button>
+        <button class="btn-act lore__up" id="loreCyber"><span class="btn-act__k">Cyberware</span><span class="btn-act__v">${cyberBtnTxt(id)}</span></button></div>
       ${L.weapon?`<div class="lore__ult"><b>VŨ KHÍ</b><span class="lore__flavor">${L.weapon}</span></div>`:''}
       <div class="lore__ult lore__skill"><b>ĐÒN THƯỜNG</b>${L.attack?`<span class="lore__flavor">${L.attack}</span>`:''}<span>${sk.desc||'100% ATK, +25 Energy.'}</span></div>
       <div class="lore__ult"><b>CHIÊU CUỐI · ${d.ult.name}</b>${L.ultFlavor?`<span class="lore__flavor">${L.ultFlavor}</span>`:''}<span>${d.ult.desc}</span><div class="lore__pills"><span class="pill"><small>COST</small>${d.ult.cost} EN</span><span class="pill">${kindTxt}</span>${d.ult.mult?`<span class="pill">${Math.round(d.ult.mult*100)}% ATK</span>`:''}</div></div>
@@ -239,6 +255,7 @@ function openLore(id){
   box.dataset.tab=LORE_TAB.cur; body.querySelectorAll('.lore__tab').forEach(x=>x.classList.toggle('is-on',x.dataset.tab===LORE_TAB.cur));
   body.scrollTop=0; box.hidden=false;
   const up=$('#loreUp'); if(up) up.addEventListener('click',()=>{ const r=upgrade(id); if(r==='ok'){ AUDIO.upgrade(); renderWallet(); const sc=body.scrollTop; openLore(id); body.scrollTop=sc; } else sfx('error',.4); });
+  const cy=$('#loreCyber'); if(cy) cy.addEventListener('click',()=>{ if(typeof openCyberFor==='function') openCyberFor(id); });
 }
 $('#loreClose').addEventListener('click',()=>{ $('#lore').hidden=true; });
 /* Đổi biệt danh hồ sơ: chạm vào tên ở Lobby */

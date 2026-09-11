@@ -18,6 +18,7 @@
 <link rel="stylesheet" href="css/chromefall.css">
 <link rel="stylesheet" href="css/fx.css">
 <link rel="stylesheet" href="css/riot.css">
+<link rel="stylesheet" href="css/cyber.css">
 </head>
 <body>
 
@@ -65,6 +66,7 @@
         <button class="menu__btn" data-go="squad"><b>SQUAD</b><small>3 SLOT</small></button>
         <button class="menu__btn" data-go="map"><b>MAP</b><small>HALCYON</small></button>
         <button class="menu__btn" id="btnRiotMenu" data-go="riotmap"><b>DẸP LOẠN</b><small id="riotMenuSub">KHOÁ</small><i class="menu__dot" id="riotMenuDot" hidden></i></button>
+        <button class="menu__btn" data-go="cyber"><b>CYBERWARE</b><small id="cyberMenuSub">5 Ô</small><i class="menu__dot" id="cyberMenuDot" hidden></i></button>
         <button class="menu__btn" data-go="gacha"><b>GACHA</b><small>REQUISITION</small></button>
         <button class="menu__btn" data-go="archive"><b>ARCHIVE</b><small>LORE</small></button>
         <button class="menu__btn" data-go="config"><b>CONFIG</b><small>SYS</small></button>
@@ -137,6 +139,27 @@
         <div class="cfg__sep"></div>
         <button class="cfg__row cfg__row--danger" id="cfgReset"><span><b>RESET TIẾN TRÌNH</b><small>Xoá hồ sơ trên máy này, chơi lại từ tutorial</small></span><i>▸</i></button>
         <div class="cfg__note">CHROMEFALL v0.3 · prototype · dữ liệu ★ FAKE · <a href="kit.html">UI kit &amp; tokens</a><br>UI SFX: "Sci Fi UI SFX Pack" © JDSherbert (audio/CREDITS.txt) · âm chiến đấu tổng hợp WebAudio</div>
+      </div>
+    </div>
+
+    <!-- ===== SCREEN: CYBERWARE — chọn nhân vật → chọn ô → chọn món → lắp / nâng bậc / tháo.
+         Nội dung do js/cyberui.js đổ; icon vẽ bằng SVG, thả art/cyber/<id>.png vào là tự thay. ===== -->
+    <div class="screen cyber" data-screen="cyber">
+      <div class="sh"><span class="sh__title">Cyberware</span><span class="pill"><small>LK</small><span id="cbParts">0</span></span><span class="pill"><small>CR</small><span id="cbCr">0</span></span><button class="btn-ghost" data-go="home">◂ BASE</button></div>
+      <div class="cbpick" id="cbPick"></div>
+      <div class="cbbody" id="cbBody"></div>
+      <button class="btn-act btn-act--full" id="btnScrap"><span class="btn-act__k">Phân tách bản dư</span><span class="btn-act__v" id="scrapMeta">—</span></button>
+
+      <!-- Tờ chọn món cho một ô -->
+      <div class="dl cb__panel" id="cbSlotBox" hidden>
+        <div class="sh"><span class="sh__title" id="cbSlotTitle">Ô</span><span class="sh__sub" id="cbSlotSub">—</span><button class="btn-ghost" id="cbSlotClose">◂ CYBERWARE</button></div>
+        <div class="cblist" id="cbSlotList"></div>
+      </div>
+      <!-- Tờ phân tách bản dư -->
+      <div class="dl cb__panel" id="cbScrapBox" hidden>
+        <div class="sh"><span class="sh__title">Phân tách</span><span class="sh__sub" id="cbScrapSub">—</span><button class="btn-ghost" id="cbScrapClose">◂ CYBERWARE</button></div>
+        <div class="dl__list" id="cbScrapList"></div>
+        <button class="btn-act btn-act--go btn-act--full" id="btnScrapAll"><span class="btn-act__k">Phân tách tất cả</span><span class="btn-act__v" id="scrapAllMeta">—</span></button>
       </div>
     </div>
 
@@ -331,6 +354,7 @@
 <script src="js/data.js"></script>
 <script src="js/state.js"></script>
 <script src="js/riot.js"></script>
+<script src="js/cyber.js"></script>
 <script src="js/story.js"></script>
 <script src="js/audio.js"></script>
 <script src="js/fx.js"></script>
@@ -338,5 +362,6 @@
 <script src="js/comic.js"></script>
 <script src="js/app.js"></script>
 <script src="js/riotui.js"></script>
+<script src="js/cyberui.js"></script>
 </body>
 </html>
