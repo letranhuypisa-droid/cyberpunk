@@ -1,25 +1,5 @@
 {
-  "comic_lint": [
-    "art/comic/00t_o1_p2.jpg: speech ash 32 chữ > 25: \"Hàng cực phẩm… Halo cấp S, gãy vòng ngoài nhưng lõi còn nguyên tem. Cạy được cục này đem bán thì hai chị em tao húp thịt hộp nhòe mồm nửa năm!\"",
-    "art/comic/00t_o2_p2.jpg: speech ash 44 chữ > 25: \"Lò đúc của lão Foreman. Chỉ có lửa ở đấy mới luộc nổi hợp kim của Tháp. Mà đời này không ai nuôi báo cô ai đâu cưng — muốn gỡ vòng thì vác xác về làm culi trừ nợ cho băng của tao.\"",
-    "art/comic/07a_i1_p1.jpg: speech ronin 27 chữ > 25: \"Ở đây tao chỉ lượm sắt vụn, không xẻ thịt đồng loại. Muốn nhập bọn thì tự chứng minh mày không phải một cục nợ vô dụng.\"",
-    "art/comic/07b_i1_p1.jpg: caption 41 chữ > 40: \"Xưởng đúc bỏ hoang cắm sâu dưới lòng đất. Từng thuộc sở hữu của Canticle, nay là hang ổ của băng Foreman — nơi sở hữu ngọn lửa duy nhất ở Khu Đáy đủ nhiệt để bẻ khóa một chiếc Halo.\"",
-    "art/comic/07c_o1_p1.jpg: speech psalm 30 chữ > 25: \"Trên Tháp, đám lính sinh học biến đổi như cô được gọi là Choir — Đội Hợp Xướng. Đứa nào hỏng hóc, lỗi nhịp đều bị lôi đến phòng tôi.\"",
-    "art/comic/07c_o1_p2.jpg: speech psalm 31 chữ > 25: \"Cô là ca thứ ba trăm mười ba. Cô không xưng tội. Cô trừng mắt hỏi tôi: “Bà có đếm xem tay bà đã tước bao nhiêu mạng người rồi không?”\"",
-    "art/comic/07c_o2_p2.jpg: speech psalm 26 chữ > 25: \"Nhưng dưới đáy cống ngầm có một mụ già ghi chép mọi thứ rơi từ trên trời xuống. Từ sắt vụn… cho tới những đứa trẻ.\"",
-    "art/comic/07d_i1_p1.jpg: caption 46 chữ > 40: \"Thánh đường ngầm rữa nát dưới lòng cống. Ống xả mục nát hàn chắp vá thành một cây đàn phong cầm khổng lồ; xác lính máy xếp lớp thành bệ thờ nghi ngút khói; nến đỏ cắm ngập trên những hộp sọ cơ khí cháy sém.\"",
-    "art/comic/07d_i1_p2.jpg: speech motherrust 28 chữ > 25: \"Hỡi đứa con của sắt thép… Ta vẫn nhớ ánh mắt hoang dại này, từ trước khi lũ trên Tháp khắc số hiệu nô lệ lên gáy con.\"",
-    "art/comic/07d_o1_p1.jpg: speech motherrust 31 chữ > 25: \"Sáu năm về trước, Tầng Bốn sụp đổ. Bốn nghìn mạng người về với thánh. Canticle lạnh lùng đóng lên một con dấu đỏ chót: “Sự cố kết cấu kỹ thuật”.\"",
-    "art/comic/07d_o1_p2.jpg: speech motherrust 32 chữ > 25: \"Ba ngày sau, những chuyến xe tải bọc thép màu trắng bò xuống vùng đổ nát. Chúng không đến để bới sắt vụn… chúng đến để vét sạch lũ trẻ mồ côi.\"",
-    "art/comic/07d_o2_p2.jpg: speech motherrust 26 chữ > 25: \"Con bé mười một tuổi gầy trơ xương, tay cầm thanh đoản kiếm rỉ sét của bố, lầm lũi đứng chắn ngang bánh xích xe tải.\"",
-    "art/comic/07d_o2_p2.jpg: speech motherrust 27 chữ > 25: \"Khóe mắt nó ráo hoảnh, không rơi một giọt nước mắt. Miệng nó chỉ lẩm nhẩm bài đồng dao đếm bước chân của lũ trẻ Khu Đáy…\"",
-    "art/comic/07d_o3_p1.jpg: thought yuki 27 chữ > 25: \"Âm thanh bê tông nứt toác. Cát bụi mù mịt. Bàn tay lạnh ngắt của mẹ buông thõng. Xác bố bẹp dúm dưới khối dầm thép gãy.\"",
-    "art/comic/07e_i1_p1.jpg: caption 49 chữ > 40: \"Sàn nâng công nghiệp số 3, một khối lồng sắt khổng lồ lao vun vút từ đỉnh Tháp xé gió rít xuống đáy sâu. Mỗi nhịp cửa lưới thép mở ra ở từng khoang là một hàng lính Choir đứng bất động, vô hồn như búp bê cơ khí.\"",
-    "art/comic/07e_i1_p2.jpg: speech cantor 35 chữ > 25: \"Đơn vị 07. Cô đang để dữ liệu bảo mật rò rỉ bừa bãi ra khắp cái máng lợn tăm tối này. Ta đành phải đích thân hạ cố xuống đây ấn nút xóa rác.\"",
-    "art/comic/07e_o3_p1.jpg: speech psalm 31 chữ > 25: \"Trên đỉnh Tháp hiện có hàng nghìn đứa trẻ bị bắt cóc như cô năm xưa. Giờ tất cả đã bị nhào nặn thành một dàn Hợp Xướng Choir hoàn chỉnh.\"",
-    "art/comic/07e_o4_p1.jpg: speech kai 30 chữ > 25: \"Em sẽ lấy bút ghi lại hết. Không để sót một cái tên nào trên đời. Phải để lũ chuột dưới cống ngầm này biết đường mà ghi nhớ họ!\"",
-    "art/comic/07e_o5_p3.jpg: speech ronin 37 chữ > 25: \"Tôn chỉ làm ăn của tổ tao: Không tháo dỡ đồng loại. Mà trên kia, đang có cả nghìn con người bị lũ trên Tháp tháo tung ra từng mảnh. Đã đi… thì cả tổ cùng đi.\""
-  ],
+  "comic_lint": [],
   "ult_lint": [],
   "art_audit": [
     "cipher: thiếu sprite idle,attack,crit,hurt,die",
