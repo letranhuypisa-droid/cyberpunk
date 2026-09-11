@@ -47,7 +47,7 @@ rồi mở `http://localhost:8765/index.html`. UI kit và token: `kit.html`. Nú
 | `scratch/sfx_ab.html` | Trang nghe đối chiếu SFX: bản đang dùng cạnh bản kia, âm lượng đã cân — mở bằng preview `static-sfx` |
 | `scratch/key_enemy.py` | Tách nền hàng loạt ảnh idle kẻ địch (`art-src/ENEMY/<id>.png` → `art/sprite/<id>_idle.png`), tự chọn cỡ theo rank, in `box` cho `FOE_SPRITE` |
 | `scratch/sim.js` | Mô phỏng trận bằng Node để cân bằng `mult` từng sector (cùng luật SPD/crit/trạng thái; `SIM_PATCH` để thử số khác) |
-| `scratch/cyber_sheet.py` | Cắt 6 tấm contact sheet CYBERWARE (lưới 5×2) → 60 PNG nền trong `art/cyber/<ô><bậc>.png`; tự dò nền xanh hay nền trắng |
+| `scratch/cyber_sheet.py` | Cắt 6 tấm contact sheet CYBERWARE (lưới 5×2) → 60 WebP nền trong `art/cyber/<ô><bậc>.webp`; tự dò nền (alpha / xanh / trắng), số đo bố cục thẻ trong `INNER` |
 | `scratch/comic_lint.js` | Soát comic: người nói, bong bóng, tên file panel so với `docs/comic-prompts.md` |
 | `scratch/comic_measure.js` | Đo chữ trong bong bóng/caption từng panel |
 | `scratch/art_audit.js` | Kiểm kê art/animation còn thiếu cho chương 1 (thẻ, chân dung, pose sprite, video ult, nền, panel) |
@@ -196,8 +196,9 @@ lá trùng gacha → PHÂN TÁCH → LINH KIỆN (LK) → nâng bậc 6 ô cyber
 - **RONIN (`noChrome:true`)** đi lên như mọi người rồi **dừng ở món cuối cùng còn là đồ mặc vào** — vì bậc
   thấp của mọi ô đều không phải cấy ghép (găng da, áo khoác, mũ lưỡi trai, giày vải). TAY dừng ở 02, các ô
   khác 07–08; tổng 41/60 bậc. Đổi lại món ở đúng bậc trần cho **×1.5** chỉ số (THÉP TRẦN).
-- **Ảnh món**: thả 6 tấm contact sheet vào `art-src/CYBER/<ô>.png` rồi chạy `python scratch/cyber_sheet.py`
-  → 60 PNG `art/cyber/<ô><bậc>.png`. Chưa có thì ô hiện icon SVG, game vẫn chạy.
+- **Ảnh món đã có đủ 60** (`art/cyber/<ô><bậc>.webp`, 512×512 nền trong, 2,1 MB cả bộ), cắt từ 6 tấm
+  contact sheet trong `art-src/CYBER/` bằng `python scratch/cyber_sheet.py`. Đổi tấm nào thì chạy lại
+  tấm đó (`python scratch/cyber_sheet.py head`). Thiếu file thì ô hiện icon SVG, game vẫn chạy.
 
 > `scratch/sim.js` **chưa mô phỏng cyberware** — bảng tỉ lệ thắng ở `docs/dep-loan.md` §F1 là **sàn**.
 

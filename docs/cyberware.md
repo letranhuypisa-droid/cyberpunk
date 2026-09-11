@@ -45,7 +45,7 @@ Theo lệ: chỗ nào cần hỏi thì tự chọn cái khuyến nghị rồi gh
 | Q6 | Tháo ra được không? | **Không.** Thang chỉ đi lên | Không có gì để tháo: bậc sau luôn hơn bậc trước ở cùng một ô. Bỏ được cả cơ chế hoàn 50% LK của bản đầu. |
 | Q7 | RONIN thì sao? | **Đi được tới món cuối cùng còn là ĐỒ MẶC VÀO của từng ô rồi dừng**, và món ở đúng bậc trần đó cho **×1.5** chỉ số | Chính bộ art giải bài này: bậc thấp không phải cấy ghép mà là **găng tay, áo khoác, mũ lưỡi trai, giày**. Nên anh không bị khoá sạch, chỉ dừng ở chỗ món bắt đầu thay thịt bằng máy. Xem §D3. |
 | Q8 | Tên món tiếng Việt hay tiếng Anh? | **Giữ nguyên tiếng Anh như in trên art** | Chữ trong game và chữ trên ảnh phải là một. Dòng phụ thì viết tiếng Việt. |
-| Q9 | Cắt 60 ảnh thế nào? | **`scratch/cyber_sheet.py`** cắt lưới 5×2, khử nền (tự dò xanh/trắng), cắt sát nội dung, ra PNG 512 vuông | Cùng loại việc với `key_enemy.py`. Chưa có file thì giao diện vẽ icon SVG của ô — không bao giờ là ô trống. |
+| Q9 | Cắt 60 ảnh thế nào? | **`scratch/cyber_sheet.py`** cắt lưới 5×2, khử nền (tự dò alpha/xanh/trắng), cắt sát nội dung, ra **WebP 512 vuông** | Cùng loại việc với `key_enemy.py`. Chưa có file thì giao diện vẽ icon SVG của ô — không bao giờ là ô trống. |
 | Q10 | Cyberware theo từng nhân vật hay dùng chung? | **Theo từng nhân vật** | Đây là chỗ "chọn 3 người để đầu tư" trở thành một quyết định thật, và nó khớp với luật đồn trú bên DẸP LOẠN (`power()` có tính cyberware). |
 
 ---
@@ -217,20 +217,9 @@ Ba luật giao diện giữ như bên DẸP LOẠN: **mọi con số đều có 
 
 ## F. Art
 
-### F1. Sáu tấm contact sheet → 60 ảnh rời
+### F1. Sáu tấm contact sheet → 60 ảnh rời — **ĐÃ CẮT XONG 11/09**
 
-Anh thả 6 tấm vào **`art-src/CYBER/`** với đúng tên này:
-
-| File | Tấm |
-|---|---|
-| `art-src/CYBER/head.png` | mũ / nón bảo hiểm |
-| `art-src/CYBER/body.png` | áo khoác |
-| `art-src/CYBER/arm.png` | găng / tay máy |
-| `art-src/CYBER/legs.png` | giày / ủng |
-| `art-src/CYBER/ac1.png` | phụ kiện A (ID Tag → Singularity Crown) |
-| `art-src/CYBER/ac2.png` | phụ kiện B (Tactical Pouch → Exo Wings) |
-
-rồi chạy:
+Anh thả 6 tấm vào **`art-src/CYBER/`** (`head · body · arm · legs · ac1 · ac2`, đều 1536×1024), rồi:
 
 ```bash
 python scratch/cyber_sheet.py            # cắt cả 6 tấm
@@ -238,15 +227,26 @@ python scratch/cyber_sheet.py head arm   # chỉ cắt hai tấm
 python scratch/cyber_sheet.py --dry      # xem sẽ làm gì, không ghi file
 ```
 
-Ra `art/cyber/<ô><bậc>.png` — `head01.png` … `ac210.png`, PNG 512×512 nền trong suốt. Script:
+Ra **`art/cyber/<ô><bậc>.webp`** — 60 file, 512×512 nền trong suốt, **2,1 MB cả bộ**.
+`art-src/` bị gitignore nên không có trong git worktree; script tự lần theo file `.git` sang bản chính.
 
-1. Chia lưới **5 cột × 2 hàng**, cắt **ruột thẻ** (bỏ khung, bỏ đầu thẻ số+độ hiếm, bỏ chân thẻ tên+mô tả —
-   game vẽ khung riêng nên phần đó là rác).
-2. **Tự dò nền** cho cả tấm: xanh (5 tấm) hay trắng (tấm `arm` anh gửi trên nền trắng). Dò theo cả tấm chứ
-   không theo từng ô — mép một ô có thể rơi trúng khung thẻ màu tối và làm đoán sai.
-3. Khử vệt xanh còn bám ở rìa vật thể, cắt sát nội dung, đặt giữa khung vuông có lề.
+**Định dạng: WebP q88, không phải PNG.** Cùng 512px mà 35 KB thay vì 262 KB — cả bộ 2,1 MB thay vì
+15 MB, trong khi ảnh chỉ hiện ở cỡ 44–56px. Repo đã dùng `.webp` cho sprite sheet hiệu ứng nên không
+thêm định dạng mới. `cyberArt()` thử `.webp` trước rồi mới tới `.png`, nên vẫn đè tay bằng PNG được.
 
-Thiếu tấm nào thì ô đó hiện icon SVG, game vẫn chạy. Không có gì bắt buộc phải sinh thêm.
+**Số đo bố cục thẻ** (lấy tỉ lệ pixel-đục trung bình theo dòng và theo cột của **cả 60 thẻ** — thẻ do
+cùng một khuôn sinh ra nên một lần đo là đúng cho cả bộ):
+
+| Phần | Vị trí | Độ đục |
+|---|---|---|
+| Đầu thẻ (số + độ hiếm) | dòng 0 – 8.6% | 0.80 – 0.95 |
+| **Ảnh** | dòng 9.4 – 82.8% | 0.10 – 0.63 |
+| Chân thẻ (tên + mô tả) | dòng 83.6 – 97% | 0.89 – 0.97 |
+| Hai viền dọc khung thẻ | cột 2% và 97.7% | 0.54 và 0.35 |
+
+Script làm ba việc: cắt ruột thẻ theo số đo trên (`INNER`), khử nền (**tự dò** `alpha` / `green` /
+`bright` cho cả tấm — tấm `arm` anh gửi đã có sẵn kênh trong suốt), rồi cắt sát vật thể và đặt giữa
+khung vuông. Thêm `clear_corners()` xoá bốn dấu trang trí ở góc khung, và `bbox()` lọc vệt mảnh.
 
 ### F2. Nếu sinh lại tấm nào
 
@@ -314,4 +314,33 @@ Ronin 41/41 → 154/1.484/131/46.
 **Hồi quy:** `ult_lint` 60/60, `comic_lint` + `art_audit` xanh, chiến dịch không đổi, 9 bãi DẸP LOẠN không
 đổi. Console 0 lỗi JS.
 
-**Còn nợ:** anh thả 6 tấm vào `art-src/CYBER/` rồi chạy `python scratch/cyber_sheet.py` là có đủ 60 ảnh.
+### 11/09 (tối) — cắt xong 60 ảnh từ 6 tấm
+
+Anh thả 6 tấm vào `art-src/CYBER/`. Cắt xong: **60 file `art/cyber/<ô><bậc>.webp`, 2,1 MB cả bộ.**
+
+**Bốn lần cắt sai trước khi đúng, và cả bốn đều vì ĐOÁN thay vì ĐO:**
+
+| Lần | Cách làm | Sai ở đâu |
+|---|---|---|
+| 1 | Cắt cố định `top .13 / bottom .21` (đoán) | Cụt tà áo choàng Mythic — 60/60 ảnh ra cùng cỡ `xxx×338`, đúng bằng vùng cắt |
+| 2 | Dò động dải ảnh theo tỉ lệ pixel-nền từng dòng | Đầu thẻ là hình chevron nên vẫn hở nền, còn áo choàng rộng thì dòng nào cũng kín — tín hiệu đảo chiều, ra dải 487px hoặc 150px tuỳ thẻ |
+| 3 | Cắt cố định `top .115 / bottom .115` (đoán lại) | Còn dính nguyên thanh chân thẻ và dấu chevron ở góc |
+| 4 | Thêm lọc "bỏ hạt lẻ" khi tính hộp bao | Vệt góc dày ~30px chứ không mảnh, lọc không đụng tới |
+
+**Lần thứ năm mới đo thật:** lấy tỉ lệ pixel-đục **trung bình của cả 60 thẻ** theo dòng và theo cột. Vì 60
+thẻ do cùng một khuôn sinh ra, biểu đồ trung bình lộ ngay ba dải rõ ràng (số ở §F1) — đầu thẻ 0–8.6%,
+ảnh 9.4–82.8%, chân thẻ 83.6–97%, hai viền dọc ở 2% và 97.7%. Cộng thêm `clear_corners()` xoá bốn dấu
+trang trí ở góc. Kết quả: 60/60 ảnh có cỡ nội dung **khác nhau**, không ảnh nào chạm mép, không ảnh nào rỗng.
+
+**Dấu hiệu nhận ra mình đang sai mà lúc đầu bỏ qua: 60 ảnh ra cùng một cỡ.** Sáu mươi món khác hình
+khác dáng thì không đời nào cùng kích thước — con số đó đã nói "hộp bao đang lấy cả vùng cắt" ngay từ
+lần chạy đầu, mà tôi vẫn đi sửa chỗ khác hai lần nữa mới nhìn ra.
+
+**Một nhánh nữa của `key_alpha`:** tấm `arm` anh gửi là RGBA **đã có kênh trong suốt sẵn** — key lại là
+hỏng. Thêm nhánh `alpha` dùng thẳng kênh có sẵn, và `sheet_bg` dò ba kiểu nền chứ không phải hai.
+
+**Định dạng:** WebP q88 thay vì PNG — cùng 512px mà 35 KB thay vì 262 KB, cả bộ 2,1 MB thay vì 15 MB.
+Ảnh chỉ hiện ở cỡ 44–56px nên không mất gì. `cyberArt()` thử `.webp` trước rồi `.png`.
+
+**Kiểm trong game:** 6 ô của Yuki lên đúng art, thang 10 bậc của PHỤ KIỆN A load đủ 10/10 ảnh,
+console 0 lỗi.

@@ -138,9 +138,9 @@ const CYBER_SLOTS = [
 ];
 const cyberSlot   = id => CYBER_SLOTS.find(s=>s.id===id);
 const cyberItem   = (slot, step) => { const s=cyberSlot(slot); return s && step>=1 && step<=CYBER.maxStep ? { name:s.list[step-1][0], sub:s.list[step-1][1], step, slot, rar:CYBER_STEP_RARITY[step-1] } : null; };
-/* Ảnh: art/cyber/<ô><bậc 2 chữ số>.png, cắt từ 6 tấm contact sheet bằng scratch/cyber_sheet.py.
+/* Ảnh: art/cyber/<ô><bậc 2 chữ số>.webp, cắt từ 6 tấm contact sheet bằng scratch/cyber_sheet.py.
    Chưa có file thì giao diện vẽ icon SVG của ô — không phải ô trống. */
-const cyberArt    = (slot, step) => ['art/cyber/'+slot+String(step).padStart(2,'0')+'.png'];
+const cyberArt    = (slot, step) => { const n=slot+String(step).padStart(2,'0'); return ['art/cyber/'+n+'.webp','art/cyber/'+n+'.png']; };
 
 /* =====================================================================
    HỒ SƠ — PLAYER.parts (ví LK) + PLAYER.cyber = { [heroId]: { [slot]: bậc 0..10 } }

@@ -94,6 +94,8 @@
    TỜ MỘT Ô — cả thang 10 bậc
    ===================================================================== */
 .cb__panel{z-index:60;grid-template-rows:auto minmax(0,1fr) auto}
+.cb__panel .sh__title{flex:none;white-space:nowrap}
+.cb__panel .sh__sub{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cblist{display:flex;flex-direction:column;gap:6px;overflow:auto;overscroll-behavior:contain}
 .cbstep{display:grid;grid-template-columns:56px minmax(0,1fr) auto;align-items:center;gap:10px;padding:7px 9px;
   border:1px solid var(--line-1);background:var(--surface-1);
