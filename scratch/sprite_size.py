@@ -55,6 +55,11 @@ for g, ids in GROUPS.items():
     for i, m in sorted(rows, key=lambda x: -x[1]['body_h']):
         tag = '  <- bon chan/bay, khong chuan hoa' if i in FOUR_LEG else ''
         k = HERO_TARGET / (m['body_h'] / BOX_H)
+        # Máy không phân biệt được "người thấp" với "người đang tấn thấp". Thấp hơn nhóm 6% trở lên thì
+        # PHẢI nhìn bằng mắt trước khi kéo cao: kéo một tư thế tấn rộng lên cho bằng người đứng thẳng là
+        # đầu nó to hơn hẳn mọi người (đúng vụ Ronin 11/09 — xem BODY_FIX trong js/data.js).
+        if i not in FOUR_LEG and avg and m['body_h'] < avg * 0.94:
+            tag += '  <- THAP hon nhom: tan thap hay nguoi thap? soi mat roi hay chot BODY_FIX'
         print('   %-12s NGUOI %4d (%5.1f%%)  VOI %4d (%5.1f%%)  HOP %4d  rong %4d  file %dx%d  x%.3f%s'
               % (i, m['body_h'], m['body_h'] / BOX_H * 100, m['reach'], m['reach'] / BOX_H * 100,
                  m['box_h'], m['w'], m['size'][0], m['size'][1], k, tag))

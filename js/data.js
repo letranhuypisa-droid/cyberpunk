@@ -602,16 +602,23 @@ const BODY_H = {
   straydog:.570, drone:.460, chromehound:.594 };                 // ba con này đo thấp là ĐÚNG (bốn chân / bay)
 /* ART_H = từ mặt sàn lên tới nét vẽ CAO NHẤT (hào quang, nòng súng, và cả khoảng hụt của con bay lơ lửng),
    cũng in ra bởi scratch/sprite_size.py (cột VOI). Khác BODY_H: đây là chiều cao ô lưới phải chừa chỗ,
-   BODY_H là chiều cao để so người với người. Ronin là ví dụ rõ nhất — art của anh nhỏ nên phải kéo lên 18%,
-   nhưng vẽ ra chỉ chiếm 0.849×1.18 ≈ 1.0 hộp, không việc gì phải bắt cả sân teo lại 18% vì anh. */
+   BODY_H là chiều cao để so người với người. Con nào hộp bị phóng (h > 682) thì chỗ phải chừa là
+   ART_H × hệ số phóng, không phải cả cái hộp — trong hộp thường có sẵn một khoảng trời trống trên đầu. */
 const ART_H = {
   yuki:.982, kai:.985, psalm:.991, ash:.981, ronin:.849,
   scav:.867, welder:.867, tinman:.867, slagger:.867, chopshop:.867, hollow:.867, glassjaw:.867, gutterrat:.867, pipefitter:.867,
   bulwark:.946, enforcer:.946, kiln:.946, drillbit:.946,
   rigger:1, foreman:1, cantor:1, archon:1, motherrust:1,
   straydog:.587, drone:.696, chromehound:.666 };
+/* BODY_FIX = chốt tay, đè lên số đo tự động. Máy đo chiều cao hộp bao nên KHÔNG phân biệt được "người thấp"
+   với "người đang tấn thấp": RONIN chưa có tư thế đứng yên, ảnh idle của anh là mượn tạm frame Light Attack
+   (art-src/HERO/ronin poses.png chỉ có Light Attack · Crit · Khuỵu gối · Hurt), tấn rộng nên đo ra .830 —
+   kéo anh lên cho bằng .95 thì đầu anh to hơn đầu Ash 21% (đo bề ngang đầu: 134 → 158 px so với Ash 131).
+   Cỡ người của anh vốn đã đúng, nên chốt bằng cỡ chuẩn để hệ số = 1, không đụng vào sprite.
+   Bao giờ có tư thế đứng yên thật thì cắt vào, đo lại, và bỏ dòng này. */
+const BODY_FIX = { ronin:.95 };
 const HERO_BODY_H = .95;                                          // cỡ người chuẩn của đội mình
-const HERO_SIZE = { psalm:1.03, ronin:1.03 };                     // ★ ai cao/thấp hơn chuẩn bao nhiêu (1 = đúng chuẩn)
+const HERO_SIZE = { psalm:1.03 };                                 // ★ ai cao/thấp hơn chuẩn bao nhiêu (1 = đúng chuẩn)
 const FOE_BODY_H = { grunt:.85, elite:.97, boss:.99 };            // cỡ người chuẩn của địch theo rank (trùm còn được phóng thêm RANK_SC)
 const NO_BODY_SCALE = ['straydog','drone','chromehound'];   // bốn chân và máy bay: thấp là đúng, đừng kéo cao bằng người
 /* Bản sao box đã nhân hệ số. PHẢI clone: sprites/box dùng chung tham chiếu với def gốc trong ENEMY_POOL,
@@ -624,7 +631,7 @@ function scaleSprites(s, k){
 }
 /* Chuẩn hoá cỡ người: địch kéo về cỡ chuẩn của rank nó, nhân vật đội mình kéo về cùng một cỡ người.
    Chạy TRƯỚC khối chiêu mộ bên dưới, nên bản chiêu mộ chỉ còn phải bù từ cỡ rank lên cỡ nhân vật. */
-const bodyScale = (id, target) => { const b=BODY_H[id]; return (b && target && !NO_BODY_SCALE.includes(id)) ? target/b : 1; };
+const bodyScale = (id, target) => { const b=BODY_FIX[id] || BODY_H[id]; return (b && target && !NO_BODY_SCALE.includes(id)) ? target/b : 1; };
 ENEMY_POOL.forEach(e => { if(e.sprites) e.sprites = scaleSprites(e.sprites, bodyScale(e.id, FOE_BODY_H[e.rank])); });
 Object.keys(ROSTER).forEach(id => { const d=ROSTER[id];
   if(d.sprites) d.sprites = scaleSprites(d.sprites, bodyScale(id, HERO_BODY_H*(HERO_SIZE[id]||1))); });
