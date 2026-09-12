@@ -49,7 +49,7 @@ const words = t => String(t).replace(/…/g, ' ').trim().split(/\s+/).filter(Boo
 const BANNED = ['bài ca', 'hát lạc điệu', 'bắt nhịp', 'thứ tự lệnh', 'deck', 'Operator', 'Free Zone', 'quận SIS', 'tầng âm bảy'];
 const TERMS = ['Tháp', 'Khu Đáy', 'Canticle', 'Choir', 'Halo', 'Chromefall', 'Chrome', 'Scav', 'Ronin', 'Muzzle', 'Foreman', 'Psalm', 'Archon', 'Cantor', 'Mother Rust', 'Tầng Bốn', 'Đơn vị 07', 'lính máy', 'vòng', 'drone', 'Enforcer'];
 const PRON = ['tôi', 'tao', 'mày', 'cô', 'cậu', 'bà', 'ông', 'chị', 'em', 'ta', 'con', 'ngươi', 'anh', 'mình', 'tụi tôi', 'tụi bay', 'họ', 'lão'];
-const ART_ID = { 'art/card/yuki.png': 'yuki', 'art/card/ash.png': 'ash', 'art/card/kai.png': 'kai', 'art/card/psalm.png': 'psalm', 'art/card/ronin.png': 'ronin', 'art/card/muzzle.png': 'muzzle' };
+const ART_ID = { 'art/card/yuki.jpg': 'yuki', 'art/card/ash.jpg': 'ash', 'art/card/kai.jpg': 'kai', 'art/card/psalm.jpg': 'psalm', 'art/card/ronin.jpg': 'ronin', 'art/card/muzzle.jpg': 'muzzle' };
 
 /* ---- docs/comic-prompts.md ---- */
 const doc = read('docs/comic-prompts.md'); const docMap = new Map();

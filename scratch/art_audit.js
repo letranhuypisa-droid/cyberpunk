@@ -67,7 +67,7 @@ function audit(def, id) {
   return {
     id,
     name: (def && def.name) || id,
-    card: exists('art/card/' + id + '.png'),
+    card: exists('art/card/' + id + '.jpg'),
     portrait: has((def && def.portrait) || ['art/card/' + id + '_portrait.jpg']),
     poses,
     ult: has((def && def.ultVideo) || []) || (def && def.ultVideo ? false : null),

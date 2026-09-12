@@ -153,6 +153,18 @@
         "8802"
       ],
       "port": 8802
+    },
+    {
+      "name": "static-card",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8796",
+        "--bind",
+        "127.0.0.1"
+      ],
+      "port": 8796
     }
   ]
 }

@@ -26,10 +26,10 @@ const bang  = (text,at='br')=>({ who:null, kind:'sfx', text, at, auto:true });
 const page  = (layout,...panels)=>({ layout, panels });
 const as    = (b,label)=>Object.assign(b,{as:label});
 
-const ART = { yuki:['art/card/yuki.png'], ash:['art/card/ash.png'], kai:['art/card/kai.png'], psalm:['art/card/psalm.png'], ronin:['art/card/ronin.png'], muzzle:['art/card/muzzle.png'],
-              // art thẻ kẻ địch (art/card/<id>.png) — panel nào có mặt địch thì dùng thẳng, khỏi silhouette
-              scav:['art/card/scav.png'], rigger:['art/card/rigger.png'], foreman:['art/card/foreman.png'], archon:['art/card/archon.png'],
-              motherrust:['art/card/motherrust.png'], cantor:['art/card/cantor.png'] };
+const ART = { yuki:['art/card/yuki.jpg'], ash:['art/card/ash.jpg'], kai:['art/card/kai.jpg'], psalm:['art/card/psalm.jpg'], ronin:['art/card/ronin.jpg'], muzzle:['art/card/muzzle.jpg'],
+              // art thẻ kẻ địch (art/card/<id>.jpg) — panel nào có mặt địch thì dùng thẳng, khỏi silhouette
+              scav:['art/card/scav.jpg'], rigger:['art/card/rigger.jpg'], foreman:['art/card/foreman.jpg'], archon:['art/card/archon.jpg'],
+              motherrust:['art/card/motherrust.jpg'], cantor:['art/card/cantor.jpg'] };
 const BG  = { yard:['art/bg/bg_07a.jpg'], foundry:['art/bg/bg_07b.jpg'], gate:['art/bg/bg_07c.jpg'], arena:['art/bg/bg_battle.jpg'],
               sewer:['art/bg/bg_07d.jpg','art/bg/bg_07b.jpg'], lift:['art/bg/bg_07e.jpg','art/bg/bg_07c.jpg'] };   // 07-D / 07-E: thả bg_07d.jpg, bg_07e.jpg vào là tự thay nền tạm
 const face = (id,zoom=1.6)=>({ img:ART[id], pos:'50% 6%', zoom });        // cận mặt (pos/zoom chỉ dùng cho ảnh tạm — xem ghi chú 12/09 ở đầu file)

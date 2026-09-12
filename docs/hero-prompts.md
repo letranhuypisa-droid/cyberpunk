@@ -30,7 +30,7 @@ Lore đầy đủ: `docs/characters.md`. Thuật ngữ và vũ khí: `docs/gloss
 
 | # | Ảnh | File đích | Khổ | Cần không |
 |---|---|---|---|---|
-| 1 | **Ảnh thẻ** (key art toàn thân, **có bối cảnh**) | `art/card/<id>.png` | dọc 1536×2720 | **bắt buộc** — mở khoá 4 chỗ cùng lúc |
+| 1 | **Ảnh thẻ** (key art toàn thân, **có bối cảnh**) | gốc `art-src/CARD/<id>.png` → game `art/card/<id>.jpg` | sinh ở dọc 1536×2720; bản game hạ còn ngang 1152 | **bắt buộc** — mở khoá 4 chỗ cùng lúc |
 | 2 | Ảnh bán thân | `art/card/<id>_portrait.jpg` | tự cắt từ (1) | tôi cắt bằng script, bạn không phải sinh |
 | 3 | **Sprite đứng** (toàn thân, **nền xanh**) | `art/sprite/<id>_idle.png` | dọc, cạnh dài ≥ 1024 | **bắt buộc để ra trận** |
 | 4 | Sprite `attack` / `crit` / `hurt` / `die` | `art/sprite/<id>_<pose>.png` | như (3) | nên có — thiếu thì engine tự dùng lại pose gần nhất |
@@ -489,8 +489,9 @@ heavy mud-caked boots, patient silent face.
 
 ## 8. Có ảnh rồi thì làm gì
 
-1. Thả ảnh thẻ vào thư mục gốc (hoặc `art-src/HERO/`) → tôi đổi tên thành `art/card/<id>.png`, cắt `<id>_portrait.jpg`
-   (JPEG q90, dải trên 0,375–0,424 chiều cao) và cất bản gốc.
+1. Thả ảnh thẻ vào thư mục gốc (hoặc `art-src/HERO/`) → tôi đổi tên thành `art-src/CARD/<id>.png` (bản gốc), chạy
+   `python scratch/card_web.py --only <id>` ra bản game `art/card/<id>.jpg` (ngang ≤ 1152, q90), rồi cắt
+   `<id>_portrait.jpg` (JPEG q90, dải trên 0,375–0,424 chiều cao).
 2. Thả ảnh nền xanh → `python scratch/key_enemy.py art-src/HERO --only <id>` → `art/sprite/<id>_idle.png` + số `box`
    dán vào `HERO_SPRITE` trong `js/data.js`.
 3. Xong bước 1 cho cả 10 người thì **lọc bể gacha theo art** (việc K12) không còn cắt ai — mọi người trong bể đều có mặt.
@@ -589,7 +590,7 @@ Bạn gửi `Ronin.png` (942×1669). Đã cắm xong theo đúng mục 8:
 
 | Việc | Kết quả |
 |---|---|
-| Ảnh thẻ | `art/card/ronin.png` — 942×1669, tỉ lệ 0,5644 (chuẩn là 0,5647, lệch không đáng kể) |
+| Ảnh thẻ | `art/card/ronin.jpg` — 942×1669, tỉ lệ 0,5644 (chuẩn là 0,5647, lệch không đáng kể) |
 | Ảnh bán thân | `art/card/ronin_portrait.jpg` — 942×707, cắt dải trên 0,4239 chiều cao như 8 người kia, JPEG q90, 143 KB |
 | Bản cũ | `art-src/HERO/ronin_card_v1.png` + `ronin_portrait_v1.jpg` |
 | Bản gốc mới | `art-src/HERO/ronin_card_v2.png` |
@@ -609,8 +610,8 @@ cho quy cách bảng đầy đủ.
 
 ## 11. Bảng pose nền xanh cho MUZZLE (và mẫu bảng dùng chung từ nay)
 
-Sau đợt Ronin 11/09, **Muzzle là người chơi được duy nhất còn thiếu sprite trận**: ảnh thẻ `art/card/muzzle.png`
-(1536×2720) và chân dung đều đã có, nên màn mở rương và thanh lượt hiện đúng mặt ông — nhưng ra sân vẫn là bóng đen.
+Sau đợt Ronin 11/09, **Muzzle là người chơi được duy nhất còn thiếu sprite trận**: ảnh thẻ `art/card/muzzle.jpg`
+(1152×2040, gốc 1536×2720 ở `art-src/CARD/`) và chân dung đều đã có, nên màn mở rương và thanh lượt hiện đúng mặt ông — nhưng ra sân vẫn là bóng đen.
 Nếu bể gacha chương 1 chỉ mở Ronin + Muzzle thì một trong hai lá bài hiếm hoi ấy kéo về sẽ không đánh nhau được tử tế.
 
 ### Quy cách bảng gộp (rút từ bảng Ronin — cách tốt nhất hiện nay)

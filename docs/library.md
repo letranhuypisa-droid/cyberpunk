@@ -820,7 +820,7 @@ Chỗ nào đã có sẵn chữ thì em chép luôn vào đây để anh viết 
 
 ## D1 · SỔ BỘ — kẻ địch chương 1 ✦ *(đã cắm vào game)*
 
-Chữ anh viết ngày 11/09, đọc được ở ARCHIVE → tab **SỔ BỘ**. Thẻ dùng luôn art kẻ địch có sẵn (`art/card/<id>.png`), không cần ảnh mới.
+Chữ anh viết ngày 11/09, đọc được ở ARCHIVE → tab **SỔ BỘ**. Thẻ dùng luôn art kẻ địch có sẵn (`art/card/<id>.jpg`), không cần ảnh mới.
 Phần dưới in tự động từ `CODEX` nhóm `foe` trong `js/data.js` — sửa chữ ở đó rồi chạy `node scratch/library_dump.js`.
 
 <!-- AUTO:D1:BEGIN — in bằng scratch/library_dump.js, đừng sửa tay -->

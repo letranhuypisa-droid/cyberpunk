@@ -58,8 +58,8 @@ Nếu dùng Seedance qua API, hậu tố tham số đặt cuối prompt:
 `--ratio 16:9 --duration 5 --resolution 1080p --camerafixed false --watermark false`.
 Dùng web UI thì bỏ dòng này, chọn tay trong panel.
 
-**Nên chạy image-to-video**, lấy đúng file art của nhân vật (`art/card/yuki.png`, `art/card/kai.png`, `art/card/ash.png`,
-`art/card/psalm.png`, `art/card/ronin.png`, `art/card/muzzle.png`, `art/card/echo.png`, `art/card/wire.png`, `art/card/stitch.png`) làm ảnh tham chiếu
+**Nên chạy image-to-video**, lấy đúng file art của nhân vật (`art-src/CARD/yuki.png`, `art-src/CARD/kai.png`, `art-src/CARD/ash.png`,
+`art-src/CARD/psalm.png`, `art-src/CARD/ronin.png`, `art-src/CARD/muzzle.png`, `art-src/CARD/echo.png`, `art-src/CARD/wire.png`, `art-src/CARD/stitch.png`) làm ảnh tham chiếu
 để tạo hình không trôi. Khi đó rút khối `CAST` còn một câu, dành token cho máy quay.
 
 ---
@@ -1152,4 +1152,4 @@ cùng tên file `video/<id>_ult.mp4`. Khai trong `ENEMY_POOL` (`js/data.js`), kh
 
 Bị Psalm chiếm quyền điều khiển (`APOSTASY`) thì lượt đó nó đánh đồng bọn và **không** tung chiêu; Energy giữ nguyên
 cho lượt sau. Đã có video: `glassjaw` (cú đấm điện hình rồng), `kiln` (bão lửa). Prompt cho con tiếp theo: dùng lại
-mục 2–4, ảnh tham chiếu là `art/card/<id>.png`.
+mục 2–4, ảnh tham chiếu là `art-src/CARD/<id>.png`.

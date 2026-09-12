@@ -39,7 +39,7 @@ const ROSTER = {
            // (art/sprite/<id>_dash.png cũ không còn được nạp.)
            sprites:{ idle:['art/sprite/yuki_idle.png'], attack:['art/sprite/yuki_attack.png'], hurt:['art/sprite/yuki_hurt.png'],
                      box:{ idle:{w:744,h:682,ax:372}, attack:{w:1173,h:682,ax:466}, hurt:{w:924,h:682,ax:641} } },
-           portrait:['art/card/yuki_portrait.jpg','art/card/yuki.png'], pos:'50% 4%',   // bán thân cắt từ art thẻ như 8 người kia (art thẻ đời trước để art-src/YUKI/yuki_card_v1.png, key art bán thân cũ ở art-src/YUKI/yuki_portrait_keyart.jpg)
+           portrait:['art/card/yuki_portrait.jpg','art/card/yuki.jpg'], pos:'50% 4%',   // bán thân cắt từ art thẻ như 8 người kia (art thẻ đời trước để art-src/YUKI/yuki_card_v1.png, key art bán thân cũ ở art-src/YUKI/yuki_portrait_keyart.jpg)
            reveal:['art/reveal/yuki_reveal.jpg','art-src/YUKI/Yuki mở rương.png'], revealPos:'50% 50%',   // ảnh mở rương 16:9: mặt thẻ khi quay ra ở gacha
            revealVideo:['video/yuki_reveal.mp4','art-src/YUKI/hoat anh mo ruong.mp4'],            // video mở rương phát trước khi lật thẻ (chỉ Yuki có)
            // Cut-in khi phát chiêu cuối. 11/09: thay bằng video mới (854×480) và BỎ hẳn hai video cũ — Yuki chỉ còn
@@ -58,7 +58,7 @@ const ROSTER = {
            sprites:{ idle:['art/sprite/psalm_idle.png'], attack:['art/sprite/psalm_attack.png'], hurt:['art/sprite/psalm_hurt.png'],
                      box:{ idle:{w:744,h:682,ax:372}, attack:{w:1203,h:682,ax:534}, hurt:{w:811,h:682,ax:382} } },
            ultVideo:['video/psalm_ult.mp4','art-src/PSALM/PSALM ultimate.mp4'],
-           portrait:['art/card/psalm_portrait.jpg','art/card/psalm.png'], pos:'50% 12%',
+           portrait:['art/card/psalm_portrait.jpg','art/card/psalm.jpg'], pos:'50% 12%',
            reveal:['art/reveal/psalm_reveal.jpg','art-src/PSALM/PSALM rương.png'], revealPos:'50% 50%' },
   ash:   { id:'ash',   name:'ASH',   faction:'rust', tier:'A', atk:120, hp:1000, energyMax:75, spd:105, crit:12,
            skill:{ desc:'Đòn thường 100% ATK, +35 Energy. Lưỡi axit để lại độc: mục tiêu mất thêm 20% ATK của Ash đầu mỗi lượt, trong 2 lượt.', mult:1, energy:35,
@@ -76,7 +76,7 @@ const ROSTER = {
            sprites:{ idle:['art/sprite/ash_idle.png'], attack:['art/sprite/ash_attack.png'], hurt:['art/sprite/ash_hurt.png'],
                      box:{ idle:{w:796,h:682,ax:521}, attack:{w:1179,h:682,ax:385}, hurt:{w:861,h:682,ax:574} } },
            ultVideo:['video/ash_ult.mp4','art-src/ASH/ash ultimate.mp4'],
-           portrait:['art/card/ash_portrait.jpg','art/card/ash.png'], pos:'50% 8%',
+           portrait:['art/card/ash_portrait.jpg','art/card/ash.jpg'], pos:'50% 8%',
            reveal:['art/reveal/ash_reveal.jpg','art-src/ASH/ash rương.png'], revealPos:'50% 50%' },
   kai:   { id:'kai',   name:'KAI',   faction:'rust', tier:'B', atk:95,  hp:1200, energyMax:100, spd:96,  crit:10,
            skill:{ desc:'Đòn thường 100% ATK, +25 Energy, thêm 15% tỉ lệ chí mạng.', mult:1, energy:25, critPct:15 },
@@ -93,7 +93,7 @@ const ROSTER = {
            sprites:{ idle:['art/sprite/kai_idle.png'], attack:['art/sprite/kai_attack.png'], hurt:['art/sprite/kai_hurt.png'],
                      box:{ idle:{w:744,h:682,ax:372}, attack:{w:744,h:682,ax:372}, hurt:{w:744,h:682,ax:372} } },   // 11/09: 5 pose mới (Kai đeo pháo điện từ), cả bộ cùng hộp 744×682
            ultVideo:['video/kai_ult.mp4','art-src/Kai/Kai ultimate 2.mp4'],   // 11/09: video mới (bản cũ vẫn nằm ở art-src/Kai/Kai ultimate.mp4, không còn được gọi)
-           portrait:['art/card/kai_portrait.jpg','art/card/kai.png'], pos:'50% 8%',
+           portrait:['art/card/kai_portrait.jpg','art/card/kai.jpg'], pos:'50% 8%',
            reveal:['art/reveal/kai_reveal.jpg','art-src/Kai/Kai rương.png'], revealPos:'50% 50%' },
   // ---- Chỉ có chân dung (trong trận hiện silhouette) ----
   /* noChrome: thân xác hoàn toàn là máu thịt, "không một khớp nối kim loại" (LORE.ronin.past) → không lắp
@@ -110,7 +110,7 @@ const ROSTER = {
            sprites:{ idle:['art/sprite/ronin_idle.png'], attack:['art/sprite/ronin_attack.png'], hurt:['art/sprite/ronin_hurt.png'],
                      box:{ idle:{w:744,h:682,ax:372}, attack:{w:745,h:682,ax:372}, hurt:{w:744,h:682,ax:372} } },   // hộp thật nằm ở HERO_SPRITE bên dưới (đè lên đây), gồm cả crit/die
            ultVideo:['video/ronin_ult.mp4'],
-           portrait:['art/card/ronin_portrait.jpg','art/card/ronin.png'], pos:'50% 8%' },
+           portrait:['art/card/ronin_portrait.jpg','art/card/ronin.jpg'], pos:'50% 8%' },
   muzzle:{ id:'muzzle',name:'MUZZLE',faction:'rust', tier:'B', atk:70,  hp:1750, energyMax:125, spd:80,  crit:5,   // ★ FAKE: cost + hệ số (tên + mô tả chiêu cuối đã chốt, xem docs/skill-naming.md §9)
            skill:{ desc:'Đòn thường 100% ATK, +30 Energy.', mult:1, energy:30 },
            ult:{ name:'FIELD PATCH', cost:125, kind:'heal', mult:1.2, desc:'Muzzle đóng cánh cửa xe xuống nền, cả tổ lùi về sau lưng anh. Trong vòm bụi đó giáp rách được vá, người ngã đứng dậy: hồi 120% ATK cho cả đội.' },
@@ -124,7 +124,7 @@ const ROSTER = {
            ],
            sprites:{ idle:['art/sprite/muzzle_idle.png'], attack:['art/sprite/muzzle_attack.png'] },
            ultVideo:['video/muzzle_ult.mp4'],
-           portrait:['art/card/muzzle_portrait.jpg','art/card/muzzle.png'], pos:'50% 8%' },
+           portrait:['art/card/muzzle_portrait.jpg','art/card/muzzle.jpg'], pos:'50% 8%' },
   echo:  { id:'echo',  name:'ECHO',  faction:'chrome', tier:'A', atk:105, hp:1000, energyMax:100, spd:100, crit:10,
            skill:{ desc:'Đòn thường 100% ATK, +25 Energy, thêm 5% tỉ lệ chí mạng.', mult:1, energy:25, critPct:5 },
            ult:{ name:'PLAYBACK', cost:100, kind:'nuke', mult:2.5, fx:'shock', desc:'Echo bóc niêm phong ở cổ, mở lại cái loa cô tự cắt và nói đúng hai chữ bằng giọng đi mượn: 250% ATK lên một mục tiêu. Nói xong cô lấy tay bịt loa lại.' },
@@ -134,7 +134,7 @@ const ROSTER = {
              { id:'echo-cut', tag:'CẮT LOA', name:'DẬP TẮT BÀI CA', when:{enemyFaction:'chrome'}, effect:{dmgPct:10},
                desc:'Quá thấu hiểu cách thức truyền tin bằng sóng âm của Quân Đoàn Ca, các đòn tấn công của Echo gây sát thương áp đảo lên các cỗ máy thuộc phe Chrome.' },
            ],
-           sprites:{idle:['art/sprite/echo_idle.png'],attack:['art/sprite/echo_attack.png']}, ultVideo:['video/echo_ult.mp4'], portrait:['art/card/echo_portrait.jpg','art/card/echo.png'], pos:'50% 8%' },
+           sprites:{idle:['art/sprite/echo_idle.png'],attack:['art/sprite/echo_attack.png']}, ultVideo:['video/echo_ult.mp4'], portrait:['art/card/echo_portrait.jpg','art/card/echo.jpg'], pos:'50% 8%' },
   wire:  { id:'wire',  name:'WIRE',  faction:'chrome', tier:'B', atk:80,  hp:1500, energyMax:75, spd:90,  crit:8,
            skill:{ desc:'Đòn thường 100% ATK, +30 Energy.', mult:1, energy:30 },
            ult:{ name:'OVERCLOCK', cost:75, kind:'nuke', mult:2.2, fx:'shock', desc:'Wire với tay bắt lấy dòng điện trong Halo của mục tiêu rồi vặn quá ngưỡng: 220% ATK. Cái vòng quay nhanh dần cho tới lúc nướng chín thứ nó đang đội.' },
@@ -144,7 +144,7 @@ const ROSTER = {
              { id:'wire-lot', tag:'SỐ LÔ', name:'MÃ LÔ KHẮC TẬN XƯƠNG', when:{enemyFaction:'chrome'}, effect:{dmgPct:8},
                desc:'Từng tự tay lắp ráp hàng ngàn cỗ máy cho Canticle, Wire nắm rõ vị trí những con ốc lỏng trên từng số lô kẻ địch phe Chrome, khiến các đòn đánh của cô gây sát thương tàn khốc lên chúng.' },
            ],
-           sprites:{idle:['art/sprite/wire_idle.png'],attack:['art/sprite/wire_attack.png']}, ultVideo:['video/wire_ult.mp4'], portrait:['art/card/wire_portrait.jpg','art/card/wire.png'], pos:'50% 8%' },
+           sprites:{idle:['art/sprite/wire_idle.png'],attack:['art/sprite/wire_attack.png']}, ultVideo:['video/wire_ult.mp4'], portrait:['art/card/wire_portrait.jpg','art/card/wire.jpg'], pos:'50% 8%' },
   stitch:{ id:'stitch',name:'STITCH',faction:'rust',   tier:'S', atk:140, hp:900,  energyMax:100, spd:108, crit:15,
            skill:{ desc:'Đòn thường 100% ATK, +30 Energy.', mult:1, energy:30 },
            ult:{ name:'SUTURE', cost:100, kind:'heal', mult:1.5, desc:'Bốn cánh tay phẫu thuật bung ra, bốn cây kim cong, bốn sợi chỉ bắn đi bốn hướng. Chỉ thắt lại một cái, vết thương cả tổ đóng miệng cùng lúc: hồi 150% ATK cho cả đội.' },
@@ -154,13 +154,13 @@ const ROSTER = {
              { id:'stitch-sleeve', tag:'TAY ÁO', name:'TAY ÁO DÀY CHIẾN TRẬN', when:{enemyFaction:'rust'}, effect:{dmgTakenPct:-10},
                desc:'Những mũi chỉ đen tích tụ qua năm tháng trên tay áo như một tấm giáp tâm linh, giúp bà giảm thiểu sát thương khi đối đầu với các thế lực bùn lầy Khu Đáy.' },
            ],
-           sprites:{idle:['art/sprite/stitch_idle.png'],attack:['art/sprite/stitch_attack.png']}, ultVideo:['video/stitch_ult.mp4'], portrait:['art/card/stitch_portrait.jpg','art/card/stitch.png'], pos:'50% 8%' },
+           sprites:{idle:['art/sprite/stitch_idle.png'],attack:['art/sprite/stitch_attack.png']}, ultVideo:['video/stitch_ult.mp4'], portrait:['art/card/stitch_portrait.jpg','art/card/stitch.jpg'], pos:'50% 8%' },
 };
 /* ---- ★ FAKE: 10 nhân vật chưa có art → silhouette; cost/hệ số còn tạm (tên + mô tả chiêu cuối đã chốt, xem docs/skill-naming.md §9) ---- */
 const mkChar = (id,name,faction,tier,atk,hp,energyMax,skill,ult,passives) => ({ id,name,faction,tier,atk,hp,energyMax,
   skill:Object.assign({ mult:1, energy:25 }, skill), ult, passives:passives||[],
   sprites:{ idle:['art/sprite/'+id+'_idle.png'], attack:['art/sprite/'+id+'_attack.png'], hurt:['art/sprite/'+id+'_hurt.png'] },
-  portrait:['art/card/'+id+'_portrait.jpg','art/card/'+id+'.png'], pos:'50% 8%' });
+  portrait:['art/card/'+id+'_portrait.jpg','art/card/'+id+'.jpg'], pos:'50% 8%' });
 /* spd/crit cho 10 nhân vật mkChar (+ fx chiêu cuối nếu có) ★ FAKE */
 const HERO_EXTRA = { vesper:{spd:110,crit:15}, nyx:{spd:106,crit:15}, halo:{spd:92,crit:10}, cipher:{spd:100,crit:10}, meridian:{spd:78,crit:5},
   toll:{spd:98,crit:15}, spark:{spd:104,crit:10,ultFx:'shock'}, vixen:{spd:114,crit:15}, junker:{spd:76,crit:5,ultFx:'explode'}, gravedigger:{spd:74,crit:8} };
@@ -369,7 +369,7 @@ const ENEMY_POOL = [
      Cố ý KHÔNG có link: đã bị cắt khỏi hệ thống nên không được hồi máu. ★ Hành vi chưa cài: đứng yên tới khi bị đánh. */
   { id:'husk',       name:'PHẾ PHẨM',       faction:'chrome', rank:'grunt', atk:55,  hp:900  },
 ];
-/* ---- Art thẻ kẻ địch: art/card/<id>.png (768×1360, có nền, không tách nền) ----
+/* ---- Art thẻ kẻ địch: art/card/<id>.jpg (768×1360, có nền, không tách nền) ----
    Hiện ở: thanh lượt trong trận, chân dung người nói trong comic, bestiary ở kit.html, dòng passive trong ARCHIVE.
    Đủ 21 con chương 1; địch chương 2–3 chưa có ảnh → vẫn silhouette. Thêm con mới: thả file vào art/card/ rồi
    thêm id vào FOE_ART (và FOE_POS nếu đầu nhân vật không nằm ở khoảng 15–20% chiều cao ảnh).
@@ -377,7 +377,7 @@ const ENEMY_POOL = [
 const FOE_POS = { gutterrat:'50% 18%', straydog:'62% 30%', chromehound:'40% 24%', drone:'50% 26%', bulwark:'45% 16%' };
 const FOE_ART = ['scav','rigger','straydog','welder','gutterrat','chopshop','tinman','slagger','pipefitter','hollow','glassjaw',
                  'drone','bulwark','kiln','drillbit','enforcer','chromehound','foreman','motherrust','archon','cantor'];
-FOE_ART.forEach(id=>{ const e=ENEMY_POOL.find(x=>x.id===id); if(!e) return; e.portrait=['art/card/'+id+'.png']; if(FOE_POS[id]) e.pos=FOE_POS[id]; });
+FOE_ART.forEach(id=>{ const e=ENEMY_POOL.find(x=>x.id===id); if(!e) return; e.portrait=['art/card/'+id+'.jpg']; if(FOE_POS[id]) e.pos=FOE_POS[id]; });
 
 /* ---- Tốc độ + chí mạng kẻ địch: [spd, crit%] ★ FAKE. Chó/drone/Glass Jaw nhanh hơn Yuki (112) để dạy "SPD quyết định ai ra đòn trước";
    giáp (Tin Man, Bulwark) chậm; boss ≤ 100 để đội mình vẫn được đi trước boss. Thiếu id → [90, 5]. ---- */
@@ -1072,7 +1072,7 @@ const CODEX = [
     { id:'ironrule', name:'QUY TẮC SẮT CỦA ĐÁY', sub:'Luật của Ronin', en:'the iron rule of the Bottom', faction:'rust', where:'Tổ nhặt sắt',
       text:'Luật bất thành văn do Ronin đặt ra cho Tổ Nhặt Sắt: "Không bao giờ tháo dỡ thứ gì còn ấm." Giữa một thế giới sẵn sàng rã máy, róc thịt nhau để đổi lấy linh kiện, quy tắc ấy là ranh giới mong manh cuối cùng giữ họ lại làm con người.' },
   ]},
-  /* SỔ BỘ — bestiary. foe:'<id trong ENEMY_POOL>' → thẻ mượn luôn art kẻ địch ở art/card/<id>.png, không cần ảnh riêng.
+  /* SỔ BỘ — bestiary. foe:'<id trong ENEMY_POOL>' → thẻ mượn luôn art kẻ địch ở art/card/<id>.jpg, không cần ảnh riêng.
      ult{name,desc} = chiêu cuối của con đó (5 boss + Kiln + Glass Jaw). spot = một dòng nhận diện chiến thuật, in dưới phần lore.
      Chỉ số nằm ở ENEMY_POOL, không chép vào đây. Thứ tự trong danh sách = thứ tự hiện ở tab SỔ BỘ: 5 trùm trước, rồi xếp theo băng. */
   { key:'foe', label:'SỔ BỘ', tab:'Sổ bộ', items:[
