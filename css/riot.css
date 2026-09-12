@@ -97,6 +97,8 @@
 .yard__head i{display:block;margin-top:5px;font:var(--fs-2xs)/1.4 var(--font-mono);font-style:normal;color:var(--text-2)}
 .yard__tags{display:flex;gap:4px;flex-wrap:wrap}
 .ytag{padding:2px 5px;border:1px solid var(--line-2);font:800 8px/1.3 var(--font-mono);letter-spacing:.14em;color:var(--text-2)}
+/* "BÃI n" = mã màn, in đậm hơn ba chip còn lại vì nó là cái hiện ở ô SECTOR lúc vào trận */
+.ytag--no{border-color:var(--line-3);color:var(--text-1);background:var(--surface-2)}
 .ytag--rust{border-color:var(--rust);color:var(--rust-hi)}
 .ytag--chrome{border-color:var(--chrome);color:var(--chrome-hi)}
 .ytag--own{border-color:var(--hp);color:var(--hp)}

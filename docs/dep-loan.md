@@ -79,6 +79,9 @@ Anh dặn "cần hỏi gì thì cứ mặc định chọn cái bạn khuyến ng
 Mặt bằng DISTRICT 07 nhìn từ trên xuống hơi chếch, chia ba vòng: **vành ngoài** (rìa bãi rác) → **lòng khu**
 (nơi có người ở) → **trung tâm** (chân Tháp). Càng vào trong càng nhiều tiền, càng nhiều quân phải bỏ ra.
 
+Cột `#` không phải số trang trí: nó là **`yardNo()`** — mã màn `BÃI 1`…`BÃI 9` hiện ở ô SECTOR khi vào trận và
+ở chip đầu tờ chi tiết. Số lấy theo vị trí trong `RIOT_YARDS`, nên **đổi thứ tự mảng là đổi mã màn**.
+
 | # | id | Tên | Vòng | Mở khi | Phe giữ | Ô quân | Ngưỡng giữ | CR/kiện | SH/kiện | Wave | mult | m50 | Sức mạnh ổ | Trùm | Nền |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 1 | `drop` | **BÃI RƠI CŨ** | 1 | ngay | rust | 1 | 800 | 20 | 0 | 2 | 1.88 | 2.14 | 3 697 | — | `bg_07a` |
@@ -782,9 +785,12 @@ Về tới bản đồ: nút bãi thành `is-own`, thẻ in `0/1 QUÂN · BẬC 
 Một lỗi chữ sửa luôn: dòng thưởng là dòng dài nhất trong game, ở 375 px nó gãy đúng giữa `+2` và `SH` — số một
 dòng, đơn vị một dòng, đọc như hỏng. Thêm `&nbsp;` giữa số và đơn vị nên chỗ gãy rơi vào dấu `·`.
 
-Còn một chỗ gợn **chưa đụng vào, chờ anh quyết**: ô SECTOR trên đầu màn trận in `BÃI-DROP` — `yardSector()` ghép
-`'BÃI-' + id`, mà `id` là chữ Anh trong code và đây là chỗ duy nhất người chơi nhìn thấy nó. Chiến dịch in `07-A`,
-nên chỗ này hoặc thành số (`BÃI 1`…`BÃI 9`) hoặc giữ nguyên nếu anh thấy đọc được.
+**Mã màn đổi thành `BÃI 1`…`BÃI 9` (anh chốt).** Ô SECTOR trên đầu màn trận trước in `BÃI-DROP` — `yardSector()`
+ghép `'BÃI-' + id`, mà `id` là chữ Anh trong code và đây là chỗ duy nhất nó lọt ra màn hình (chiến dịch in `07-A`).
+Số lấy từ `yardNo()` = vị trí trong `RIOT_YARDS`, **đúng bằng cột `#` của bảng §C** (vành ngoài → trung tâm, cũng
+là thứ tự mở khoá): BÃI 1 = BÃI RƠI CŨ … BÃI 9 = NGHĨA ĐỊA THÉP. Tờ chi tiết thêm chip **`BÃI n`** đứng trước
+RUST/CHROME, nếu không thì con số ở màn trận không tra được ở đâu ra. Đổi thứ tự `RIOT_YARDS` là đổi luôn số này
+— muốn giữ số cố định thì phải thêm cột `no` vào bảng.
 
 **Cách đánh tay một trận để kiểm (ghi lại cho lần sau, tốn nhiều lượt nhất ở đây):** bấm nút theo thời gian
 cố định là hỏng — lượt nào cũng có hoạt ảnh dài ngắn khác nhau, bấm sớm thì mất lượt. Cách chạy được: bật

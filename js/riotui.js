@@ -275,7 +275,9 @@ function renderYard(){
   const mine=teamPower(TEAM), pw=yardPower(y, retake), v=powerVerdict(mine, pw);
   const max=Math.max(mine,pw)||1;
 
-  $('#yTags').innerHTML=`<span class="ytag ytag--${y.fav}">${y.fav==='rust'?'RUST':'CHROME'}</span><span class="ytag">${y.sub}</span>`
+  /* Chip "BÃI n" trước tên: đây là cái mã hiện ở ô SECTOR khi vào trận (yardSector), không có chỗ nào
+     nói số đó là bãi nào thì nó là con số vô nghĩa. */
+  $('#yTags').innerHTML=`<span class="ytag ytag--no">BÃI ${yardNo(y)}</span><span class="ytag ytag--${y.fav}">${y.fav==='rust'?'RUST':'CHROME'}</span><span class="ytag">${y.sub}</span>`
     + (owned?`<span class="ytag ytag--own">ĐANG GIỮ</span>`:retake?`<span class="ytag ytag--bad">ĐANG BỊ CHIẾM</span>`:`<span class="ytag ytag--free">Ổ LOẠN</span>`);
   $('#yName').textContent=y.name;
   $('#yDesc').textContent=y.desc;

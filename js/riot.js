@@ -377,8 +377,13 @@ const riotHasWork = () => { const o=riotSummary(); return o.crates>0 || o.contes
    TRẬN CHIẾM BÃI — object HÌNH DẠNG SECTOR, y như riotSector(n) của thang tầng.
    mode:'yard' để js/riotui.js biết cộng thưởng theo bãi thay vì theo tầng.
    ===================================================================== */
+/* Số thứ tự bãi 1→9 theo đúng bảng §C (vành ngoài → trung tâm, cũng là thứ tự mở khoá).
+   Đây là "mã màn" của trận chiếm bãi, đứng cùng chỗ với 07-A của chiến dịch, nên phải là tiếng Việt:
+   bản đầu ghép 'BÃI-'+id nên in ra BÃI-DROP — id chữ Anh trong code lọt thẳng ra màn hình. */
+const yardNo = y => RIOT_YARDS.indexOf(y)+1;
+
 function yardSector(y, retake){
-  return { id:'BÃI-'+y.id.toUpperCase().slice(0,5), mode:'yard', yard:y.id, retake:!!retake,
+  return { id:'BÃI '+yardNo(y), mode:'yard', yard:y.id, retake:!!retake,
            name:y.name, tag:'KHU ĐÁY · '+y.sub+(retake?' · GIÀNH LẠI':''),
            waves:y.plan.length, mult:yardMult(y, retake), rec:Math.round(y.hold/6),
            reward:yardTakeReward(y, retake), boss:y.boss||null, plan:y.plan,
