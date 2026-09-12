@@ -69,7 +69,7 @@ Thả file đúng tên vào đúng thư mục là game tự dùng — không c�
 
 | Thư mục | Đựng gì | Quy cách |
 |---|---|---|
-| `art/card/` | **Art thẻ**: key art nhân vật `<id>.png`, chân dung cắt `<id>_portrait.jpg`, art kẻ địch `<id>.png` | dọc 9:16, có nền, ~768×1360 (nhân vật 1152×2048 hoặc 1536×2720). Chân dung = cắt phần trên art thẻ (đầu → ngang hông), JPEG q90 ≤ 400 KB |
+| `art/card/` | **Art thẻ**: key art nhân vật `<id>.jpg`, chân dung cắt `<id>_portrait.jpg`, art kẻ địch `<id>.jpg` | dọc 9:16, có nền, JPEG q90 4:2:0. Ngang ≤ 1152 px (khung game rộng tối đa 560 CSS px → 1152 đã là mật độ 2×); địch giữ nguyên 768×1360. Bản gốc PNG cất ở `art-src/CARD/`, chuyển bằng `python scratch/card_web.py`. Chân dung = cắt phần trên art thẻ (đầu → ngang hông), q90 ≤ 400 KB |
 | `art/sprite/` | Frame trong trận `<id>_idle/attack/crit/hurt/die.png` (`crit` = đòn chí mạng, `die` = gục; đều tuỳ chọn; không cần `dash`) | **tách nền**, cao 682px (pose giơ vũ khí có thể cao hơn), chân chạm đáy |
 | `art/fx/` | Overlay hiệu ứng `<kind>.webp` (một lần) và `<kind>_loop.webp` (lặp): hit, crit, explode, shock, poison, burn, stun, heal, shield | sprite sheet ô vuông 256 px, 6 cột, nền trong suốt — `docs/fx-prompts.md` |
 | `art/bg/` | Nền sector `bg_<sector>.jpg` (+ `bg_base.jpg` cho màn COMMS ở HOME) | 3:4 dọc, 1536×2048; thiếu thì rơi về `art/bg/bg_battle.jpg` |
@@ -96,10 +96,10 @@ Thả file đúng tên vào đúng thư mục là game tự dùng — không c�
   Làm sheet từ video nền xanh: `python scratch/fx_sheet.py in.mp4 art/fx/crit.webp`. Xem thử ở `kit.html` mục B9.
 - **Video chiêu cuối** giờ chiếu trong hộp trên đầu người phát chiêu (`RULES.holo`), không phủ kín sân; video cũ dùng nguyên.
   Mặc định 16:9; def khai `ultRatio` thì dùng tỉ lệ riêng (hai video chiêu cuối của địch quay dọc 3:4, 540×720), hộp kẹp cao tối đa 50% sân.
-- **Art thẻ kẻ địch** (`art/card/<id>.png`, đủ 21 con chương 1) hiện ở thanh lượt trong trận, chân dung người nói trong comic,
+- **Art thẻ kẻ địch** (`art/card/<id>.jpg`, đủ 21 con chương 1) hiện ở thanh lượt trong trận, chân dung người nói trong comic,
   panel comic của boss và bestiary `kit.html`. Thêm con mới: thả file + thêm id vào `FOE_ART` trong `js/data.js`.
-- **Chân dung** ưu tiên `<id>_portrait.jpg` (bán thân, đọc rõ ở cỡ 30px); thiếu thì dùng thẳng key art `<id>.png`.
-  Đủ 9 người có art (yuki, ash, kai, psalm, ronin, muzzle, echo, wire, stitch): cắt phần trên của `art/card/<id>.png`
+- **Chân dung** ưu tiên `<id>_portrait.jpg` (bán thân, đọc rõ ở cỡ 30px); thiếu thì dùng thẳng key art `<id>.jpg`.
+  Đủ 9 người có art (yuki, ash, kai, psalm, ronin, muzzle, echo, wire, stitch): cắt phần trên của bản gốc `art-src/CARD/<id>.png`
   (đầu → ngang hông, ~38–42% chiều cao thẻ, tuỳ người đứng gần hay xa trong ảnh gốc), lưu JPEG q90.
   Khung thẻ 3:4 hẹp hơn ảnh bán thân nên nó cắt hai bên chứ không cắt trên dưới — `pos` trong `ROSTER` không còn tác dụng ở khung này.
 - **Video ult**: file gốc trong `art-src/<TÊN>/`, hạ chuẩn bằng lệnh ffmpeg trong `docs/ult-prompts.md` §1. Một nhân vật

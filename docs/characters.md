@@ -139,7 +139,7 @@ Từ hôm nay tôi viết cả tổ vào đây. Ronin. Muzzle. Chị. Yuki. Ai �
 ---
 
 ## STITCH — Bác sĩ của Đáy
-*Rust · S · gacha · Art: chân dung có sẵn (art/card/stitch.png)*
+*Rust · S · gacha · Art: chân dung có sẵn (art/card/stitch.jpg)*
 
 **Là ai.** Mất giấy phép vì vá cho một lính máy đào ngũ. Giờ bà vá cả người lẫn máy trong một cái container, ai trả gì cũng nhận.
 
@@ -256,7 +256,7 @@ Từ hôm nay tôi viết cả tổ vào đây. Ronin. Muzzle. Chị. Yuki. Ai �
 ---
 
 ## ECHO — Giọng sao chép
-*Chrome · A · gacha · Art: chân dung có sẵn (art/card/echo.png)*
+*Chrome · A · gacha · Art: chân dung có sẵn (art/card/echo.jpg)*
 
 **Là ai.** Mang giọng của Yuki để gọi Yuki về. Đêm thứ tư, cô nghe lại băng ghi âm của chính mình và tự cắt loa.
 
@@ -279,7 +279,7 @@ Kiến nghị bị bác. Đơn vị đã rời tuyến.
 ---
 
 ## WIRE — Thợ lắp Halo bỏ trốn
-*Chrome · B · gacha · Art: chân dung có sẵn (art/card/wire.png)*
+*Chrome · B · gacha · Art: chân dung có sẵn (art/card/wire.jpg)*
 
 **Là ai.** Tám năm lắp Halo cho Canticle, chín trăm cái, nhớ từng số lô. Giờ cô đi tháo từng cái mình đã lắp.
 

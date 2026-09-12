@@ -1,6 +1,6 @@
 # CHROMEFALL — Prompt art kẻ địch (Tutorial + Chương 1)
 
-> **Trạng thái 07/09/2026.** Đủ **21/21 art thẻ** (`art/card/<id>.png`, ảnh dọc có nền) — đã cắm vào game: thanh lượt
+> **Trạng thái 07/09/2026.** Đủ **21/21 art thẻ** (`art/card/<id>.jpg`, ảnh dọc có nền) — đã cắm vào game: thanh lượt
 > trong trận, chân dung người nói trong comic, 14 panel comic của boss (không còn silhouette), bestiary `kit.html`.
 > Danh sách id có art nằm ở `FOE_ART` trong `js/data.js`.
 >
@@ -257,7 +257,7 @@ a tail of braided wire. Low to the ground, tense pouncing stance, all four paws 
 #### `hollow` · HOLLOW — Rust · grunt · 07-B, 07-D · P2
 **Nhận diện:** Tín đồ của Mother Rust tự mổ phanh lồng ngực, móc sạch lòng mề rồi **để trống hoác như thế** — bịt lại là chối bỏ ân sủng. Dây thần kinh máy đứt lòng thòng rủ ra khỏi miệng hốc.
 
-> **Chốt 11/09: chữ chạy theo ảnh.** Bản lore đầu tiên cho tín đồ nhồi linh kiện vào bụng rồi khâu bằng dây thép, nhưng `art/card/hollow.png` đã vẽ khoang ngực trống — anh chọn **đổi chữ trong sổ bộ**, giữ nguyên ảnh. Prompt dưới đúng với ảnh đang chạy; đừng thêm chi tiết nhồi/khâu vào các biến thể sau.
+> **Chốt 11/09: chữ chạy theo ảnh.** Bản lore đầu tiên cho tín đồ nhồi linh kiện vào bụng rồi khâu bằng dây thép, nhưng `art/card/hollow.jpg` đã vẽ khoang ngực trống — anh chọn **đổi chữ trong sổ bộ**, giữ nguyên ảnh. Prompt dưới đúng với ảnh đang chạy; đừng thêm chi tiết nhồi/khâu vào các biến thể sau.
 
 > **MÀU LÀ CHỖ PHÂN BIỆT (chốt 11/09).** Cùng một dáng người, hai câu chuyện ngược nhau:
 > **tối màu, ám rỉ sét, xanh chì ngả tím** = `hollow`, người Đáy **tự moi** vì tín ngưỡng (phe Rust).
