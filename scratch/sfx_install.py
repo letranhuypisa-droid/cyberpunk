@@ -27,10 +27,13 @@ EXT_IN = ['.mp3', '.m4a', '.wav', '.ogg', '.aac', '.flac']
 # Quay lại bản 11/09: đổi về None, riêng heal/wave đổi thành 'heal_v1'/'wave_v1' (bản cũ đã đổi tên
 # vì gói mới có file trùng tên), rồi chạy lại script. So sánh: docs/sfx-prompts.md §8.
 # Bản thứ 2, 3… của một tiếng (hit2, hit3): game bốc ngẫu nhiên, khai số bản ở SFX_VARIANTS trong js/audio.js.
+# Năm tiếng gacha + hit3 chưa có bản thu: nguồn do scratch/sfx_synth.py tổng hợp ra art-src/SFX/ (§10).
 MAP = {
-    'hit': None, 'hit2': 'attack', 'crit': None, 'kia': None, 'heal': None, 'ready': None, 'ult': None, 'wave': None,
+    'hit': None, 'hit2': 'attack', 'hit3': None, 'crit': None, 'kia': None, 'heal': None, 'ready': None,
+    'ult': None, 'wave': None,
     'explode': 'explosion', 'shock': None, 'burn': None, 'poison': None, 'stun': None, 'shield': None,
     'victory': 'win', 'defeat': None, 'reveal_s': None, 'shield_break': None, 'upgrade': 'level up',
+    'tell': None, 'tell_up': None, 'tell_down': None, 'reveal_a': None, 'new_char': None,
     'error': None, 'glitch': None, 'swipe': None, 'select': 'select 2', 'cursor': 'click', 'open': 'select',
     'cancel': None, 'close': None,
 }

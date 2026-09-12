@@ -44,6 +44,7 @@ Kiểm DẸP LOẠN mà không phải qua tiêu đề: `python scratch/riot_serv
 | `scratch/recruit_table.js` | Dò bảng quy đổi kẻ địch → đơn vị chơi được: in chỉ số sau quy đổi cạnh băng chỉ số nhân vật cùng bậc, đánh dấu con lệch băng (`--bad` chỉ in con lệch) |
 | `scratch/fx_sheet.py` | Video/gif nền xanh → sprite sheet hiệu ứng `art/fx/<kind>.webp` (ô vuông 256, 6 cột) |
 | `scratch/sfx_install.py` | File SFX sinh bằng AI (`art-src/SFX/*.mp3\|m4a`) → `audio/<tên>.ogg`: cắt im lặng, chuẩn hoá đỉnh −1 dB, mono ogg (`--dry` để chỉ đo) |
+| `scratch/sfx_synth.py` | Tổng hợp offline sáu tiếng chưa có bản thu (`tell`, `tell_up`, `tell_down`, `reveal_a`, `new_char`, `hit3`) → `art-src/SFX/<tên>.wav`, Python thuần; sửa số trong script rồi chạy lại `sfx_install.py` là đổi được tính cách (`docs/sfx-prompts.md` §10) |
 | `scratch/sfx_compare.py` | Đo đặc tính file SFX (dài, thời gian tới đỉnh, đuôi vang, độ sáng, số nhịp) để so bản mới với bản đang dùng |
 | `scratch/sfx_ab.html` | Trang nghe đối chiếu SFX: bản đang dùng cạnh bản kia, âm lượng đã cân — mở bằng preview `static-sfx` |
 | `scratch/key_enemy.py` | Tách nền hàng loạt ảnh idle kẻ địch (`art-src/ENEMY/<id>.png` → `art/sprite/<id>_idle.png`), tự chọn cỡ theo rank, in `box` cho `FOE_SPRITE` |
@@ -85,7 +86,7 @@ Thả file đúng tên vào đúng thư mục là game tự dùng — không c�
 | `art/reveal/` | Mặt thẻ khi mở rương `<id>_reveal.jpg` | 1280×720, nhân vật đứng giữa |
 | `art/comic/` | Ảnh panel comic `<sector>_<i\|o><trang>_p<panel>.jpg` (vd `00t_i1_p2.jpg`) | prompt từng panel ở `docs/comic-prompts.md` |
 | `video/` | Cut-in chiêu cuối `<id>_ult.mp4` (cả nhân vật lẫn kẻ địch), video mở rương `<id>_reveal.mp4` | H.264 1280×720; video địch đang là 540×720 dọc (`ultRatio:3/4`) |
-| `audio/` | SFX giao diện `select/cursor/open/swipe/error/glitch/cancel/close.ogg` + âm chiến đấu `hit/crit/kia/heal/ready/ult/wave/explode/shock/burn/poison/stun/shield` (`.ogg`, `.mp3` hoặc `.wav`) | mono 44.1 kHz, 0.15–1.4 s, cắt hết im lặng ở đầu — `docs/sfx-prompts.md` |
+| `audio/` | SFX giao diện `select/cursor/open/swipe/error/glitch/cancel/close.ogg` + âm chiến đấu `hit/hit2/hit3/crit/kia/heal/ready/ult/wave/explode/shock/burn/poison/stun/shield` + tiếng phụ và nhịp gacha `victory/defeat/reveal_s/reveal_a/shield_break/upgrade/tell/tell_up/tell_down/new_char` (`.ogg`, `.mp3` hoặc `.wav`) | 25/25 tên đã có file, mono 44.1 kHz, 0.15–1.4 s, cắt hết im lặng ở đầu — `docs/sfx-prompts.md` |
 | `art-src/` | Ảnh/video gốc theo thư mục nhân vật (`YUKI/`, `ASH/`, `Kai/`, `PSALM/`), `HERO/` (pose normal/crit/die mới của đội mình), `ENEMY/` (idle + pose của địch, video ult địch), `BG/` + `MAP/` (bản gốc chưa cắt của nền và bản đồ), `SFX/` (file âm gốc chưa cắt) | bản chưa hạ chuẩn |
 
 - **Sprite trong trận** tách nền bằng `scratch/key_frame.py`

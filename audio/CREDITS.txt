@@ -1,2 +1,3 @@
 UI sounds: "Sci Fi UI SFX Pack (FREE)" by JDSherbert (https://jdsherbert.itch.io). Used under the pack's free license; attribution kept here and in CONFIG.
-Combat sounds (hit, crit, ult, heal, KIA) are synthesized at runtime with WebAudio in js/audio.js.
+Combat and gacha sounds ship as files in audio/; the WebAudio synthesis in js/audio.js is only the fallback for a name with no file.
+Six of them (tell, tell_up, tell_down, reveal_a, new_char, hit3) are generated offline by scratch/sfx_synth.py — see docs/sfx-prompts.md §10.

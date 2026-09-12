@@ -10,7 +10,8 @@ Game hiện có **hai lớp âm thanh**:
 Từ 11/09, lớp 2 nhận file thật: **thả `audio/<tên>.ogg` (hoặc `.mp3`, `.wav`) là game dùng file đó, thiếu file thì tự
 tổng hợp như cũ** — giống luật `art/fx/*.webp` bên `docs/fx-prompts.md`. Không phải sửa code, không phải khai gì.
 
-> **Tình trạng sau đợt 2 (§8):** 18/18 tiếng trong trận **đã có file**, không còn cái nào chạy bằng WebAudio.
+> **Tình trạng sau đợt 4 (§10):** **25/25 tiếng đã có file** — 18 tiếng trong trận (đợt 2), rồi năm nhịp gacha và bản
+> thứ ba của đòn thường (đợt 4). Không còn tên nào chạy bằng WebAudio, và Console không còn 18 lỗi đỏ lúc mở game.
 > Sáu tiếng giao diện `error` `glitch` `swipe` (đợt 1) và `select` `cursor` `open` (đợt 2) đã là hàng nhà — bản
 > JDSherbert cũ cất ở `audio/jdsherbert/`. Chỉ `cancel` `close` còn mượn, và **cả hai chưa chỗ nào gọi**: bỏ hai file
 > đó khỏi `AUDIO.files` là gỡ được credit trong `audio/CREDITS.txt` và `README.md`. File nguồn (mp3/m4a chưa xử lý)
@@ -67,6 +68,8 @@ AUDIO.crit()      // nghe thử một tiếng bất kỳ
 ```
 
 Chưa có file thì Network báo 404 cho `audio/<tên>.ogg|mp3|wav` — **bình thường**, đúng như ảnh `art/fx/*.webp` chưa có.
+Một tên thiếu file là **ba** request trượt (dò lần lượt cả ba đuôi). Từ đợt 4 (§10) không còn tên nào thiếu, nên thấy
+404 trong nhóm `audio/` tức là có tên mới vừa thêm vào `SFX_BATTLE` mà chưa cài file.
 
 ---
 
@@ -462,12 +465,104 @@ tiếng đấm lúc trúng mới là phản hồi thật, tiếng bấm chỉ l�
 `SFX_VARIANTS = { hit:3 }` trong `js/audio.js` — game tự tìm `audio/hit2.*`, `audio/hit3.*` và **bốc ngẫu nhiên**
 mỗi lần kêu. Thiếu bản nào thì bỏ qua bản đó, còn một bản thì y như cũ.
 
-Đang có **2 bản**: `hit.ogg` (0,42 s, đợt 1) và `hit2.ogg` (0,78 s, từ `attack.mp3` của bạn). Muốn bản thứ ba thì
-thả `hit3.mp3` vào thư mục gốc rồi `python scratch/sfx_install.py hit3` — không phải sửa code.
+Đang có **đủ 3 bản** từ đợt 4 (§10): `hit.ogg` (0,42 s, đợt 1), `hit2.ogg` (0,78 s, từ `attack.mp3` của bạn) và
+`hit3.ogg` (0,33 s, tổng hợp offline). Thả `hit4.mp3` vào thư mục gốc, sửa `SFX_VARIANTS` thành `{ hit:4 }` rồi
+`python scratch/sfx_install.py hit4` là có bản thứ tư.
 
-> Trong đống file bạn gửi không còn tiếng va chạm nào hợp làm bản thứ ba: `laser gun.m4a` đo ra gần `hit` nhất
+> Hồi đợt 3, trong đống file bạn gửi không còn tiếng va chạm nào hợp làm bản thứ ba: `laser gun.m4a` đo ra gần `hit` nhất
 > (0,71 s · 2186 Hz so với 0,42 s · 2243 Hz) nhưng nó là **tiếng súng**, mà `hit` dùng chung cho cả đội — Yuki và
 > Ronin cầm katana thì nghe sai. Muốn tiếng súng thì phải tách tiếng đòn thường theo nhân vật (§6).
 
 Muốn tiếng khác cũng có nhiều bản (ví dụ `kia` với 4 bản `male die`): thêm một dòng vào `SFX_VARIANTS` rồi cài
 `kia2` `kia3` `kia4` — cơ chế đã dùng chung.
+
+---
+
+## 10. Đợt 4: sáu ô trống cuối — năm nhịp gacha + bản thứ ba của đòn thường (12/09)
+
+Mở game là Console đỏ **18 lỗi**. Nó **không phải hỏng**: `AUDIO.warm()` dò ba đuôi cho mỗi tên trong `SFX_BATTLE`,
+sáu tên chưa có file × 3 đuôi = 18 request trượt, rồi rơi về tiếng tổng hợp đúng như thiết kế (§1). Chỗ đáng sửa nằm
+sau con số đó: **năm trong sáu tiếng ấy là nhịp gacha** — đúng mấy giây người chơi nín thở chờ lật thẻ — mà chúng
+đang kêu bằng một bộ dao động trần, nghe ra tiếng máy bíp.
+
+| Tên file | Kêu ở đâu | Dài | Thiếu file thì |
+|---|---|---|---|
+| `tell` | nhịp nền, **mọi thẻ** — [app.js:457](../js/app.js#L457) · loạt ×1 [app.js:552](../js/app.js#L552) | 0,17 s | `tone(320)` |
+| `tell_up` | nâng bậc — [app.js:461](../js/app.js#L461), [app.js:467](../js/app.js#L467) | 0,29 s | hai `tone` vươn lên |
+| `tell_down` | nâng hụt (near-miss) — [app.js:463](../js/app.js#L463) | 0,36 s | một `tone` tụt xuống |
+| `reveal_a` | thẻ bậc A lật — [app.js:562](../js/app.js#L562) | 0,66 s | hai `tone` |
+| `new_char` | nhãn NEW nảy vào — [app.js:563](../js/app.js#L563) | 0,44 s | hai `tone` |
+| `hit3` | bản thứ ba của đòn thường, `SFX_VARIANTS` (§9.3) | 0,33 s | chỉ còn `hit` và `hit2` |
+
+`tell` kêu **10 lần trong một loạt ×10** nên nó phải mỏng nhất bộ: 0,17 s, gần như không có dải cao (−45 dB trên
+4 kHz). Ngược lại `tell_up` cho lấp lánh hẳn (−25 dB) — **khoảng cách 18 dB ở dải cao giữa `tell_up` và `tell_down`**
+chính là thứ làm tai phân biệt được "nâng lên" với "nâng hụt" mà không cần nhìn màn hình.
+
+### Bản đang dùng là hàng tổng hợp offline, không phải bản thu
+
+Sáu file hiện tại do `scratch/sfx_synth.py` sinh ra (Python thuần, không cần numpy), rồi qua `sfx_install.py` như mọi
+file khác. Nó **không phải** tiếng tổng hợp lúc chạy của `AUDIO.tone()`: có transient ở đầu, có hoà âm lệch, có đuôi
+tắt dần, riêng `reveal_a` dựng từ bốn mode chuông. Muốn sửa tính cách thì sửa số trong script rồi cài lại:
+
+```bash
+python scratch/sfx_synth.py tell_up && python scratch/sfx_install.py tell_up
+```
+
+Đây là **bản nền**. Thu được bản ElevenLabs thì ghi đè thẳng bằng prompt dưới đây — không phải sửa code, không phải
+khai gì (luật §1).
+
+### Đo lại cho khớp họ
+
+`hit3` phải nằm cùng họ với hai bản kia, vì game **bốc ngẫu nhiên** giữa ba bản: cùng đỉnh −1 dBFS là chưa đủ, lệch
+dải thấp là nghe ra ngay bản nào mỏng hơn. Đo bằng `ffmpeg -af lowpass=f=300,volumedetect`:
+
+| | dài | dải thấp | dải giữa | dải cao |
+|---|---|---|---|---|
+| `hit` | 0,48 s | −15,9 dB | −20,5 dB | −29,9 dB |
+| `hit2` | 0,78 s | −22,1 dB | −19,5 dB | −26,8 dB |
+| `hit3` | 0,33 s | −19,6 dB | −22,9 dB | −29,0 dB |
+
+Bản `hit3` đầu tiên đo ra **−28,6 dB** ở dải thấp — mỏng hơn `hit` 13 dB — vì để tiếng "tách" ở đầu lấn hết đỉnh; đã
+dồn lại phần thụp dưới. Nó còn bị cắt lặng xuống **0,16 s**, ngắn hơn `hit` ba lần, nên đuôi ngân kim loại phải cho
+tắt chậm hơn. Hai con số đó ghi luôn trong `scratch/sfx_synth.py` cạnh chỗ sửa, để lần sau đừng vặn ngược lại.
+
+### Prompt
+
+**tell** — 0.3 s
+```
+very short soft synth tick, single muted mid-range blip rising slightly, subtle, quiet, one-shot, dry, no music, no voice
+```
+
+**tell_up** — 0.5 s
+```
+short rising synth riser, bright upward sweep with a small metallic sparkle at the top, hopeful, one-shot, dry, no music, no voice
+```
+
+**tell_down** — 0.5 s
+```
+short descending synth tone, dull downward slide fading out, slightly detuned and disappointing, one-shot, dry, no music, no voice
+```
+
+**reveal_a** — 0.8 s
+```
+item reveal chime, single bright bell hit with a short glass shimmer tail, clean, less grand than a jackpot fanfare, one-shot, dry, no music, no voice
+```
+
+**new_char** — 0.7 s
+```
+digital unlock notification, three fast ascending square-wave blips with a thin bright tail, crisp and synthetic, one-shot, dry, no music, no voice
+```
+
+**hit3** — 0.5 s: dùng **y nguyên** prompt của `hit` ở §2. Sinh lại là ra một bản khác — đúng thứ `SFX_VARIANTS` cần,
+không phải viết prompt mới.
+
+### Kiểm
+
+Server tĩnh `static-sfx` (cổng 8791), mở `index.html`, F12 → Console:
+
+```
+AUDIO.warm(); AUDIO.list()
+```
+
+Đo được: **25/25 tên chạy bằng file**, không còn tên nào rơi về WebAudio, Network **0 request trượt** (trước 18),
+Console 0 lỗi. `AUDIO.pick('hit')` gọi 30 lần trả đủ ba bản (8 · 11 · 11).
