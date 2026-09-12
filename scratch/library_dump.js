@@ -12,15 +12,16 @@ const ROOT = path.join(__dirname, '..');
 /* Nạp js/data.js trong một hàm kín, chỉ cần giả lập localStorage */
 const src = fs.readFileSync(path.join(ROOT, 'js/data.js'), 'utf8');
 const shim = { getItem: () => null, setItem: () => {}, removeItem: () => {} };
-const D = new Function('localStorage', src + '\n;return {ROSTER,LORE,CODEX,ENEMY_POOL,SECTORS,BANNERS,PLAYER_DEFAULTS,STORY_ONLY};')(shim);
-const { ROSTER, LORE, CODEX, ENEMY_POOL, SECTORS, BANNERS, PLAYER_DEFAULTS } = D;
+const D = new Function('localStorage', src + '\n;return {ROSTER,LORE,CODEX,ENEMY_POOL,SECTORS,BANNER,PLAYER_DEFAULTS,STORY_ONLY,foeSector};')(shim);
+const { ROSTER, LORE, CODEX, ENEMY_POOL, SECTORS, BANNER, PLAYER_DEFAULTS, foeSector } = D;
 
 const md = s => String(s || '').replace(/<br><br>/g, '\n\n').replace(/<br>/g, '  \n');
 const foeName = id => (ENEMY_POOL.find(e => e.id === id) || { name: id }).name;
 const heroName = id => (ROSTER[id] || { name: id }).name;
 
 /* Cách sở hữu: có sẵn trong hồ sơ mặc định · thưởng cốt truyện (SECTORS[].unlock) · gacha.
-   Từ 11/09 gacha khoá theo chương và tách hai bể: REQUISITION (nhân vật, SH) và CHIÊU MỘ (kẻ địch, CR). */
+   Từ 12/09 gacha là MỘT bể REQUISITION trả SH; nhân vật khoá theo chương, quân chiêu mộ còn phải
+   đánh bại con đó trước mới vào bể (docs/gacha-merge.md). */
 const START = PLAYER_DEFAULTS().owned;
 function ownText(id) {
   if (START.includes(id)) return 'sở hữu từ đầu';
@@ -28,10 +29,9 @@ function ownText(id) {
   if (s) return `thưởng khi xong ${s.id} · ${s.name}`;
   const d = ROSTER[id] || {};
   if (d.debut == null) return 'gacha · chưa xếp chương, còn khoá';
-  const b = d.recruit ? BANNERS.crew : BANNERS.hero;
-  const feat = b.featured === id ? ' · đang tăng tỉ lệ' : '';
-  const where = d.recruit ? 'chiêu mộ · trả CR' : 'gacha · trả SH';
-  return d.debut > 1 ? `${where} · mở ở chương ${d.debut}` : where + feat;
+  const feat = BANNER.featured === id ? ' · đang tăng tỉ lệ' : '';
+  if (d.recruit) { const sec = foeSector(id); return `gacha · trả SH · phải hạ ${d.name} ở ${sec || 'DẸP LOẠN'} trước`; }
+  return d.debut > 1 ? `gacha · trả SH · mở ở chương ${d.debut}` : 'gacha · trả SH' + feat;
 }
 /* Điều kiện bật nội tại, nói bằng lời, không có số */
 function condText(w) {

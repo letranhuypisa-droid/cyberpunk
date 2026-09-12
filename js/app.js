@@ -231,20 +231,12 @@ $('#loreClose').addEventListener('click',()=>{ $('#lore').hidden=true; });
 $('#pName').addEventListener('click',()=>{ const n=prompt('Biệt danh hồ sơ (tối đa 14 ký tự):', PLAYER.name); if(n&&n.trim()){ PLAYER.name=n.trim().slice(0,14).toUpperCase(); savePlayer(); renderWallet(); } });
 
 /* ---- GACHA ---- */
-/* Hai bể: 'hero' = REQUISITION (nhân vật, trả SH) · 'crew' = CHIÊU MỘ (kẻ địch đã đánh bại, trả CR) */
-const GA = { banner:'hero' };
-const curBanner = () => BANNERS[GA.banner];
-document.querySelectorAll('#gachaTabs .lore__tab').forEach(b=>b.addEventListener('click',()=>{
-  if(GA.banner===b.dataset.banner) return;
-  GA.banner=b.dataset.banner; sfx('cursor',.2); renderGacha();
-}));
+/* MỘT bể REQUISITION, trả SH (gộp 12/09, xem docs/gacha-merge.md). Hai đường vào bể:
+   nhân vật mở theo chương · quân chiêu mộ phải đánh bại con đó trong trận trước. */
 function renderGacha(){
   renderWallet();
-  const b=curBanner(), pool=bannerPool(b), locked=bannerLocked(b), feat=bannerFeatured(b);
+  const b=BANNER, pool=bannerPool(), locked=bannerLocked(), feat=bannerFeatured();
   const have=pool.filter(c=>owns(c.id)).length;
-  document.querySelectorAll('#gachaTabs .lore__tab').forEach(t=>t.classList.toggle('is-on', t.dataset.banner===b.id));
-  $('#gachaTitle').textContent=b.name; $('#gCurLbl').textContent=b.curLabel;
-  /* Ví hiện đúng loại tiền của bể đang xem — CHIÊU MỘ trả CR chứ không trả SH */
   $('#gShards').textContent=PLAYER[b.cur].toLocaleString('en-US');
   /* Tải sẵn ảnh mở rương (nhẹ, và màn khoe nhân vật cần tới ngay). Video thì KHÔNG nạp ở đây:
      resolveVideo chỉ gửi HEAD nên nạp sẵn cũng vô nghĩa, còn kéo byte của mọi video lúc mở màn là phí băng thông
@@ -263,13 +255,19 @@ function renderGacha(){
   $('#gPityBar').style.width = Math.min(100, p/b.pityS*100) + '%';
   $('#gPityTxt').innerHTML = left ? `Còn <b>${left}</b> lượt nữa là chắc chắn ra ${topTier}` : `<b>Lượt sau chắc chắn ra ${topTier}</b>`;
   $('#gPityTxt').closest('.gpity').classList.toggle('is-ready', left===0);
-  /* Nói thật về bể: chương 1 của REQUISITION chỉ có 4 người, giấu đi thì người chơi quay mãi không hiểu vì sao toàn trùng */
+  /* Nói thật về bể: đầu game bể chỉ có 4 người, giấu đi thì người chơi quay mãi không hiểu vì sao toàn trùng.
+     Từ 12/09 phải nói cả ĐƯỜNG LÀM BỂ TO RA — đánh thêm màn là có thêm quân, đó là lý do quay trượt
+     vẫn không phải cụt đường. Số con đang chờ bị hạ lấy từ lưới xám bên dưới. */
+  const unbeaten = locked.filter(x=>x.why==='unbeaten').length;
   const full = pool.length && have>=pool.length;
   $('#gNote').innerHTML = !pool.length
-    ? `Bể của chương này chưa mở ai. Để dành ${b.curLabel} cho chương sau.`
+    ? `Bể đang trống. Đánh thêm màn để mở quân, rồi quay.`
     : full
-      ? `<b>Đã đủ cả ${pool.length} đơn vị của chương này.</b> Quay tiếp chỉ ra bản dư — giữ lại để phân tách lấy linh kiện.`
-      : `Bể chương này có <b>${pool.length}</b> đơn vị · 50% số lần ra bậc của người rate-up là chính họ · ×10 chắc chắn ≥1 A · trùng thành <b>bản dư</b>, không hoàn ${b.curLabel}`;
+      ? `<b>Đã đủ cả ${pool.length} đơn vị đang có trong bể.</b> Quay tiếp chỉ ra bản dư — giữ lại để phân tách lấy linh kiện.`
+        + (unbeaten ? ` Hạ thêm kẻ địch thì bể có người mới: còn <b>${unbeaten}</b> con.` : '')
+      : `Bể có <b>${pool.length}</b> đơn vị`
+        + (unbeaten ? ` · còn <b>${unbeaten}</b> kẻ địch vào bể khi bị hạ ngoài trận` : '')
+        + ` · 50% số lần ra bậc của người rate-up là chính họ · ×10 chắc chắn ≥1 A · trùng thành <b>bản dư</b>, không hoàn ${b.curLabel}`;
   $('#gOwned').parentElement.innerHTML=`Owned <b id="gOwned">${have}</b>/${pool.length} · Pulls <b id="gPulls">${PLAYER.pulls}</b>`;
   const canPull = pool.length>0;
   $('#btnPull1').disabled = !canPull || PLAYER[b.cur]<b.cost1;
@@ -278,20 +276,30 @@ function renderGacha(){
   $('#btnPull10').querySelector('.btn-act__v').textContent=`${b.cost10.toLocaleString('en-US')} ${b.curLabel} · ≥1 A`;
   renderLockedPool(locked);
 }
-/* Thẻ xám cho người chưa tới chương của họ. Bể nhân vật chương 1 chỉ có 4 người, nên phải cho thấy
-   13 người còn lại đang chờ ở chương nào — đó là lý do để dành SH thay vì tưởng game hết nội dung. */
+/* Thẻ xám cho đơn vị chưa vào bể. Đầu game bể chỉ có 4 người nên phải cho thấy 33 đơn vị còn lại đang
+   chờ ở đâu — đó là lý do để dành SH thay vì tưởng game hết nội dung.
+   HAI NHÓM, thứ tự có ý: nhóm CHƯA ĐÁNH BẠI đứng TRƯỚC vì nó là việc người chơi làm được ngay hôm nay
+   (đi đánh màn đó), còn nhóm chương là việc phải chờ bản mới. Mỗi con ghi luôn màn gặp được.
+   locked = [{def, why}] từ bannerLocked(). */
 function renderLockedPool(locked){
   const box=$('#gLocked'), grid=$('#gLockedGrid');
   if(!locked.length){ box.hidden=true; return; }
   box.hidden=false;
-  const byCh = locked.reduce((m,c)=>{ const k=c.debut==null?'?':c.debut; (m[k]=m[k]||[]).push(c); return m; },{});
-  $('#gLockedSub').textContent=`${locked.length} đơn vị · mở dần theo chương`;
-  grid.innerHTML=Object.keys(byCh).sort().map(k=>{
-    const lbl = k==='?' ? 'CHƯA XẾP CHƯƠNG' : 'CHƯƠNG '+k;
-    return `<div class="glocked__row"><span class="glocked__ch">${lbl}</span>`
-      + byCh[k].map(c=>`<span class="glocked__u t-${c.tier}"><b>${c.name}</b><em>${c.tier}</em></span>`).join('')
-      + `</div>`;
-  }).join('');
+  const unbeaten = locked.filter(x=>x.why==='unbeaten').map(x=>x.def);
+  const byCh = locked.filter(x=>x.why==='chapter').reduce((m,x)=>{ const k=x.def.debut==null?'?':x.def.debut; (m[k]=m[k]||[]).push(x.def); return m; },{});
+  $('#gLockedSub').textContent = [ unbeaten.length?`${unbeaten.length} chờ bị hạ`:'', Object.keys(byCh).length?`${locked.length-unbeaten.length} chờ chương`:'' ].filter(Boolean).join(' · ');
+  const unit = c => `<span class="glocked__u t-${c.tier}"><b>${c.name}</b><em>${c.tier}</em></span>`;
+  /* Nhóm con chưa hạ theo MÀN gặp được, không theo chương: người chơi cần biết đi đâu mà hạ.
+     Chỉ gặp ở DẸP LOẠN (không có trong SECTORS[].plan) → gom vào nhóm cuối. */
+  const bySec = unbeaten.reduce((m,c)=>{ const k=foeSector(c.id)||'DẸP LOẠN'; (m[k]=m[k]||[]).push(c); return m; },{});
+  const rows = [];
+  Object.keys(bySec).sort().forEach(k=>{
+    rows.push(`<div class="glocked__row"><span class="glocked__ch glocked__ch--foe">HẠ Ở ${k}</span>${bySec[k].map(unit).join('')}</div>`);
+  });
+  Object.keys(byCh).sort().forEach(k=>{
+    rows.push(`<div class="glocked__row"><span class="glocked__ch">${k==='?'?'CHƯA XẾP CHƯƠNG':'CHƯƠNG '+k}</span>${byCh[k].map(unit).join('')}</div>`);
+  });
+  grid.innerHTML=rows.join('');
 }
 /* Mặt thẻ khi quay ra: ảnh mở rương (<id>_reveal.jpg, 16:9, nhân vật đứng giữa) nếu có, không thì chân dung thường */
 const revealDef = d => d.reveal ? {...d, portrait:d.reveal, pos:d.revealPos||'50% 50%'} : d;
@@ -377,10 +385,10 @@ function flyShard(from, to, amount){
 }
 
 async function doPull(n){
-  const b=curBanner();
-  const res=pull(n, b.id); if(!res){ sfx('error',.4); return; }
+  const b=BANNER;
+  const res=pull(n); if(!res){ sfx('error',.4); return; }
   dailyProgress('pull'); renderWallet();      // ★ chỉ cập nhật ví: gọi renderGacha() ở đây sẽ tụt thanh pity về 0 và lộ ngay là có S
-  $('#gShards').textContent=PLAYER[b.cur].toLocaleString('en-US');   // ví của bể đang xem (CHIÊU MỘ trả CR)
+  $('#gShards').textContent=PLAYER[b.cur].toLocaleString('en-US');
   res.sort((a,b)=> TIER_RANK[a.tier]-TIER_RANK[b.tier]);   // hiếm nhất ra cuối: loạt ×10 thành đường dốc lên
   /* Nạp trước byte video ngay khi biết kết quả. Nhịp tell + lật thẻ phía sau cho 1–8 giây nạp,
      đủ để lúc cần phát thì đã có sẵn thay vì đứng chờ buffer giữa khoảnh khắc quan trọng nhất. */
@@ -442,8 +450,8 @@ async function doPull(n){
 }
 $('#btnPull1').addEventListener('click',()=>doPull(1));
 $('#btnPull10').addEventListener('click',()=>doPull(10));
-// ★ DEV: nạp đúng loại tiền của bể đang xem (CHIÊU MỘ trả CR nên nạp SH thì vô dụng)
-$('#btnRefill').addEventListener('click',()=>{ const b=curBanner(); PLAYER[b.cur]+= b.cur==='credits'?20000:1000; savePlayer(); renderGacha(); });
+// ★ DEV: nạp SH — bể gộp chỉ còn một loại tiền
+$('#btnRefill').addEventListener('click',()=>{ PLAYER.shards+=1000; savePlayer(); renderGacha(); });
 
 /* =====================================================================
    DẸP LOẠN — danh sách tầng. Không có màn mới trong trận: chọn tầng → gán SECTOR = riotSector(n) → go('battle').
@@ -457,7 +465,7 @@ function renderRiot(){
   $('#riotOpen').textContent = 'TẦNG '+open;
   if(!riotUnlocked()){
     $('#riotSub').textContent='KHOÁ · CẦN XONG '+RIOT.unlock;
-    list.innerHTML=`<div class="srow is-locked srow--soon"><span class="srow__id">—</span><span><div class="srow__name">CHƯA MỞ</div><div class="srow__meta">Xong màn ${RIOT.unlock} rồi quay lại. Dẹp loạn là chỗ cày CR để chiêu mộ quân.</div></span></div>`;
+    list.innerHTML=`<div class="srow is-locked srow--soon"><span class="srow__id">—</span><span><div class="srow__name">CHƯA MỞ</div><div class="srow__meta">Xong màn ${RIOT.unlock} rồi quay lại. Dẹp loạn là chỗ cày SH vô hạn — và là chỗ hạ thêm quân để mở bể.</div></span></div>`;
     $('#btnRiotGo').disabled=true; $('#riotMeta').textContent='CẦN XONG '+RIOT.unlock; return;
   }
   $('#riotSub').textContent='KHU ĐÁY · XUNG ĐỘT TỰ PHÁT';

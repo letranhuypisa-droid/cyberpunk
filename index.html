@@ -150,13 +150,10 @@
       <button class="btn-act btn-act--go btn-act--full" id="btnRiotGo" data-go="battle"><span class="btn-act__k">Vào tầng</span><span class="btn-act__v" id="riotMeta">—</span></button>
     </div>
 
-    <!-- ===== SCREEN: GACHA — hai bể: REQUISITION (nhân vật, SH) và CHIÊU MỘ (kẻ địch, CR) ===== -->
+    <!-- ===== SCREEN: GACHA — MỘT bể REQUISITION, trả SH. Nhân vật mở theo chương, quân chiêu mộ
+         phải đánh bại con đó trước (docs/gacha-merge.md). ===== -->
     <div class="screen gacha" data-screen="gacha">
       <div class="sh"><span class="sh__title" id="gachaTitle">Requisition</span><span class="pill"><small id="gCurLbl">SH</small><span id="gShards">900</span></span><button class="btn-ghost" data-go="home">◂ BASE</button></div>
-      <div class="lore__tabs gacha__tabs" id="gachaTabs">
-        <button class="lore__tab is-on" data-banner="hero">REQUISITION</button>
-        <button class="lore__tab" data-banner="crew">CHIÊU MỘ</button>
-      </div>
       <div class="gbanner">
         <div class="portrait" id="gachaArt"></div>
         <div class="gbanner__tag" id="gachaTag">RATE-UP</div>
@@ -172,8 +169,9 @@
         <button class="btn-act btn-act--go btn-act--full" id="btnPull10"><span class="btn-act__k">Pull ×10</span><span class="btn-act__v">270 SH · ≥1 A</span></button>
       </div>
       <div class="gfoot"><span class="lbl">Owned <b id="gOwned">5</b>/19 · Pulls <b id="gPulls">0</b></span><button class="btn-ghost" id="btnRefill" title="Dev: nạp thử" hidden>+1000 SH · DEV</button></div>
-      <!-- Người của bể này nhưng chưa tới chương của họ: thẻ xám, để người chơi biết SH để dành cho ai -->
-      <div class="glocked" id="gLocked" hidden><div class="glocked__h"><b>CHƯA MỞ</b><small id="gLockedSub"></small></div><div class="glocked__grid" id="gLockedGrid"></div></div>
+      <!-- Chưa vào bể: thẻ xám, để người chơi biết SH để dành cho ai. Hai nhóm — kẻ địch đã tới chương
+           mà chưa hạ (ghi luôn màn gặp được), và người chưa tới chương của họ. -->
+      <div class="glocked" id="gLocked" hidden><div class="glocked__h"><b>CHƯA VÀO BỂ</b><small id="gLockedSub"></small></div><div class="glocked__grid" id="gLockedGrid"></div></div>
       <div class="reveal" id="reveal" hidden>
         <div class="reveal__grid" id="revealGrid"></div>
         <div class="cutin" id="revealCutin" hidden><!-- video mở rương (Yuki) phát trước khi lật thẻ -->
