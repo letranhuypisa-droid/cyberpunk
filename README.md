@@ -31,7 +31,7 @@ rồi mở `http://localhost:8765/index.html`. UI kit và token: `kit.html`. Nú
 | `js/audio.js` | SFX giao diện (audio/*.ogg) + âm chiến đấu: có `audio/<tên>.ogg\|mp3\|wav` thì dùng file, thiếu thì tổng hợp WebAudio. Một thao tác = một tiếng (`SFX_ONE`/`SFX_BEAT`); `SFX_VARIANTS` cho tiếng nhiều bản (`hit`, `hit2`…); `SFX_MUTE` cho nút không kêu |
 | `js/fx.js` | Overlay hiệu ứng trên sprite: một lần (hit/crit/nổ/điện/độc/cháy/choáng/hồi máu/lá chắn) và lặp theo trạng thái + lá chắn; tự dùng sprite sheet `art/fx/<kind>.webp` nếu có |
 | `js/battle.js` | Engine trận: passive, lượt theo SPD, chế độ chọn mục tiêu, di chuyển tới mục tiêu kiểu Idle Heroes (`playMoveAttack`), sát thương + chí mạng, lá chắn (`addShield`/`absorbShield`), trạng thái choáng/độc/cháy (`applyStatus`/`tickStatus`), ult + video holo trên đầu nhân vật (`playHolo`), chiêu cuối của địch (`enemyUlt`), wave (hồi máu giữa wave), hint tutorial. `finish()` tách nhánh thưởng theo `SECTOR.mode` (chiến dịch / `'riot'`) |
-| `js/app.js` | Router màn hình, lobby, squad (3 slot, lưu đội), sector, **dẹp loạn** (`renderRiot`), gacha một bể, archive (tab Kỹ năng / Passive / Hồ sơ), config, COMMS |
+| `js/app.js` | Router màn hình, lobby, squad (3 slot, lưu đội), sector, **dẹp loạn** (`renderRiot`), gacha một bể, archive (4 tab; `openLore` dùng chung cho nhân vật lẫn kẻ địch), config, COMMS |
 | `js/data_later.js` | Dữ liệu chương 2–3 bản cũ (không nạp), giữ để viết lại quanh Yuki |
 | `scratch/key_frame.py` | Tách nền frame sprite (idle/attack/hurt), in `box` để dán vào `ROSTER` |
 | `scratch/ult_lint.js` | Soát chiêu cuối: số trong `desc` có khớp `mult`/`hits`/`shieldPct`/`healPct`/`flat`/`drainEnergy` không, `energyMax` có bằng `ult.cost` không, và bản chiêu mộ có còn viết theo giọng phía địch không. Thoát mã 1 nếu lệch |
@@ -144,6 +144,13 @@ không ghi vào `PLAYER.cleared`. Bể tự lớn theo tiến trình: 4 (hồ s�
 Hồ sơ cũ được gieo `defeated` từ `cleared` × `SECTORS[].plan` nên không tụt.
 Trùng không hoàn SH — giữ thành bản dư trong `PLAYER.extra` để phân tách lấy linh kiện (đợt 3).
 CR giờ chỉ còn việc nâng cấp; hố tiêu CR thứ hai là cyberware.
+
+**Một mục cho một nhân vật ở ARCHIVE (12/09 — `docs/archive-merge.md`).** Trước đó 20 trong 21 mục *Sổ bộ*
+trùng id với tab *Nhân vật*, và hai tab giữ hai **nửa** của cùng một trang: `LORE` chỉ có cho 19 nhân vật nên
+tab HỒ SƠ của cả 20 con chiêu mộ rỗng, trong khi danh xưng / tiểu sử / nhận diện / flavor chiêu cuối của
+chúng nằm bên `CODEX`. Giờ tab **Nhân vật = 19 người**, tab **Sổ bộ = 21 kẻ địch** và không id nào ở cả hai.
+`FOE_LORE` sinh từ `CODEX` lúc nạp rồi ánh xạ sang hình dạng `LORE`, nên `openLore` dựng được trang cho cả
+hai bên mà không phải viết thêm chữ. Sổ bộ **không khoá đọc**, chỉ đánh dấu `CHƯA HẠ` → `ĐÃ HẠ` → `ĐÃ CÓ`.
 
 **DẸP LOẠN.** Thang đánh vô hạn ở Khu Đáy, mở sau 07-A. `riotSector(n)` dựng object hình dạng SECTOR rồi
 `go('battle')` — engine trận không biết mình đang ở chế độ nào. Wave của mỗi tầng **cố định** (`riotRng` gieo

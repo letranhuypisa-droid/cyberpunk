@@ -228,8 +228,8 @@ trôi xuống dưới màn.
 
 ## F. Ngoài phạm vi đợt này
 
-- **Sổ bộ vs Nhân vật ở ARCHIVE.** 20 trong 21 mục Sổ bộ trùng id với tab Nhân vật; chỉ `cantor` là riêng.
-  Nội dung **không** trùng (Sổ bộ = lore không số, viết theo phía địch, `openCodex`; Nhân vật = bảng kit có
-  số, viết theo phe mình, `openLore`) nên đây là trùng **mặt**, không trùng cơ chế. Để đợt sau.
+- ~~**Sổ bộ vs Nhân vật ở ARCHIVE.**~~ **Xong 12/09 → `docs/archive-merge.md`.** Đọc kỹ ra thì nặng hơn
+  "trùng mặt": hai tab đang giữ hai NỬA của cùng một trang — tab HỒ SƠ của cả 20 con chiêu mộ rỗng, trong
+  khi chữ lấp chỗ rỗng đó nằm ở tab bên cạnh.
 - **Cân lại kinh tế CR** sau khi CYBERWARE có chỗ tiêu (C3).
 - **Bể giới hạn thời gian.** Hình dạng `{hero:n}` của pity giữ lại chỗ cho nó (C8), nhưng không cài bây giờ.
