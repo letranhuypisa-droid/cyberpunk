@@ -52,20 +52,30 @@ function warmVideo(list){
 }
 /* Phát video trong một hộp .cutin (có <video>, .cutin__who, .cutin__name, .cutin__skip): chiêu cuối trong trận, mở rương ở gacha.
    Xong khi video hết / lỗi / bấm SKIP / quá 8s (không bao giờ treo). Tắt tiếng theo PLAYER.settings.sound.
-   opts.silent = không kêu tiếng mở hộp (chiêu cuối trong trận dùng cờ này: video đã có tiếng sẵn, 11/09). */
+   opts.silent = không kêu tiếng mở hộp (chiêu cuối trong trận dùng cờ này: video đã có tiếng sẵn, 11/09).
+
+   TRẢ VỀ true nếu video ĐÃ THẬT SỰ CHẠY (sự kiện 'playing' đã bắn), false nếu chưa kịp chạy đã hỏng.
+   Vì sao cần (11/09): trình duyệt chặn video tự phát CÓ TIẾNG khi trang chưa nhận cú chạm nào của người dùng —
+   `v.play()` bị từ chối, hộp đóng lại sau ~0,2 giây và người chơi không thấy gì. Từ hôm nay chiêu có video
+   không kêu AUDIO.ult nữa, nên hỏng video = không hình, không tiếng. Chỗ gọi (ultCutin) đọc cờ này để rơi về
+   banner chữ + tiếng như thời chưa có video. Bấm SKIP giữa chừng vẫn tính là đã chạy, không rơi về banner. */
 async function playVideoBox(box, src, who, name, accent, opts={}){
   const v=box.querySelector('video');
   box.querySelector('.cutin__who').textContent=who; box.querySelector('.cutin__name').textContent=name;
   box.style.setProperty('--accent', accent||'var(--chrome)');
   v.src=src; v.currentTime=0; v.muted=!(PLAYER.settings&&PLAYER.settings.sound); box.hidden=false; if(!opts.silent) sfx('open',.22);
+  let started=false;
   await new Promise(async res=>{
     let done=false; const end=()=>{ if(!done){ done=true; box._end=null; res(); } };
     box._end=end; v.onended=end; v.onerror=end; box.querySelector('.cutin__skip').onclick=end;
+    v.onplaying=()=>{ started=true; };
     const guard=setTimeout(end, 8000);
     try{ await v.play(); }catch(e){ v.muted=true; try{ await v.play(); }catch(e2){ end(); } }
     v.addEventListener('ended',()=>clearTimeout(guard),{once:true});
   });
+  v.onplaying=null;
   v.pause(); box.hidden=true; v.removeAttribute('src'); v.load();
+  return started;
 }
 function stopVideoBox(box){ if(!box) return; if(box._end) box._end(); if(!box.hidden){ box.querySelector('video').pause(); box.hidden=true; } }
 /* URL tuyệt đối cho url() đặt trong biến CSS inline (Chrome tính url() tương đối theo file .css chứa var(), không theo trang) */

@@ -633,12 +633,15 @@ async function execAttack(u,t){
 /* Mở màn chiêu cuối, dùng chung cho đội mình và kẻ địch: chớp sân, rồi video holo trên đầu người phát chiêu
    (thiếu file / tắt VIDEO CHIÊU CUỐI trong CONFIG → banner tên chiêu như cũ).
    11/09: có video thì KHÔNG kêu tiếng chiêu cuối nữa (AUDIO.ult) và cũng bỏ luôn tiếng mở hộp trong playVideoBox —
-   video tự có tiếng, chồng thêm hai tiếng tổng hợp lên trên chỉ làm đục. Không có video thì banner vẫn kêu như cũ. */
+   video tự có tiếng, chồng thêm hai tiếng tổng hợp lên trên chỉ làm đục. Không có video thì banner vẫn kêu như cũ.
+   Cùng ngày, sau khi chạy thử một trận thật: `playHolo` giờ trả về CÓ CHẠY ĐƯỢC KHÔNG. Trình duyệt từ chối phát
+   video có tiếng khi trang chưa nhận cú chạm nào (và file hỏng cũng vậy) — trước đây gặp cảnh đó là người chơi
+   vừa không thấy hình vừa không nghe tiếng, vì AUDIO.ult đã bị bỏ. Nay hỏng thì rơi xuống banner + tiếng. */
 async function ultCutin(u){
   UI.stageflash.animate([{opacity:.18},{opacity:0}],{duration:360,easing:'ease-out'});
   const src = ultVideoOn() ? await pickCutin(u) : null;
-  if(src) return playHolo(u, src);
-  AUDIO.ult();
+  if(src && await playHolo(u, src)) return;          // video chạy được: xong, tiếng đã nằm trong video
+  AUDIO.ult();                                       // không có video, hoặc có mà không phát nổi → banner chữ + tiếng như cũ
   UI.ubName.textContent=u.ult.name; UI.ubSub.textContent=`${u.name} · ${u.ult.desc.split('.')[0]}`;
   UI.banner.style.setProperty('--accent', u.faction==='rust'?'var(--rust)':'var(--chrome)');
   UI.banner.classList.remove('show'); void UI.banner.offsetWidth; UI.banner.classList.add('show');
@@ -747,10 +750,12 @@ function holoPlace(u){
   box.style.setProperty('--hx', left+'px'); box.style.setProperty('--hy', top+'px'); box.style.setProperty('--hw', w+'px');
   box.style.setProperty('--holo-ratio', String(ratio)); box.style.setProperty('--tx', Math.round(Math.min(w-16, Math.max(16, cx-left)))+'px');
 }
+/* Trả về true nếu video chạy thật. false = trình duyệt không cho phát (chưa có cú chạm nào) hoặc file hỏng —
+   lúc đó ultCutin phải rơi về banner chữ, nếu không người chơi vừa không thấy hình vừa không nghe tiếng. */
 async function playHolo(u, src){
-  const box=$('#ultHolo'); if(!box) return;
+  const box=$('#ultHolo'); if(!box) return false;
   holoPlace(u); UI.stage.classList.add('is-holo'); if(u.el) u.el.classList.add('is-casting');
-  try{ await playVideoBox(box, src, `${u.name} · ULTIMATE`, u.ult.name, u.faction==='rust'?'var(--rust)':'var(--chrome)', {silent:true}); }   // silent: không kêu tiếng mở hộp, để nguyên tiếng của video
+  try{ return await playVideoBox(box, src, `${u.name} · ULTIMATE`, u.ult.name, u.faction==='rust'?'var(--rust)':'var(--chrome)', {silent:true}); }   // silent: không kêu tiếng mở hộp, để nguyên tiếng của video
   finally{ UI.stage.classList.remove('is-holo'); if(u.el) u.el.classList.remove('is-casting'); }
 }
 /* Dừng video (reset trận / rời trận) — app.js gọi khi đổi màn hình */
