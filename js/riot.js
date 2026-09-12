@@ -203,10 +203,15 @@ function yardYield(y){
   return { cr:Math.round(y.cr*fill*fav*lvm), sh:Math.round(y.sh*fill*lvm), fill, fav, lvm, gp, n, lv };
 }
 const raidPower = y => Math.round(y.hold * Math.min(RIOT_ECON.raidCap, 1 + RIOT_ECON.raidStep*(((yst(y.id)||{}).held)||0)));
-/* Mili-giây tới kiện kế. null = đã đầy trần (thời gian ngừng chạy — đây là cái đồng hồ kéo người chơi về) */
+/* Bãi đang giữ mà TRỐNG QUÂN: đồng hồ đứng — không đẻ kiện, không phản kích (§D3: hệ số quân = 0).
+   Bản 11/09 quên chỗ này: bãi trống vẫn đẻ kiện 0 CR, vẫn tính vào hợp đồng tuần "nhận 40 kiện", và sau 6 chu kỳ
+   thì thua phản kích với 0 quân — người chơi mới (3 người đều trong đội) chiếm được bãi rồi mất luôn mà không hiểu vì sao. */
+const yardIdle = y => { const s=yst(y.id); return !!s && s.state==='own' && !(s.gar||[]).length; };
+/* Mili-giây tới kiện kế. null = không đếm: đã đầy trần (thời gian ngừng chạy — đây là cái đồng hồ kéo người
+   chơi về) hoặc chưa có quân (giao diện phân biệt hai trường hợp bằng yardIdle) */
 function yardNextMs(y, now){
   const s=yst(y.id); if(!s || s.state!=='own') return null;
-  if(s.crates >= yardCap(y)) return null;
+  if(yardIdle(y) || s.crates >= yardCap(y)) return null;
   const ms=riotCycleMs(); const d=(now||Date.now()) - s.t0;
   return ms - ((d % ms) + ms) % ms;
 }
@@ -218,6 +223,7 @@ function yardNextMs(y, now){
 function settleYard(y, now){
   const s=yst(y.id); if(!s || s.state!=='own') return 0;
   if(s.t0 > now + 60000) s.t0 = now;                       // đồng hồ máy bị vặn lùi → kéo về hiện tại
+  if(yardIdle(y)){ s.t0 = now; return 0; }                 // trống quân: đồng hồ đứng, đóng quân vào mới bắt đầu đếm
   const ms=riotCycleMs(), cap=yardCap(y), yl=yardYield(y);
   const n = Math.floor((now - s.t0)/ms);
   if(n <= 0) return 0;
@@ -342,13 +348,14 @@ function riotFeedSeen(){ const r=riotStore(); let ch=false; r.feed.forEach(f=>{ 
    ===================================================================== */
 function riotSummary(now){
   now = now || Date.now();
-  const o = { own:0, contested:0, open:0, crates:0, cr:0, sh:0, crPerH:0, shPerH:0, next:null, full:0 };
+  const o = { own:0, contested:0, open:0, crates:0, cr:0, sh:0, crPerH:0, shPerH:0, next:null, full:0, idle:0 };
   const perCycle = 60/RIOT_ECON.cycleMin;
   RIOT_YARDS.forEach(y=>{
     if(yardOpen(y)) o.open++;
     const s=yst(y.id); if(!s) return;
     if(s.state==='contested'){ o.contested++; return; }
     o.own++; o.crates+=s.crates; o.cr+=s.cr; o.sh+=s.sh;
+    if(yardIdle(y)){ o.idle++; return; }                    // trống quân: không đếm, không tính vào thu nhập/giờ
     const yl=yardYield(y); o.crPerH += yl.cr*perCycle; o.shPerH += yl.sh*perCycle;
     const nx=yardNextMs(y, now);
     if(nx==null) o.full++; else if(o.next==null || nx<o.next) o.next=nx;

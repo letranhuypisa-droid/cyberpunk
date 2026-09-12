@@ -110,11 +110,7 @@ function renderRiotHead(){
   $('#rmOwn').textContent = `${o.own}/${RIOT_YARDS.length}`;
   $('#rmRate').innerHTML  = o.own ? `${rn(o.crPerH)} CR<small>/GIỜ</small>${o.shPerH?` · ${o.shPerH} SH<small>/GIỜ</small>`:''}` : '—';
   $('#rmCrates').textContent = o.crates;
-  const cd=$('#rmNext');
-  cd.textContent = !o.own ? 'CHƯA CHIẾM BÃI NÀO' : o.next==null ? 'ĐẦY TRẦN' : rms(o.next);
-  cd.classList.toggle('is-full', o.own>0 && o.next==null);
-  const ms=riotCycleMs();
-  $('#rmNextBar').style.width = (o.next==null ? 100 : (1-o.next/ms)*100).toFixed(1)+'%';
+  renderNextCd(o);
   const un=riotFeedUnseen(); const fb=$('#rmFeedBtn');
   fb.hidden = !riotStore().feed.length; $('#rmFeedN').textContent=un; fb.classList.toggle('has-new', un>0);
   const w=riotWeekTick(), done=RIOT_WEEK.filter(t=>(w.prog[t.id]||0)>=t.goal).length;
@@ -127,11 +123,21 @@ function renderRiotHead(){
   renderWallet();
 }
 
-/* Dòng số đang chạy của một bãi đang giữ: "3/8 · 12:47" hoặc "8/8 · ĐẦY TRẦN" */
+/* Ô "KIỆN TIẾP THEO" ở đầu màn. Không đếm thì phải nói vì sao: đầy trần (đồng hồ ngừng) hay chưa có quân
+   (đồng hồ chưa chạy) — hai chuyện khác nhau, bản đầu gộp cả hai thành "ĐẦY TRẦN". */
+function renderNextCd(o){
+  const cd=$('#rmNext');
+  cd.textContent = !o.own ? (o.contested ? 'GIÀNH LẠI BÃI ĐÃ MẤT' : 'CHƯA CHIẾM BÃI NÀO')
+                 : o.next!=null ? rms(o.next) : o.full ? 'ĐẦY TRẦN' : 'CHƯA CÓ QUÂN';
+  cd.classList.toggle('is-full', o.own>0 && o.next==null && o.full>0);
+  $('#rmNextBar').style.width = (o.next!=null ? (1-o.next/riotCycleMs())*100 : o.full ? 100 : 0).toFixed(1)+'%';
+}
+/* Chữ đếm ngược của MỘT bãi đang giữ: thời gian, hoặc lý do không đếm */
+const yardCdTxt = (y, now) => { const ms=yardNextMs(y, now); return ms!=null ? rms(ms) : yardIdle(y) ? 'CHƯA CÓ QUÂN' : 'ĐẦY TRẦN'; };
+/* Dòng số đang chạy của một bãi đang giữ: "3/8 · 12:47" · "8/8 · ĐẦY TRẦN" · "0/8 · CHƯA CÓ QUÂN" */
 function yardCd(y, now){
   const s=yst(y.id); if(!s) return '';
-  const ms=yardNextMs(y, now);
-  return `${s.crates}/${yardCap(y)} · ${ms==null?'ĐẦY TRẦN':rms(ms)}`;
+  return `${s.crates}/${yardCap(y)} · ${yardCdTxt(y, now)}`;
 }
 /* Trạng thái một nút trên bản đồ */
 function yardNode(y){
@@ -181,14 +187,13 @@ function riotTickStart(){
     if($('#battle').dataset.screen!=='riotmap') return riotTickStop();
     if(settleYards()){ renderRiotHead(); renderRiotNodes(); if(!$('#yardSheet').hidden) renderYard(); return; }
     const now=Date.now(), o=riotSummary(now);
-    const cd=$('#rmNext'); cd.textContent = !o.own ? 'CHƯA CHIẾM BÃI NÀO' : o.next==null ? 'ĐẦY TRẦN' : rms(o.next);
-    $('#rmNextBar').style.width = (o.next==null?100:(1-o.next/riotCycleMs())*100).toFixed(1)+'%';
+    renderNextCd(o);
     $('#rmNodes').querySelectorAll('.ynode[data-id]').forEach(n=>{
       const u=n.querySelector('.ynode__cd[data-live]'); if(!u) return;
       u.textContent = yardCd(yardById(n.dataset.id), now);
     });
     const y=RMAP.yard&&yardById(RMAP.yard), c=$('#yCd');
-    if(c && y && yardOwned(y.id)){ const ms=yardNextMs(y, now); c.textContent = ms==null ? 'ĐẦY TRẦN' : rms(ms); }
+    if(c && y && yardOwned(y.id)) c.textContent = yardCdTxt(y, now);
   }, 1000);
 }
 function riotTickStop(){ if(RMAP.tick){ clearInterval(RMAP.tick); RMAP.tick=null; } }
@@ -311,14 +316,16 @@ function renderYard(){
   </section>`);
 
   /* 4. KIỆN HÀNG */
+  const idle = owned && yardIdle(y);
   if(owned||retake){
-    const now=Date.now(), ms=yardNextMs(y, now), left=(cap-s.crates);
+    const now=Date.now(), left=(cap-s.crates);
     H.push(`<section class="ysec">
       <h4>4 · KIỆN HÀNG</h4>
       <div class="ycrate"><b class="mono">${s.crates}/${cap}</b><span class="lbl">kiện đang chờ</span>
-        <span class="ycd">${retake?'ĐÓNG BĂNG':'KIỆN TIẾP'} <b class="mono" id="yCd">${retake?'—':(ms==null?'ĐẦY TRẦN':rms(ms))}</b></span></div>
+        <span class="ycd">${retake?'ĐÓNG BĂNG':'KIỆN TIẾP'} <b class="mono" id="yCd">${retake?'—':yardCdTxt(y, now)}</b></span></div>
       ${rbar(s.crates/cap*100, s.crates>=cap?'rbar--full':'rbar--ok')}
       <p class="ynote">${retake ? 'Bãi đang bị chiếm: ngừng đẻ kiện, số kiện đã có <b>bị đóng băng chứ không mất</b> — giành lại là nhận được nguyên vẹn.'
+        : idle ? 'Bãi trống quân: đồng hồ <b>đứng yên</b>, không đẻ kiện và cũng không bị phản kích. Đóng quân vào là bắt đầu đếm.'
         : s.crates>=cap ? 'Đầy trần — thời gian đang trôi đi vô ích. Nhận kiện để bãi chạy lại.'
         : `Còn ${left} kiện nữa là đầy trần, tức khoảng ${rdur(left*cycMin)}.`}</p>
       ${(!retake&&s.crates)?`<button class="btn-act btn-act--full ybtn" data-act="claim"><span class="btn-act__k">Nhận kiện</span><span class="btn-act__v">+${rn(s.cr)} CR${s.sh?` · +${s.sh} SH`:''}</span></button>`:''}
@@ -332,8 +339,8 @@ function renderYard(){
       <h4>5 · PHẢN KÍCH</h4>
       <div class="ypw"><span class="lbl">Đợt tới</span>${rbar(rp/Math.max(rp,yl.gp)*100,'rbar--foe')}<b class="mono">${rn(rp)}</b></div>
       <div class="ypw"><span class="lbl">Đồn trú</span>${rbar(yl.gp/Math.max(rp,yl.gp)*100, ok?'rbar--ok':'rbar--warn')}<b class="mono">${rn(yl.gp)}</b></div>
-      <div class="yverdict"><span class="ychip ychip--${ok?'over':'dead'}">${ok?'GIỮ ĐƯỢC':'SẼ MẤT BÃI'}</span>
-        <span>${retake?'Phải giành lại trước đã.':`còn ${left} chu kỳ (${rdur(left*cycMin)})`}</span></div>
+      <div class="yverdict"><span class="ychip ychip--${idle?'even':ok?'over':'dead'}">${idle?'ĐỨNG YÊN':ok?'GIỮ ĐƯỢC':'SẼ MẤT BÃI'}</span>
+        <span>${retake?'Phải giành lại trước đã.':idle?'Trống quân thì không có phản kích — và cũng không có kiện.':`còn ${left} chu kỳ (${rdur(left*cycMin)})`}</span></div>
       <p class="ynote">Đã giữ ${(s.held||0)} đợt liên tiếp · mỗi đợt giữ được thì đợt sau mạnh thêm ${RIOT_ECON.raidStep*100|0}%,
         trần ${rn(y.hold*RIOT_ECON.raidCap)}. <b>Đồn trú gấp đôi ngưỡng thì không bao giờ mất bãi.</b>
         Phản kích chỉ nổ trong lúc bãi còn đẻ kiện — đầy trần là mọi thứ đóng băng.</p>
