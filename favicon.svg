@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="CHROMEFALL">
+  <!-- CHROMEFALL · favicon. Nhát dọc tím-trắng = chiêu ZERO của Yuki ("Ba bước, một nhát").
+       Màu lấy đúng token trong css/chromefall.css: --bg-1 #0B0D12 · --chrome #7C4DFF
+       · --chrome-hi #B7A4FF · --chrome-white #DCE6F7. Vẽ dọc và mảnh để ở cỡ 16 px vẫn đọc ra một nhát cắt. -->
+  <defs>
+    <linearGradient id="cut" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#B7A4FF" stop-opacity="0"/>
+      <stop offset=".2" stop-color="#B7A4FF"/>
+      <stop offset=".5" stop-color="#DCE6F7"/>
+      <stop offset=".8" stop-color="#7C4DFF"/>
+      <stop offset="1" stop-color="#7C4DFF" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="halo" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#7C4DFF" stop-opacity="0"/>
+      <stop offset=".5" stop-color="#7C4DFF" stop-opacity=".55"/>
+      <stop offset="1" stop-color="#7C4DFF" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="32" height="32" rx="7" fill="#0B0D12"/>
+  <rect x="1.5" y="1.5" width="29" height="29" rx="5.5" fill="none" stroke="#7C4DFF" stroke-opacity=".5"/>
+  <rect x="9" y="3" width="14" height="26" fill="url(#halo)"/>
+  <rect x="15.1" y="2.5" width="1.8" height="27" fill="url(#cut)"/>
+</svg>

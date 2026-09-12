@@ -22,6 +22,7 @@ Kiểm DẸP LOẠN mà không phải qua tiêu đề: `python scratch/riot_serv
 |---|---|
 | `index.html` | Bản chơi: markup mọi màn hình + overlay comic |
 | `kit.html` + `js/kit.js` | UI kit: component, token, roster, bestiary (demo, không nạp trong bản chơi) |
+| `favicon.svg` | Icon tab: nhát dọc tím-trắng (chiêu ZERO), màu lấy token. Khai ở `<link rel="icon">` trong cả hai trang — có khai thì trình duyệt không đòi `/favicon.ico` nữa |
 | `css/chromefall.css` | Token thiết kế (Chrome/Rust/tier/ngữ nghĩa, sáng + tối) và toàn bộ giao diện; khối `v0.3` ở cuối: chọn mục tiêu, lao vào, hint, comic, archive |
 | `css/fx.css` | Overlay hiệu ứng đòn đánh/trạng thái (placeholder vẽ bằng CSS, `.fx--sheet` khi có ảnh) + hộp holo video chiêu cuối `.holo` |
 | `js/core.js` | Tiện ích DOM, thẻ nhân vật (`cardEl`), loader ảnh/video có fallback, hộp phát video `.cutin` dùng chung (ult trong trận, mở rương ở gacha), thanh HP/Energy, theme |
@@ -30,7 +31,7 @@ Kiểm DẸP LOẠN mà không phải qua tiêu đề: `python scratch/riot_serv
 | `js/comic.js` | Renderer trang comic: layout panel, ảnh + fallback, bong bóng hiện dần, lật trang, SKIP |
 | `js/state.js` | Lưu/nạp hồ sơ (`SAVE`, local hoặc remote), nâng cấp (`UPGRADE`), **`unitStats(id)`** — một chỗ duy nhất tính chỉ số cuối (gốc × cấp × cyberware) và `baseStats(id)`, và `power(id)`/`teamPower()`, nhiệm vụ ngày |
 | `js/audio.js` | SFX giao diện (audio/*.ogg) + âm chiến đấu: có `audio/<tên>.ogg\|mp3\|wav` thì dùng file, thiếu thì tổng hợp WebAudio. Một thao tác = một tiếng (`SFX_ONE`/`SFX_BEAT`); `SFX_VARIANTS` cho tiếng nhiều bản (`hit`, `hit2`…); `SFX_MUTE` cho nút không kêu |
-| `js/fx.js` | Overlay hiệu ứng trên sprite: một lần (hit/crit/nổ/điện/độc/cháy/choáng/hồi máu/lá chắn) và lặp theo trạng thái + lá chắn; tự dùng sprite sheet `art/fx/<kind>.webp` nếu có |
+| `js/fx.js` | Overlay hiệu ứng trên sprite: một lần (hit/crit/ZERO/nổ/điện/độc/cháy/choáng/hồi máu/lá chắn) và lặp theo trạng thái + lá chắn. `FX_META` khai 10 kind, 4 kind có bản lặp; dùng sprite sheet `art/fx/<kind>.webp` nếu có, thiếu thì placeholder CSS — **14/14 đã có file** từ 12/09 |
 | `js/battle.js` | Engine trận: lưới sân 3 hàng mỗi phe (`FORMATION`, không ai chồng lên ai) + `stageScale()` đặt `--big`, bảng nội tại chạm-để-đọc (`openPassive`), passive, lượt theo SPD, chế độ chọn mục tiêu, di chuyển tới mục tiêu kiểu Idle Heroes (`playMoveAttack`), sát thương + chí mạng, lá chắn (`addShield`/`absorbShield`), trạng thái choáng/độc/cháy (`applyStatus`/`tickStatus`), ult + video holo trên đầu nhân vật (`playHolo`), chiêu cuối của địch (`enemyUlt`), wave (hồi máu giữa wave), hint tutorial. `finish()` tách nhánh thưởng theo `SECTOR.mode` (chiến dịch / `'riot'`) |
 | `js/app.js` | Router màn hình, lobby, squad (3 slot, lưu đội, **khoá người đang đồn trú**), sector, thang tầng dẹp loạn (`renderRiot`), gacha một bể, archive (5 tab: Nhân vật · Sổ bộ · Địa danh · Thuật ngữ · Truyện; `openLore` dùng chung cho nhân vật lẫn kẻ địch), config, COMMS |
 | `js/riot.js` | **DẸP LOẠN — chiếm bãi**: 9 cái bãi ở District 07 (`RIOT_YARDS`), kinh tế (`RIOT_ECON`), sức mạnh ổ neo vào số đo `m50`, đồn trú, kiện hàng theo chu kỳ, phản kích, nâng bãi, hợp đồng tuần. Số liệu sửa ở đây |
@@ -42,7 +43,8 @@ Kiểm DẸP LOẠN mà không phải qua tiêu đề: `python scratch/riot_serv
 | `scratch/ult_lint.js` | Soát chiêu cuối: số trong `desc` có khớp `mult`/`hits`/`shieldPct`/`healPct`/`flat`/`drainEnergy` không, `energyMax` có bằng `ult.cost` không, và bản chiêu mộ có còn viết theo giọng phía địch không. Thoát mã 1 nếu lệch |
 | `scratch/sprite_size.py` | Đo sprite theo % hộp 682 và in sẵn hai bảng để dán vào `js/data.js`: **`BODY_H`** = chiều cao NGƯỜI (bào mòn 41px nên bỏ hào quang / nòng súng) để mọi người cao bằng nhau, **`ART_H`** = chiều cao NÉT VẼ tính từ mặt sàn, để lưới sân chừa đủ chỗ |
 | `scratch/recruit_table.js` | Dò bảng quy đổi kẻ địch → đơn vị chơi được: in chỉ số sau quy đổi cạnh băng chỉ số nhân vật cùng bậc, đánh dấu con lệch băng (`--bad` chỉ in con lệch) |
-| `scratch/fx_sheet.py` | Video/gif nền xanh → sprite sheet hiệu ứng `art/fx/<kind>.webp` (ô vuông 256, 6 cột) |
+| `scratch/fx_sheet.py` | Video/gif nền xanh **hoặc thư mục PNG trong suốt** → sprite sheet hiệu ứng `art/fx/<kind>.webp` (ô vuông 256, 6 cột) |
+| `scratch/fx_synth.py` | Dựng 14 overlay hiệu ứng bằng công thức (numpy, trường khoảng cách) → PNG trong suốt rồi gọi `fx_sheet.py`; bản `_loop` khép vòng chính xác, lố 300 kB thì tự hạ chất lượng WebP (`docs/fx-prompts.md` §8) |
 | `scratch/sfx_install.py` | File SFX sinh bằng AI (`art-src/SFX/*.mp3\|m4a`) → `audio/<tên>.ogg`: cắt im lặng, chuẩn hoá đỉnh −1 dB, mono ogg (`--dry` để chỉ đo) |
 | `scratch/sfx_synth.py` | Tổng hợp offline sáu tiếng chưa có bản thu (`tell`, `tell_up`, `tell_down`, `reveal_a`, `new_char`, `hit3`) → `art-src/SFX/<tên>.wav`, Python thuần; sửa số trong script rồi chạy lại `sfx_install.py` là đổi được tính cách (`docs/sfx-prompts.md` §10) |
 | `scratch/sfx_compare.py` | Đo đặc tính file SFX (dài, thời gian tới đỉnh, đuôi vang, độ sáng, số nhịp) để so bản mới với bản đang dùng |
@@ -80,7 +82,7 @@ Thả file đúng tên vào đúng thư mục là game tự dùng — không c�
 |---|---|---|
 | `art/card/` | **Art thẻ**: key art nhân vật `<id>.jpg`, chân dung cắt `<id>_portrait.jpg`, art kẻ địch `<id>.jpg` | dọc 9:16, có nền, JPEG q90 4:2:0. Ngang ≤ 1152 px (khung game rộng tối đa 560 CSS px → 1152 đã là mật độ 2×); địch giữ nguyên 768×1360. Bản gốc PNG cất ở `art-src/CARD/`, chuyển bằng `python scratch/card_web.py`. Chân dung = cắt phần trên art thẻ (đầu → ngang hông), q90 ≤ 400 KB |
 | `art/sprite/` | Frame trong trận `<id>_idle/attack/crit/hurt/die.png` (`crit` = đòn chí mạng, `die` = gục; đều tuỳ chọn; không cần `dash`) | **tách nền**, cao 682px (pose giơ vũ khí có thể cao hơn), chân chạm đáy |
-| `art/fx/` | Overlay hiệu ứng `<kind>.webp` (một lần) và `<kind>_loop.webp` (lặp): hit, crit, explode, shock, poison, burn, stun, heal, shield | sprite sheet ô vuông 256 px, 6 cột, nền trong suốt — `docs/fx-prompts.md` |
+| `art/fx/` | Overlay hiệu ứng `<kind>.webp` (một lần: hit, crit, zero, explode, shock, poison, burn, stun, heal, shield) và `<kind>_loop.webp` (lặp: poison, burn, stun, shield) | **14/14 đã có**, sprite sheet ô vuông 256 px, 6 cột, nền trong suốt, ≤300 kB; dựng lại bằng `python scratch/fx_synth.py` — `docs/fx-prompts.md` |
 | `art/bg/` | Nền sector `bg_<sector>.jpg` (+ `bg_base.jpg` cho màn COMMS ở HOME) | 3:4 dọc, 1536×2048; thiếu thì rơi về `art/bg/bg_battle.jpg` |
 | `art/map/` | Bản đồ Halcyon `map_halcyon.jpg` | 9:16 dọc, 1152×2048; toạ độ nút tính theo % ảnh (`MAP_AREAS`) |
 | `art/reveal/` | Mặt thẻ khi mở rương `<id>_reveal.jpg` | 1280×720, nhân vật đứng giữa |
@@ -101,8 +103,10 @@ Thả file đúng tên vào đúng thư mục là game tự dùng — không c�
   18 có hurt (thiếu Archon, Cantor, Enforcer). Thiếu pose nào engine tự rơi về pose gần nhất.
   Script nhận cả ảnh chụp màn hình từ contact sheet (tự cắt viền, xoá nhãn số, bỏ mảnh ô kế bên) và tự khớp cỡ thân với idle.
   **Video chỉ còn dùng cho chiêu cuối** (`ultVideo`), không dùng cho sprite trong trận.
-- **Overlay hiệu ứng** mặc định vẽ bằng CSS; thả `art/fx/<kind>.webp` là game dùng ảnh (animation chí mạng: `art/fx/crit.webp`).
-  Làm sheet từ video nền xanh: `python scratch/fx_sheet.py in.mp4 art/fx/crit.webp`. Xem thử ở `kit.html` mục B9.
+- **Overlay hiệu ứng**: cả 14 kind **đã có sheet** trong `art/fx/` từ 12/09 (bản nền tổng hợp bằng
+  `python scratch/fx_synth.py`); thiếu file thì game tự về placeholder CSS. Ghi đè `art/fx/<kind>.webp` là thay,
+  không phải sửa code. Làm sheet từ video nền xanh: `python scratch/fx_sheet.py in.mp4 art/fx/crit.webp`.
+  Xem thử ở `kit.html` mục B9.
 - **Video chiêu cuối** giờ chiếu trong hộp trên đầu người phát chiêu (`RULES.holo`), không phủ kín sân; video cũ dùng nguyên.
   Mặc định 16:9; def khai `ultRatio` thì dùng tỉ lệ riêng (hai video chiêu cuối của địch quay dọc 3:4, 540×720), hộp kẹp cao tối đa 50% sân.
 - **Art thẻ kẻ địch** (`art/card/<id>.jpg`, đủ 21 con chương 1) hiện ở thanh lượt trong trận, chân dung người nói trong comic,

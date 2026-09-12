@@ -1,4 +1,8 @@
-# CHROMEFALL — Overlay hiệu ứng đòn đánh, trạng thái, và hộp video chiêu cuối (v0.3 · 11/09/2026)
+# CHROMEFALL — Overlay hiệu ứng đòn đánh, trạng thái, và hộp video chiêu cuối (v0.4 · 12/09/2026)
+
+> **Tình trạng sau đợt 12/09 (§8):** **14/14 sheet đã có file**, không kind nào còn dùng placeholder CSS, và
+> Console không còn 14 lỗi đỏ lúc vào trận. Bản đang dùng là hàng tổng hợp offline bằng `scratch/fx_synth.py` —
+> **bản nền**, có art xịn hơn thì ghi đè `art/fx/<kind>.webp`, không phải sửa code. Prompt AI ở §3 vẫn nguyên giá trị.
 
 Ba thứ trong trận được thêm ngày 11/09, tài liệu này nói cách nó chạy và cách bạn thay ảnh thật vào:
 
@@ -54,6 +58,8 @@ còn lại giữa thân (`fy` ≈ 50).
 | shield | `art/fx/shield.webp` | `art/fx/shield_loop.webp` |
 
 Có file là game dùng; thiếu file là về placeholder CSS. Mỗi kind độc lập, làm cái nào trước cũng được.
+**Từ 12/09 cả 14 file đều có** (§8) — nên thấy 404 trong nhóm `art/fx/` tức là vừa thêm kind mới vào `FX_META` mà
+chưa dựng sheet. Một kind thiếu file là **một** request trượt, kind có bản lặp thì hai.
 
 `shield` là **lá chắn** (chiêu FIRE STORM của Kiln): loé một lần lúc dựng và mỗi lần chặn được đòn, bản lặp chạy suốt
 thời gian còn khiên. **Lúc vỡ thì phát `explode`** (thêm 11/09) — trước đó vòm lửa chỉ tắt lặng lẽ, mất đúng khoảnh
@@ -195,3 +201,80 @@ Sprite giữ nguyên **idle**, trượt thẳng tới trước mặt mục tiêu
 150 ms, về idle rồi trượt thẳng về đúng chỗ cũ (240 ms). Số liệu: `RULES.move`. Nhân vật mới chỉ cần **idle + attack
 (+ hurt)**; `art/sprite/*_dash.png` của Yuki/Psalm/Ash/Kai không còn được nạp (giữ hay xoá tuỳ bạn — 07-E i3 p2 trong
 comic vẫn dùng `yuki_dash.png` làm hình nền panel).
+
+---
+
+## 8. Đợt 12/09: 14 sheet bản nền dựng bằng công thức
+
+Trước đợt này `art/fx/` **trống trơn**: mọi hiệu ứng trong trận đều là placeholder CSS, và Console đỏ 14 lỗi (10 kind
+trong `FX_META` + 4 bản `_loop`, mỗi tên một lượt dò). Đúng luật §2 nên **không phải hỏng** — nhưng cũng có nghĩa là
+phần overlay chưa hề tồn tại.
+
+**Không sinh bằng video AI**, và lý do nằm ngay trong quy cách §2 ở trên: nền phải **một màu phẳng tuyệt đối**, máy
+quay **đứng yên từng pixel**, bốn bản `_loop` phải **khép vòng không nháy** — ba thứ video AI rất khó cho, mà khử nền
+xong còn "ăn một phần mép mờ" như §2 đã cảnh báo. Dựng bằng `scratch/fx_synth.py` (numpy + PIL, không cần gì thêm):
+
+| | |
+|---|---|
+| alpha | là alpha **thật**, không qua khử nền → mép mờ còn nguyên, không bị gặm |
+| màu | lấy thẳng token `css/chromefall.css` → không lệch khỏi hai tông Chrome / Rust |
+| khép vòng | mọi tham số là hàm của pha `p = i/N` tuần hoàn → frame cuối nối liền frame đầu, **chính xác** |
+| số frame | khai tay, bội số của 6 → sheet không thừa ô trống |
+
+Vẽ bằng **trường khoảng cách**: mỗi hình là `exp(-(d/w)²)` nên mép tự mịn, không cần lọc răng cưa. Hiệu ứng tự phát
+sáng thì cộng dồn rồi mới rút alpha ra từ độ sáng; khói là lớp tối riêng nằm dưới.
+
+```bash
+python scratch/fx_synth.py                 # dựng cả 14
+python scratch/fx_synth.py crit zero       # chỉ vài cái, sau khi vặn số trong script
+```
+
+### Kết quả
+
+| Kind | Frame | fps | Dài | kB | Dựng từ gì |
+|---|---|---|---|---|---|
+| `hit` | 12 | 24 | 0,50 s | 121 | một vệt chéo trắng + lõi trắng + 9 tia lửa |
+| `crit` | 18 | 24 | 0,75 s | 271 | hai vệt `--crit` cắt thành X, vệt sau vào trễ một nhịp, loé lõi trắng, 16 tia lửa |
+| `zero` | 18 | 24 | 0,75 s | 117 | một nhát **dọc** `--chrome-hi`, lõi mảnh, quầng tím loang, một vòng mảnh nở rồi tắt ở p≈0,6 |
+| `explode` | 18 | 24 | 0,75 s | 255 | **7 thuỳ lửa lệch tâm** (trắng nóng → `--crit` → `--rust`) + vòng xung kích + 9 cuộn khói trôi lên + 12 mảnh bay |
+| `shock` | 12 | 24 | 0,50 s | 106 | 5 tia răng cưa `--energy` đổi hình **từng frame** (đó là cái tạo ra cảm giác nháy) |
+| `poison` | 18 | 24 | 0,75 s | 191 | 13 giọt bay theo tia rồi rơi, mỗi giọt có đuôi chỉ hướng bắn, + 4 bong bóng nổi lên vỡ |
+| `burn` | 18 | 24 | 0,75 s | 258 | bệ lửa + 7 lưỡi uốn bè-chân-nhọn-ngọn, lệch cỡ, + 10 than bay |
+| `stun` | 12 | 24 | 0,50 s | 115 | vòng `--hp-mid` nở + 3 ngôi sao nảy ra lệch nhịp |
+| `heal` | 18 | 24 | 0,75 s | 227 | cột sáng `--hp` dựng lên + 18 hạt bay lên + vòng dưới chân |
+| `shield` | 18 | 24 | 0,75 s | 273 | vòm **lục giác** `--rust` ập từ ngoài vào + than quanh vòm |
+| `poison_loop` | 18 | 16 | 1,12 s | 151 | 7 bong bóng lệch pha, tới cuối đường thì vỡ thành 4 hạt |
+| `burn_loop` | 18 | 16 | 1,12 s | 246 | như `burn` nhưng thở theo `sin(2πp)`, không dâng lên |
+| `stun_loop` | 18 | 16 | 1,12 s | 137 | 3 sao quay một vòng ellipse — chu kỳ bằng **đúng** một vòng nên khép kín tự nhiên |
+| `shield_loop` | 18 | 16 | 1,12 s | 265 | vòm lửa thở ±3,5%, sáu cạnh lay lệch pha, than trôi dọc vòm |
+
+Tổng **2,7 MB** thêm vào site. Sheet nào lố trần 300 kB thì `fx_synth.py` tự hạ chất lượng WebP (85 → 76 → 68) rồi
+làm lại; `shield_loop` ở q85 ra 307 kB nên đang chạy q76.
+
+### Năm cái bẫy, ghi lại để đừng vặn ngược
+
+1. **Màu phát sáng phải giữ nguyên độ tươi, cường độ dồn hết vào alpha.** Để màu tối dần theo cường độ là tối
+   **hai lần** (màu tối × alpha thấp): hạt lửa mờ ra **đốm xám**, không phải đốm cam mờ, và trên nền tối của game
+   thì gần như mất hẳn. Bản đầu bị đúng lỗi này ở cả 14 sheet.
+2. **Lửa phải bè ở chân, nhọn ở ngọn.** Vệt thuôn đối xứng hai đầu cho ra **hình lá bay**, không ra ngọn lửa. Và
+   lưỡi lửa phải **uốn + lệch cỡ**, nếu không bảy lưỡi thành bảy cái nón đều tăm tắp, nhìn ra hàng rào cọc.
+3. **Đừng cho hiệu ứng tắt quá gấp.** Số mũ tắt 1,4 làm bốn frame cuối chỉ còn dưới 10% cường độ — nhìn ra sheet
+   trống bốn ô, phí đúng 1/4 số frame vừa trả tiền dung lượng. Để 0,85.
+4. **Một quầng tròn duy nhất không ra vụ nổ.** `explode` và `poison` bản đầu đều là "quả cầu phát sáng" mượt mà,
+   vô hồn. Phải nhiều thuỳ lệch tâm (nổ) hoặc nhiều giọt có đuôi (bắn toé) mới ra silhouette gồ ghề.
+5. **`np.pi * t` với `t` là float32 thì ở `t=1` nó nhúc nhích quá π**, `sin` ra số âm cỡ −9e−8, luỹ thừa không
+   nguyên thành `NaN`, mà `NaN` đi qua `np.maximum` là lây ra cả frame. Chặn `sin` về ≥0 trước khi luỹ thừa.
+
+### Kiểm
+
+Server tĩnh `static-sfx` (cổng 8791), mở `index.html`, Console:
+
+```
+FX.preloadAll()
+```
+
+Đo được: **14/14 kind có sheet**, `FX.sheets` đọc đúng `6×2`/`6×3` và 24/16 fps, Network nhóm `art/fx/` **14 request
+200, 0 trượt** (trước là 14 trượt). Xem từng frame trên nền tối thì dùng `kit.html` mục B9.
+
+> `kit.html` còn 10 lỗi 404 **không liên quan**: thiếu ảnh chân dung `art/card/<id>_portrait.jpg` của vesper · nyx ·
+> halo · cipher · meridian · spark · toll · vixen · junker · gravedigger. Nợ art cũ, ghi ở đây cho đỡ đi tìm lại.
