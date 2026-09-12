@@ -10,8 +10,10 @@
 # (2) không có --ref: khớp diện tích thân (mặt nạ bào mỏng 1% chiều cao để bỏ vòng halo / cán vũ khí mỏng), S = sqrt(thân idle đã ra / thân pose).
 # Kết quả ghi vào scratch/foe_boxes.json {id:{idle:{w,h,ax}, attack:…, scale, idleH}} → dán vào FOE_SPRITE / HERO_SPRITE (js/data.js).
 # Đội mình (yuki/psalm/ash/kai): thả '<id> normal/crit/die.png' vào art-src/HERO, chạy `python scratch/key_enemy.py art-src/HERO`; idle/hurt gốc giữ nguyên.
-# Ronin (11/09) cắt từ bảng 4 pose, ảnh "idle" đang là ô đòn thường → phải chạy riêng kèm --h, không thì anh ta cao vống lên:
-#   python scratch/key_enemy.py art-src/HERO --only ronin --h 0.843      (bỏ --h khi nào có ô tư thế đứng thật)
+# Ronin + Muzzle (11/09, đợt sau): đã có ảnh tư thế ĐỨNG YÊN thật nên chạy thẳng, không cần --h nữa:
+#   python scratch/key_enemy.py art-src/HERO --only ronin,muzzle
+# (4 pose động của Muzzle cắt từ bảng 2×2 'muzzle.png' — nhớ xoá nhãn ô, vạch khung, và khử ô kính xanh trên
+#  cánh cửa về trong suốt cho khớp ảnh idle, không thì trong trận cửa sổ khiên hiện ra một mảng xanh phông.)
 # Nhân vật nhìn sang phải như ảnh gốc; setFrame() trong battle.js tự lật cho phe địch.
 import sys, os, json, re
 from PIL import Image; import numpy as np
@@ -20,7 +22,7 @@ from scipy import ndimage
 RANK={ 'scav':'grunt','rigger':'boss','straydog':'grunt','welder':'grunt','gutterrat':'grunt','chopshop':'grunt','tinman':'grunt','slagger':'grunt',   # rigger lên trùm băng Scav 11/09 — ảnh cũ cắt cỡ lính, đã cắt lại
        'pipefitter':'grunt','hollow':'grunt','glassjaw':'grunt','drone':'grunt','bulwark':'elite','kiln':'elite','drillbit':'elite','enforcer':'elite',
        'chromehound':'elite','foreman':'boss','motherrust':'boss','archon':'boss','cantor':'boss' }
-HERO={'yuki','psalm','ash','kai','ronin','muzzle'}        # đội mình: idle/hurt gốc đã có (key_frame.py), chỉ thêm pose normal/crit/die (muzzle: chờ art, xem hero-prompts §11)
+HERO={'yuki','psalm','ash','kai','ronin','muzzle'}        # đội mình: yuki/psalm/ash/kai có idle/hurt gốc từ key_frame.py, chỉ thêm normal/crit/die; ronin + muzzle cắt nguyên bộ 5 pose ở đây
 RANK_H={'grunt':.86,'elite':.94,'boss':1.0,'hero':.98}
 HEIGHT={'straydog':.58,'chromehound':.66,'drone':.50}     # bốn chân / bay: thấp hơn người
 LIFT={'drone':130}                                        # bay: nhấc khỏi sàn (px trong canvas 682)

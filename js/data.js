@@ -106,7 +106,7 @@ const ROSTER = {
                desc:'Cực kỳ căm ghét những kẻ rã xác người đổi tiền, nhát chém của Ronin gây sát thương tàn bạo lên tên trùm Foreman.' },
            ],
            sprites:{ idle:['art/sprite/ronin_idle.png'], attack:['art/sprite/ronin_attack.png'], hurt:['art/sprite/ronin_hurt.png'],
-                     box:{ idle:{w:744,h:682,ax:372}, attack:{w:744,h:682,ax:372}, hurt:{w:744,h:682,ax:372} } },   // ★ idle TẠM = chính frame đòn thường (tấn ngang): bảng pose 11/09 chưa có tư thế đứng
+                     box:{ idle:{w:744,h:682,ax:372}, attack:{w:745,h:682,ax:372}, hurt:{w:744,h:682,ax:372} } },   // hộp thật nằm ở HERO_SPRITE bên dưới (đè lên đây), gồm cả crit/die
            ultVideo:['video/ronin_ult.mp4'],
            portrait:['art/card/ronin_portrait.jpg','art/card/ronin.png'], pos:'50% 8%' },
   muzzle:{ id:'muzzle',name:'MUZZLE',faction:'rust', tier:'B', atk:70,  hp:1750, energyMax:125, spd:80,  crit:5,   // ★ FAKE: cost + hệ số (tên + mô tả chiêu cuối đã chốt, xem docs/skill-naming.md §9)
@@ -213,7 +213,10 @@ const HERO_SPRITE = {
   kai:{attack:{w:744,h:682,ax:372}, crit:{w:744,h:682,ax:372}, die:{w:744,h:682,ax:372}},
   psalm:{attack:{w:852,h:682,ax:426}, crit:{w:899,h:682,ax:449}, die:{w:744,h:682,ax:372}},
   ash:{attack:{w:843,h:693,ax:421}, crit:{w:744,h:682,ax:372}, die:{w:744,h:682,ax:372}},
-  ronin:{attack:{w:744,h:682,ax:372}, crit:{w:744,h:682,ax:372}, die:{w:744,h:682,ax:372}} };
+  // Ronin + Muzzle: cắt lại nguyên bộ 5 pose ngày 11/09 bằng `python scratch/key_enemy.py art-src/HERO --only ronin,muzzle`
+  // (Ronin đã có tư thế ĐỨNG YÊN thật nên không cần --h nữa; Muzzle 4 pose động cắt từ bảng, ô kính trên cánh cửa khử về trong suốt).
+  ronin:{idle:{w:744,h:682,ax:372}, attack:{w:745,h:682,ax:372}, crit:{w:744,h:682,ax:372}, hurt:{w:744,h:682,ax:372}, die:{w:744,h:682,ax:372}},
+  muzzle:{idle:{w:744,h:682,ax:372}, attack:{w:744,h:682,ax:372}, crit:{w:744,h:682,ax:372}, hurt:{w:744,h:682,ax:372}, die:{w:744,h:682,ax:372}} };
 Object.entries(HERO_SPRITE).forEach(([id,poses])=>{ const s=ROSTER[id]&&ROSTER[id].sprites; if(!s) return; s.box=s.box||{};
   for(const p in poses){ s[p]=['art/sprite/'+id+'_'+p+'.png']; s.box[p]=poses[p]; } });
 
@@ -585,38 +588,81 @@ CHAPTERS.forEach(ch => ch.sectors.forEach(sid => {
   (sec.plan||[]).flat().forEach(id => { const n=Math.max(1, ch.n); if(FOE_DEBUT[id]==null || n<FOE_DEBUT[id]) FOE_DEBUT[id]=n; });
 }));
 /* ---- Cỡ người trên sân ----
-   Đo bằng `python scratch/sprite_size.py` (hộp bao phần không trong suốt của <id>_idle.png, % của hộp 682):
-   nhân vật 98% · lính 86.1% · elite 94.0% · trùm 99.4%. Đứng bên kia sân thì chênh lệch đó là CHỦ Ý
-   (lính nhỏ, trùm to). Nhưng chiêu mộ về làm ĐỒNG ĐỘI đứng cùng hàng với Yuki thì một con Scav thấp hơn
-   13% trông như trẻ con — nên bản chiêu mộ kéo về đúng cỡ người.
+   HAI việc khác nhau, đừng trộn:
+     1. CHUẨN HOÁ — mỗi bộ sprite vẽ/cắt ở một cỡ hơi khác nhau; BODY_H đo cỡ thật của từng ảnh để engine
+        kéo hết về cùng một thước. Đây là sửa lỗi art, không phải quyết định thiết kế.
+     2. SIZE — ai TO ai NHỎ là CHỦ Ý, khai tay ở bảng SIZE bên dưới. Chuẩn hoá xong mà không có bảng này
+        thì cả sân cao bằng nhau, ông vác cánh cửa ô tô đứng ngang cô cầm katana (chốt 11/09 sau khi
+        người dùng chỉ ra Ash to quá còn Muzzle với Thợ Ống thì phải là hai cái to nhất).
+   BODY_H = chiều cao NGƯỜI đo được của <id>_idle.png, tính theo hộp chuẩn 682px, in ra bởi
+   `python scratch/sprite_size.py` (cột NGUOI). Phải đo NGƯỜI chứ không đo hộp bao: hộp của Kai cao bằng
+   hộp của Ash (668px) nhưng tính cả khẩu pháo thò lên sau lưng, nên người Kai thấp hơn Ash 2% — cộng
+   thêm hàng sau bị thu nhỏ nữa là ra cảnh "Kai bé hơn Ash" trên sân.
    Không cắt lại art: nhân w/h/ax của box lên cùng một hệ số là sprite to đều, chân vẫn chạm đất
-   (.unit__frame neo bottom) và tâm không đổi (left tính từ ax). Muốn bỏ chuẩn hoá thì đặt HERO_BODY_H = 0.
+   (.unit__frame neo bottom) và tâm không đổi (left tính từ ax). Muốn bỏ chuẩn hoá thì xoá bảng SIZE.
    Hệ số lớn hơn thì vẫn phải nhân ĐỦ CẢ BA: h vượt 682 chỉ vẽ cao thêm lên trên (đúng), nhưng w vượt 744
-   mà ax giữ nguyên là neo chân lệch sang một bên.
-   RIGGER: từng cắt ở cỡ lính (86.1%) dù đã lên boss ngày 11/09 — đã cắt lại đủ 5 pose ở cỡ boss, nên
-   KHÔNG còn ngoại lệ ở đây nữa; bản cũ cất ở scratch/_bak_rigger/. */
-const HERO_BODY_H = .98;
-const RECRUIT_BODY_H = { grunt:.861, elite:.94, boss:.994 };
-const RECRUIT_BODY_FIX = {};
-const RECRUIT_NO_SCALE = ['straydog','drone','chromehound'];   // bốn chân và máy bay: thấp là đúng, đừng kéo cao bằng người
+   mà ax giữ nguyên là neo chân lệch sang một bên. Sprite vẽ cao quá ô lưới thì css/chromefall.css lo, theo
+   --big mà battle.js đặt trên #stage (tính từ ART_H bên dưới). */
+const BODY_H = {
+  yuki:.928, kai:.949, psalm:.943, ash:.969, ronin:.963, muzzle:.935,
+  scav:.855, welder:.855, tinman:.855, slagger:.853, chopshop:.852, hollow:.850, glassjaw:.850, gutterrat:.840, pipefitter:.831,
+  bulwark:.933, enforcer:.900, kiln:.867, drillbit:.861,
+  rigger:.994, foreman:.993, cantor:.963, archon:.916, motherrust:.913,
+  straydog:.570, drone:.460, chromehound:.594 };                 // ba con này đo thấp là ĐÚNG (bốn chân / bay)
+/* ART_H = từ mặt sàn lên tới nét vẽ CAO NHẤT (hào quang, nòng súng, và cả khoảng hụt của con bay lơ lửng),
+   cũng in ra bởi scratch/sprite_size.py (cột VOI). Khác BODY_H: đây là chiều cao ô lưới phải chừa chỗ,
+   BODY_H là chiều cao để so người với người. Con nào hộp bị phóng (h > 682) thì chỗ phải chừa là
+   ART_H × hệ số phóng, không phải cả cái hộp — trong hộp thường có sẵn một khoảng trời trống trên đầu. */
+const ART_H = {
+  yuki:.982, kai:.985, psalm:.991, ash:.981, ronin:.985, muzzle:.985,
+  scav:.867, welder:.867, tinman:.867, slagger:.867, chopshop:.867, hollow:.867, glassjaw:.867, gutterrat:.867, pipefitter:.867,
+  bulwark:.946, enforcer:.946, kiln:.946, drillbit:.946,
+  rigger:1, foreman:1, cantor:1, archon:1, motherrust:1,
+  straydog:.587, drone:.696, chromehound:.666 };
+/* BODY_FIX = chốt tay, đè lên số đo tự động của BODY_H. Cần đến khi ảnh idle KHÔNG phải tư thế đứng yên:
+   máy đo chiều cao thì không phân biệt được "người thấp" với "người đang tấn thấp", kéo một thế tấn rộng
+   lên cho bằng người đứng thẳng là đầu nó to hơn hẳn mọi người. Ronin từng phải chốt tay vì đúng lý do đó;
+   11/09 có ảnh đứng yên thật, cắt lại là số đo tự khớp (.963) nên bảng này trống trở lại. */
+const BODY_FIX = {};
+const BODY_BASE = .95;   // ★ SIZE 1.00 nghĩa là cao ngần này trong hộp 682 — người lớn cỡ chuẩn
+/* ★ SIZE = cỡ người cố ý, 1.00 = người lớn cỡ chuẩn. Đây là bảng thiết kế, chỉnh thoải mái.
+   Hai cái to nhất ngoài trùm là MUZZLE (vác nguyên cánh cửa ô tô làm khiên, HP cao nhất game) và
+   THỢ ỐNG (khối cơ bắp trần). Nhỏ nhất là Chuột Cống (lom khom) và Hollow (xác khô).
+   Cấp bậc KHÔNG còn quyết định cỡ nữa — một con lính có thể to hơn một elite, đó là chuyện bình thường;
+   cấp bậc đã đọc được qua nhãn ELITE/BOSS và viền bảng chỉ số. Trùm còn được phóng thêm RANK_SC (battle.js). */
+const SIZE = {
+  // đội mình
+  yuki:.96, kai:.99, ash:.98, psalm:1.04, ronin:1.03, muzzle:1.16,
+  // lính
+  scav:.96, gutterrat:.90, welder:.98, chopshop:.99, tinman:1.04, slagger:1.08, pipefitter:1.16, hollow:.92, glassjaw:1,
+  // elite
+  bulwark:1.10, kiln:1.10, drillbit:1.06, enforcer:1.05,
+  // trùm
+  rigger:1.06, foreman:1.12, motherrust:1.02, archon:1.04, cantor:1 };
+const NO_BODY_SCALE = ['straydog','drone','chromehound'];   // bốn chân và máy bay: thấp là đúng, đừng kéo cao bằng người
 /* Bản sao box đã nhân hệ số. PHẢI clone: sprites/box dùng chung tham chiếu với def gốc trong ENEMY_POOL,
    sửa tại chỗ là kẻ địch trong 6 màn chương 1 cũng to theo. */
 function scaleSprites(s, k){
-  if(!s || !(k>0) || Math.abs(k-1)<.02) return s;
+  if(!s || !(k>0) || Math.abs(k-1)<.005) return s;   // ngưỡng 0.5%: bảng SIZE là số thiết kế, bỏ qua 2% là nó nói dối
   const out={...s, box:{}};
   for(const p in (s.box||{})){ const b=s.box[p]; out.box[p]={ w:Math.round(b.w*k), h:Math.round(b.h*k), ax:Math.round(b.ax*k) }; }
   return out;
 }
+/* Đưa mọi sprite về đúng cỡ SIZE của nó. Chạy TRƯỚC khối chiêu mộ bên dưới, nên con chiêu mộ về đội mình
+   giữ nguyên cỡ nó vốn có bên kia sân — một con Thợ Ống to vẫn to khi đứng cạnh Yuki, đúng như vậy. */
+const bodyScale = id => { const b=BODY_FIX[id] || BODY_H[id], sz=SIZE[id];
+  return (b && sz && !NO_BODY_SCALE.includes(id)) ? BODY_BASE*sz/b : 1; };
+ENEMY_POOL.forEach(e => { if(e.sprites) e.sprites = scaleSprites(e.sprites, bodyScale(e.id)); });
+Object.keys(ROSTER).forEach(id => { const d=ROSTER[id]; if(d.sprites) d.sprites = scaleSprites(d.sprites, bodyScale(id)); });
+
 const RECRUITABLE = Object.keys(FOE_DEBUT).filter(id => !RECRUIT_SKIP.includes(id));
 RECRUITABLE.forEach(id => {
   const e = ENEMY_POOL.find(x => x.id===id); if(!e || ROSTER[id]) return;
   const b = RECRUIT_BAND[e.rank], f = RECRUIT_FIX[id] || {};
   const ult = e.ult ? { ...e.ult, ...(f.ult||{}) } : RECRUIT_ULT[id];
-  const bodyH = RECRUIT_BODY_FIX[id] || RECRUIT_BODY_H[e.rank];
-  const k = (HERO_BODY_H && bodyH && !RECRUIT_NO_SCALE.includes(id)) ? HERO_BODY_H/bodyH : 1;
   ROSTER[id] = {
     ...e, recruit:true, debut:1, foeRank:e.rank, rank:undefined,
-    sprites: scaleSprites(e.sprites, k),
+    sprites: e.sprites,                       // đã đúng cỡ SIZE của nó từ trên; về đội mình không co lại
     tier: f.tier || b.tier,
     atk:  f.atk!=null ? f.atk : Math.round(e.atk*b.atk),
     hp:   f.hp !=null ? f.hp  : Math.round(e.hp *b.hp),

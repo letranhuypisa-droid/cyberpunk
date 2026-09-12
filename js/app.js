@@ -8,7 +8,7 @@
 const APP=$('#battle');
 function go(name){
   if(name==='battle' && !SECTOR.team){ TEAM=normalizeTeam(TEAM); if(TEAM.includes(null)) return go('squad'); }
-  if(APP.dataset.screen==='battle' && name!=='battle'){ B.gen++; exitTargeting(); stopCutin(); comicEnd(); }   // rời trận giữa chừng: huỷ mọi việc đang chờ
+  if(APP.dataset.screen==='battle' && name!=='battle'){ B.gen++; exitTargeting(); closePassive(); stopCutin(); comicEnd(); }   // rời trận giữa chừng: huỷ mọi việc đang chờ
   if(APP.dataset.screen==='gacha' && name!=='gacha') stopVideoBox($('#revealCutin'));
   if(APP.dataset.screen!==name && APP.dataset.screen!=='title') sfx('swipe',.35);
   APP.dataset.screen=name;

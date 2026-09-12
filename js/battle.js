@@ -52,7 +52,7 @@ function applyStaticPassives(u, teamIds, enemyDefs){
   let atk=1, hp=1, en=0;
   u.active.forEach(({effect:e={}})=>{ atk+=(e.atkPct||0)/100; hp+=(e.hpPct||0)/100; en=Math.max(en,e.energyStart||0); });
   u.atk=Math.round(u.atk*atk); u.hpMax=Math.round(u.hpMax*hp); u.hp=u.hpMax; u.energy=Math.min(u.energyMax,en);
-  u.active.forEach(p=>u.chips.push({type:'buff',label:p.tag||p.name}));
+  u.active.forEach(p=>u.chips.push({type:'buff',label:p.tag||p.name,pas:p.id}));   // pas → chip chạm được, mở bảng nội tại
 }
 /* Passive theo đòn: đồng đội → luôn áp; địch → chỉ khi mục tiêu đúng id / đúng phe */
 const scopeHits = (w,other) => !w || w.always || w.ally || w.allyAny || (w.enemy && other.id===w.enemy) || (w.enemyFaction && other.side==='enemy' && other.faction===w.enemyFaction);
@@ -65,8 +65,9 @@ function passiveMods(src,tgt){
 
 function initBattle(){
   B.gen++; const g=B.gen;
-  exitTargeting(); hideHint(); stopCutin(); SHEET.clear(); FX.preloadAll();
+  exitTargeting(); hideHint(); closePassive(); stopCutin(); SHEET.clear(); FX.preloadAll();
   const team=battleTeam(), enemyDefs=sectorEnemyDefs();
+  stageScale([...team.map(id=>ROSTER[id]), ...enemyDefs]);
   // đội mình: nhân ATK/HP theo cấp nâng cấp (state.js), rồi áp passive tĩnh
   // unitStats (state.js) = chỉ số cuối: gốc × cấp nâng cấp × linh kiện × cyberware. Thẻ nhân vật đọc cùng hàm này
   // nên con số trên thẻ và con số vào trận luôn khớp.
@@ -117,16 +118,24 @@ async function waveTransition(){
   spawnWave(); B.busy=false; newRound();
 }
 
-/* ---- Đội hình trên sân: % trong vùng phe (x từ trái, y từ đáy), z = thứ tự vẽ, sc = thu nhỏ hàng sau.
-   Đội mình 3 slot zig-zag đối xứng với địch: slot 0 trước-dưới, slot 1 sau-giữa, slot 2 trước-trên. ---- */
+/* ---- Đội hình trên sân: LƯỚI 3 hàng mỗi phe, mỗi người một hàng ----
+   row 1 = hàng trong cùng (trên, xa người xem) … row 3 = hàng ngoài cùng (dưới). Mỗi hàng là một dải ngang riêng
+   (css .field là grid 3 hàng bằng nhau) nên sprite và bảng chỉ số của hai người không bao giờ chồng lên nhau.
+   x = % bề ngang nửa sân, so le để vẫn đọc ra chiều sâu; z = thứ tự vẽ, hàng ngoài đè lên hàng trong.
+   KHÔNG thu nhỏ hàng sau nữa (trước đây sc .94/.9): cùng một người đứng hàng nào cũng phải to như nhau —
+   cỡ người giờ do BODY_H trong js/data.js quyết định, không do chỗ đứng. ---- */
 const FORMATION = {
-  ally:  [{x:62,y:3,z:3},{x:38,y:30,z:2,sc:.94},{x:62,y:57,z:1,sc:.9}],
-  enemy: [{x:40,y:4,z:3},{x:57,y:34,z:2},{x:40,y:58,z:1}],
+  ally:  [{row:3,x:58},{row:2,x:41},{row:1,x:54}],
+  enemy: [{row:3,x:42},{row:2,x:58},{row:1,x:46}],
 };
+/* Chỉ TRÙM mới được phóng to quá khung hàng (phần tràn trổ lên khoảng trời trên sân — xem sidePositions + css .field).
+   Elite không phóng nữa: cỡ của nó đã khai ở bảng SIZE trong js/data.js rồi, phóng thêm là đầu nó
+   thò lên đè vào bảng chỉ số của người đứng hàng trong. */
+const RANK_SC = { boss:1.15 };
 function unitEl(u,pos){
   const e=el('div',`unit unit--${u.side} unit--${u.faction} unit--${(u.tier||'b').toLowerCase()}`);
   e.dataset.uid=u.uid;
-  e.style.cssText=`--x:${pos.x}%;--y:${pos.y}%;--z:${pos.z};--sc:${pos.sc||1};--bob-delay:${-Math.round(Math.random()*2400)}ms`;
+  e.style.cssText=`--row:${pos.row};--x:${pos.x}%;--z:${pos.row};--sc:${pos.sc||1};--bob-delay:${-Math.round(Math.random()*2400)}ms`;
   e.innerHTML=`<div class="unit__sprite"><div class="unit__shadow"></div><div class="unit__ring"></div>
       <div class="unit__bob"><div class="unit__pose"><div class="sil sil--free ${u.faction==='rust'?'sil--rust':''}"><span class="sil__lbl">NO SPRITE</span></div>
       <div class="unit__frame"><img alt=""><i class="unit__sheet"></i><div class="unit__flash"></div></div></div></div>
@@ -134,28 +143,52 @@ function unitEl(u,pos){
     <div class="unit__plate"><div class="unit__name"><span>${u.name}</span>${u.side==='ally'?`<span class="tier">${u.tier}</span>`:`<span class="rank">${u.rank==='boss'?'BOSS':u.rank==='elite'?'ELITE':'ATK '+u.atk}</span>`}</div>${hpBar()}</div>`;
   const plate=e.querySelector('.unit__plate');
   if(u.energyMax) plate.appendChild(energyBarEl(u.energyMax));   // đội mình luôn có; địch chỉ con nào có chiêu cuối (energyMax = ult.cost)
-  plate.insertAdjacentHTML('beforeend',`<div class="unit__hp mono"></div><div class="chips"></div><span class="unit__ready">READY</span>`);
+  plate.insertAdjacentHTML('beforeend',`<div class="unit__hp mono"></div><span class="unit__ready">READY</span>`);
+  e.insertAdjacentHTML('beforeend','<div class="chips"></div>');   // NGOÀI bảng chỉ số: bảng có clip-path nên thứ gì nằm trong cũng bị cắt
   if(u.side==='enemy') e.addEventListener('click',()=>onEnemyTap(u));
+  else e.addEventListener('click',()=>{ if((u.passives||[]).length) openPassive(u); });   // người của mình: chạm để đọc nội tại
   return e;
+}
+/* Chỗ đứng của cả một phe. Boss cao hơn khung hàng (RANK_SC) nên luôn đẩy về hàng TRONG CÙNG: phần vượt ra
+   trổ lên khoảng trời phía trên sân chứ không đè lên đầu con đứng trước. rollWave() vốn xếp boss đứng giữa. */
+function sidePositions(side, units){
+  const pos=units.map((u,i)=>({...(FORMATION[side][i]||FORMATION[side][0]), sc:RANK_SC[u.rank]||1}));
+  const bi=units.findIndex(u=>u.rank==='boss');
+  if(bi>=0){
+    let back=0; pos.forEach((p,i)=>{ if(p.row<pos[back].row) back=i; });
+    if(back!==bi){ const t={row:pos[bi].row,x:pos[bi].x}; pos[bi].row=pos[back].row; pos[bi].x=pos[back].x; pos[back].row=t.row; pos[back].x=t.x; }
+  }
+  return pos;
 }
 function renderSide(side){
   const host = side==='ally'?UI.allies:UI.enemies; host.innerHTML=''; SHEET.prune();
-  B.units.filter(u=>u.side===side).forEach(u=>{
-    const i=+u.uid.split('-')[1]; let pos=FORMATION[side][i]||FORMATION[side][0];
-    if(u.rank==='boss') pos={...pos, x:pos.x-12, sc:1.28, z:pos.z+3};   // boss to hơn, lùi vào trong, vẽ đè lên
-    else if(u.rank==='elite') pos={...pos, sc:1.08};
-    u.el=unitEl(u,pos); if(u.rank) u.el.classList.add('unit--'+u.rank);
+  const units=B.units.filter(u=>u.side===side), pos=sidePositions(side, units);
+  units.forEach((u,i)=>{
+    u.el=unitEl(u,pos[i]); if(u.rank) u.el.classList.add('unit--'+u.rank);
     if(u.link){ u.chips.push({type:'buff',label:'HALO LINK'}); }
     host.appendChild(u.el); updateUnit(u);
     if(u.sprites) mountSprite(u);      // địch có sprite riêng (Glass Jaw); còn lại giữ silhouette
   });
+}
+/* #stage --big = NÉT VẼ cao nhất của trận vượt hộp chuẩn 682 bao nhiêu lần; css chia bề ngang ô lưới cho số này
+   để người cao nhất vẫn nằm gọn trong hàng của mình.
+   Phải tính theo nét vẽ (ART_H × hệ số đã phóng của hộp) chứ không theo hộp: hộp của Ronin bị phóng 18% để anh cao
+   bằng người khác, nhưng trong hộp đó có sẵn 15% khoảng trống trên đầu — lấy hộp thì cả sân teo 18% vì một mình anh.
+   Đặt MỘT LẦN cho cả trận (đội hình + toàn bộ địch của sector): tính lại mỗi wave thì sân co giật mỗi lần đổi đợt.
+   Chỉ đo pose idle — pose đánh có cao hơn thì lúc đó unit cũng đã trượt ra khỏi hàng rồi. */
+function stageScale(defs){
+  let big=1;
+  defs.forEach(d=>{ const b=d && d.sprites && d.sprites.box && d.sprites.box.idle;
+    if(b&&b.h) big=Math.max(big, (ART_H[d.id]||1) * b.h/682); });
+  UI.stage.style.setProperty('--big', big.toFixed(3));
 }
 function updateUnit(u){
   const e=u.el; if(!e) return;
   setHpBar(e.querySelector('.bar'), u.hp, u.hpMax);
   e.querySelector('.unit__hp').textContent = `${Math.max(0,u.hp)}/${u.hpMax}`;
   const eb=e.querySelector('.ebar'); if(eb){ setEnergyBar(eb,u.energy,u.energyMax); e.classList.toggle('is-ready', u.energy>=u.energyMax && u.alive); }
-  e.querySelector('.chips').innerHTML = [...u.chips, ...shieldChip(u), ...statusChips(u)].map(c=>`<span class="chip chip--${c.type}">${c.label}${c.val?` <em>${c.val}</em>`:''}</span>`).join('');
+  e.querySelector('.chips').innerHTML = [...u.chips, ...shieldChip(u), ...statusChips(u)].map(c=>
+    `<span class="chip chip--${c.type}${c.pas?' chip--info':''}"${c.pas?` data-pas="${c.pas}" data-uid="${u.uid}"`:''}>${c.label}${c.val?` <em>${c.val}</em>`:''}</span>`).join('');
   syncStatusFx(u);
   e.classList.toggle('is-dead', !u.alive);
   if(!u.alive) SHEET.del(e.querySelector('.unit__frame'));   // xác nằm im, không nhún tiếp
@@ -166,28 +199,33 @@ function removeChip(u,label){ u.chips=u.chips.filter(c=>c.label!==label); update
 /* ---- Sprite: preload frame idle/attack/hurt (không còn frame dash: di chuyển giữ nguyên idle) ----
    Nguồn sprite: ROSTER (đội mình) hoặc ENEMY_POOL (kẻ địch có sprite riêng, hiện mới Glass Jaw).
    Con nào không khai báo sprites thì vẫn là silhouette như cũ. */
-const spriteSrc = id => (ROSTER[id] || ENEMY_POOL.find(e=>e.id===id) || {}).sprites;
+/* Cùng một id có thể có HAI bộ box khác cỡ: bản đứng bên địch (ENEMY_POOL, cỡ theo rank) và bản đã chiêu mộ về
+   đội mình (ROSTER, đã kéo lên cỡ người — js/data.js). Phải tra theo PHE, không thì một con Scav đứng bên kia sân
+   vẫn to bằng Yuki và cả thang cỡ người (lính nhỏ · elite ngang · trùm to) đổ hết. Cache cũng phải tách theo phe. */
+const spriteSrc = (id,side) => ((side==='enemy' ? (ENEMY_POOL.find(e=>e.id===id) || ROSTER[id]) : (ROSTER[id] || ENEMY_POOL.find(e=>e.id===id))) || {}).sprites;
+const frameKey = u => (u.side==='enemy' ? 'foe:' : '') + u.id;
 const POSES = ['idle','attack','crit','hurt','die'];   // crit = tư thế đòn chí mạng (thiếu → attack) · die = tư thế gục (thiếu → hurt); đều tuỳ chọn
-function frameSet(id){
-  if(B.frames[id]) return B.frames[id];
-  const s=spriteSrc(id); if(!s) return null;
+function frameSet(id, side){
+  const key=(side==='enemy'?'foe:':'')+id;
+  if(B.frames[key]) return B.frames[key];
+  const s=spriteSrc(id,side); if(!s) return null;
   const box=s.box||{}, anim=s.anim||{};
   // mỗi pose: ảnh tĩnh (bắt buộc) + sheet động (tuỳ chọn). Sheet hỏng/thiếu file → tự rơi về ảnh tĩnh.
   const sheetOf = p => anim[p] ? loadFirst(anim[p].sheet).then(src => src && {...anim[p], src}) : null;
-  B.frames[id] = Promise.all([ Promise.all(POSES.map(p=>loadFirst(s[p]))), Promise.all(POSES.map(sheetOf)) ])
+  B.frames[key] = Promise.all([ Promise.all(POSES.map(p=>loadFirst(s[p]))), Promise.all(POSES.map(sheetOf)) ])
     .then(([[idle,attack,crit,hurt,die], sheets])=>{
       const pose = (src,i) => src && { src, box:box[POSES[i]], anim:sheets[i], face:s.face||'right' };
       const fIdle=pose(idle,0), fAttack=pose(attack,1)||fIdle, fCrit=pose(crit,2), fHurt=pose(hurt,3), fDie=pose(die,4);
       return { idle:fIdle, attack:fAttack, crit:fCrit||fAttack, hurt:fHurt, die:fDie||fHurt };
     });
-  return B.frames[id];
+  return B.frames[key];
 }
 function preloadFrames(){
   battleTeam().forEach(id=>{
-    frameSet(id);
+    frameSet(id,'ally');
     if(ultVideoOn()) ultVariants(ROSTER[id]).forEach(resolveVideo);   // HEAD video ult ngay từ đầu trận để lúc phát chiêu không phải chờ
   });
-  sectorEnemyDefs().forEach(d=>{ if(d.sprites) frameSet(d.id);        // nạp sớm sheet của địch trong sector
+  sectorEnemyDefs().forEach(d=>{ if(d.sprites) frameSet(d.id,'enemy');        // nạp sớm sheet của địch trong sector
     if(ultVideoOn() && d.ult) ultVariants(d).forEach(resolveVideo); });   // và video chiêu cuối của địch (Glass Jaw, Kiln)
   B.units.filter(u=>u.side==='ally').forEach(mountSprite);
 }
@@ -249,7 +287,7 @@ function setFrame(u, frame){
   }
 }
 async function mountSprite(u){
-  const p=frameSet(u.id); if(!p) return;
+  const p=frameSet(u.id,u.side); if(!p) return;
   const f=await p; if(!f||!f.idle||!u.el) return;
   setFrame(u,f.idle); u.el.querySelector('.unit__pose').classList.add('has-img');
 }
@@ -269,7 +307,7 @@ function flashSprite(u){
    Chết: giữ frame hurt, mất bão hoà, sụm nhẹ xuống (CSS .is-dead). */
 async function playHurt(u, killed){
   const e=u.el; if(!e) return; e.classList.add('is-hit'); setTimeout(()=>e.classList.remove('is-hit'), 320);
-  const f = B.frames[u.id] ? await B.frames[u.id] : null;
+  const f = B.frames[frameKey(u)] ? await B.frames[frameKey(u)] : null;
   const fr = f && (killed ? f.die : f.hurt);           // chết → frame die (Drill-Bit), không có thì hurt; trúng đòn → hurt
   if(!fr) return;
   flashSprite(u); setFrame(u, fr);
@@ -281,7 +319,7 @@ async function playHurt(u, killed){
 const animDone = (a, ms) => Promise.race([a.finished.catch(()=>{}), wait(ms+80)]);
 /* Attack tại chỗ (giảm chuyển động / dự phòng): +28px/90ms out (scale 1.02,.96) → giữ 120ms → về 0/180ms. Tổng 390ms */
 async function playAttackAnim(u, poseName){
-  const f = await B.frames[u.id]; if(!u.el) return; const pose=u.el.querySelector('.unit__pose');
+  const f = await B.frames[frameKey(u)]; if(!u.el) return; const pose=u.el.querySelector('.unit__pose');
   flashSprite(u);
   const fr=f&&(f[poseName]||f.attack); if(fr) setFrame(u,fr);   // poseName 'crit' → frame đòn chí mạng nếu sprite có
   if(!reduced()){
@@ -309,7 +347,7 @@ function moveDelta(u,tgt){
    strike được gọi đúng lúc va chạm (dealDamage ở đó). Giảm chuyển động hoặc không đo được vị trí → đánh tại chỗ. */
 async function playMoveAttack(u,tgt,strike,o){
   o=Object.assign({},RULES.move,o||{});
-  const g=B.gen; const f=B.frames[u.id]?await B.frames[u.id]:null; if(g!==B.gen||!u.el) return;
+  const g=B.gen; const f=B.frames[frameKey(u)]?await B.frames[frameKey(u)]:null; if(g!==B.gen||!u.el) return;
   const pose=u.el.querySelector('.unit__pose'); const d=!reduced()&&moveDelta(u,tgt);
   if(!d){ const p=playAttackAnim(u,o.pose); await wait(90); if(g===B.gen) strike(); await p; return; }
   const elm=u.el; elm.classList.add('is-dashing'); elm.style.setProperty('--zd',o.z);
@@ -518,6 +556,35 @@ function showHint(key){
 }
 function hideHint(){ UI.hint.hidden=true; }
 $('#hintClose').addEventListener('click', e=>{ e.stopPropagation(); hideHint(); });
+
+/* ---- Bảng nội tại trong trận ----
+   Trên sân chỉ hiện chip của nội tại ĐANG BẬT và chip chỉ có chỗ cho hai chữ (CHỊ EM, FAN…), nên chạm vào chip
+   — hoặc chạm vào chính người của đội mình — sẽ mở bảng liệt kê ĐỦ nội tại của người đó: tên đầy đủ, điều kiện,
+   con số, mô tả, và nội tại nào chưa bật. Dùng chung passiveInfo()/fxText() với trang hồ sơ ở ARCHIVE (js/app.js,
+   nạp sau file này nên chỉ gọi lúc người chơi bấm, không gọi lúc nạp trang). */
+const PAS = { box:$('#pasBox'), who:$('#pasWho'), body:$('#pasBody') };
+function openPassive(u, focusId){
+  const list=u.passives||[]; if(!list.length) return;
+  PAS.who.textContent=u.name;
+  PAS.body.innerHTML = list.map(p=>{
+    const on=(u.active||[]).some(a=>a.id===p.id);
+    const cond=(typeof passiveInfo==='function' ? passiveInfo(p).cond : '') || '';
+    const fx=(typeof fxText==='function' ? fxText(p.effect||{}) : '') || '';
+    return `<div class="pas ${on?'is-active':'is-locked'}${p.id===focusId?' is-focus':''}">
+      <div class="pas__body"><b class="pas__name">${p.name}</b><span class="pas__cond">${cond}</span>
+        <span class="pas__fx">${fx}</span><p class="pas__desc">${p.desc||''}</p></div>
+      <span class="pas__state">${on?'ĐANG BẬT':'CHƯA BẬT'}</span></div>`;
+  }).join('');
+  PAS.body.scrollTop=0; PAS.box.hidden=false; sfx('swipe',.3);
+}
+function closePassive(){ if(PAS.box) PAS.box.hidden=true; }
+$('#pasClose').addEventListener('click', e=>{ e.stopPropagation(); closePassive(); });
+/* Bắt ở pha capture: chạm vào chip của kẻ địch không được biến thành chạm chọn mục tiêu */
+UI.stage.addEventListener('click', e=>{
+  const c=e.target.closest && e.target.closest('.chip--info'); if(!c) return;
+  e.stopPropagation(); e.preventDefault();
+  const u=B.units.find(x=>x.uid===c.dataset.uid); if(u) openPassive(u, c.dataset.pas);
+}, true);
 
 async function startTurn(){
   if(B.over) return;
@@ -867,7 +934,9 @@ UI.btnUlt.addEventListener('click', playerUlt);
 $('#btnReset').addEventListener('click', ()=>{ B.skipIntro=true; initBattle(); B.skipIntro=false; });
 $('#btnAgain').addEventListener('click', ()=>{ B.skipIntro=true; initBattle(); B.skipIntro=false; });
 document.addEventListener('keydown', e=>{
-  if($('#battle').dataset.screen!=='battle' || B.mode!=='target') return;
+  if($('#battle').dataset.screen!=='battle') return;
+  if(e.key==='Escape' && PAS.box && !PAS.box.hidden){ e.preventDefault(); return closePassive(); }   // Esc đóng bảng nội tại trước
+  if(B.mode!=='target') return;
   if(e.key==='Escape'){ e.preventDefault(); cancelTargeting(); }
   else if(e.key==='Enter'){ e.preventDefault(); const t=ensureTarget(); if(t) confirmTarget(t); }
 });
