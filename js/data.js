@@ -486,8 +486,11 @@ const SECTORS = [
 ];
 /* =====================================================================
    CHIÊU MỘ — kẻ địch chương 1 thành đơn vị chơi được (11/09)
-   Bể = mọi con có mặt trong SECTORS[].plan của chương 1, trừ RECRUIT_SKIP. Mỗi con dựng một BẢN SAO
+   Ứng viên = mọi con có mặt trong SECTORS[].plan của chương 1, trừ RECRUIT_SKIP. Mỗi con dựng một BẢN SAO
    nạp thẳng vào ROSTER, nên squad, ARCHIVE, gacha, battleTeam, spriteSrc dùng được ngay mà không phải sửa gì.
+   Ứng viên KHÁC bể gacha: từ 12/09 con nào chưa bị hạ trong trận thì chưa vào bể (beaten(), xem khối GACHA).
+   Bản sao vẫn dựng sẵn cho cả 20 con ngay lúc nạp trang — ARCHIVE và lưới xám của màn gacha cần đọc def
+   của con chưa hạ để in tên và bậc.
    Bản sao — KHÔNG bao giờ sửa def gốc trong ENEMY_POOL: wave của 6 màn chương 1 phải giữ nguyên cân bằng.
    Vì thế lính thường KHÔNG được thêm ult vào ENEMY_POOL; chiêu của chúng chỉ sống trên bản chiêu mộ.
 
@@ -763,16 +766,28 @@ const PLAYER_KEY='chromefall.player.v3';
 const LEGACY_KEYS=['chromefall.player.v2'];
 /* extra = bản dư ngoài bản đầu {id:số} — trùng gacha KHÔNG hoàn shards nữa mà giữ lại để phân tách lấy linh kiện.
    Ghi từ đợt 1 dù màn phân tách làm ở đợt 3, để không mất lá nào của người chơi trong lúc chờ.
-   pity = pity riêng cho từng banner (hồ sơ cũ lưu một số → migrateProfile đổi thành object).
+   pity = giữ trong object theo id banner dù chỉ còn một bể (xem khối GACHA).
+   defeated = id kẻ địch ĐÃ HẠ trong trận, ghi lúc con đó chết (killUnit) chứ không phải lúc clear màn.
+     Đây là cửa vào bể gacha của quân chiêu mộ. Lý do không suy từ cleared: DẸP LOẠN không ghi vào cleared,
+     và hạ trùm ở wave 3 rồi chết ở wave 4 thì vẫn là đã hạ.
    riot = tiến trình DẸP LOẠN: tier đang mở, best = tầng cao nhất đã thắng. */
 const PLAYER_DEFAULTS = () => ({ name:'YUKI', level:1, credits:3000, shards:300, owned:['yuki','ash','kai'], team:['yuki','ash','kai'],
-  pity:{hero:0, crew:0}, pulls:0, cleared:[], extra:{}, riot:{tier:1, best:0},
+  pity:{hero:0}, pulls:0, cleared:[], defeated:[], extra:{}, riot:{tier:1, best:0},
   settings:{sound:true, sfx:true, motion:false, skipStory:false, anim:true, ultVideo:true, revealVideo:true}, levels:{}, daily:null, hintsSeen:[] });
 const _loaded = (()=>{ try{ for(const k of [PLAYER_KEY,...LEGACY_KEYS]){ const raw=localStorage.getItem(k); if(raw) return { p:JSON.parse(raw), legacy:k!==PLAYER_KEY }; } }catch(e){} return { p:{}, legacy:false }; })();
 const PLAYER = Object.assign(PLAYER_DEFAULTS(), _loaded.p);
 PLAYER.settings = Object.assign(PLAYER_DEFAULTS().settings, _loaded.p.settings||{});
 const savePlayer = () => { if(typeof SAVE!=='undefined') SAVE.save(PLAYER); else try{ localStorage.setItem(PLAYER_KEY, JSON.stringify(PLAYER)); }catch(e){} };
 const owns = id => PLAYER.owned.includes(id);
+/* Đã hạ con này chưa — cửa vào bể gacha của quân chiêu mộ (xem khối GACHA). */
+const beaten = id => (PLAYER.defeated||[]).includes(id);
+/* Ghi một kẻ địch vừa chết. Gọi từ killUnit trong battle.js, KHÔNG savePlayer ở đây: finish() lưu một
+   lần cho cả trận (kể cả trận thua). Trả về true nếu đây là lần đầu hạ con đó — để bảng kết quả in
+   "MỞ BỂ · <tên>". */
+function noteDefeated(id){
+  if(!id || beaten(id)) return false;
+  PLAYER.defeated=PLAYER.defeated||[]; PLAYER.defeated.push(id); return true;
+}
 /* Đội hình hợp lệ: chỉ nhân vật đã sở hữu, không trùng, đúng TEAM_SIZE; thiếu thì bù từ owned, còn thiếu nữa thì null */
 function normalizeTeam(arr){
   const t=(arr||[]).filter((id,i,a)=>id && ROSTER[id] && owns(id) && a.indexOf(id)===i).slice(0,TEAM_SIZE);
@@ -794,12 +809,23 @@ function normalizeTeam(arr){
   if(!p.name || p.name==='OPERATOR-77') p.name='YUKI';
   if(!Array.isArray(p.hintsSeen)) p.hintsSeen=[];
   if(!Array.isArray(p.cleared)) p.cleared=[];
-  /* 11/09: hai banner nên pity tách đôi. Hồ sơ cũ lưu một số — giữ nguyên số đó cho banner nhân vật,
-     người chơi đã quay 40 lượt không được reset về 0 chỉ vì mình đổi cấu trúc. */
-  if(typeof p.pity === 'number') p.pity = { hero:p.pity, crew:0 };
-  if(!p.pity || typeof p.pity !== 'object') p.pity = { hero:0, crew:0 };
-  for(const k of ['hero','crew']) if(typeof p.pity[k] !== 'number') p.pity[k]=0;
+  /* pity qua hai lần đổi cấu trúc: số trơn (≤10/09) → {hero,crew} (11/09) → {hero} (12/09, gộp bể).
+     Gộp lấy số LỚN HƠN chứ không bỏ crew đi: người chơi đã quay 47 lượt không được reset chỉ vì mình
+     đổi cấu trúc. Xấu nhất là sớm ra một con S, và bể crew mới sống một ngày nên gần như không ai kịp gom. */
+  if(typeof p.pity === 'number') p.pity = { hero:p.pity };
+  if(!p.pity || typeof p.pity !== 'object') p.pity = { hero:0 };
+  p.pity = { hero: Math.max(p.pity.hero|0, p.pity.crew|0) };
   if(!p.extra || typeof p.extra !== 'object') p.extra = {};
+  /* 12/09: gieo defeated cho hồ sơ cũ. Clear một màn = đã hạ mọi con trong plan của màn đó (phải dọn
+     hết wave mới clear được), nên suy lại được đầy đủ. Không gieo thì người đang ở 07-B mở bản mới
+     thấy bể tụt từ 17 về 4 — mất tiến trình. Chạy MỘT LẦN: sau đó killUnit tự ghi tiếp.
+     Soát _loaded.p chứ KHÔNG soát p: PLAYER_DEFAULTS() đã gán defeated:[] nên p.defeated bao giờ cũng
+     là mảng, điều kiện trên p thì không bao giờ đúng và hồ sơ cũ lặng lẽ mất hết tiến trình. */
+  if(!Array.isArray(_loaded.p.defeated)){
+    const seed=new Set();
+    p.cleared.forEach(sid => { const s=SECTORS.find(x=>x.id===sid); if(s) (s.plan||[]).flat().forEach(id=>seed.add(id)); });
+    p.defeated=[...seed];
+  }
   if(!p.riot || typeof p.riot !== 'object') p.riot = { tier:1, best:0 };
   p.riot.tier=Math.max(1, p.riot.tier|0); p.riot.best=Math.max(0, p.riot.best|0);
   /* Bản dư của người đã bị KHOÁ lại theo chương vẫn giữ nguyên trong extra — không xoá của người chơi.
@@ -1147,6 +1173,8 @@ function availableBonds(){ return BONDS.filter(b=>b.pair.every(owns)); }
 
 /* =====================================================================
    KHOÁ THEO CHƯƠNG (chốt 11/09) — chỉ quay được người ĐÃ XUẤT HIỆN trong màn chơi của chương đã ra.
+   Đây là lớp khoá THỨ NHẤT, áp cho cả nhân vật lẫn kẻ địch. Kẻ địch còn một lớp thứ hai từ 12/09:
+   phải đã bị hạ trong trận (beaten(), xem khối GACHA). Nhân vật KHÔNG có lớp hai — bắt hạ Ronin thì vô nghĩa.
    Kẻ địch lấy debut từ FOE_DEBUT (suy từ SECTORS[].plan, xem khối CHIÊU MỘ). Nhân vật thì chép tay
    ở đây vì truyện quyết định chứ không phải wave. Chỉ ghi những gì docs/story.md nói thật:
      §2 chương 1 · §4 chương 2 (Vesper, Echo) và chương 3 (Halo, Nyx).
@@ -1161,39 +1189,59 @@ const releasedChapter = () => Math.max(...CHAPTERS.filter(c=>!c.soon).map(c=>c.n
 const unlocked = id => { const d=ROSTER[id]; return !!d && d.debut!=null && d.debut<=releasedChapter(); };
 
 /* =====================================================================
-   GACHA — hai bể riêng (chốt 11/09)
-     REQUISITION  nhân vật, trả SHARDS. Bể chương 1 chỉ có RONIN + MUZZLE.
-     CHIÊU MỘ     kẻ địch đã đánh bại, trả CREDITS. Đây là chỗ tiêu CR thứ hai (trước chỉ có nâng cấp)
-                  và là cửa ra quân cho chế độ chiếm bãi — thiếu quân thì không giữ được bãi.
-   pick = lọc bể · featured = rate-up 50% khi quay trúng ĐÚNG bậc của người đó (không cứng bậc S nữa:
-   bể nhân vật chương 1 không có ai bậc S nên ép S là quay ra undefined).
-   Trùng KHÔNG hoàn shards nữa — giữ lại thành bản dư (PLAYER.extra) để phân tách lấy linh kiện (đợt 3).
+   GACHA — MỘT bể duy nhất (chốt 12/09, gộp hai bể của 11/09 — xem docs/gacha-merge.md)
+   REQUISITION: nhân vật lẫn kẻ địch chiêu mộ được, cùng trả SHARDS, cùng một thanh pity.
+   Bản 11/09 tách hai bể (REQUISITION trả SH · CHIÊU MỘ trả CR) nhưng cả hai chạy chung pull() và
+   đổ chung vào ROSTER, nên khác biệt duy nhất là loại tiền — hai cái tên hứa hẹn hai cơ chế không có thật.
+   Đợt này lấy đúng cái fiction "thu nạp kẻ bại trận" làm cơ chế: kẻ địch phải ĐÁNH BẠI rồi mới vào bể.
+   HAI ĐƯỜNG VÀO BỂ, khác nhau thật:
+     nhân vật  khoá theo chương (debut ≤ chương đã ra) — truyện quyết định, không phải wave.
+     kẻ địch   khoá theo chương VÀ phải có trong PLAYER.defeated (beaten()). Chương 2 chưa ra thì địch
+               chương 2 không vào bể kể cả khi gặp ở DẸP LOẠN.
+   Nhờ vậy bể tự lớn theo tiến trình, không phải cân thêm: 4 (hồ sơ mới) → 7 (00-T) → 11 (07-A) →
+   17 (07-B) → 22 (07-C) → 24 (07-D). Đầu game vẫn đúng 4 người như bể nhân vật cũ.
+   CR giờ chỉ còn một việc: nâng cấp. Hố tiêu CR thứ hai là CYBERWARE (đợt 3+4), chưa cân lại ở đây.
+   pick = lọc bể · featured = rate-up 50% khi quay trúng ĐÚNG bậc của người đó (không cứng bậc S:
+   bể chương 1 có thể không có ai bậc S, ép S là quay ra undefined).
+   Trùng KHÔNG hoàn shards — giữ lại thành bản dư (PLAYER.extra) để phân tách lấy linh kiện (đợt 3).
+   Giữ hình dạng object cho pity ({hero:n}) chứ không hạ về số trơn: mai có bể giới hạn thời gian thì
+   khỏi chuyển hồ sơ lần thứ ba.
    ===================================================================== */
-const BANNERS = {
-  hero: { id:'hero', name:'REQUISITION', sub:'NHÂN VẬT',        cur:'shards',  curLabel:'SH',
-          cost1:30,  cost10:270,  rates:{S:.03,A:.15,B:.82}, pityS:50, tenGuaranteeA:true,
-          featured:'ronin', pick:c => !c.recruit && !STORY_ONLY.includes(c.id) },
-  crew: { id:'crew', name:'CHIÊU MỘ',    sub:'KẺ ĐỊCH KHU ĐÁY', cur:'credits', curLabel:'CR',
-          cost1:600, cost10:5400, rates:{S:.02,A:.13,B:.85}, pityS:60, tenGuaranteeA:true,
-          featured:'archon', pick:c => !!c.recruit },
-};
-const bannerById = id => BANNERS[id] || BANNERS.hero;
-/* Bể của một banner: đúng bậc, đúng loại, và đã mở theo chương */
-const gachaPool = (tier, b=BANNERS.hero) => Object.values(ROSTER).filter(c => c.tier===tier && b.pick(c) && unlocked(c.id));
-/* Toàn bộ bể của banner, không phân bậc — dùng cho đếm "đã sở hữu x/y" và cho màn banner */
-const bannerPool = b => Object.values(ROSTER).filter(c => b.pick(c) && unlocked(c.id));
-/* Người của banner này nhưng CHƯA mở (hiện thẻ xám kèm nhãn chương) */
-const bannerLocked = b => Object.values(ROSTER).filter(c => b.pick(c) && !unlocked(c.id));
-/* Bậc thực tế quay được: bể chương 1 của REQUISITION không có ai bậc S, ép S thì rand([]) ra undefined.
+const BANNER = { id:'hero', name:'REQUISITION', sub:'NHÂN VẬT & QUÂN CHIÊU MỘ', cur:'shards', curLabel:'SH',
+                 cost1:30, cost10:270, rates:{S:.03,A:.15,B:.82}, pityS:50, tenGuaranteeA:true,
+                 featured:'ronin',
+                 pick:c => !STORY_ONLY.includes(c.id) && (!c.recruit || beaten(c.id)) };
+/* Bể theo bậc: đúng bậc, qua pick, và đã mở theo chương */
+const gachaPool = (tier, b=BANNER) => Object.values(ROSTER).filter(c => c.tier===tier && b.pick(c) && unlocked(c.id));
+/* Toàn bộ bể, không phân bậc — dùng cho đếm "đã sở hữu x/y" và cho màn banner */
+const bannerPool = (b=BANNER) => Object.values(ROSTER).filter(c => b.pick(c) && unlocked(c.id));
+/* Đơn vị CHƯA vào bể, kèm lý do — màn gacha in hai nhóm xám khác nhau nên phải phân biệt:
+     'unbeaten' kẻ địch đã tới chương nhưng chưa hạ  → nhóm CHƯA ĐÁNH BẠI, ghi luôn màn gặp được
+     'chapter'  chưa tới chương của họ                → nhóm CHƯƠNG n
+   Kẻ địch vừa chưa tới chương vừa chưa hạ thì tính là 'chapter': chương là cái chặn ở ngoài. */
+function bannerLocked(b=BANNER){
+  const out=[];
+  for(const c of Object.values(ROSTER)){
+    if(STORY_ONLY.includes(c.id)) continue;
+    if(!unlocked(c.id)) out.push({ def:c, why:'chapter' });
+    else if(c.recruit && !beaten(c.id)) out.push({ def:c, why:'unbeaten' });
+  }
+  return out;
+}
+/* Màn đầu tiên gặp được con này — in kèm nhãn CHƯA ĐÁNH BẠI để người chơi biết đi đâu mà hạ.
+   Suy từ SECTORS[].plan, không chép tay. Không có màn nào (chỉ gặp ở DẸP LOẠN) → null. */
+const foeSector = id => (SECTORS.find(s => (s.plan||[]).flat().includes(id)) || {}).id || null;
+/* Bậc thực tế quay được: bể chương 1 có thể không có ai bậc S, ép S thì rand([]) ra undefined.
    Tụt dần S → A → B cho tới khi có người; hết sạch thì trả null và pull() từ chối. */
 const tierDown = { S:'A', A:'B', B:null };
 function pickTier(b, want){ let t=want; while(t && !gachaPool(t,b).length) t=tierDown[t]; return t; }
-const bannerFeatured = b => { const f=ROSTER[b.featured]; if(f && b.pick(f) && unlocked(f.id)) return f;
+const bannerFeatured = (b=BANNER) => { const f=ROSTER[b.featured]; if(f && b.pick(f) && unlocked(f.id)) return f;
   const p=bannerPool(b); return p.sort((x,y)=>'BAS'.indexOf(y.tier)-'BAS'.indexOf(x.tier))[0] || null; };
-/* pity theo từng banner. Hồ sơ cũ lưu pity là số → migrateProfile đổi thành {hero:n, crew:0}. */
-const pityOf = b => (PLAYER.pity && PLAYER.pity[b.id]) || 0;
+/* pity vẫn giữ trong object theo id banner. Hồ sơ cũ: số trơn (≤10/09) hoặc {hero,crew} (11/09)
+   → migrateProfile gộp lại thành {hero:n}. */
+const pityOf = (b=BANNER) => (PLAYER.pity && PLAYER.pity[b.id]) || 0;
 
-function rollOne(b, forceMinA){
+function rollOne(b=BANNER, forceMinA){
   PLAYER.pity[b.id]=pityOf(b)+1; PLAYER.pulls++;
   let want;
   if(pityOf(b)>=b.pityS) want='S';
@@ -1213,9 +1261,8 @@ function take(c, tier){
   else { PLAYER.extra=PLAYER.extra||{}; PLAYER.extra[c.id]=(PLAYER.extra[c.id]||0)+1; }
   return { id:c.id, tier, isNew, copies:1+((PLAYER.extra&&PLAYER.extra[c.id])||0) };
 }
-function pull(n, bannerId='hero'){
-  const b=bannerById(bannerId);
-  if(!bannerPool(b).length) return null;                       // bể rỗng (chương chưa mở ai) → không cho quay
+function pull(n, b=BANNER){
+  if(!bannerPool(b).length) return null;                       // bể rỗng (chưa mở ai, chưa hạ ai) → không cho quay
   const cost = n===10 ? b.cost10 : b.cost1;
   if(PLAYER[b.cur] < cost) return null;
   PLAYER[b.cur] -= cost;
