@@ -101,11 +101,8 @@
       "name": "static-riot",
       "runtimeExecutable": "python",
       "runtimeArgs": [
-        "-m",
-        "http.server",
-        "8802",
-        "--bind",
-        "127.0.0.1"
+        "scratch/riot_serve.py",
+        "8802"
       ],
       "port": 8802
     }

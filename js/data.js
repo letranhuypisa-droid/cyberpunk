@@ -660,7 +660,8 @@ const RIOT = {
   bossEvery: 5,
   bg: ['art/bg/bg_07a.jpg','art/bg/bg_battle.jpg'],
 };
-const riotUnlocked = () => PLAYER.cleared.includes(RIOT.unlock);
+/* ?riot trên URL (RIOT_DEV ở js/riot.js, nạp sau file này) coi như đã mở khoá — chỉ trong phiên, không ghi hồ sơ. */
+const riotUnlocked = () => PLAYER.cleared.includes(RIOT.unlock) || (typeof RIOT_DEV!=='undefined' && RIOT_DEV.start);
 /* Bể địch của dẹp loạn = địch của các chương đã ra (FOE_DEBUT), kể cả Cantor: hắn không chiêu mộ được
    nhưng vẫn được làm tường chắn mỗi 5 tầng. */
 const riotFoes = rank => ENEMY_POOL.filter(e => FOE_DEBUT[e.id]!=null && FOE_DEBUT[e.id]<=releasedChapter() && e.rank===rank);

@@ -36,6 +36,17 @@ const RIOT_ECON = {
 /* Cày thử không phải chờ 45 phút: mở game bằng ...index.html?riotfast → một chu kỳ 15 giây. */
 if(typeof location!=='undefined' && /[?&]riotfast\b/.test(location.search)) RIOT_ECON.cycleMin = .25;
 const riotCycleMs = () => Math.round(RIOT_ECON.cycleMin*60*1000);
+/* Cờ kiểm thử trên URL (docs/dep-loan.md Q15) — chỉ sống trong phiên, KHÔNG ghi gì vào hồ sơ:
+     ?riot       mở game là vào thẳng bản đồ Khu Đáy (js/riotui.js gọi go('riotmap') thay vì màn tiêu đề),
+                 và riotUnlocked() (data.js) coi như đã xong 07-A dù hồ sơ chưa có.
+     ?riot=all   như trên, thêm: bỏ điều kiện tầng HỐ LOẠN → cả 9 bãi mở (yardOpen bên dưới).
+   Chạy localhost và vào thẳng: `python scratch/riot_serve.py` (launch "static-riot") — nó chuyển `/` sang
+   `index.html?riot&riotfast&dev`. Ở sim.js không có `location` nên cả hai cờ tắt. */
+const RIOT_DEV = (()=>{
+  const q = typeof location!=='undefined' ? new URLSearchParams(location.search) : null;
+  const v = q && q.has('riot') ? (q.get('riot')||'') : null;
+  return { start: v!=null, allYards: v==='all' };
+})();
 
 /* =====================================================================
    9 CÁI BÃI — ba vòng từ rìa bãi rác vào chân Tháp.
@@ -104,7 +115,7 @@ function riotStore(){
 const yst = id => riotStore().yards[id] || null;
 const yardOwned = id => { const s=yst(id); return !!s && s.state==='own'; };
 const yardHeld  = id => !!yst(id);                                   // đang giữ HOẶC đang bị chiếm (đã từng chiếm được)
-const yardOpen  = y => riotUnlocked() && PLAYER.riot.best >= (y.need||0);
+const yardOpen  = y => riotUnlocked() && (RIOT_DEV.allYards || PLAYER.riot.best >= (y.need||0));   // ?riot=all: mở hết để kiểm
 const yardLv    = y => { const s=yst(y.id); return (s && s.lv) || 1; };
 const yardCap   = y => RIOT_ECON.capBase + RIOT_ECON.capPerLv*(yardLv(y)-1);
 

@@ -437,3 +437,7 @@ finish = async function(win){
   const b=$('#btnResRiot'); if(b) b.hidden = !(SECTOR.mode==='yard' || SECTOR.mode==='riot');
   return _finish0(win);
 };
+
+/* ?riot — vào thẳng bản đồ Khu Đáy để kiểm, bỏ qua màn tiêu đề và HOME (docs/dep-loan.md Q15).
+   app.js vừa go('title') ngay trước file này; tải lại trang vẫn giữ tham số nên F5 cũng về đúng bản đồ. */
+if(RIOT_DEV.start) go('riotmap');
