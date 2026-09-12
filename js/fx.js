@@ -41,7 +41,17 @@ const FX = {
     p.then(v=>this.ready.set(name,v));
     this.sheets.set(name,p); return p;
   },
-  preloadAll(){ Object.keys(FX_META).forEach(k=>{ this.sheet(k,false); if(FX_META[k].loop) this.sheet(k,true); }); },
+  /* Nạp theo THỨ TỰ KÊU, không phải theo thứ tự khai: 14 sheet là 2,7 MB, kéo hết cùng lúc lúc vào trận thì
+     nó giành băng thông với sprite — mà sprite mới là thứ người chơi đang ngồi chờ thấy. hit/crit bắn ngay
+     đòn đầu nên nằm đầu (cổng nạp ở battleGate đã chờ hai cái này); bản _loop phải có người dính trạng thái
+     mới cần, đẩy hẳn sang LOAD.idle. */
+  warmOrder: ['hit','crit','zero','explode','shock','heal','shield','poison','burn','stun'],
+  preloadAll(){
+    this.warmOrder.forEach(k=>{ if(FX_META[k]) this.sheet(k,false); });
+    Object.keys(FX_META).forEach(k=>{ if(!this.warmOrder.includes(k)) this.sheet(k,false); });
+    const loops = Object.keys(FX_META).filter(k=>FX_META[k].loop).map(k=>()=>this.sheet(k,true));
+    if(typeof LOAD!=='undefined') LOAD.idle(loops); else loops.forEach(f=>f());
+  },
   /* Lớp chứa hiệu ứng: .unit__fx trong .unit__pose (đi theo sprite khi lao tới / nhấp nhô). Tạo khi cần. */
   host(t){
     const root = t && t.el ? t.el : t; if(!root || !root.querySelector) return null;

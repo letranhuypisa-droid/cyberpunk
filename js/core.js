@@ -50,6 +50,71 @@ function warmVideo(list){
     videoWarm.set(src, v); v.src=src; v.load();
   });
 }
+/* =====================================================================
+   LOAD — màn hình nạp, và nạp trước lúc rảnh
+
+   Vào trận là kéo khoảng 14 MB mà không chặn gì: 5 pose sprite cho MỖI unit trên sân (1,8–2,2 MB một unit),
+   14 sheet hiệu ứng (2,7 MB), nền sector (~320 kB). Không có màn nạp nên người chơi ngồi nhìn sân trống rồi
+   người mọc dần ra từng con. Hai lớp:
+
+     · LOAD.gate(nhãn, việc[])  — che bằng overlay có thanh tiến độ, mở khi xong. Dùng cho thứ PHẢI có.
+     · LOAD.idle(việc[])        — nạp trước lúc rảnh, không UI, không ai phải chờ. Dùng cho thứ SẮP cần.
+
+   "Việc" là HÀM trả Promise (không phải Promise dựng sẵn), để nó chỉ bắt đầu khi tới lượt — LOAD.idle xếp
+   hàng tuần tự chính là để không giành băng thông với thứ đang hiện trên màn.
+
+   KHÔNG BAO GIỜ TREO: quá LOAD.cap ms là mở màn luôn, việc chưa xong chạy tiếp ở nền. Thà vào trận thiếu
+   một sprite hơn là đứng ở màn nạp vĩnh viễn vì một file 404 — cùng luật với hộp video ở dưới.
+   ===================================================================== */
+const LOAD = {
+  cap: 6000,          // trần chờ (ms)
+  min: 240,           // hiện ít nhất ngần này, khỏi nháy một cái rồi tắt khi mọi thứ đã ở cache
+  _el: null, _jobs: [],
+  box(){
+    if(this._el) return this._el;
+    const host = $('#screens') || document.body;
+    const e = el('div', 'load', '<div class="load__in"><div class="load__lb"></div>' +
+      '<div class="load__bar"><i></i></div><div class="load__pc">0%</div></div>');
+    e.hidden = true; host.appendChild(e); return (this._el = e);
+  },
+  /* Vẽ tiến độ CỘNG DỒN của mọi cổng đang mở. Hai cổng chồng nhau là có thật (vào trận rồi truyện intro
+     mở tiếp, hoặc người chơi bấm nhanh), mà mỗi cổng tự ghi thanh riêng thì chúng đè nhau: thanh chạy 57%
+     trong khi chữ ghi 0%. Nhãn lấy của cổng mở sau cùng — nó là việc người chơi đang chờ. */
+  _paint(){
+    const js=this._jobs; if(!js.length) return;
+    const box=this.box();
+    const done=js.reduce((s,j)=>s+j.done,0), n=js.reduce((s,j)=>s+j.n,0);
+    const p = n ? Math.round(done/n*100) : 100;
+    box.querySelector('.load__lb').textContent = js[js.length-1].label;
+    box.querySelector('.load__bar i').style.width = p+'%';
+    box.querySelector('.load__pc').textContent = p+'%';
+  },
+  async gate(label, tasks, opts={}){
+    tasks = (tasks||[]).filter(Boolean);
+    if(!tasks.length) return;
+    const job = { done:0, n:tasks.length, label:label||'ĐANG NẠP' };
+    this._jobs.push(job);
+    this.box().hidden=false; this._paint();
+    const t0=performance.now();
+    const all = tasks.map(fn => { let p; try{ p=fn(); }catch(e){ p=null; }
+      return Promise.resolve(p).catch(()=>null).then(v=>{ job.done++; this._paint(); return v; }); });
+    await Promise.race([ Promise.all(all), wait(opts.cap || this.cap) ]);
+    const left = this.min - (performance.now()-t0);
+    if(left > 0) await wait(left);
+    this._jobs.splice(this._jobs.indexOf(job), 1);
+    if(!this._jobs.length) this.box().hidden=true; else this._paint();
+  },
+  /* Chạy TUẦN TỰ, mỗi việc một nhịp rảnh. Song song thì nó ăn hết băng thông của thứ người chơi đang xem. */
+  idle(tasks){
+    const q = (tasks||[]).filter(Boolean);
+    const next = window.requestIdleCallback ? f=>window.requestIdleCallback(f,{timeout:1500}) : f=>setTimeout(f,120);
+    const step = () => { const fn=q.shift(); if(!fn) return;
+      let p; try{ p=fn(); }catch(e){ p=null; }
+      Promise.resolve(p).catch(()=>null).then(()=>next(step)); };
+    next(step);
+  },
+};
+
 /* Phát video trong một hộp .cutin (có <video>, .cutin__who, .cutin__name, .cutin__skip): chiêu cuối trong trận, mở rương ở gacha.
    Xong khi video hết / lỗi / bấm SKIP / quá 8s (không bao giờ treo). Tắt tiếng theo PLAYER.settings.sound.
    opts.silent = không kêu tiếng mở hộp (chiêu cuối trong trận dùng cờ này: video đã có tiếng sẵn, 11/09).

@@ -78,6 +78,14 @@ function panelEl(p, sid, kind, pageNo, idx){
   return f;
 }
 
+/* Danh sách ảnh của một trang — ĐÚNG bộ ứng viên mà panelEl sẽ thử, để nạp trước trúng cùng key cache
+   của loadFirst (nó cache theo list.join('|'), lệch một đường dẫn là nạp lại từ đầu). */
+function pageImgs(pages, i, sid, kind){
+  const pg=pages[i]; if(!pg) return [];
+  const L=LAYOUTS[pg.layout]||LAYOUTS.splash;
+  return pg.panels.slice(0,L.cells).map((p,k)=>[comicImgName(sid,kind,i+1,k+1), ...(p.img||[])]);
+}
+
 /* opt.replay = mở lại từ Archive (đọc lại), khác lần đọc trong mạch chơi: nút thoát ghi ĐÓNG thay vì SKIP. */
 function playComic(pages, sector, kind='intro', opt={}){
   return new Promise(res=>{
@@ -107,6 +115,9 @@ function playComic(pages, sector, kind='intro', opt={}){
       if(seen) hidden().forEach(b=>b.classList.remove('is-hid'));
       else { const first=hidden()[0]; if(first) first.classList.remove('is-hid'); }
       setHint();
+      // Nạp trước trang SAU lúc rảnh → lật trang thành tức thì. Cả sector là 4–8 MB nên không nạp trọn gói.
+      if(typeof LOAD!=='undefined' && i+1<pages.length)
+        LOAD.idle(pageImgs(pages,i+1,sid,kind).map(l=>()=>loadFirst(l)));
     };
     const tap=async()=>{
       if(busy||done) return;
@@ -128,7 +139,13 @@ function playComic(pages, sector, kind='intro', opt={}){
     U.skip.onclick=e=>{ e.stopPropagation(); end(); };
     U.back.onclick=e=>{ e.stopPropagation(); back(); };
     document.addEventListener('keydown',onKey);
-    render(false);
+    /* Cổng nạp CHỈ cho trang đang đọc. Trước đây panel hiện khung trống rồi ảnh nhảy vào từng cái;
+       chờ cả sector thì quá lâu (13–24 panel), nên chờ một trang rồi để trang sau nạp ở nền. */
+    (async()=>{
+      if(typeof LOAD!=='undefined')
+        await LOAD.gate('ĐANG NẠP TRUYỆN', pageImgs(pages,0,sid,kind).map(l=>()=>loadFirst(l)), {cap:4000});
+      if(!done) render(false);
+    })();
   });
 }
 /* Kết thúc truyện đang chạy (khi rời màn battle) */

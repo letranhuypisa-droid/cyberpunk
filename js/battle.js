@@ -63,9 +63,22 @@ function passiveMods(src,tgt){
   return { mult:(1+dmg/100)*(1+taken/100), crit:crit/100, dmg, taken };
 }
 
+/* Cổng nạp vào trận: chờ đúng thứ PHẢI có rồi mới mở màn — nền sector, pose `idle` của mọi unit sắp ra sân,
+   và hai sheet fx kêu ngay đòn đầu. Khoảng 3 MB thay vì 14 MB. Bốn pose còn lại, sheet trạng thái và HEAD
+   video ult chạy ở nền sau khi cổng mở (xem frameSet và FX.preloadAll).
+   Gọi trước initBattle ở router (js/app.js). loadFirst/FX.sheet đều có cache nên gọi lại không tải lần hai. */
+async function battleGate(){
+  if(typeof LOAD==='undefined') return;
+  const tasks=[ ()=>applyBg(UI.stage, SECTOR) ];
+  battleTeam().forEach(id=>{ const s=spriteSrc(id,'ally'); if(s&&s.idle) tasks.push(()=>loadFirst(s.idle)); });
+  sectorEnemyDefs().forEach(d=>{ const s=spriteSrc(d.id,'enemy'); if(s&&s.idle) tasks.push(()=>loadFirst(s.idle)); });
+  tasks.push(()=>FX.sheet('hit',false), ()=>FX.sheet('crit',false));
+  await LOAD.gate(`SECTOR ${SECTOR.id} · ĐANG NẠP`, tasks);
+}
+
 function initBattle(){
   B.gen++; const g=B.gen;
-  exitTargeting(); hideHint(); closePassive(); stopCutin(); SHEET.clear(); FX.preloadAll();
+  exitTargeting(); hideHint(); closePassive(); stopCutin(); SHEET.clear();
   const team=battleTeam(), enemyDefs=sectorEnemyDefs();
   stageScale([...team.map(id=>ROSTER[id]), ...enemyDefs]);
   // đội mình: nhân ATK/HP theo cấp nâng cấp (state.js), rồi áp passive tĩnh
@@ -77,7 +90,7 @@ function initBattle(){
   UI.sectorNo.textContent=SECTOR.id; UI.waveNo.textContent=`0/${SECTOR.waves}`; UI.roundNo.textContent='00';
   UI.stage.classList.remove('has-bg'); UI.stage.style.removeProperty('--bgimg');
   applyBg(UI.stage, SECTOR).then(ok=>{ if(ok) UI.stage.classList.add('has-bg'); });
-  renderSide('ally'); preloadFrames();
+  renderSide('ally'); preloadFrames(); FX.preloadAll();   // fx SAU sprite: sprite là thứ người chơi đang chờ thấy
   UI.enemies.innerHTML=''; setInputs(false); ticker('Khởi tạo…');
   const st=STORY[SECTOR.id];
   const intro = st&&st.intro&&!B.skipIntro&&!(PLAYER.settings&&PLAYER.settings.skipStory) ? playComic(st.intro, SECTOR, 'intro') : Promise.resolve();
@@ -211,13 +224,26 @@ function frameSet(id, side){
   const s=spriteSrc(id,side); if(!s) return null;
   const box=s.box||{}, anim=s.anim||{};
   // mỗi pose: ảnh tĩnh (bắt buộc) + sheet động (tuỳ chọn). Sheet hỏng/thiếu file → tự rơi về ảnh tĩnh.
-  const sheetOf = p => anim[p] ? loadFirst(anim[p].sheet).then(src => src && {...anim[p], src}) : null;
-  B.frames[key] = Promise.all([ Promise.all(POSES.map(p=>loadFirst(s[p]))), Promise.all(POSES.map(sheetOf)) ])
-    .then(([[idle,attack,crit,hurt,die], sheets])=>{
-      const pose = (src,i) => src && { src, box:box[POSES[i]], anim:sheets[i], face:s.face||'right' };
-      const fIdle=pose(idle,0), fAttack=pose(attack,1)||fIdle, fCrit=pose(crit,2), fHurt=pose(hurt,3), fDie=pose(die,4);
-      return { idle:fIdle, attack:fAttack, crit:fCrit||fAttack, hurt:fHurt, die:fDie||fHurt };
+  const sheetOf = p => anim[p] ? loadFirst(anim[p].sheet).then(src => src && {...anim[p], src}) : Promise.resolve(null);
+  const pose = (src,p,sh) => src && { src, box:box[p], anim:sh||null, face:s.face||'right' };
+  /* HAI PHA — vì sao. Bản cũ Promise.all cả 5 pose nên sprite chỉ hiện khi ~2 MB của unit đó về XONG; sáu
+     unit trên sân là 12 MB trước khi thấy người đầu tiên. Giờ pha 1 chỉ chờ `idle` (~400 kB), bốn pose kia
+     về sau và được điền TẠI CHỖ vào cùng object — sớm nhất thì unit cũng phải vài giây nữa mới thật sự đánh.
+     Trong lúc chờ, unit chạy đúng luật của một con thiếu pose: mọi chỗ gọi đều là `f[pose] || f.attack` nên
+     nó tạm dùng idle, không chỗ nào vỡ. Đủ bộ rồi thì áp lại luật rơi của bản cũ (crit→attack, die→hurt). */
+  B.frames[key] = Promise.all([loadFirst(s.idle), sheetOf('idle')]).then(([src, sh])=>{
+    const f = { idle:pose(src,'idle',sh), attack:null, crit:null, hurt:null, die:null };
+    f.attack = f.crit = f.idle;                        // hai pose này chỗ gọi coi là luôn có
+    const got = {};                                    // pose nào THẬT SỰ nạp được — khai trong data mà file 404
+    const rest = ['attack','crit','hurt','die'].map(p => !s[p] ? null :   // thì phải rơi y như bản cũ
+      Promise.all([loadFirst(s[p]), sheetOf(p)]).then(([s2,sh2])=>{ const q=pose(s2,p,sh2); if(q){ f[p]=q; got[p]=1; } }));
+    Promise.all(rest.filter(Boolean)).then(()=>{
+      if(!got.attack) f.attack = f.idle;
+      if(!got.crit)   f.crit   = f.attack;
+      if(!got.die)    f.die    = f.hurt;
     });
+    return f;
+  });
   return B.frames[key];
 }
 function preloadFrames(){

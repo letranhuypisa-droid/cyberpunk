@@ -14,7 +14,9 @@ function go(name){
   if(APP.dataset.screen!==name && APP.dataset.screen!=='title') sfx('swipe',.35);
   APP.dataset.screen=name;
   document.querySelectorAll('.screen').forEach(sc=>sc.classList.toggle('is-active', sc.dataset.screen===name));
-  if(name==='battle') initBattle();
+  // Vào trận: che bằng cổng nạp rồi mới dựng sân. Kiểm lại data-screen vì người chơi có thể bấm ◂ BASE
+  // trong lúc đang nạp — dựng sân cho một màn đã rời là vừa phí vừa sai.
+  if(name==='battle') battleGate().then(()=>{ if(APP.dataset.screen==='battle') initBattle(); });
   if(name==='squad') renderSquad();
   if(name==='map') renderMap();
   if(name==='riot') renderRiot();
@@ -54,8 +56,22 @@ function renderDailyList(){
 }
 $('#daily').addEventListener('click',()=>{ renderDailyList(); $('#dailyBox').hidden=false; });
 $('#dailyClose').addEventListener('click',()=>{ $('#dailyBox').hidden=true; });
+/* Ngồi ở HOME là lúc rảnh nhất — tranh thủ nạp trước thứ vào trận sẽ cần: pose `idle` của đội hình, nền
+   sector kế, hai sheet fx kêu ngay đòn đầu. Nạp xong thì cổng nạp lúc vào trận thường mở luôn ở 100%.
+   Tuần tự ở nhịp rảnh nên không giành băng thông với ảnh đang hiện trên HOME. */
+function warmNextBattle(){
+  if(typeof LOAD==='undefined') return;
+  const q=[];
+  normalizeTeam(TEAM).filter(Boolean).forEach(id=>{
+    const s=(ROSTER[id]||{}).sprites; if(s&&s.idle) q.push(()=>loadFirst(s.idle));
+  });
+  if(typeof SECTOR!=='undefined' && SECTOR && SECTOR.bg) q.push(()=>loadFirst(SECTOR.bg));
+  if(typeof FX!=='undefined') q.push(()=>FX.sheet('hit',false), ()=>FX.sheet('crit',false));
+  LOAD.idle(q);
+}
+
 function renderHome(){
-  renderWallet(); renderDailyStrip();
+  renderWallet(); renderDailyStrip(); warmNextBattle();
   const bonds=availableBonds(); const c=$('#comms');
   if(bonds.length){ const b=bonds[Math.floor(Math.random()*bonds.length)]; c.hidden=false;
     $('#commsText').innerHTML=`<b>${ROSTER[b.pair[0]].name} · ${ROSTER[b.pair[1]].name}</b> — ${b.lines[0].text}`;

@@ -25,7 +25,7 @@ Kiểm DẸP LOẠN mà không phải qua tiêu đề: `python scratch/riot_serv
 | `favicon.svg` | Icon tab: nhát dọc tím-trắng (chiêu ZERO), màu lấy token. Khai ở `<link rel="icon">` trong cả hai trang — có khai thì trình duyệt không đòi `/favicon.ico` nữa |
 | `css/chromefall.css` | Token thiết kế (Chrome/Rust/tier/ngữ nghĩa, sáng + tối) và toàn bộ giao diện; khối `v0.3` ở cuối: chọn mục tiêu, lao vào, hint, comic, archive |
 | `css/fx.css` | Overlay hiệu ứng đòn đánh/trạng thái (placeholder vẽ bằng CSS, `.fx--sheet` khi có ảnh) + hộp holo video chiêu cuối `.holo` |
-| `js/core.js` | Tiện ích DOM, thẻ nhân vật (`cardEl`), loader ảnh/video có fallback, hộp phát video `.cutin` dùng chung (ult trong trận, mở rương ở gacha), thanh HP/Energy, theme |
+| `js/core.js` | Tiện ích DOM, thẻ nhân vật (`cardEl`), loader ảnh/video có fallback, **`LOAD`** (màn hình nạp `LOAD.gate` + nạp trước lúc rảnh `LOAD.idle`), hộp phát video `.cutin` dùng chung (ult trong trận, mở rương ở gacha), thanh HP/Energy, theme |
 | `js/data.js` | **Số liệu & hồ sơ**: roster (ATK/HP/SPD/CRIT, skill + fx/status, passive), kẻ địch (`FOE_STATS`, `FOE_SKILL`, `ult`), **chiêu mộ** (`RECRUIT_*` — nạp kẻ địch chương 1 vào `ROSTER` thành đơn vị chơi được), chương/sector, **`RIOT`** (dẹp loạn), `RULES` (move, holo, foeUltGain), hồ sơ người chơi (v3, tự chuyển từ v2), lore, bonds, **`BANNER`** (một bể gacha; khoá theo chương + `beaten()` cho quân chiêu mộ). Sửa ở đây. |
 | `js/story.js` | **Comic từng màn**: trang, panel, bong bóng cho intro/outro của 00-T → 07-E. Sửa lời thoại ở đây. |
 | `js/comic.js` | Renderer trang comic: layout panel, ảnh + fallback, bong bóng hiện dần, lật trang, SKIP |
@@ -103,6 +103,11 @@ Thả file đúng tên vào đúng thư mục là game tự dùng — không c�
   18 có hurt (thiếu Archon, Cantor, Enforcer). Thiếu pose nào engine tự rơi về pose gần nhất.
   Script nhận cả ảnh chụp màn hình từ contact sheet (tự cắt viền, xoá nhãn số, bỏ mảnh ô kế bên) và tự khớp cỡ thân với idle.
   **Video chỉ còn dùng cho chiêu cuối** (`ultVideo`), không dùng cho sprite trong trận.
+- **Nạp asset** (`LOAD` ở `js/core.js`, xem `docs/plan-2026-09.md` mục 12/09 khuya): thứ **phải có** thì chặn
+  bằng `LOAD.gate` có thanh tiến độ (vào trận: nền sector + pose `idle` + `hit`/`crit`; comic: đúng trang đang
+  đọc); thứ **sắp cần** thì `LOAD.idle` nạp trước lúc rảnh, tuần tự (ngồi HOME nạp trước đội hình; đọc trang này
+  nạp trước trang sau). `frameSet` chỉ chờ `idle` rồi điền bốn pose còn lại sau, nên một unit hiện ở 382 kB thay
+  vì 1,9 MB. Cổng không bao giờ treo: quá `LOAD.cap` là mở màn, việc còn lại chạy ở nền.
 - **Overlay hiệu ứng**: cả 14 kind **đã có sheet** trong `art/fx/` từ 12/09 (bản nền tổng hợp bằng
   `python scratch/fx_synth.py`); thiếu file thì game tự về placeholder CSS. Ghi đè `art/fx/<kind>.webp` là thay,
   không phải sửa code. Làm sheet từ video nền xanh: `python scratch/fx_sheet.py in.mp4 art/fx/crit.webp`.

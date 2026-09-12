@@ -977,6 +977,18 @@ button.hero__mission:hover i{color:var(--text-1)}
 @keyframes banner{0%{opacity:0;transform:translateX(-40px)}15%{opacity:1;transform:translateX(0)}80%{opacity:1;transform:translateX(0)}100%{opacity:0;transform:translateX(40px)}}
 .stageflash{position:absolute;inset:0;background:var(--flash);opacity:0;pointer-events:none;z-index:19}
 
+/* Màn hình nạp (LOAD ở js/core.js): phủ kín khung, thanh tiến độ thật (đếm theo số việc đã xong).
+   z-index 70 = trên mọi thứ trong khung, kể cả cut-in (30) và topnav (50) — nó là cái chặn. */
+.load{position:absolute;inset:0;z-index:70;display:grid;place-items:center;background:var(--bg-0);animation:load-in 140ms linear}
+.load[hidden]{display:none}
+.load__in{width:min(76%,340px);display:grid;gap:7px}
+.load__lb{font:600 var(--fs-xs)/1.4 var(--font-mono);letter-spacing:.18em;color:var(--text-2)}
+.load__bar{height:6px;background:var(--surface-2);border:1px solid var(--line-2);overflow:hidden;clip-path:polygon(0 0,100% 0,100% 100%,4px 100%)}
+.load__bar>i{display:block;height:100%;width:0;transition:width 140ms linear;
+  background:linear-gradient(90deg,var(--chrome-lo),var(--chrome) 60%,var(--chrome-hi))}
+.load__pc{font:700 var(--fs-2xs)/1 var(--font-mono);letter-spacing:.12em;color:var(--text-3);text-align:right}
+@keyframes load-in{from{opacity:0}to{opacity:1}}
+
 /* Cut-in video chiêu cuối: phủ toàn sân, khung cắt chéo, thanh tên chạy vào */
 .cutin{position:absolute;inset:0;z-index:30;background:var(--bg-0);overflow:hidden}
 .cutin[hidden]{display:none}
