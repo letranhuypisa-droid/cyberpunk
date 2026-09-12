@@ -117,21 +117,51 @@ function renderConfig(){
 document.querySelectorAll('.cfg__row[data-cfg]').forEach(r=>r.addEventListener('click',()=>{ PLAYER.settings[r.dataset.cfg]=!PLAYER.settings[r.dataset.cfg]; savePlayer(); renderConfig(); }));
 $('#cfgReset').addEventListener('click',()=>{ if(confirm('Xoá toàn bộ tiến trình trên máy này?')){ SAVE.reset(); location.reload(); } });
 
-/* ---- ARCHIVE: 3 tab. NHÂN VẬT = thẻ sáng khi đã sở hữu, bấm mở hồ sơ (KỸ NĂNG · PASSIVE · HỒ SƠ).
+/* ---- ARCHIVE: 4 tab (bỏ trùng 12/09, xem docs/archive-merge.md).
+       NHÂN VẬT  19 người — thẻ sáng khi đã sở hữu, bấm mở hồ sơ (KỸ NĂNG · PASSIVE · HỒ SƠ).
+       SỔ BỘ     21 kẻ địch — nhà DUY NHẤT của chúng; trước 12/09 20 con nằm ở CẢ HAI tab, mỗi tab
+                 một nửa trang. Bấm mở cùng openLore, đọc được cả khi chưa sở hữu.
        ĐỊA DANH / THUẬT NGỮ = Thư viện (CODEX trong data.js), mở hết ngay, không khoá theo tiến trình. ---- */
 const ARCH = { tab:'char' };
 function renderArchive(){
   const grid=$('#archGrid'); grid.innerHTML=''; $('#codex').hidden=true;
   document.querySelectorAll('#archTabs .lore__tab').forEach(b=>b.classList.toggle('is-on', b.dataset.atab===ARCH.tab));
-  grid.classList.toggle('arch--codex', ARCH.tab!=='char');
+  /* arch--codex = lưới thẻ ngang 4:3, chỉ dành cho Địa danh / Thuật ngữ. Sổ bộ giờ dùng đúng thẻ 3/4
+     của tab Nhân vật: chúng là cùng một loại thứ — thứ sở hữu được — nên phải trông giống nhau. */
+  grid.classList.toggle('arch--codex', ARCH.tab==='place' || ARCH.tab==='term');
+  if(ARCH.tab==='foe') return renderFoeGrid(grid);
   if(ARCH.tab!=='char') return renderCodexGrid(grid, codexGroup(ARCH.tab));
-  const all=Object.values(ROSTER); const n=all.filter(d=>owns(d.id)).length;
+  const all=Object.values(ROSTER).filter(d=>!d.recruit); const n=all.filter(d=>owns(d.id)).length;
   $('#archCount').textContent=`${n}/${all.length} HỒ SƠ`;
   [...all].sort((a,b)=>owns(b.id)-owns(a.id) || 'SAB'.indexOf(a.tier)-'SAB'.indexOf(b.tier)).forEach(d=>{
     const has=owns(d.id); const t=el('div',`tile tile--${d.faction} tile--${d.tier.toLowerCase()} ${has?'':'is-locked'}`);
     t.appendChild(portraitEl(d));
     t.insertAdjacentHTML('beforeend',`${has?(lvl(d.id)>1?`<span class="tile__lock tile__lv">LV ${lvl(d.id)}</span>`:''):'<span class="tile__lock">LOCKED</span>'}<div class="tile__name"><span>${has?d.name:'???'}</span><span class="tier">${d.tier}</span></div>`);
     if(has) t.addEventListener('click',()=>openLore(d.id));
+    grid.appendChild(t);
+  });
+}
+/* SỔ BỘ — 21 kẻ địch, thứ tự theo tiến trình: đã chiêu mộ → đã hạ → chưa gặp.
+   KHÔNG khoá đọc: chữ viết ra để đọc, và người chơi đánh nhau với chúng ngay mười phút đầu. Chỉ đánh dấu
+   trạng thái, không giấu tên. CANTOR không có def trong ROSTER (RECRUIT_SKIP) nên def rơi về ENEMY_POOL —
+   hắn cũng không có `tier`, phải guard chứ tier.toLowerCase() là vỡ trang. */
+function renderFoeGrid(grid){
+  const items=(codexGroup('foe')||{items:[]}).items;
+  const nBeat=items.filter(it=>beaten(it.id)).length;
+  $('#archCount').textContent=`${nBeat}/${items.length} ĐÃ HẠ`;
+  const rank = it => owns(it.id) ? 0 : beaten(it.id) ? 1 : 2;
+  [...items].sort((a,b)=>rank(a)-rank(b)).forEach(it=>{
+    const d = ROSTER[it.id] || ENEMY_POOL.find(e=>e.id===it.id); if(!d) return;
+    const has=owns(it.id), beat=beaten(it.id);
+    const t=el('div',`tile tile--${d.faction} ${d.tier?'tile--'+d.tier.toLowerCase():''} ${beat||has?'':'is-locked'}`);
+    t.appendChild(portraitEl(d));
+    /* Ba nhãn cùng một dạng ngữ pháp — sổ bộ là bảng kiểm, liếc một cái phải biết đang ở bước nào.
+       Cấp nâng cấp không để ở đây: nó nằm ngay trong trang, còn "ĐÃ CÓ" mới là thông tin của lưới. */
+    const badge = has ? `<span class="tile__lock tile__lv">ĐÃ CÓ</span>`
+                      : beat ? `<span class="tile__lock tile__lock--beat">ĐÃ HẠ</span>`
+                             : `<span class="tile__lock">CHƯA HẠ</span>`;
+    t.insertAdjacentHTML('beforeend',`${badge}<div class="tile__name"><span>${d.name}</span>${d.tier?`<span class="tier">${d.tier}</span>`:''}</div>`);
+    t.addEventListener('click',()=>openLore(it.id));
     grid.appendChild(t);
   });
 }
@@ -188,17 +218,41 @@ function passiveInfo(p){
     return { def:{name:'',faction:w.enemyFaction,portrait:[]}, cond:`ĐỊCH PHE ${w.enemyFaction.toUpperCase()}`, state: secs.length?'SECTOR '+secs.join(' · '):'CHƯA GẶP', cls:'' }; }
   return { def:null, cond:'LUÔN BẬT', state:'ĐANG BẬT', cls:'is-active' };
 }
+/* Trang hồ sơ — dùng chung cho 19 nhân vật (tab NHÂN VẬT) và 21 kẻ địch (tab SỔ BỘ), xem
+   docs/archive-merge.md. Ba mức, quyết bởi việc đơn vị này có def chơi được và đã sở hữu chưa:
+     đã sở hữu          KỸ NĂNG · PASSIVE · HỒ SƠ  (đầy đủ, có nút Upgrade)
+     chưa sở hữu        chỉ HỒ SƠ — chữ vẫn đọc được, số thì chưa
+     không có ROSTER    chỉ HỒ SƠ (mỗi Cantor: sống sang chương 2–3 nên không chiêu mộ được)
+   Chữ lấy LORE trước, không có thì FOE_LORE (sinh từ CODEX, xem js/data.js). */
 function openLore(id){
-  const L=LORE[id]||{}; const d=ROSTER[id]; if(!d) return;
+  const d = ROSTER[id] || ENEMY_POOL.find(e=>e.id===id); if(!d) return;
+  const L = LORE[id] || FOE_LORE[id] || {};
+  const kit = !!(ROSTER[id] && owns(id));             // có dựng hai pane số hay không
+  const foeOnly = !ROSTER[id];                        // có def chơi được không (Cantor thì không)
   const box=$('#lore'); box.className='lore '+(d.faction==='rust'?'lore--rust':'lore--chrome');
   const art=portraitEl(d); $('#loreArt').replaceWith(art); art.id='loreArt';
-  $('#loreTags').textContent = `${d.faction.toUpperCase()} · TIER ${d.tier} · ${d.ult.name}`;
+  const ultName = (d.ult && d.ult.name) || L.ultName || '';
+  $('#loreTags').textContent = [d.faction.toUpperCase(), d.tier&&`TIER ${d.tier}`, ultName].filter(Boolean).join(' · ');
   $('#loreName').textContent=d.name; $('#loreEpithet').textContent=L.epithet||'';
-  const st=unitStats(id), L1=lvl(id), sk=d.skill||{};   // cùng hàm với thẻ nhân vật và lúc vào trận
-  const upTxt = L1>=UPGRADE.maxLevel ? 'MAX' : `LV ${L1+1} · ${UPGRADE.cost(L1).toLocaleString('en-US')} CR`;
-  const kindTxt = d.ult.kind==='control'?'ĐIỀU KHIỂN':d.ult.kind==='heal'?'HỒI MÁU':d.ult.kind==='aoe'?'TOÀN BỘ ĐỊCH':'MỘT MỤC TIÊU';
-  const body=$('#loreBody'); body.innerHTML=`
-    <div class="lore__tabs"><button class="lore__tab" data-tab="skill">Kỹ năng</button><button class="lore__tab" data-tab="passive">Passive</button><button class="lore__tab" data-tab="lore">Hồ sơ</button></div>
+  /* Khối TUYỆT KỸ chỉ in trong HỒ SƠ khi KHÔNG có pane KỸ NĂNG — có pane thì nó đã nằm ở đó rồi,
+     in cả hai chỗ là đọc hai lần cùng một đoạn. Thiếu nhánh này thì con ĐÃ HẠ mà chưa chiêu mộ
+     mất luôn phần mô tả chiêu cuối, trong khi tab SỔ BỘ cũ vẫn cho xem. */
+  const ultBlock = !kit && ultName && (L.ultFlavor || (d.ult&&d.ult.desc))
+    ? `<div class="lore__ult"><b>TUYỆT KỸ · ${ultName}</b><span>${L.ultFlavor || d.ult.desc}</span></div>` : '';
+  /* Vì sao chưa mở được đủ trang — nói thẳng, đừng để người chơi tưởng hỏng. Ba trạng thái khác nhau,
+     đừng gộp: bảo người đã hạ Foreman là "hãy đi hạ Foreman" thì họ biết ngay mình đang đọc chữ bịa. */
+  const gateTxt = foeOnly
+    ? `<p class="lore__empty">Không chiêu mộ được: ${d.name} còn sống sang chương sau.</p>`
+    : kit ? ''
+    : beaten(id) ? `<p class="lore__empty">Đã hạ — ${d.name} đang nằm trong bể, quay ở REQUISITION là có.</p>`
+                 : `<p class="lore__empty">Chưa hạ. Đánh bại ${d.name} ngoài trận thì ${d.name} vào bể REQUISITION.</p>`;
+  let skillHtml='', tabsHtml='';
+  if(kit){
+    const st=unitStats(id), L1=lvl(id), sk=d.skill||{};   // cùng hàm với thẻ nhân vật và lúc vào trận
+    const upTxt = L1>=UPGRADE.maxLevel ? 'MAX' : `LV ${L1+1} · ${UPGRADE.cost(L1).toLocaleString('en-US')} CR`;
+    const kindTxt = d.ult.kind==='control'?'ĐIỀU KHIỂN':d.ult.kind==='heal'?'HỒI MÁU':d.ult.kind==='aoe'?'TOÀN BỘ ĐỊCH':'MỘT MỤC TIÊU';
+    tabsHtml = `<div class="lore__tabs"><button class="lore__tab" data-tab="skill">Kỹ năng</button><button class="lore__tab" data-tab="passive">Passive</button><button class="lore__tab" data-tab="lore">Hồ sơ</button></div>`;
+    skillHtml = `
     <div class="lore__pane lore__pane--skill">
       <div class="lore__stats"><span class="pill"><small>LV</small>${L1}</span><span class="pill"><small>ATK</small>${st.atk}</span><span class="pill"><small>HP</small>${st.hp}</span><span class="pill"><small>EN</small>${d.energyMax}</span><span class="pill"><small>SPD</small>${st.spd}</span><span class="pill"><small>CRIT</small>${st.crit+(sk.critPct||0)}%</span>
         <button class="btn-act btn-act--go lore__up" id="loreUp" ${L1>=UPGRADE.maxLevel||PLAYER.credits<UPGRADE.cost(L1)?'disabled':''}><span class="btn-act__k">Upgrade</span><span class="btn-act__v">${upTxt} · +${Math.round(UPGRADE.statPerLevel*100)}% ATK/HP</span></button></div>
@@ -206,23 +260,34 @@ function openLore(id){
       <div class="lore__ult lore__skill"><b>ĐÒN THƯỜNG</b>${L.attack?`<span class="lore__flavor">${L.attack}</span>`:''}<span>${sk.desc||'100% ATK, +25 Energy.'}</span></div>
       <div class="lore__ult"><b>CHIÊU CUỐI · ${d.ult.name}</b>${L.ultFlavor?`<span class="lore__flavor">${L.ultFlavor}</span>`:''}<span>${d.ult.desc}</span><div class="lore__pills"><span class="pill"><small>COST</small>${d.ult.cost} EN</span><span class="pill">${kindTxt}</span>${d.ult.mult?`<span class="pill">${Math.round(d.ult.mult*100)}% ATK</span>`:''}</div></div>
     </div>
-    <div class="lore__pane lore__pane--passive"></div>
+    <div class="lore__pane lore__pane--passive"></div>`;
+  }
+  const body=$('#loreBody'); body.innerHTML=tabsHtml+skillHtml+`
     <div class="lore__pane lore__pane--lore${L.form?' lore__doc lore__doc--'+L.form:''}">
+      ${L.voice&&!L.past?`<div class="lore__sec"><p class="voice">${L.voice}</p></div>`:''}
       ${L.profile||!L.past?`<div class="lore__sec"><span class="lbl">Là ai</span><p class="lead">${L.profile||'Chưa có hồ sơ.'}</p></div>`:''}
       ${L.past?`<div class="lore__sec"><span class="lbl">${(L.labels||{}).past||'Chuyện đã xảy ra'}</span><p>${L.past}</p></div>`:''}
       ${L.now?`<div class="lore__sec"><span class="lbl">${(L.labels||{}).now||'Bây giờ'}</span><p>${L.now}</p></div>`:''}
-      ${L.voice?`<div class="lore__sec"><p class="voice">${L.voice}</p></div>`:''}
+      ${L.voice&&L.past?`<div class="lore__sec"><p class="voice">${L.voice}</p></div>`:''}
+      ${ultBlock}
+      ${L.where?`<div class="lore__pills"><span class="pill"><small>GẶP Ở</small>${L.where}</span></div>`:''}
+      ${gateTxt}
     </div>`;
   const pane=body.querySelector('.lore__pane--passive');
-  if(!(d.passives||[]).length) pane.innerHTML='<p class="lore__empty">Chưa có nội tại.</p>';
-  (d.passives||[]).forEach(p=>{
-    const info=passiveInfo(p); const r=el('div',`pas ${info.cls}`);
-    const pic=el('div','pas__pic'); if(info.def) pic.appendChild(portraitEl(info.def)); r.appendChild(pic);
-    r.insertAdjacentHTML('beforeend',`<div class="pas__body"><b class="pas__name">${p.name}</b><span class="pas__cond">${info.cond}</span><span class="pas__fx">${fxText(p.effect||{})}</span><p class="pas__desc">${p.desc||''}</p></div><span class="pas__state">${info.state}</span>`);
-    pane.appendChild(r);
-  });
+  if(pane){
+    if(!(d.passives||[]).length) pane.innerHTML='<p class="lore__empty">Chưa có nội tại.</p>';
+    (d.passives||[]).forEach(p=>{
+      const info=passiveInfo(p); const r=el('div',`pas ${info.cls}`);
+      const pic=el('div','pas__pic'); if(info.def) pic.appendChild(portraitEl(info.def)); r.appendChild(pic);
+      r.insertAdjacentHTML('beforeend',`<div class="pas__body"><b class="pas__name">${p.name}</b><span class="pas__cond">${info.cond}</span><span class="pas__fx">${fxText(p.effect||{})}</span><p class="pas__desc">${p.desc||''}</p></div><span class="pas__state">${info.state}</span>`);
+      pane.appendChild(r);
+    });
+  }
   body.querySelectorAll('.lore__tab').forEach(b=>b.addEventListener('click',()=>{ LORE_TAB.cur=b.dataset.tab; box.dataset.tab=LORE_TAB.cur; body.querySelectorAll('.lore__tab').forEach(x=>x.classList.toggle('is-on',x===b)); body.scrollTop=0; }));
-  box.dataset.tab=LORE_TAB.cur; body.querySelectorAll('.lore__tab').forEach(x=>x.classList.toggle('is-on',x.dataset.tab===LORE_TAB.cur));
+  /* Không dựng pane số thì phải ÉP về 'lore': LORE_TAB.cur nhớ tab lần trước, còn 'skill' thì
+     box[data-tab=skill] ẩn hết mọi pane đang có → trang trắng. */
+  box.dataset.tab = kit ? LORE_TAB.cur : 'lore';
+  body.querySelectorAll('.lore__tab').forEach(x=>x.classList.toggle('is-on',x.dataset.tab===box.dataset.tab));
   body.scrollTop=0; box.hidden=false;
   const up=$('#loreUp'); if(up) up.addEventListener('click',()=>{ const r=upgrade(id); if(r==='ok'){ AUDIO.upgrade(); renderWallet(); const sc=body.scrollTop; openLore(id); body.scrollTop=sc; } else sfx('error',.4); });
 }

@@ -844,6 +844,8 @@ let TEAM = normalizeTeam(PLAYER.team);
    profile: mục "Là ai" (không bắt buộc; thiếu thì trang hồ sơ bỏ luôn mục đó)
    weapon / attack / ultFlavor: hiện ở tab KỸ NĂNG, phía trên dòng số của skill và ult.
      → chữ hình ảnh nằm ở đây, CON SỐ vẫn nằm ở ROSTER.skill.desc / ROSTER.ult.desc. Sửa cân bằng thì sửa bên ROSTER.
+   CHỈ 19 NHÂN VẬT ở đây. 21 kẻ địch có hồ sơ riêng, sinh từ CODEX sang FOE_LORE (xem khối đó, dưới CODEX);
+   openLore đọc `LORE[id] || FOE_LORE[id]` nên hai bảng không được trộn vào nhau.
    ===================================================================== */
 const LORE = {
   yuki: { epithet:'Vết Chém Tàn Tro', labels:{ past:'Tiểu sử' },
@@ -1110,6 +1112,33 @@ const CODEX = [
   ]},
 ];
 const codexGroup = key => CODEX.find(g => g.key===key);
+
+/* =====================================================================
+   FOE_LORE — hồ sơ kẻ địch, SINH từ nhóm 'foe' của CODEX (12/09, xem docs/archive-merge.md)
+   Trước 12/09 chữ của 20 con chiêu mộ chỉ sống ở tab SỔ BỘ, nên tab HỒ SƠ trong trang nhân vật của
+   chúng RỖNG ("Chưa có hồ sơ.") trong khi chữ lấp chỗ rỗng đó nằm ngay tab bên cạnh. Ánh xạ sang đúng
+   hình dạng của LORE là openLore dùng được ngay, không phải viết thêm chữ nào.
+     sub → epithet · text → profile · spot → now (nhãn NHẬN DIỆN) · voice → voice
+     ult.desc → ultFlavor: openLore vốn in chiêu cuối thành HAI dòng — flavor rồi số. Bản CODEX viết
+       theo phía địch không số, bản ROSTER viết theo phe mình có số. Đúng hai dòng đó.
+   SINH, không chép tay: chép là chữ ở hai chỗ, sửa một chỗ quên chỗ kia.
+   GIỮ RIÊNG, không trộn vào LORE: scratch/library_dump.js duyệt Object.keys(LORE) để in §C của
+   docs/library.md; trộn vào là §C phình 19 → 39 trong khi §D1 vẫn in lại chừng đó chữ từ CODEX —
+   thành in hai lần cùng một thứ.
+   ===================================================================== */
+const FOE_LORE = {};
+(codexGroup('foe') || {items:[]}).items.forEach(it => {
+  FOE_LORE[it.id] = {
+    epithet: it.sub || '',
+    profile: it.text || '',
+    now:     it.spot || '',
+    labels:  { now:'NHẬN DIỆN' },
+    voice:   it.voice || '',
+    ultFlavor: it.ult ? it.ult.desc : '',
+    ultName:   it.ult ? it.ult.name : '',      // Cantor không có def trong ROSTER → tên chiêu lấy ở đây
+    where:     it.where || '',
+  };
+});
 
 /* ---- BONDS: hội thoại ngoài trận, hiện ở Lobby (COMMS) khi cả hai nhân vật đã trong tổ ---- */
 const BONDS = [
