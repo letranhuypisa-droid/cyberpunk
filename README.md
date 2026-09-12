@@ -14,6 +14,7 @@ python -m http.server 8765
 ```
 
 rồi mở `http://localhost:8765/index.html`. UI kit và token: `kit.html`. Nút DEV +1000 SH ở gacha chỉ hiện khi thêm `?dev` vào URL.
+Kiểm DẸP LOẠN mà không phải qua tiêu đề: `python scratch/riot_serve.py` rồi mở `http://127.0.0.1:8802/` (xem mục DẸP LOẠN).
 
 ## Cấu trúc
 
@@ -173,6 +174,10 @@ chiếm bãi (đánh) → đóng quân 1–3 người → bãi đẻ KIỆN HÀN
   đúng bố cục 7 dải của prompt). Thả file vào là tự thay, không phải sửa toạ độ.
   Ảnh minh hoạ từng bãi dùng lại `art/bg/bg_07*.jpg`; thả `art/riot/yard_<id>.jpg` vào là tự thay.
 - Thử không phải chờ 45 phút: mở `index.html?riotfast` → một chu kỳ **15 giây**.
+- **Kiểm nhanh (12/09):** `python scratch/riot_serve.py` (hoặc launch `static-riot`, cổng 8802) rồi mở
+  `http://127.0.0.1:8802/` → tự chuyển sang `index.html?riot&riotfast&dev`: vào thẳng bản đồ Khu Đáy, coi như đã mở
+  khoá (**chỉ trong phiên**, không ghi hồ sơ), chu kỳ 15 giây, có nút nạp tiền. `?riot=all` mở cả 9 bãi.
+  Bãi trống quân thì đồng hồ đứng (không kiện rỗng, không phản kích). Việc còn nợ: `docs/dep-loan.md` §K.
 
 ## CYBERWARE + phân tách bản dư (11/09, đợt 3+4)
 

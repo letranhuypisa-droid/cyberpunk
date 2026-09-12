@@ -6,7 +6,10 @@
 
 Tài liệu này là chỗ duy nhất mô tả chế độ **DẸP LOẠN**: bản đồ riêng của Khu Đáy, chiếm bãi, đóng quân,
 kiện hàng, phản kích, nâng bãi, hợp đồng tuần — kèm số liệu cân bằng, đặc tả giao diện và prompt sinh ảnh.
-Nhật ký chung vẫn ở `docs/plan-2026-09.md`.
+**Việc còn chưa làm ở §K** (soát 12/09). Nhật ký chung vẫn ở `docs/plan-2026-09.md`.
+
+> **Kiểm nhanh:** chạy launch `static-riot` (hoặc `python scratch/riot_serve.py`) rồi mở `http://127.0.0.1:8802/`
+> → vào thẳng bản đồ Khu Đáy với chu kỳ 15 giây và nút nạp tiền, không phải qua tiêu đề hay thắng 07-A. Xem Q15.
 
 ---
 
@@ -66,6 +69,7 @@ Anh dặn "cần hỏi gì thì cứ mặc định chọn cái bạn khuyến ng
 | Q12 | "Sức mạnh ổ" tính từ chỉ số kẻ địch hay từ số đo? | **Từ số đo (`m50`)** | Cộng chỉ số xếp SÂN LÒ ĐÚC (0% thắng) *dễ hơn* HÀNG RÀO GÃY (100% thắng). Chi tiết ở §D1 — đây là chỗ đổi lớn nhất so với bản thiết kế ban đầu. |
 | Q13 | Nút dưới cùng của tờ chi tiết làm gì khi đã giữ bãi? | **Đổi theo việc tiếp theo đáng làm**: NHẬN KIỆN → ĐÓNG QUÂN → ĐÓNG | Một nút "đóng" chết ở vị trí đẹp nhất màn hình là phí. |
 | Q14 | Chu kỳ 45 phút thì thử thế nào? | Mở game bằng `index.html?riotfast` → **một chu kỳ 15 giây** | Không ai ngồi chờ 6 tiếng để kiểm một cái trần. |
+| Q15 | Kiểm thử có phải đi qua tiêu đề → HOME → thắng 07-A mới thấy bản đồ? (12/09) | **Không.** `index.html?riot` vào thẳng bản đồ Khu Đáy và coi như đã mở khoá **chỉ trong phiên** (không ghi hồ sơ); `?riot=all` mở luôn cả 9 bãi. `python scratch/riot_serve.py` (launch `static-riot`, cổng 8802) là `http.server` cộng một dòng chuyển `/` sang `index.html?riot&riotfast&dev` | Sửa một dòng mà phải đánh lại 07-A thì không ai kiểm. Ghi "đã mở khoá" vào hồ sơ thì lan sang bản chơi thật; cờ trong phiên thì bỏ tham số là hết. Mỗi cổng là một hồ sơ riêng (localStorage tính theo origin) nên cổng kiểm không đụng hồ sơ ở 8765. |
 
 ---
 
@@ -215,7 +219,8 @@ trần kiện   = 8 + 2 × (bậc bãi − 1)                                   
 Bỏ quân **vượt** ngưỡng vẫn có lợi tới 1.5× — nên một bãi nhỏ vẫn đáng để dồn người mạnh vào, và người chơi có
 một lựa chọn thật: dàn mỏng 9 bãi hay dồn 3 bãi to.
 
-**Kết sổ (settle)** chạy mỗi lần mở màn DẸP LOẠN, mỗi lần nhận kiện, và mỗi 30 giây khi đang mở màn đó:
+**Kết sổ (settle)** chạy mỗi lần mở màn DẸP LOẠN, mỗi lần nhận kiện, mỗi lần đổi quân, và **mỗi giây** khi đang
+mở màn đó (`riotTick` trong `js/riotui.js` — rẻ, chín phép chia; bản 11/09 của tài liệu ghi "30 giây" là ghi sai):
 
 ```
 số chu kỳ trôi qua = floor((bây giờ − mốc) / 45 phút),  kẹp theo chỗ trống còn lại của trần
@@ -225,6 +230,12 @@ nếu đã đầy trần: mốc = bây giờ         ← đầy rồi thì thờ
 ```
 
 **Nhận kiện**: cộng CR/SH vào ví, xoá kiện chờ, `mốc = bây giờ`. Có nút **NHẬN TẤT CẢ** ở bản đồ.
+(`mốc = bây giờ` lúc nhận làm mất phần lẻ của chu kỳ đang chạy — xem K6, chưa đổi.)
+
+**Bãi trống quân thì đồng hồ đứng** (hệ số quân = 0; sửa 12/09, xem §J): không đẻ kiện, không đếm phản kích,
+`mốc = bây giờ` ở mỗi lần kết sổ — đóng quân vào mới bắt đầu đếm. Giao diện in `CHƯA CÓ QUÂN` ở đúng chỗ đáng lẽ
+là đồng hồ (đầu màn, nút bãi, mục 4 của tờ chi tiết) và chip phản kích nói `ĐỨNG YÊN`. Bản 11/09 quên chỗ này:
+bãi trống vẫn đẻ kiện 0 CR rồi thua phản kích với 0 quân sau 6 chu kỳ.
 
 ### D4. Phản kích
 
@@ -478,9 +489,13 @@ nâng cấp**. Nhãn ở §D1 phải khớp tỉ lệ thắng thật trong ±1 b
 | R10 | Bản đồ District 07 vẽ bằng SVG (chờ ảnh thật) | `js/riotui.js` | ✓ |
 | R11 | Prompt sinh ảnh | §H tài liệu này | ✓ |
 | R12 | Ghi vào README + nhật ký | `README.md`, `docs/plan-2026-09.md` | ✓ |
+| R13 | Cờ `?riot` / `?riot=all`: vào thẳng bản đồ, mở khoá trong phiên (Q15) | `js/riot.js`, `js/data.js`, `js/riotui.js` | ✓ 12/09 |
+| R14 | Server kiểm `scratch/riot_serve.py` + launch `static-riot` chuyển `/` sang `?riot&riotfast&dev` | `scratch/`, `.claude/launch.json` | ✓ 12/09 |
+| R15 | Bãi trống quân: đồng hồ đứng — không kiện rỗng, không phản kích (§D3) | `js/riot.js`, `js/riotui.js` | ✓ 12/09 |
 
-**Không làm ở đợt này** (ghi lại để khỏi quên): PvP tranh bãi, đổi ca đồn trú tự động, bãi có sự kiện theo mùa,
-linh kiện (→ đợt 3), cyberware (→ đợt 4).
+**Không làm ở đợt này** (ghi lại để khỏi quên): PvP tranh bãi, đổi ca đồn trú tự động, bãi có sự kiện theo mùa.
+Linh kiện và cyberware đã làm cùng ngày 11/09 ở đợt 3+4 gộp (`docs/cyberware.md`); bãi vẫn chỉ đẻ CR + SH (Q7).
+Danh sách còn nợ cập nhật ở **§K**.
 
 ---
 
@@ -491,7 +506,7 @@ Nguyên tắc theo yêu cầu: **thử code trước**. Kết quả:
 | Thứ | Code được? | Hiện đang là gì |
 |---|---|---|
 | Bản đồ District 07 | **Được** | SVG vẽ tay trong `js/riotui.js` (`riotMapSvg()`): 3 vòng, đường ống, khối nhà, sương. Thả `art/map/map_d07.jpg` vào là tự thay. |
-| Biểu tượng kiện / quân / phản kích / sức mạnh | **Được** | SVG inline, không cần file. |
+| Biểu tượng kiện / quân / phản kích / sức mạnh | **Được — nhưng chưa vẽ** | Giao diện đang dùng chữ (`KIỆN`, `QUÂN ĐÓNG`, `ĐỢT TỚI`) và chấm màu, đọc được. Bản 11/09 ghi "đã có SVG inline" là ghi nhầm — soát 12/09 không thấy trong `js/riotui.js`. Tuỳ chọn, K3. |
 | Ảnh minh hoạ từng bãi | **Không cần ảnh mới** | Dùng lại `art/bg/bg_07*.jpg`. Thả `art/riot/yard_<id>.jpg` vào là tự thay. |
 | Chấm/huy hiệu trạng thái | **Được** | CSS thuần. |
 
@@ -581,8 +596,9 @@ deep shadows, volumetric dust, wet concrete, cel-shaded illustration, high contr
 
 - **Bản đồ SVG dự phòng** — `riotMapSvg()` trong `js/riotui.js`. Vẽ 5 dải, khối nhà, ống cống, hàng rào chéo,
   miệng hố, sương ở phần chưa mở khoá. Đủ để chơi và test toạ độ trước khi có ảnh thật.
-- **Biểu tượng** — kiện hàng (thùng có nắp chéo), quân (hình người vai vuông), phản kích (mũi tên gãy),
-  sức mạnh (tia). Tất cả là `<svg>` 16×16 inline trong `js/riotui.js`, đổi màu theo `currentColor`.
+- **Biểu tượng** — *chưa làm* (bản 11/09 ghi là đã có, soát 12/09 thì không). Nếu làm: kiện hàng (thùng có nắp
+  chéo), quân (hình người vai vuông), phản kích (mũi tên gãy), sức mạnh (tia), `<svg>` 16×16 inline trong
+  `js/riotui.js`, đổi màu theo `currentColor`. Không bắt buộc — chữ đang đủ đọc (K3).
 
 ---
 
@@ -634,3 +650,63 @@ một điểm nào. Console 0 lỗi JS; 404 duy nhất do mình thêm là `art/m
 cả hai đều là chuỗi dự phòng cố ý.
 
 **Còn nợ:** một ảnh bản đồ `art/map/map_d07.jpg` (prompt §H1). Chín ảnh bãi là tuỳ chọn (§H2).
+
+### 12/09 — vào thẳng bản đồ để kiểm, và một lỗi bãi trống quân
+
+Anh cần kiểm chế độ này mà không muốn đi qua tiêu đề → HOME → thắng 07-A mỗi lần tải lại. Thêm cờ `?riot`
+(Q15): `js/riotui.js` gọi `go('riotmap')` ngay sau khi `app.js` mở màn tiêu đề, còn `riotUnlocked()` trong
+`data.js` coi cờ này như đã xong 07-A — **chỉ trong phiên**, hồ sơ không đổi một byte. `?riot=all` bỏ thêm
+điều kiện tầng để mở cả 9 bãi. `scratch/riot_serve.py` là `http.server` cộng một dòng chuyển hướng `/` →
+`/index.html?riot&riotfast&dev`, và launch `static-riot` (cổng 8802) trỏ vào nó: bấm chạy là đứng trong Khu Đáy.
+
+Kiểm bằng chính cái đó thì lộ ngay một lỗi bản 11/09 không thấy, vì hôm đó chưa để bãi nằm không đủ lâu:
+**bãi chiếm được mà chưa đóng quân vẫn đẻ kiện.** Kiện 0 CR, nhưng vẫn đếm — nút bãi hiện huy hiệu "1", nút
+dưới cùng nói "NHẬN KIỆN · 1 KIỆN · +0 CR", nhận thì vẫn cộng vào hợp đồng tuần "nhận 40 kiện" và việc ngày.
+Tệ hơn: biến đếm phản kích cũng chạy, nên đúng 6 chu kỳ sau bãi thua phản kích **với 0 quân** — ở `?riotfast`
+là 90 giây, ngoài đời là 4 giờ 30. Người chơi mới (3 người đều trong đội, không đóng được ai — đúng cái ngõ cụt
+đã ghi ở §D2) chiếm được bãi rồi mất bãi trước khi kịp quay được người thứ tư, mà không có chỗ nào giải thích.
+§D3 nói rõ hệ số quân 0 là không đẻ kiện, và chính dòng chữ trên nút cũng nói "BÃI TRỐNG QUÂN THÌ KHÔNG ĐẺ
+KIỆN" — code chỉ quên làm đúng lời mình hứa.
+
+Sửa: `yardIdle()`; bãi trống quân thì `settleYard` đặt `mốc = bây giờ` rồi thoát, `yardNextMs` trả null,
+`riotSummary` đếm riêng `idle` để không tính vào thu nhập/giờ. Giao diện phải phân biệt hai lý do "không đếm":
+đầy trần (đồng hồ ngừng) và chưa có quân (đồng hồ chưa chạy) — bản 11/09 gộp cả hai thành "ĐẦY TRẦN", giờ in
+`CHƯA CÓ QUÂN` ở đầu màn, ở nút bãi và ở mục 4; chip phản kích nói `ĐỨNG YÊN`.
+
+Kiểm lại toàn bộ vòng lặp với `?riotfast` (chiếm bằng `captureYard()` để đi nhanh): bãi trống 17 giây (hơn một
+chu kỳ) không đẻ gì · đóng SCAV vào là 15 giây sau có kiện 35 CR (20 × 1.5 × 1.15, công thức in đúng) · nhận
+cộng ví + hợp đồng tuần + việc ngày · nâng bậc trừ 800 CR lên bậc 2, trần 10 · ép `rc = 5` thì đợt phản kích
+giữ được +24 CR và vào báo cáo · ép `held = 6` (phản kích 1 280 > SCAV 1 228) thì thất thủ, 4 kiện + 212 CR
+đóng băng · giành lại trả nguyên vẹn · báo cáo và hợp đồng tuần in đúng thứ tự · HOME báo "8 KIỆN CHỜ" + chấm
+đỏ. 375×812 và 375×667 đều vừa khung, không cuộn trang.
+
+Hai chỗ chữ nhỏ sửa luôn: ô "KIỆN TIẾP THEO" nói `GIÀNH LẠI BÃI ĐÃ MẤT` thay vì "CHƯA CHIẾM BÃI NÀO" khi bãi
+duy nhất đang bị chiếm; §D3 ghi kết sổ "mỗi 30 giây" trong khi code và §E2 nói mỗi giây — sửa tài liệu theo code.
+
+**Soát lại việc còn nợ → §K.** Đáng chú ý: §H3 bản 11/09 ghi bộ biểu tượng SVG 16×16 "đã code" nhưng không có
+trong `js/riotui.js` (K3); `claimYard()` đặt `mốc = bây giờ` làm mất phần lẻ của chu kỳ đang chạy (K6) — cái này
+là quyết định của §D3 chứ không phải lỗi, nên ghi ra để anh quyết chứ tôi không tự đổi.
+
+**Hồi quy:** `ult_lint` 60/60, `comic_lint` + `art_audit` không có gì mới, `sim.js --yard` 40 trận/bãi cùng
+thứ bậc (100/100/90 · 80/45/30 · 0/0/0 — lệch ngẫu nhiên của mẫu nhỏ, không đổi số nào). Console: chỉ 404 của
+`map_d07`, `art/riot/yard_*` và mấy file SFX đợt 3 đang chờ anh (`tell`, `new_char`, `reveal_a`, `hit3`).
+
+---
+
+## K. Còn chưa làm — soát lại 12/09
+
+Đối chiếu §B–§H với code đang chạy (`js/riot.js`, `js/riotui.js`, `css/riot.css`) và chạy thử toàn bộ vòng lặp
+bằng `?riot&riotfast&dev` ở 375×812 và 375×667. Những gì còn lại, xếp theo thứ đáng làm trước:
+
+| # | Việc | Bắt buộc? | Ghi chú |
+|---|---|---|---|
+| K1 | **Ảnh bản đồ `art/map/map_d07.jpg`** | Nếu muốn đẹp | Chưa có file (`art/map/` chỉ có `map_halcyon.jpg`). Prompt + bố cục 7 dải ở §H1; game đang chạy bản SVG, toạ độ nút không phải sửa khi thả ảnh vào. |
+| K2 | Chín ảnh bãi `art/riot/yard_<id>.jpg` | Không | Thư mục `art/riot/` chưa tồn tại, đang mượn `bg_07*.jpg`. Prompt §H2. |
+| K3 | Biểu tượng 16×16 (kiện · quân · phản kích · sức mạnh) | Không | §H3 bản 11/09 ghi "đã code" nhưng thật ra chưa; giao diện dùng chữ và đọc được. |
+| K4 | `sim.js` chưa mô phỏng cyberware → bảng §F1 là **sàn** | Nên | Đội đã lắp cyberware mạnh hơn số in; vòng 3 (72/64/45 % ở cấp 20) sẽ dễ hơn thực tế. Cách làm: nạp `js/cyber.js` + `PLAYER.cyber` giả vào `sim.js --yard`, đo lại `m50` vòng 3 bằng `riot_tune.js m50 200 20`. Nhãn đang lệch về phía bi quan nên chưa gấp. |
+| K5 | Thẻ nhãn "CHÂN THANG MÁY" xuống dòng thành 4 dòng ở 375 px | Nên | Luật §C là thẻ chở đúng 3 dòng. Tên dài nhất trong 9 bãi; sửa `max-width` của `.ynode__card` (140 → ~150 px) hoặc bớt `letter-spacing` cho tên ≥ 14 ký tự. Chưa đè lên nút khác nhờ giãn 9 %. |
+| K6 | Nhận kiện làm mất phần lẻ của chu kỳ đang chạy | Anh quyết | §D3 chốt `mốc = bây giờ` khi nhận. Hệ quả: nhận lúc kiện kế còn 5 phút thì đồng hồ nhảy về 45:00, mất 40 phút — trung bình mất nửa kiện mỗi lần nhận, 3 lần/ngày ≈ 6–8 % sản lượng, và người chơi **nhìn thấy** đồng hồ nhảy lùi. Sửa là bỏ dòng `s.t0=Date.now()` trong `claimYard()` (`settleYards()` ngay trước đó đã đặt mốc đúng cho cả hai trường hợp đầy/chưa đầy). Đổi thì số ở §F2 nhích lên chừng đó. |
+| K7 | Trận chiếm bãi thật (qua `battle.js`) chưa đánh lại trong phiên 12/09 | Nên | 11/09 đã kiểm; 12/09 tôi chiếm bằng `captureYard()` để đi nhanh. Anh kiểm bằng nút CHIẾM BÃI ở BÃI RƠI CŨ (99 % thắng), thắng xong phải thấy "CHIẾM ĐƯỢC … +200 CR · +2 SH" và nút `◂ KHU ĐÁY`. |
+| K8 | Việc còn treo từ §G: PvP tranh bãi · đổi ca đồn trú tự động · bãi có sự kiện theo mùa | Không | Chưa có lý do làm trước chương 2. |
+
+Đã xong 12/09 và rút khỏi danh sách: cờ `?riot` + server kiểm (Q15, R13–R14), lỗi bãi trống quân (R15).
