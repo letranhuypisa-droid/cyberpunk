@@ -96,7 +96,9 @@ const ROSTER = {
            portrait:['art/card/kai_portrait.jpg','art/card/kai.png'], pos:'50% 8%',
            reveal:['art/reveal/kai_reveal.jpg','art-src/Kai/Kai rương.png'], revealPos:'50% 50%' },
   // ---- Chỉ có chân dung (trong trận hiện silhouette) ----
-  ronin: { id:'ronin', name:'RONIN', faction:'rust', tier:'A', atk:130, hp:1050, energyMax:100, spd:104, crit:15,   // ★ FAKE: cost + hệ số (tên + mô tả chiêu cuối đã chốt, xem docs/skill-naming.md §9)
+  /* noChrome: thân xác hoàn toàn là máu thịt, "không một khớp nối kim loại" (LORE.ronin.past) → không lắp
+     cyberware được. Bù bằng THÉP TRẦN, một bộ cố định trong CYBER.bare (js/cyber.js) — docs/cyberware.md Q7. */
+  ronin: { id:'ronin', name:'RONIN', faction:'rust', tier:'A', atk:130, hp:1050, energyMax:100, spd:104, crit:15, noChrome:true,   // ★ FAKE: cost + hệ số (tên + mô tả chiêu cuối đã chốt, xem docs/skill-naming.md §9)
            skill:{ desc:'Đòn thường 100% ATK, +25 Energy, thêm 10% tỉ lệ chí mạng.', mult:1, energy:25, critPct:10 },
            ult:{ name:'IAIDO', cost:100, kind:'nuke', mult:2.8, desc:'Ronin không né. Anh bước tới một bước, vào đúng đường đòn đang tới, rồi chém xuống một nhát: 280% ATK lên một mục tiêu.' },
            passives:[
@@ -707,7 +709,8 @@ const RIOT = {
   bossEvery: 5,
   bg: ['art/bg/bg_07a.jpg','art/bg/bg_battle.jpg'],
 };
-const riotUnlocked = () => PLAYER.cleared.includes(RIOT.unlock);
+/* ?riot trên URL (RIOT_DEV ở js/riot.js, nạp sau file này) coi như đã mở khoá — chỉ trong phiên, không ghi hồ sơ. */
+const riotUnlocked = () => PLAYER.cleared.includes(RIOT.unlock) || (typeof RIOT_DEV!=='undefined' && RIOT_DEV.start);
 /* Bể địch của dẹp loạn = địch của các chương đã ra (FOE_DEBUT), kể cả Cantor: hắn không chiêu mộ được
    nhưng vẫn được làm tường chắn mỗi 5 tầng. */
 const riotFoes = rank => ENEMY_POOL.filter(e => FOE_DEBUT[e.id]!=null && FOE_DEBUT[e.id]<=releasedChapter() && e.rank===rank);
@@ -818,7 +821,7 @@ const LEGACY_KEYS=['chromefall.player.v2'];
      và hạ trùm ở wave 3 rồi chết ở wave 4 thì vẫn là đã hạ.
    riot = tiến trình DẸP LOẠN: tier đang mở, best = tầng cao nhất đã thắng. */
 const PLAYER_DEFAULTS = () => ({ name:'YUKI', level:1, credits:3000, shards:300, owned:['yuki','ash','kai'], team:['yuki','ash','kai'],
-  pity:{hero:0}, pulls:0, cleared:[], defeated:[], extra:{}, riot:{tier:1, best:0},
+  pity:{hero:0}, pulls:0, cleared:[], defeated:[], extra:{}, riot:{tier:1, best:0}, parts:0, cyber:{},
   settings:{sound:true, sfx:true, motion:false, skipStory:false, anim:true, ultVideo:true, revealVideo:true}, levels:{}, daily:null, hintsSeen:[] });
 const _loaded = (()=>{ try{ for(const k of [PLAYER_KEY,...LEGACY_KEYS]){ const raw=localStorage.getItem(k); if(raw) return { p:JSON.parse(raw), legacy:k!==PLAYER_KEY }; } }catch(e){} return { p:{}, legacy:false }; })();
 const PLAYER = Object.assign(PLAYER_DEFAULTS(), _loaded.p);

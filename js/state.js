@@ -43,7 +43,20 @@ function upgrade(id){
    Thêm nguồn cộng chỉ số mới (linh kiện, cyberware) thì nối vào đây, không đi sửa ba chỗ rời nhau.
    core.js nạp trước state.js và kit.html không nạp state.js — nơi gọi phải guard typeof.
    ===================================================================== */
+/* Cấp nâng cấp NHÂN trước, cyberware nhân sau — hai nguồn nhân nhau chứ không cộng dồn phần trăm.
+   cyberBonus() ở js/cyber.js nạp sau file này, nên phải guard typeof (kit.html cũng không nạp nó). */
 function unitStats(id){
+  const d = (typeof ROSTER!=='undefined' && ROSTER[id]) || null;
+  if(!d) return { atk:0, hp:0, spd:100, crit:0 };
+  const m = statMult(id);
+  const c = typeof cyberBonus==='function' ? cyberBonus(id) : { atkPct:0, hpPct:0, spd:0, crit:0 };
+  return { atk:  Math.round(d.atk*m*(1+(c.atkPct||0)/100)),
+           hp:   Math.round(d.hp *m*(1+(c.hpPct ||0)/100)),
+           spd:  Math.round((d.spd||100) + (c.spd||0)),
+           crit: Math.round((d.crit||0)  + (c.crit||0)) };
+}
+/* Chỉ số GỐC (đã tính cấp, chưa tính cyberware) — màn CYBERWARE in "145 → 168" cần vế trái này */
+function baseStats(id){
   const d = (typeof ROSTER!=='undefined' && ROSTER[id]) || null;
   if(!d) return { atk:0, hp:0, spd:100, crit:0 };
   const m = statMult(id);
@@ -60,6 +73,7 @@ const DAILY_TASKS = [
   { id:'attacks', label:'Tung 15 đòn thường',        goal:15, reward:30 },
   { id:'ult',     label:'Phát 3 chiêu cuối',         goal:3,  reward:40 },
   { id:'pull',    label:'Quay Requisition 1 lần',    goal:1,  reward:30 },
+  { id:'riotcrate', label:'Nhận 5 kiện ở Khu Đáy',   goal:5,  reward:30 },   // DẸP LOẠN, js/riot.js gọi dailyProgress
 ];
 const today = () => { const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
 function dailyTick(){

@@ -1,0 +1,217 @@
+/* =====================================================================
+   DẸP LOẠN — bản đồ Khu Đáy, tờ chi tiết một bãi, chọn quân đồn trú.
+   Đọc token của css/chromefall.css, không tự đặt màu mới. Đặc tả: docs/dep-loan.md §E.
+   ===================================================================== */
+
+/* ---- Chấm đỏ "có việc" trên nút DẸP LOẠN ở HOME ---- */
+.menu__dot{position:absolute!important;top:6px;right:6px;width:6px;height:6px;background:var(--danger);
+  clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);animation:hp-warn 1200ms steps(2,end) infinite}
+.menu__dot[hidden]{display:none!important}
+
+/* =====================================================================
+   MÀN BẢN ĐỒ
+   ===================================================================== */
+.riotmap{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr) auto;gap:8px;padding:10px}
+/* Tiêu đề không được xuống dòng: nhãn phụ dài ra thì cắt bớt, đừng đẩy chữ KHU ĐÁY thành hai dòng */
+.riotmap .sh__title{flex:none;white-space:nowrap}
+.riotmap .sh__sub{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.rm__head{display:grid;gap:6px}
+.rm__stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.rmstat{padding:7px 9px;border:1px solid var(--line-1);background:var(--surface-1);min-width:0}
+.rmstat b{display:block;margin-top:3px;font:900 var(--fs-sm)/1.1 var(--font-mono);letter-spacing:.06em;color:var(--text-1);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rmstat b small{font-size:8px;letter-spacing:.1em;color:var(--text-3)}
+.rmstat:nth-child(2) b{color:var(--rust-hi)}
+.rmstat:nth-child(3) b{color:var(--energy)}
+
+.rm__timer{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:8px;padding:6px 9px;border:1px solid var(--line-1);background:var(--surface-1)}
+.rm__timer b{grid-column:2;justify-self:end;grid-row:1;font:800 var(--fs-sm)/1 var(--font-mono);color:var(--energy)}
+.rm__timer b.is-full{color:var(--energy-full)}
+.rm__bar{grid-column:1/-1;display:block;height:3px;background:var(--surface-4)}
+.rm__bar u{display:block;height:100%;width:0;background:var(--energy);transition:width 1s linear}
+
+.rm__chips{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.rmchip{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 9px;border:1px solid var(--line-1);
+  background:var(--surface-1);color:var(--text-2);font:700 8px/1 var(--font-mono);letter-spacing:.16em;cursor:pointer}
+.rmchip[hidden]{display:none}
+.rmchip em{font-style:normal;padding:2px 5px;border:1px solid var(--line-2);color:var(--text-3)}
+.rmchip.has-new{border-color:var(--energy);color:var(--text-1)}
+.rmchip.has-new em{border-color:var(--energy);color:var(--text-inv);background:var(--energy)}
+
+/* Ảnh 100% rộng, cao theo 9:16 rồi cuộn dọc — KHÔNG cover, vì nút đặt theo % sẽ lệch (cùng luật .map__img) */
+.rm__view{position:relative;overflow:auto;overscroll-behavior:contain;border:1px solid var(--line-1);background:var(--bg-1)}
+.rm__img{position:relative;width:100%;aspect-ratio:9/16}
+.rm__art{position:absolute;inset:0;background-size:100% 100%;background-position:center}
+.rm__art svg{display:block;width:100%;height:100%}
+.rm__img::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background-image:linear-gradient(rgba(190,200,222,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(190,200,222,.05) 1px,transparent 1px);
+  background-size:32px 32px}
+.rm__art.has-img~.rm__nodes{mix-blend-mode:normal}
+.rm__fog{position:absolute;left:0;right:0;top:0;pointer-events:none;
+  background:linear-gradient(180deg,var(--bg-0) 42%,rgba(11,13,18,.85) 72%,rgba(11,13,18,0) 100%)}
+.rm__nodes{position:absolute;inset:0}
+
+/* ---- Nút một cái bãi ---- */
+.ynode{position:absolute;width:26px;height:26px;transform:translate(-50%,-50%);padding:0;border:0;background:none;cursor:pointer;z-index:1}
+.ynode:hover,.ynode:focus-visible{z-index:3}
+.ynode__dot{position:absolute;inset:6px;transform:rotate(45deg);border:1px solid var(--line-3);background:var(--surface-2)}
+.ynode__badge{position:absolute;top:-6px;right:-8px;z-index:2;min-width:14px;padding:1px 3px;font:800 8px/1.3 var(--font-mono);
+  font-style:normal;text-align:center;color:var(--text-inv);background:var(--energy)}
+.ynode__card{position:absolute;top:50%;transform:translateY(-50%);width:max-content;max-width:140px;padding:5px 7px;text-align:left;
+  border:1px solid var(--line-2);background:rgba(11,13,18,.86);backdrop-filter:blur(2px)}
+.ynode--r .ynode__card{left:calc(100% + 4px)}
+.ynode--l .ynode__card{right:calc(100% + 4px)}
+.ynode__card b{display:block;font:800 var(--fs-2xs)/1 var(--font-ui);letter-spacing:.16em}
+.ynode__card em{display:block;margin-top:4px;font:8px/1.25 var(--font-mono);letter-spacing:.08em;font-style:normal;color:var(--text-3)}
+.ynode__card u{display:block;margin-top:3px;font:800 9px/1 var(--font-mono);text-decoration:none;color:var(--energy)}
+.ynode:hover .ynode__card{border-color:var(--line-3)}
+
+.ynode.is-locked{opacity:.4}
+.ynode.is-locked .ynode__dot{background:var(--surface-3);border-color:var(--line-2)}
+.ynode.is-free .ynode__dot{border-color:var(--danger);background:rgba(255,75,75,.22);animation:map-ping 1.8s var(--ease-sine) infinite}
+.ynode.is-free .ynode__card{border-color:rgba(255,75,75,.55)} .ynode.is-free em{color:var(--hp-low)}
+.ynode.is-own .ynode__dot{border-color:var(--hp);background:var(--hp)}
+.ynode.is-own em{color:var(--hp)}
+.ynode.is-full .ynode__dot{border-color:var(--energy-full);background:var(--energy-full);animation:map-ping 1.4s var(--ease-sine) infinite}
+.ynode.is-full .ynode__card{border-color:var(--energy)} .ynode.is-full u{color:var(--energy-full)}
+.ynode.is-contested .ynode__dot{border-color:var(--crit);background:var(--crit);animation:hp-warn 1000ms steps(2,end) infinite}
+.ynode.is-contested .ynode__card{border-color:var(--crit)} .ynode.is-contested em{color:var(--crit)}
+/* HỐ LOẠN: hình tròn cho khác hẳn 9 cái bãi */
+.ynode--pit .ynode__dot{inset:3px;transform:none;border-radius:50%;border:2px solid var(--rust);background:radial-gradient(circle,rgba(255,75,75,.35),rgba(6,7,10,.9) 70%)}
+.ynode--pit .ynode__card{border-color:var(--rust-lo)} .ynode--pit em{color:var(--rust-hi)}
+
+.rm__panel{z-index:60}
+
+/* =====================================================================
+   TỜ CHI TIẾT MỘT BÃI
+   ===================================================================== */
+.yard{position:absolute;inset:0;z-index:55;background:var(--bg-0);display:grid;grid-template-rows:22% minmax(0,1fr) auto;gap:8px;padding:0 10px 10px}
+.yard[hidden]{display:none}
+.yard__hero{position:relative;overflow:hidden;margin:0 -10px;border-bottom:1px solid var(--line-2)}
+.yard__img{position:absolute;inset:0;background:var(--surface-2);background-size:cover;background-position:center 40%}
+.yard__img.has-img::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,7,10,.25),rgba(6,7,10,.92))}
+.yard__close{position:absolute;top:10px;left:10px;z-index:2}
+.yard__head{position:absolute;left:12px;right:12px;bottom:8px;z-index:2}
+.yard__head b{display:block;margin-top:4px;font:900 var(--fs-xl)/1 var(--font-ui);letter-spacing:.14em}
+.yard__head i{display:block;margin-top:5px;font:var(--fs-2xs)/1.4 var(--font-mono);font-style:normal;color:var(--text-2)}
+.yard__tags{display:flex;gap:4px;flex-wrap:wrap}
+.ytag{padding:2px 5px;border:1px solid var(--line-2);font:800 8px/1.3 var(--font-mono);letter-spacing:.14em;color:var(--text-2)}
+/* "BÃI n" = mã màn, in đậm hơn ba chip còn lại vì nó là cái hiện ở ô SECTOR lúc vào trận */
+.ytag--no{border-color:var(--line-3);color:var(--text-1);background:var(--surface-2)}
+.ytag--rust{border-color:var(--rust);color:var(--rust-hi)}
+.ytag--chrome{border-color:var(--chrome);color:var(--chrome-hi)}
+.ytag--own{border-color:var(--hp);color:var(--hp)}
+.ytag--free{border-color:var(--danger);color:var(--hp-low)}
+.ytag--bad{border-color:var(--crit);color:var(--crit)}
+
+.yard__body{overflow:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:8px}
+.ysec{padding:9px 10px;border:1px solid var(--line-1);background:var(--surface-1);
+  clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px)}
+.ysec h4{margin:0 0 7px;font:800 8px/1 var(--font-mono);letter-spacing:.24em;color:var(--text-3)}
+.ynote{margin:7px 0 0;font:var(--fs-2xs)/1.5 var(--font-mono);color:var(--text-3)}
+.ynote b{color:var(--text-2)}
+.ymath{padding:4px 6px;border-left:2px solid var(--line-2);background:var(--surface-2);color:var(--text-2)}
+.ywarn{padding:6px 8px;border-left:2px solid var(--crit);background:var(--surface-2);color:var(--text-2)}
+.ywarn b{color:var(--crit)}
+
+/* hai thanh sức mạnh đối nhau */
+.ypw{display:grid;grid-template-columns:104px 1fr auto;align-items:center;gap:8px;margin-bottom:5px}
+.ypw .lbl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ypw b{font:800 var(--fs-xs)/1 var(--font-mono);color:var(--text-1)}
+.rbar{display:block;height:8px;background:var(--surface-4);overflow:hidden}
+.rbar u{display:block;height:100%;text-decoration:none;background:var(--text-3);transition:width var(--t-state)}
+.rbar--mine u{background:var(--chrome-hi)}
+.rbar--foe  u{background:var(--hp-low)}
+.rbar--ok   u{background:var(--hp)}
+.rbar--warn u{background:var(--crit)}
+.rbar--full u{background:var(--energy-full)}
+
+.yverdict{display:flex;align-items:center;gap:8px;margin-top:7px;font:var(--fs-2xs)/1.3 var(--font-mono);color:var(--text-3)}
+.ychip{flex:none;padding:3px 7px;border:1px solid currentColor;font:800 var(--fs-2xs)/1.2 var(--font-mono);letter-spacing:.16em}
+.ychip--over{color:var(--hp)} .ychip--even{color:var(--energy)} .ychip--risk{color:var(--crit)} .ychip--dead{color:var(--danger)}
+
+/* ô đóng quân */
+.yslots{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px}
+.yslot{position:relative;aspect-ratio:3/4;padding:0;border:1px dashed var(--line-2);background:var(--surface-2);
+  color:var(--text-3);cursor:pointer;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.yslot:disabled{opacity:.45;cursor:not-allowed}
+.yslot__plus{font:300 26px/1 var(--font-ui);color:var(--line-3)}
+.yslot__lbl{font:700 8px/1 var(--font-mono);letter-spacing:.12em}
+.yslot.is-filled{border:1px solid var(--line-2);border-style:solid;justify-content:flex-end}
+.yslot.is-filled.f-rust{border-color:var(--rust-lo)} .yslot.is-filled.f-chrome{border-color:var(--chrome-lo)}
+.yslot.is-fav{border-color:var(--rust-acid)}
+.yslot__p{position:absolute;inset:0} .yslot__p .portrait{position:absolute;inset:0;--pos:50% 6%}
+.yslot__p::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(6,7,10,.9))}
+.yslot__nm{position:relative;z-index:1;font:800 8px/1 var(--font-mono);letter-spacing:.1em;color:var(--text-1)}
+.yslot__pw{position:relative;z-index:1;margin-bottom:5px;font:700 9px/1 var(--font-mono);color:var(--chrome-hi)}
+.yslot__fav{position:absolute;top:3px;left:3px;z-index:1;padding:1px 3px;font:800 7px/1.3 var(--font-mono);font-style:normal;
+  letter-spacing:.1em;color:var(--text-inv);background:var(--rust-acid)}
+
+/* thưởng mỗi kiện */
+.ypay{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.ypay b{font:900 var(--fs-2xl)/1 var(--font-mono);color:var(--rust-hi)}
+.ypay b:nth-child(2){color:var(--energy)}
+.ypay b small{margin-left:3px;font:800 var(--fs-2xs)/1 var(--font-mono);letter-spacing:.1em;color:var(--text-3)}
+.ypay .lbl{flex:1 0 100%}
+
+/* kiện hàng */
+.ycrate{display:flex;align-items:baseline;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+.ycrate b{font:900 var(--fs-xl)/1 var(--font-mono)}
+.ycd{margin-left:auto;font:var(--fs-2xs) var(--font-mono);letter-spacing:.1em;color:var(--text-3)}
+.ycd b{font-size:var(--fs-sm);color:var(--energy)}
+.ybtn{margin-top:9px;height:46px}
+
+/* bậc bãi */
+.ylv{display:flex;align-items:center;gap:4px}
+.ylv i{width:22px;height:5px;background:var(--surface-4);clip-path:var(--poly-slant)}
+.ylv i.on{background:var(--rust)}
+.ylv b{margin-left:auto;font:800 var(--fs-2xs)/1 var(--font-mono);letter-spacing:.14em;color:var(--rust-hi)}
+
+/* =====================================================================
+   CHỌN NGƯỜI ĐÓNG QUÂN
+   ===================================================================== */
+.ypick{display:flex;flex-direction:column;gap:6px;overflow:auto;overscroll-behavior:contain}
+.gpick{display:grid;grid-template-columns:38px 1fr auto;align-items:center;gap:10px;padding:6px 9px 6px 6px;
+  border:1px solid var(--line-1);background:var(--surface-1);color:var(--text-1);text-align:left;cursor:pointer}
+.gpick:hover{border-color:var(--line-3)}
+.gpick.is-off{opacity:.4;cursor:not-allowed}
+.gpick.f-rust{border-left:2px solid var(--rust-lo)} .gpick.f-chrome{border-left:2px solid var(--chrome-lo)}
+.gpick.is-fav{border-left-color:var(--rust-acid)}
+.gpick__p{position:relative;width:38px;aspect-ratio:3/4;overflow:hidden;background:var(--surface-3)}
+.gpick__p .portrait{position:absolute;inset:0;--pos:50% 6%}
+.gpick__i{min-width:0} .gpick__i b{display:block;font:700 var(--fs-xs)/1 var(--font-ui);letter-spacing:.14em}
+.gpick__i em{display:block;margin-top:4px;font:8px/1 var(--font-mono);letter-spacing:.1em;font-style:normal;color:var(--text-3)}
+.gpick.is-fav .gpick__i em{color:var(--rust-acid)}
+.gpick__pw{text-align:right;font:800 var(--fs-sm)/1 var(--font-mono);color:var(--chrome-hi)}
+.gpick__pw small{display:block;margin-top:4px;font:700 8px/1 var(--font-mono);letter-spacing:.1em;color:var(--text-3)}
+
+/* ---- Dòng báo cáo ---- */
+.rfeed--hold .dl__info b{color:var(--hp)}
+.rfeed--lost .dl__info b{color:var(--danger)}
+.rfeed--full .dl__info b{color:var(--energy-full)}
+.rfeed--take .dl__info b,.rfeed--retake .dl__info b{color:var(--chrome-hi)}
+
+/* ---- Màn thấp (375×667): dải tổng quan chiếm mất một phần ba màn, nén lại để bản đồ còn chỗ ---- */
+@media (max-height:720px){
+  .riotmap{gap:6px;padding:8px}
+  .rmstat,.rm__timer,.rmchip{padding:5px 8px}
+  .riotmap>.btn-act--full{height:46px}
+  .yard{grid-template-rows:19% minmax(0,1fr) auto}
+}
+/* ---- Màn hẹp: thẻ nhãn trên bản đồ co lại ----
+   max-width phải vừa DÒNG DÀI NHẤT của cả ba dòng, đo ở 375 px: tên "CHÂN THANG MÁY" 99 px (dài nhất),
+   "0/8 · CHƯA CÓ QUÂN" 95 px, "2/2 QUÂN · BẬC 1" 86 px → 99 + 12 padding + 2 viền = 113 px.
+   Bản cũ để 112 px nên thiếu đúng một pixel: tên xuống dòng, thẻ cao 4 dòng và đè lên bãi bên trên
+   (luật ≥ 8% giữa hai nút ở js/riot.js tính theo thẻ 3 dòng cao ~45 px). 118 px chừa 5 px dự phòng. */
+@media (max-width:380px){
+  .ynode__card{max-width:118px;padding:4px 6px}
+  .ynode__card b{font-size:9px;letter-spacing:.1em}
+  .rmstat b{font-size:var(--fs-xs)}
+}
+@media (prefers-reduced-motion:reduce){
+  .ynode .ynode__dot{animation:none!important}
+  .menu__dot{animation:none}
+}
+.rm-forced .ynode .ynode__dot{animation:none!important}
+.rm-forced .menu__dot{animation:none}

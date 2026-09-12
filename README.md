@@ -14,6 +14,7 @@ python -m http.server 8765
 ```
 
 rồi mở `http://localhost:8765/index.html`. UI kit và token: `kit.html`. Nút DEV +1000 SH ở gacha chỉ hiện khi thêm `?dev` vào URL.
+Kiểm DẸP LOẠN mà không phải qua tiêu đề: `python scratch/riot_serve.py` rồi mở `http://127.0.0.1:8802/` (xem mục DẸP LOẠN).
 
 ## Cấu trúc
 
@@ -27,11 +28,15 @@ rồi mở `http://localhost:8765/index.html`. UI kit và token: `kit.html`. Nú
 | `js/data.js` | **Số liệu & hồ sơ**: roster (ATK/HP/SPD/CRIT, skill + fx/status, passive), kẻ địch (`FOE_STATS`, `FOE_SKILL`, `ult`), **chiêu mộ** (`RECRUIT_*` — nạp kẻ địch chương 1 vào `ROSTER` thành đơn vị chơi được), chương/sector, **`RIOT`** (dẹp loạn), `RULES` (move, holo, foeUltGain), hồ sơ người chơi (v3, tự chuyển từ v2), lore, bonds, **`BANNER`** (một bể gacha; khoá theo chương + `beaten()` cho quân chiêu mộ). Sửa ở đây. |
 | `js/story.js` | **Comic từng màn**: trang, panel, bong bóng cho intro/outro của 00-T → 07-E. Sửa lời thoại ở đây. |
 | `js/comic.js` | Renderer trang comic: layout panel, ảnh + fallback, bong bóng hiện dần, lật trang, SKIP |
-| `js/state.js` | Lưu/nạp hồ sơ (`SAVE`, local hoặc remote), nâng cấp (`UPGRADE`), **`unitStats(id)`** — một chỗ duy nhất tính chỉ số cuối, và `power(id)`/`teamPower()`, nhiệm vụ ngày |
+| `js/state.js` | Lưu/nạp hồ sơ (`SAVE`, local hoặc remote), nâng cấp (`UPGRADE`), **`unitStats(id)`** — một chỗ duy nhất tính chỉ số cuối (gốc × cấp × cyberware) và `baseStats(id)`, và `power(id)`/`teamPower()`, nhiệm vụ ngày |
 | `js/audio.js` | SFX giao diện (audio/*.ogg) + âm chiến đấu: có `audio/<tên>.ogg\|mp3\|wav` thì dùng file, thiếu thì tổng hợp WebAudio. Một thao tác = một tiếng (`SFX_ONE`/`SFX_BEAT`); `SFX_VARIANTS` cho tiếng nhiều bản (`hit`, `hit2`…); `SFX_MUTE` cho nút không kêu |
 | `js/fx.js` | Overlay hiệu ứng trên sprite: một lần (hit/crit/nổ/điện/độc/cháy/choáng/hồi máu/lá chắn) và lặp theo trạng thái + lá chắn; tự dùng sprite sheet `art/fx/<kind>.webp` nếu có |
 | `js/battle.js` | Engine trận: lưới sân 3 hàng mỗi phe (`FORMATION`, không ai chồng lên ai) + `stageScale()` đặt `--big`, bảng nội tại chạm-để-đọc (`openPassive`), passive, lượt theo SPD, chế độ chọn mục tiêu, di chuyển tới mục tiêu kiểu Idle Heroes (`playMoveAttack`), sát thương + chí mạng, lá chắn (`addShield`/`absorbShield`), trạng thái choáng/độc/cháy (`applyStatus`/`tickStatus`), ult + video holo trên đầu nhân vật (`playHolo`), chiêu cuối của địch (`enemyUlt`), wave (hồi máu giữa wave), hint tutorial. `finish()` tách nhánh thưởng theo `SECTOR.mode` (chiến dịch / `'riot'`) |
-| `js/app.js` | Router màn hình, lobby, squad (3 slot, lưu đội), sector, **dẹp loạn** (`renderRiot`), gacha một bể, archive (5 tab: Nhân vật · Sổ bộ · Địa danh · Thuật ngữ · Truyện; `openLore` dùng chung cho nhân vật lẫn kẻ địch), config, COMMS |
+| `js/app.js` | Router màn hình, lobby, squad (3 slot, lưu đội, **khoá người đang đồn trú**), sector, thang tầng dẹp loạn (`renderRiot`), gacha một bể, archive (5 tab: Nhân vật · Sổ bộ · Địa danh · Thuật ngữ · Truyện; `openLore` dùng chung cho nhân vật lẫn kẻ địch), config, COMMS |
+| `js/riot.js` | **DẸP LOẠN — chiếm bãi**: 9 cái bãi ở District 07 (`RIOT_YARDS`), kinh tế (`RIOT_ECON`), sức mạnh ổ neo vào số đo `m50`, đồn trú, kiện hàng theo chu kỳ, phản kích, nâng bãi, hợp đồng tuần. Số liệu sửa ở đây |
+| `js/riotui.js` | Màn bản đồ Khu Đáy + tờ chi tiết một bãi + chọn quân đồn trú + báo cáo vắng mặt; bản đồ dự phòng vẽ bằng SVG. Bọc `winReward`/`finish` của `battle.js` để cộng thưởng trận chiếm bãi (không sửa `battle.js`) |
+| `js/cyber.js` | **CYBERWARE**: 6 ô × thang 10 bậc = 60 món (`CYBER_SLOTS`), đường cong chỉ số, giá, ví **LINH KIỆN (LK)**, phân tách bản dư, trần của RONIN. Nối vào chỉ số qua `cyberBonus(id)` — `unitStats` gọi đúng một chỗ này |
+| `js/cyberui.js` | Màn CYBERWARE: chọn nhân vật → chọn ô → xem cả thang 10 bậc → nâng bậc; tờ phân tách bản dư. Ảnh món `art/cyber/`, chưa có thì vẽ icon SVG của ô |
 | `js/data_later.js` | Dữ liệu chương 2–3 bản cũ (không nạp), giữ để viết lại quanh Yuki |
 | `scratch/key_frame.py` | Tách nền frame sprite (idle/attack/hurt), in `box` để dán vào `ROSTER` |
 | `scratch/ult_lint.js` | Soát chiêu cuối: số trong `desc` có khớp `mult`/`hits`/`shieldPct`/`healPct`/`flat`/`drainEnergy` không, `energyMax` có bằng `ult.cost` không, và bản chiêu mộ có còn viết theo giọng phía địch không. Thoát mã 1 nếu lệch |
@@ -43,6 +48,7 @@ rồi mở `http://localhost:8765/index.html`. UI kit và token: `kit.html`. Nú
 | `scratch/sfx_ab.html` | Trang nghe đối chiếu SFX: bản đang dùng cạnh bản kia, âm lượng đã cân — mở bằng preview `static-sfx` |
 | `scratch/key_enemy.py` | Tách nền hàng loạt ảnh idle kẻ địch (`art-src/ENEMY/<id>.png` → `art/sprite/<id>_idle.png`), tự chọn cỡ theo rank, in `box` cho `FOE_SPRITE` |
 | `scratch/sim.js` | Mô phỏng trận bằng Node để cân bằng `mult` từng sector (cùng luật SPD/crit/trạng thái; `SIM_PATCH` để thử số khác) |
+| `scratch/cyber_sheet.py` | Cắt 6 tấm contact sheet CYBERWARE (lưới 5×2) → 60 WebP nền trong `art/cyber/<ô><bậc>.webp`; tự dò nền (alpha / xanh / trắng), số đo bố cục thẻ trong `INNER` |
 | `scratch/comic_lint.js` | Soát comic: người nói, bong bóng, tên file panel so với `docs/comic-prompts.md` |
 | `scratch/comic_measure.js` | Đo chữ trong bong bóng/caption từng panel |
 | `scratch/art_audit.js` | Kiểm kê art/animation còn thiếu cho chương 1 (thẻ, chân dung, pose sprite, video ult, nền, panel) |
@@ -55,6 +61,8 @@ rồi mở `http://localhost:8765/index.html`. UI kit và token: `kit.html`. Nú
 | `docs/bg-prompts.md` | Prompt sinh ảnh nền và quy tắc zoom/chân trời |
 | `docs/ult-prompts.md` | Quy cách video cut-in chiêu cuối + prompt từng nhân vật |
 | `docs/plan-2026-09.md` | Đánh giá hiện trạng 07/09 + kế hoạch tháng 9 (mục tiêu: hoàn thành chương 1 trước 30/09) |
+| `docs/dep-loan.md` | **DẸP LOẠN**: thiết kế 9 cái bãi, đóng quân, kiện hàng, phản kích, nâng bãi, hợp đồng tuần + số cân bằng đo được + đặc tả giao diện + prompt bản đồ District 07 |
+| `docs/cyberware.md` | **CYBERWARE**: 6 ô × 10 bậc = 60 món, đường cong chỉ số, giá LK/CR, phân tách bản dư, trần của RONIN, quy cách 6 tấm contact sheet |
 | `docs/enemy-prompts.md` | Prompt art 21 kẻ địch chương 1 + đề xuất nội tại/lore cho địch |
 | `docs/hero-prompts.md` | Prompt art 10 nhân vật gacha chưa có ảnh (thẻ + sprite nền xanh), kèm đề xuất tạo hình từng người |
 | `docs/fx-prompts.md` | Overlay hiệu ứng: cách chạy, tên file thay thế, quy cách sheet + prompt; luật trạng thái; SPD/CRIT; hộp holo; di chuyển kiểu Idle Heroes |
@@ -113,7 +121,11 @@ Thả file đúng tên vào đúng thư mục là game tự dùng — không c�
 node scratch/sim.js 400                       # đội mặc định yuki,ash,kai
 node scratch/sim.js 400 yuki,ash,psalm        # đội khác
 node scratch/sim.js 400 yuki,ash,kai 07-D=1.0,07-E=1.1   # thử mult khác cho sector
-node scratch/sim.js 200 yuki,ash,kai --riot 20            # dò 20 tầng DẸP LOẠN (đánh dấu ← TƯỜNG khi win < 40%)
+node scratch/sim.js 200 yuki,ash,kai --riot 20            # dò 20 tầng HỐ LOẠN (đánh dấu ← TƯỜNG khi win < 40%)
+node scratch/sim.js 400 yuki,ash,kai --yard [--lv 20]     # dò 9 cái bãi DẸP LOẠN: sức mạnh ổ, tỉ lệ thắng, nhãn
+node scratch/riot_tune.js m50 200 [cấp]                   # đo lại m50 (độ khó thật của đội hình wave) sau khi sửa plan
+node scratch/riot_tune.js plan 200                        # đo ngược `mult` cho đúng tỉ lệ thắng thiết kế
+node scratch/riot_econ.js [hệ số quân] [ưu thế phe]       # thu nhập/giờ, hiệu suất theo số lần vào game, hồi vốn nâng bãi
 node scratch/recruit_table.js                            # bảng quy đổi 20 kẻ địch chiêu mộ
 node scratch/ult_lint.js                                 # chữ mô tả chiêu cuối có khớp số thật không
 ```
@@ -152,8 +164,63 @@ chúng nằm bên `CODEX`. Giờ tab **Nhân vật = 19 người**, tab **Sổ b
 `FOE_LORE` sinh từ `CODEX` lúc nạp rồi ánh xạ sang hình dạng `LORE`, nên `openLore` dựng được trang cho cả
 hai bên mà không phải viết thêm chữ. Sổ bộ **không khoá đọc**, chỉ đánh dấu `CHƯA HẠ` → `ĐÃ HẠ` → `ĐÃ CÓ`.
 
-**DẸP LOẠN.** Thang đánh vô hạn ở Khu Đáy, mở sau 07-A. `riotSector(n)` dựng object hình dạng SECTOR rồi
+**HỐ LOẠN.** Thang đánh vô hạn ở Khu Đáy, mở sau 07-A. `riotSector(n)` dựng object hình dạng SECTOR rồi
 `go('battle')` — engine trận không biết mình đang ở chế độ nào. Wave của mỗi tầng **cố định** (`riotRng` gieo
 bằng số tầng), không bốc lại mỗi lần vào.
 
-Đợt sau: chiếm bãi (cần art map District 07) · phân tách → linh kiện · cyberware 5 ô.
+## DẸP LOẠN — chiếm bãi (11/09, đợt 2)
+
+Đặc tả đầy đủ: `docs/dep-loan.md`. Nút DẸP LOẠN ở HOME giờ mở **bản đồ Khu Đáy** (`riotmap`) với 9 cái bãi
+chiếm được + một nút xuống HỐ LOẠN (thang tầng cũ, giữ nguyên).
+
+```
+chiếm bãi (đánh) → đóng quân 1–3 người → bãi đẻ KIỆN HÀNG mỗi 45 phút, trần 8 kiện (6 giờ)
+   → quay lại nhận kiện · giữ PHẢN KÍCH (mỗi 4h30) · NÂNG BÃI (5 bậc, ×3 sản lượng)
+```
+
+- **Quân đóng bãi bị khoá khỏi đội hình** — đây là lý do duy nhất khiến roster 39 người có giá trị.
+  Người đang trong đội thì không đóng quân được (đổi ở SQUAD), nên đội không bao giờ bị rút xuống dưới 3.
+- **Sức mạnh ổ loạn** hiện cạnh sức mạnh đội, và nó neo vào **số đo** chứ không phải phép cộng chỉ số:
+  `power(đội mốc) × mult / m50`, với `m50` đo bằng `scratch/riot_tune.js`. Tỉ lệ 1.0 = thắng ~55%.
+  Cộng chỉ số từng xếp SÂN LÒ ĐÚC (0% thắng) dễ hơn HÀNG RÀO GÃY (100% thắng) — xem `docs/dep-loan.md` §D1.
+- **Thua phản kích không mất bãi vĩnh viễn**: bãi thành ĐANG BỊ CHIẾM, ngừng đẻ kiện, kiện đã có **đóng băng
+  chứ không mất**; đánh một trận GIÀNH LẠI (×0.85 độ khó) là nhận lại nguyên vẹn.
+  Đồn trú ≥ 2× ngưỡng thì **không bao giờ** mất bãi.
+- **Art (12/09):** bản đồ thật `art/map/map_d07.jpg` (941×1672) + 9 ảnh bãi `art/riot/yard_<id>.jpg` (1024×576).
+  Toạ độ 10 cái nút đo trên chính ảnh đó (`RIOT_YARDS`/`RIOT_PIT` trong `js/riot.js`, bảng ở `docs/dep-loan.md` §C);
+  hai nút liền nhau phải cách ≥ 8% theo trục dọc, gần hơn là hai thẻ nhãn đè nhau. Thiếu file thì `riotMapSvg()`
+  vẽ bản dự phòng bằng SVG — nó đọc cùng bộ toạ độ nên không lệch được. Kiểm kê: `node scratch/art_audit.js`.
+- Thử không phải chờ 45 phút: mở `index.html?riotfast` → một chu kỳ **15 giây**.
+- **Kiểm nhanh (12/09):** `python scratch/riot_serve.py` (hoặc launch `static-riot`, cổng 8802) rồi mở
+  `http://127.0.0.1:8802/` → tự chuyển sang `index.html?riot&riotfast&dev`: vào thẳng bản đồ Khu Đáy, coi như đã mở
+  khoá (**chỉ trong phiên**, không ghi hồ sơ), chu kỳ 15 giây, có nút nạp tiền. `?riot=all` mở cả 9 bãi.
+  Bãi trống quân thì đồng hồ đứng (không kiện rỗng, không phản kích). Việc còn nợ: `docs/dep-loan.md` §K.
+
+## CYBERWARE + phân tách bản dư (11/09, đợt 3+4)
+
+Đặc tả đầy đủ: `docs/cyberware.md`. Nút **CYBERWARE** ở HOME (và nút tắt trong hồ sơ nhân vật ở ARCHIVE).
+
+```
+lá trùng gacha → PHÂN TÁCH → LINH KIỆN (LK) → nâng bậc 6 ô cyberware → đội mạnh hơn
+```
+
+- **6 ô, mỗi ô một thang 10 bậc** (ĐẦU · THÂN · TAY · CHÂN · PHỤ KIỆN A · PHỤ KIỆN B) = **60 món**,
+  đúng bộ art 6 tấm contact sheet. Một trục duy nhất: người chơi đọc "TAY 06/10" là biết mình ở đâu.
+  Độ hiếm theo bậc: `01 02` COMMON · `03 04` UNCOMMON · `05 06` RARE · `07 08` EPIC · `09` LEGENDARY · `10` MYTHIC.
+  **Thang chỉ đi lên** — không tháo, không hoàn.
+- **Cộng đúng 4 chỉ số `unitStats` đang trả về** (ATK% · HP% · SPD · CRIT) và nối vào **một chỗ duy nhất**:
+  `unitStats(id)` gọi `cyberBonus(id)`. Thẻ nhân vật, `power()`, hồ sơ và chỉ số lúc vào trận vì thế luôn khớp.
+  Cấp nâng cấp nhân **trước**, cyberware nhân sau — hai nguồn nhân nhau, không cộng dồn phần trăm.
+  Đủ 6 ô bậc 10 = **+44% ATK · +52% HP · +30 SPD · +34 CRIT**.
+- **LINH KIỆN (LK)** chỉ đến từ **phân tách bản dư** (`PLAYER.extra`) — đóng lời hứa treo từ đợt 1 của gacha.
+  Bậc B 10 LK · A 25 LK · S 60 LK. Phân tách **không đụng `PLAYER.owned`**, không có đường nào mất nhân vật.
+  Bãi ở DẸP LOẠN vẫn chỉ đẻ CR + SH. Một nhân vật kịch cả 6 ô ≈ 2 208 LK + 132 480 CR ≈ 9 ngày cày.
+- **RONIN (`noChrome:true`)** đi lên như mọi người rồi **dừng ở món cuối cùng còn là đồ mặc vào** — vì bậc
+  thấp của mọi ô đều không phải cấy ghép (găng da, áo khoác, mũ lưỡi trai, giày vải). TAY dừng ở 02, các ô
+  khác 07–08; tổng 41/60 bậc. Đổi lại món ở đúng bậc trần cho **×1.5** chỉ số (THÉP TRẦN).
+- **Ảnh món đã có đủ 60** (`art/cyber/<ô><bậc>.webp`, 512×512 nền trong, 2,1 MB cả bộ), cắt từ 6 tấm
+  contact sheet trong `art-src/CYBER/` bằng `python scratch/cyber_sheet.py`. Đổi tấm nào thì chạy lại
+  tấm đó (`python scratch/cyber_sheet.py head`). Thiếu file thì ô hiện icon SVG, game vẫn chạy.
+
+> `scratch/sim.js` **chưa mô phỏng cyberware** — bảng tỉ lệ thắng ở `docs/dep-loan.md` §F1 là **sàn**.
+

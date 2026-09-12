@@ -144,6 +144,15 @@
         "127.0.0.1"
       ],
       "port": 8801
+    },
+    {
+      "name": "static-riot",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "scratch/riot_serve.py",
+        "8802"
+      ],
+      "port": 8802
     }
   ]
 }
