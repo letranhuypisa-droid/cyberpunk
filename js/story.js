@@ -3,17 +3,22 @@
    Sửa lời thoại ở đây. Quy tắc viết: câu ngắn, thuật ngữ giải thích ngay lần đầu, bong bóng ≤ 25 chữ, caption ≤ 40 chữ.
 
    page(layout, ...panel)      layout: splash · v2 (trên/dưới) · h2 (trái/phải) · w3 (1 rộng + 2) · g4 (2×2)
-   panel = { img:[ảnh nền, fallback…], pos:'x% y%' (object-position), zoom, artPos:'x% y%' (neo riêng cho ảnh vẽ tay),
+   panel = { img:[ảnh nền, fallback…], pos:'x% y%' (object-position), zoom,
              fg:[sprite trong suốt đè lên], fgFlip, fgX, fgH,
-             tint:'chrome'|'rust', sil:'chrome'|'rust' (silhouette khi không có ảnh), stack:true, bubbles:[…] }
-   stack:true → xếp bong bóng thành CỘT thay vì neo tuyệt đối; khi đó `at` chỉ còn quyết định lệch trái/giữa/phải,
-   thứ tự dọc = thứ tự viết ở đây, và các khối KHÔNG THỂ đè nhau. Dùng cho ô có 3 khối chữ, hoặc ô nhỏ chữ dài.
+             tint:'chrome'|'rust', sil:'chrome'|'rust' (silhouette khi không có ảnh), bubbles:[…] }
    Ảnh riêng cho panel: đặt file art/comic/<sector>_<i|o><trang>_p<panel>.jpg (vd art/comic/00t_i1_p2.jpg) → tự được ưu tiên
    trước danh sách img. Xem docs/comic-prompts.md.
-   Bong bóng: say(who, text, at, tail) · think(who, text, at) · yell(who, text, at) · cap(text, at) · bang(text, at)
-   at: tl tr bl br c t b · who: id trong ROSTER/ENEMY_POOL, null = không tên · thêm {as:'TÊN'} để đổi nhãn. */
+   Bong bóng: say(who, text, at) · think(who, text, at) · yell(who, text, at) · cap(text, at) · bang(text, at)
+   at: tl tr bl br c t b · who: id trong ROSTER/ENEMY_POOL, null = không tên · thêm {as:'TÊN'} để đổi nhãn.
 
-const say   = (who,text,at='bl',tail)=>({ who, kind:'speech',  text, at, tail });
+   ĐỔI 12/09 (xem docs/comic-reader.md): tranh phủ TRỌN panel và dán `contain` — không bao giờ bị xén nữa;
+   mọi bong bóng dồn thành MỘT CỘT ở đáy panel. Hệ quả cho dữ liệu bên dưới:
+   · `at` chỉ còn quyết định LỆCH TRÁI / GIỮA / PHẢI. Thứ tự dọc = thứ tự viết ở đây. Các khối không thể đè nhau.
+   · `stack` và `artPos` thành THỪA — renderer bỏ qua. Còn sót trong dữ liệu cũ thì cứ để, không hại gì.
+   · `pos` / `zoom` chỉ còn tác dụng với ảnh TẠM (thẻ nhân vật, nền sector) vì ảnh tạm vẫn dán `cover`.
+   · Chỉ `bang()` còn neo đè lên tranh, và neo trong vùng tranh CÒN THẤY phía trên cột chữ. */
+
+const say   = (who,text,at='bl')=>({ who, kind:'speech',  text, at });
 const think = (who,text,at='bl')=>({ who, kind:'thought', text, at });
 const yell  = (who,text,at='c')=>({ who, kind:'shout',   text, at });
 const cap   = (text,at='tl')=>({ who:null, kind:'caption', text, at });
@@ -27,7 +32,7 @@ const ART = { yuki:['art/card/yuki.png'], ash:['art/card/ash.png'], kai:['art/ca
               motherrust:['art/card/motherrust.png'], cantor:['art/card/cantor.png'] };
 const BG  = { yard:['art/bg/bg_07a.jpg'], foundry:['art/bg/bg_07b.jpg'], gate:['art/bg/bg_07c.jpg'], arena:['art/bg/bg_battle.jpg'],
               sewer:['art/bg/bg_07d.jpg','art/bg/bg_07b.jpg'], lift:['art/bg/bg_07e.jpg','art/bg/bg_07c.jpg'] };   // 07-D / 07-E: thả bg_07d.jpg, bg_07e.jpg vào là tự thay nền tạm
-const face = (id,zoom=1.6)=>({ img:ART[id], pos:'50% 6%', zoom });        // cận mặt. Quy ước (chốt 08/09): bong bóng đầu ở dưới (bl), câu sau ở trên (tr) để chừa mặt
+const face = (id,zoom=1.6)=>({ img:ART[id], pos:'50% 6%', zoom });        // cận mặt (pos/zoom chỉ dùng cho ảnh tạm — xem ghi chú 12/09 ở đầu file)
 const half = (id,zoom=1.15)=>({ img:ART[id], pos:'50% 18%', zoom });      // nửa người
 
 const STORY = {

@@ -8,10 +8,10 @@ Sinh ảnh xong, đặt đúng tên vào thư mục `art/comic/` cạnh `index.h
 
 | Mục | Giá trị |
 |---|---|
-| Định dạng | JPG chất lượng cao, tối đa 1600px cạnh dài. Ảnh riêng hiện **nguyên khung** (`object-fit: cover` theo tâm); `pos`/`zoom` trong `js/story.js` chỉ áp cho ảnh tạm |
-| Khổ theo layout (đo ô thật ở 375×812) | `v2` (ô 359×338): **1:1** · `w3` ô rộng (359×362): **1:1** · `w3` ô nhỏ (176×315): **9:16** · `h2` (176×685, game cắt hai bên, còn ~46% bề ngang): **9:16**, chủ thể trong dải giữa 45% · `splash` (359×685): **9:16** |
+| Định dạng | JPG chất lượng cao, tối đa 1600px cạnh dài. **Từ 12/09 ảnh riêng dán `object-fit: contain` — hiện TRỌN VẸN, không bao giờ bị xén.** Lệch khổ thì game chừa viền và lấp bằng chính ảnh đó, phóng to + làm mờ. `pos`/`zoom` trong `js/story.js` chỉ còn áp cho ảnh tạm |
+| Khổ theo layout (đo ô thật ở 375×812) | `v2` (ô 359×338): **1:1** · `w3` ô rộng (359×362): **1:1** · `w3` ô nhỏ (176×315): **9:16** · `h2` (176×685): **9:16** · `splash` (359×685): **9:16** · `v3` (359×238): **3:2**. Sai khổ không còn làm mất mặt nhân vật nữa, chỉ làm ảnh nhỏ đi vì phải chừa viền — vẫn nên vẽ đúng khổ |
 | Chữ | **Không** chữ, không bong bóng, không SFX, không logo — game vẽ đè lên |
-| Vùng an toàn | Bong bóng đặt ở góc (`at` trong data): chủ thể ở giữa khung, bốn góc ít chi tiết. Ô 1:1: góc trên trái trống cho caption. Ô nhỏ 9:16: chủ thể ở nửa trên, bong bóng chiếm ~30% ô. `h2`: chủ thể trong dải giữa 45% bề ngang |
+| Vùng an toàn | **Đổi 12/09:** mọi bong bóng giờ dồn thành một cột ở **ĐÁY** panel (chiếm 25–45% chiều cao, ô nhỏ nhiều chữ thì tới 60%). Nên: đặt mặt và chi tiết quan trọng ở **nửa trên khung**; nửa dưới để nền, thân người, khói bụi. Không cần chừa góc nào khác nữa |
 | Phong cách | Manga/comic cyberpunk: nét mực đen, halftone, tương phản cao, ánh sáng kịch tính; game phủ thêm lớp chấm halftone nhẹ |
 | Màu | Nền gần đen `#06070A`. Phe **Chrome** (Tháp/Canticle): tím `#7C4DFF` + trắng lạnh `#DCE6F7`. Phe **Rust** (Đáy): cam rỉ `#E2703A` + xanh axit `#C9D830` |
 
@@ -198,11 +198,12 @@ Anh chốt: **sửa văn theo art**, trừ mục 10 (không khí, không xung đ
 python scratch/comic_import.py
 ```
 
-**Vì sao phải cắt đúng tỉ lệ:** css `.panel.has-art .panel__img` **bỏ `pos`/`zoom`** và ép `object-position:50% 50%` — ảnh vẽ riêng bị cắt giữa một cách mù quáng, không chỉnh được từ `js/story.js`. Tỉ lệ ô đo thật ở 375×812: `v2` **0.997** · `w3` ô rộng **0.93** · `w3` ô nhỏ **0.52** · `w3b` ô dọc **0.52**, ô rộng **0.93** · `h2` **0.26** · `v3` **1.51** · `splash` **0.52**.
+**Vì sao vẫn nên cắt đúng tỉ lệ** (dù từ 12/09 sai khổ không còn mất mặt nhân vật): lệch khổ thì `contain` chừa viền, ảnh nhỏ lại, phần chừa chỉ là ảnh mờ. Tỉ lệ ô đo thật ở 375×812: `v2` **0.997** · `w3` ô rộng **0.93** · `w3` ô nhỏ **0.52** · `w3b` ô dọc **0.52**, ô rộng **0.93** · `h2` **0.26** · `v3` **1.51** · `splash` **0.49**.
+**Ô co theo chiều cao màn** — ở 375×667 mọi ô rộng ra ~21% so với số trên. Đó là lý do phải dùng `contain`: cắt sẵn cho 812 thì ở 667 `cover` xén mất trán và mắt nhân vật (xem `docs/comic-reader.md` §2).
 `w3b` là bản lật của `w3` — **hai ô dọc ở trên, một ô rộng ở dưới**; dùng khi trang có hai tấm dọc rồi mới tới một tấm ngang/vuông.
-**`h2` (0.26) hầu như không dùng được**: nó là hai cột dọc cực hẹp, ảnh 0,563 vào đó mất 54% bề ngang — có hai người đứng cạnh nhau là mất hẳn một. Gặp `h2` thì đổi sang `v2` hoặc `w3b`. (Số trong §1 là bản đo cũ, lệch vài phần trăm — dùng bảng này.)
+**`h2` (0.26) hầu như không dùng được**: nó là hai cột dọc cực hẹp, ảnh 0,563 vào đó chừa viền tới 54% bề ngang. Gặp `h2` thì đổi sang `v2` hoặc `w3b`. (Số trong §1 là bản đo cũ, lệch vài phần trăm — dùng bảng này.)
 
-**Art khổ ngang thì đừng nhét vào ô dọc.** `h2` và ô nhỏ của `w3` là cột dọc 0,26–0,52; ảnh 16:9 vào đó chỉ còn 26–31% bề ngang. Đổi layout trang sang `v2` (hai ô ngang xếp chồng) rẻ hơn nhiều so với vẽ lại ảnh — đã làm thế cho 00-T trang 3.
+**Art khổ ngang nhét vào ô dọc thì phí chỗ.** `h2` và ô nhỏ của `w3` là cột dọc 0,26–0,52; ảnh 16:9 vào đó chỉ chiếm 26–31% chiều cao ô, còn lại là viền mờ. Đổi layout trang sang `v2` (hai ô ngang xếp chồng) rẻ hơn nhiều so với vẽ lại ảnh — đã làm thế cho 00-T trang 3.
 
 **Sửa chữ thì dùng `docs/comic-text.md`** — toàn bộ 178 bong bóng của 40 trang nằm một chỗ, sửa xong đẩy ngược vào game:
 
@@ -213,7 +214,7 @@ node scratch/comic_text_apply.js   # file md → game (có --dry để xem trư�
 
 **Panel đã có art riêng thì bỏ `fg` trong `js/story.js`**, không thì sprite nhân vật vẽ chồng lên art (lớp `fg` không tự tắt khi có `has-art`).
 
-**Sửa chữ xong phải quét lại chồng lấn bong bóng.** Chữ dài thêm vài từ là đủ để hai khối đè lên nhau — và ô panel co theo chiều cao màn, nên quét ở **hai khổ**: 375×812 (iPhone thường) và **375×667 (iPhone SE — khổ thấp nhất còn phổ biến, là khổ hay vỡ)**.
+**Bong bóng đè nhau không còn xảy ra được** (đổi 12/09): mọi khối chữ xếp thành một cột ở đáy panel nên chúng không thể chồng lên nhau. Cái cần canh bây giờ là **cột chữ cao quá, nuốt mất tranh**. Đo bằng `scratch/comic_overlap.js` ở **hai khổ**: 375×812 (iPhone thường) và **375×667 (iPhone SE — khổ thấp nhất còn phổ biến, là khổ hay vỡ)**. Ngưỡng: cột chữ ≤ 45% chiều cao ô ở 812.
 
 ```js
 // dán vào console khi game đang mở

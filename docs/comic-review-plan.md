@@ -2,6 +2,11 @@
 
 > Dữ liệu trang: `js/story.js`. Renderer: `js/comic.js`. Prompt ảnh: `docs/comic-prompts.md`. Luật viết: `docs/story.md` §5.
 > Kế hoạch này có sẵn phần "phát hiện" từ lần khảo sát 06/09 để bắt tay sửa ngay; phần checklist dùng lại cho mọi lần rà sau.
+>
+> **Cập nhật 12/09 — renderer đổi, một phần checklist nhóm C/D hết hiệu lực** (chi tiết: `docs/comic-reader.md`):
+> ảnh vẽ tay dán `contain` nên **không bao giờ bị xén** (C5, D1, D2 hết lo), và mọi bong bóng dồn thành một cột
+> ở đáy panel nên **không thể đè nhau** (C1 luôn đạt) và không còn che mặt (C3, C4 hết nghĩa). Cái còn phải canh
+> là **cột chữ cao quá, nuốt mất tranh** — ngưỡng mới: cột chữ ≤ 45% chiều cao ô đo ở 375×812.
 
 ---
 

@@ -506,6 +506,11 @@ button.hero__mission:hover i{color:var(--text-1)}
 .arch--codex{grid-template-columns:repeat(auto-fill,minmax(148px,1fr))}
 .tile.tile--wide{aspect-ratio:4/3}
 .tile--wide .portrait{--pos:50% 50%}
+.tile--comic{--tier:var(--text-3)}            /* thẻ tab TRUYỆN: nhãn TRƯỚC TRẬN / SAU TRẬN dùng màu chữ mờ */
+.tile--comic .portrait{--pos:50% 28%}         /* panel đầu thường là cận mặt → neo lên trên cho thấy mặt */
+.tile--comic .tile__name{gap:6px;align-items:flex-end}
+.tile--comic .tile__name span:first-child{line-height:1.3}
+.tile--comic .tier{flex:none;white-space:nowrap}
 .tile--wide .tile__name{letter-spacing:.12em;font-size:10px}
 .cdx__pic .cdx__none{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center;padding:6px;
   background:repeating-linear-gradient(45deg,transparent 0 7px,rgba(190,200,222,.045) 7px 8px)}
@@ -1064,12 +1069,26 @@ button.hero__mission:hover i{color:var(--text-1)}
 .comic__top{display:flex;align-items:center;gap:10px;padding:10px 10px 6px;font:var(--fs-2xs) var(--font-mono);letter-spacing:.2em;color:var(--text-2)}
 .comic__ctr{margin-left:auto;color:var(--text-3)}
 .comic__stage{position:relative;min-height:0;container-type:inline-size}
-.comic__hint{padding:6px 12px 10px;text-align:right;font-size:var(--fs-2xs);letter-spacing:.2em;color:var(--text-3);animation:hp-warn 1400ms steps(2,end) infinite}
+.comic__bar{display:flex;align-items:center;gap:10px;padding:6px 10px 10px}
+.comic__bar .btn-ghost:disabled{opacity:.28;cursor:default}
+.comic__hint{margin-left:auto;text-align:right;font-size:var(--fs-2xs);letter-spacing:.2em;color:var(--text-3);animation:hp-warn 1400ms steps(2,end) infinite}
 .page{position:absolute;inset:6px 8px;display:grid;gap:8px;background:#0b0b0d}
 .panel--wide{grid-column:1/-1}
-.panel{position:relative;overflow:hidden;min-height:0;margin:0;background:var(--surface-2);border:3px solid #000;box-shadow:0 0 0 1px rgba(255,255,255,.14)}
+/* Panel (đổi 12/09, xem docs/comic-reader.md §3): TRANH chiếm trọn khung, CHỮ dồn thành một cột ở ĐÁY.
+   Trước đây bong bóng neo vào cả 7 góc — `tl`/`tr`/`c` rơi đúng vào mặt nhân vật (mặt luôn ở nửa trên khung).
+   Dồn hết xuống đáy thì nửa trên khung luôn thoáng, mà tranh vẫn to hết cỡ chứ không bị teo lại. */
+.panel{position:relative;overflow:hidden;min-height:0;margin:0;display:flex;flex-direction:column;background:var(--surface-2);border:3px solid #000;box-shadow:0 0 0 1px rgba(255,255,255,.14)}
+.panel__art{position:absolute;inset:0;overflow:hidden}   /* tranh phủ TRỌN panel (ngoài luồng flex) */
+/* Lớp neo chữ tượng thanh: là ô flex, nên cao đúng bằng panel trừ cột chữ = phần tranh còn thấy. */
+.panel__sfx{position:relative;flex:1 1 auto;min-height:0;z-index:3;pointer-events:none}
+/* Ảnh vẽ riêng dán `contain` chứ KHÔNG `cover`: ô co giãn theo chiều cao màn (ở 375×667 mọi ô lệch ~21% so với
+   khổ ảnh cắt sẵn) nên `cover` là xén mất trán, mất mắt. Chỗ chừa lấp bằng .panel__bg — chính ảnh đó, phóng to,
+   làm mờ, tối đi — nên panel vẫn kín khung, không có dải đen chết. Ảnh tạm (thẻ nhân vật, nền sector) giữ `cover`. */
+.panel__bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(16px) saturate(.45) brightness(.4);transform:scale(1.14);display:none}
+.panel.has-art .panel__bg{display:block}
 .panel__img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:var(--pos,50% 30%);transform:scale(var(--zoom,1));transform-origin:var(--pos,50% 30%);display:none}
 .panel.has-img .panel__img{display:block}
+.panel.has-art .panel__img{object-fit:contain;object-position:50% 50%;transform:none}
 .panel__ph{position:absolute;inset:0;background:linear-gradient(160deg,var(--chrome-tint),transparent 60%),repeating-linear-gradient(0deg,transparent 0 3px,rgba(0,0,0,.25) 3px 4px),var(--surface-3)}
 .panel--rust .panel__ph{background:linear-gradient(160deg,var(--rust-tint),transparent 60%),repeating-linear-gradient(0deg,transparent 0 3px,rgba(0,0,0,.25) 3px 4px),var(--surface-3)}
 .panel.has-img .panel__ph{display:none}
@@ -1078,61 +1097,46 @@ button.hero__mission:hover i{color:var(--text-1)}
 .panel__sil .sil::before,.panel__sil .sil::after{opacity:.9;filter:drop-shadow(0 0 14px rgba(0,0,0,.9))}
 .panel__sil .sil__lbl{display:none}
 .panel.has-art .panel__sil{display:none}
-/* Ảnh vẽ riêng: bỏ zoom, nhưng VẪN neo được bằng --pos (panelEl đặt lại theo p.artPos khi có art).
-   Cần thế vì ô panel co giãn theo chiều cao màn — dải v3 là 1,51 ở màn 812px nhưng 1,91 ở màn 640px,
-   ảnh bị cắt trên dưới và mất đầu nhân vật nếu cứ neo cứng giữa khung. */
-.panel.has-art .panel__img{transform:none}
 .panel__fg{position:absolute;z-index:1;left:var(--fgx,55%);bottom:0;height:var(--fgh,88%);width:auto;max-width:none;transform:translateX(-50%);display:none;filter:drop-shadow(0 6px 10px rgba(0,0,0,.6))}
 .panel__fg.has-img{display:block}
 .panel__fg.is-flip{transform:translateX(-50%) scaleX(-1)}
 .panel__tone{position:absolute;inset:0;z-index:2;pointer-events:none;opacity:.22;mix-blend-mode:multiply;background:radial-gradient(circle,#000 .9px,transparent 1.3px) 0 0/4px 4px}
-.panel--chrome::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;background:rgba(124,77,255,.2);mix-blend-mode:screen}
-.panel--rust::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;background:rgba(226,112,58,.18);mix-blend-mode:screen}
-/* Bong bóng */
-.bub{position:absolute;z-index:3;max-width:74%;padding:7px 10px;background:#fff;color:#0a0b10;border:2px solid #000;border-radius:14px;box-shadow:2px 2px 0 #000;font:600 var(--fs-sm)/1.35 var(--font-ui);transition:opacity 180ms,transform 180ms}
+/* Màu phe phủ lên TRANH thôi, không phủ dải chữ (phủ cả dải chữ thì chữ bị ám màu, khó đọc) */
+.panel--chrome .panel__art::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;background:rgba(124,77,255,.2);mix-blend-mode:screen}
+.panel--rust .panel__art::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;background:rgba(226,112,58,.18);mix-blend-mode:screen}
+/* Bong bóng. KHÔNG có đuôi chỉ vào người nói (bỏ 12/09): bong bóng nằm ở dải chữ dưới tranh nên đuôi luôn chỉ
+   sai chỗ — ai nói thì đọc ở nhãn .bub__who. `at` chỉ còn quyết định lệch trái / giữa / phải. */
+.bub{position:relative;z-index:3;max-width:100%;padding:6px 9px;background:#fff;color:#0a0b10;border:2px solid #000;border-radius:14px;box-shadow:2px 2px 0 #000;font:600 var(--fs-sm)/1.28 var(--font-ui);transition:opacity 180ms,transform 180ms}
 .bub.is-hid{opacity:0;transform:scale(.85);pointer-events:none}
-.bub--tl{top:8px;left:8px}.bub--tr{top:8px;right:8px}.bub--bl{bottom:22px;left:8px}.bub--br{bottom:22px;right:8px}
-.bub--c{top:50%;left:50%;transform:translate(-50%,-50%)}.bub--c.is-hid{transform:translate(-50%,-50%) scale(.85)}
-.bub--t{top:8px;left:50%;transform:translateX(-50%)}.bub--t.is-hid{transform:translateX(-50%) scale(.85)}
-.bub--b{bottom:22px;left:50%;transform:translateX(-50%)}.bub--b.is-hid{transform:translateX(-50%) scale(.85)}
-.bub__who{display:block;margin-bottom:3px;font:800 8px/1 var(--font-mono);letter-spacing:.2em;color:var(--fac,#555)}
+.bub__who{display:block;margin-bottom:2px;font:800 8px/1 var(--font-mono);letter-spacing:.2em;color:var(--fac,#555)}
 .bub__t{display:block}
-.bub--speech::before,.bub--speech::after{content:"";position:absolute;width:0;height:0;border-style:solid}
-.bub--speech[data-tail="bl"]::before{left:18px;bottom:-14px;border-width:14px 12px 0 0;border-color:#000 transparent transparent transparent}
-.bub--speech[data-tail="bl"]::after{left:21px;bottom:-9px;border-width:10px 8px 0 0;border-color:#fff transparent transparent transparent}
-.bub--speech[data-tail="br"]::before{right:18px;bottom:-14px;border-width:14px 0 0 12px;border-color:#000 transparent transparent transparent}
-.bub--speech[data-tail="br"]::after{right:21px;bottom:-9px;border-width:10px 0 0 8px;border-color:#fff transparent transparent transparent}
-.bub--speech[data-tail="tl"]::before{left:18px;top:-14px;border-width:0 12px 14px 0;border-color:transparent transparent #000 transparent}
-.bub--speech[data-tail="tl"]::after{left:21px;top:-9px;border-width:0 8px 10px 0;border-color:transparent transparent #fff transparent}
-.bub--speech[data-tail="tr"]::before{right:18px;top:-14px;border-width:0 0 14px 12px;border-color:transparent transparent #000 transparent}
-.bub--speech[data-tail="tr"]::after{right:21px;top:-9px;border-width:0 0 10px 8px;border-color:transparent transparent #fff transparent}
 .bub--thought{border-style:dashed;border-radius:22px;font-style:italic;font-weight:500}
-.bub--thought::after{content:"";position:absolute;width:7px;height:7px;border-radius:50%;background:#fff;border:2px solid #000}
-.bub--thought[data-tail^="b"]::after{bottom:-13px} .bub--thought[data-tail^="t"]::after{top:-13px}
-.bub--thought[data-tail$="l"]::after{left:16px} .bub--thought[data-tail$="r"]::after{right:16px}
 .bub--shout{padding:0;background:#000;border:0;border-radius:0;box-shadow:none;max-width:80%;
   --jag:polygon(50% 0,58% 10%,72% 3%,74% 16%,90% 12%,86% 26%,100% 32%,90% 44%,100% 58%,88% 64%,94% 80%,78% 78%,74% 96%,60% 86%,50% 100%,40% 86%,26% 96%,22% 78%,6% 80%,12% 64%,0 58%,10% 44%,0 32%,14% 26%,10% 12%,26% 16%,28% 3%,42% 10%);clip-path:var(--jag)}
 /* Đệm dưới dày hơn đệm trên: hình ngôi sao thóp lại ở hai góc dưới, câu hét dài 3–4 dòng bị cắt mất chân chữ (thấy ở 00-T trang 3). */
 .bub--shout .bub__in{display:block;margin:3px;padding:18px 26px 30px;background:#fff;clip-path:var(--jag);font-weight:900;text-transform:uppercase;letter-spacing:.06em;text-align:center}
-.bub--caption{background:#f3e4ad;border-radius:0;box-shadow:2px 2px 0 #000;font-weight:500;font-style:italic;color:#1a1408;max-width:86%;font-size:var(--fs-xs)}
-.bub--sfx{background:none;border:0;box-shadow:none;padding:0;max-width:none;font:900 clamp(22px,9cqw,46px)/1 var(--font-ui);color:var(--rust-acid);-webkit-text-stroke:2px #000;paint-order:stroke fill;text-shadow:3px 3px 0 #000;transform:rotate(-8deg);letter-spacing:.04em}
-.bub--sfx.bub--c{transform:translate(-50%,-50%) rotate(-8deg)}
-/* Ô nhỏ của w3 chỉ rộng 168–176px: giữ max-width 74% thì một câu 17 chữ xuống 5 dòng và tràn qua lời dẫn ở trên
-   (thấy ở 07-B outro trang 1 panel 2, màn 360×640). Nới bằng lời dẫn → ít dòng hơn, thấp hơn, không đè nhau. */
-.page--w3 .panel:not(.panel--wide) .bub{max-width:88%}
-/* panel có stack:true (js/comic.js): bong bóng xếp thành cột, không thể đè nhau dù chữ dài ra.
-   `at` chỉ còn quyết định lệch trái/giữa/phải; thứ tự dọc = thứ tự viết trong js/story.js. */
-.panel__bubs{position:absolute;inset:8px 8px 22px;z-index:3;display:flex;flex-direction:column;justify-content:space-between;gap:8px}
-/* stack:'end' — dồn cả cột xuống đáy ô. Dùng khi mặt nhân vật nằm ở 1/3 trên khung: bong bóng dàn đều
-   (space-between) thì khối đầu luôn dính mép trên và che mặt, còn dồn xuống đáy thì chừa trọn phần đầu. */
-.panel__bubs--end{justify-content:flex-end}
-.panel__bubs .bub{position:relative;inset:auto;transform:none;max-width:100%}
-.panel__bubs .bub.is-hid{transform:scale(.85)}
+.bub--caption{background:#f3e4ad;border-radius:0;box-shadow:2px 2px 0 #000;font-weight:500;font-style:italic;color:#1a1408;font-size:var(--fs-xs)}
+/* Chữ tượng thanh là ngoại lệ duy nhất còn neo tuyệt đối ĐÈ LÊN TRANH: nó trong suốt, cố ý nằm trên tranh. */
+.bub--sfx{position:absolute;background:none;border:0;box-shadow:none;padding:0;max-width:none;font:900 clamp(22px,9cqw,46px)/1 var(--font-ui);color:var(--rust-acid);-webkit-text-stroke:2px #000;paint-order:stroke fill;text-shadow:3px 3px 0 #000;transform:rotate(-8deg);letter-spacing:.04em}
+.bub--sfx.bub--tl{top:8px;left:8px} .bub--sfx.bub--tr{top:8px;right:8px}
+.bub--sfx.bub--bl{bottom:8px;left:8px} .bub--sfx.bub--br{bottom:8px;right:8px}
+.bub--sfx.bub--t{top:8px;left:50%;transform:translateX(-50%) rotate(-8deg)}
+.bub--sfx.bub--b{bottom:8px;left:50%;transform:translateX(-50%) rotate(-8deg)}
+.bub--sfx.bub--c{top:50%;left:50%;transform:translate(-50%,-50%) rotate(-8deg)}
+/* Cột chữ ở đáy panel: xếp từ dưới lên, thứ tự dọc = thứ tự viết trong js/story.js, các khối KHÔNG THỂ đè nhau.
+   Nền là dải mờ dần (trong suốt ở trên) để chỗ giáp tranh không thành một đường cắt ngang cứng. */
+.panel__bubs{position:relative;flex:0 0 auto;z-index:3;display:flex;flex-direction:column;gap:5px;padding:14px 6px 6px;
+  background:linear-gradient(180deg,transparent,rgba(7,8,11,.7) 18%,rgba(7,8,11,.9))}
 .panel__bubs .bub--tl,.panel__bubs .bub--bl{align-self:flex-start}
 .panel__bubs .bub--tr,.panel__bubs .bub--br{align-self:flex-end}
 .panel__bubs .bub--t,.panel__bubs .bub--b,.panel__bubs .bub--c{align-self:center}
+/* Ô nhỏ của w3 / w3b chỉ rộng 168–176px: hạ một nấc cỡ chữ để dải chữ thấp xuống, chừa thêm chỗ cho tranh. */
+.page--w3 .panel:not(.panel--wide) .bub,.page--w3b .panel:not(.panel--wide) .bub{font-size:var(--fs-xs);padding:6px 8px}
+.page--w3 .panel:not(.panel--wide) .bub--caption,.page--w3b .panel:not(.panel--wide) .bub--caption{font-size:var(--fs-2xs)}
 .page.is-in{animation:page-in 320ms var(--ease-hit-out)} .page.is-out{animation:page-out 300ms var(--ease-hit-back) forwards}
+.page.is-back{animation:page-back 320ms var(--ease-hit-out)} .page.is-out-back{animation:page-out-back 300ms var(--ease-hit-back) forwards}
 @keyframes page-in{from{transform:translateX(24%);opacity:0}} @keyframes page-out{to{transform:translateX(-14%);opacity:0}}
+@keyframes page-back{from{transform:translateX(-24%);opacity:0}} @keyframes page-out-back{to{transform:translateX(14%);opacity:0}}
 .page[data-fx="shake"] .panel__img{animation:panel-shake 420ms steps(6) 1}
 @keyframes panel-shake{0%,100%{translate:0 0}20%{translate:-4px 2px}40%{translate:4px -2px}60%{translate:-3px -3px}80%{translate:3px 3px}}
 
@@ -1160,7 +1164,7 @@ button.hero__mission:hover i{color:var(--text-1)}
 .rm-forced .unit.is-pick .unit__brk,.rm-forced .page,.rm-forced .hint,.rm-forced .comic__hint{animation:none}
 .rm-forced .mapnode.is-open .mapnode__dot{animation:none;box-shadow:0 0 0 3px rgba(66,196,234,.25)}
 @media (prefers-reduced-motion: reduce){
-  .unit.is-pick .unit__brk,.page.is-in,.page.is-out,.hint,.comic__hint{animation:none}
+  .unit.is-pick .unit__brk,.page.is-in,.page.is-out,.page.is-back,.page.is-out-back,.hint,.comic__hint{animation:none}
   .mapnode.is-open .mapnode__dot{animation:none;box-shadow:0 0 0 3px rgba(66,196,234,.25)}
   .bub{transition:none}
 }

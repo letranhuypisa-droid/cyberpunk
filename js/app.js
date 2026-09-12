@@ -117,13 +117,15 @@ function renderConfig(){
 document.querySelectorAll('.cfg__row[data-cfg]').forEach(r=>r.addEventListener('click',()=>{ PLAYER.settings[r.dataset.cfg]=!PLAYER.settings[r.dataset.cfg]; savePlayer(); renderConfig(); }));
 $('#cfgReset').addEventListener('click',()=>{ if(confirm('Xoá toàn bộ tiến trình trên máy này?')){ SAVE.reset(); location.reload(); } });
 
-/* ---- ARCHIVE: 3 tab. NHÂN VẬT = thẻ sáng khi đã sở hữu, bấm mở hồ sơ (KỸ NĂNG · PASSIVE · HỒ SƠ).
-       ĐỊA DANH / THUẬT NGỮ = Thư viện (CODEX trong data.js), mở hết ngay, không khoá theo tiến trình. ---- */
+/* ---- ARCHIVE: 5 tab. NHÂN VẬT = thẻ sáng khi đã sở hữu, bấm mở hồ sơ (KỸ NĂNG · PASSIVE · HỒ SƠ).
+       ĐỊA DANH / THUẬT NGỮ / SỔ BỘ = Thư viện (CODEX trong data.js), mở hết ngay, không khoá theo tiến trình.
+       TRUYỆN = đọc lại trang comic từng màn, khoá theo tiến trình (xem comicEntries). ---- */
 const ARCH = { tab:'char' };
 function renderArchive(){
   const grid=$('#archGrid'); grid.innerHTML=''; $('#codex').hidden=true;
   document.querySelectorAll('#archTabs .lore__tab').forEach(b=>b.classList.toggle('is-on', b.dataset.atab===ARCH.tab));
   grid.classList.toggle('arch--codex', ARCH.tab!=='char');
+  if(ARCH.tab==='comic') return renderComicGrid(grid);
   if(ARCH.tab!=='char') return renderCodexGrid(grid, codexGroup(ARCH.tab));
   const all=Object.values(ROSTER); const n=all.filter(d=>owns(d.id)).length;
   $('#archCount').textContent=`${n}/${all.length} HỒ SƠ`;
@@ -155,6 +157,34 @@ function renderCodexGrid(grid, g){
     t.appendChild(codexPic(it));
     t.insertAdjacentHTML('beforeend',`<div class="tile__name"><span>${it.name}</span></div>`);
     t.addEventListener('click',()=>openCodex(g, it));
+    grid.appendChild(t);
+  });
+}
+/* ---- ARCHIVE · TRUYỆN: đọc lại trang comic trước/sau mỗi màn (js/story.js), mở bằng playComic.
+   Khoá theo tiến trình để không lộ truyện: phần TRƯỚC TRẬN mở khi màn đã mở, phần SAU TRẬN chỉ mở khi ĐÃ THẮNG
+   màn đó. Ảnh thẻ mượn panel đầu của phần ấy. ---- */
+function comicEntries(){
+  const out=[];
+  SECTORS.forEach(sec=>{
+    const st=(typeof STORY!=='undefined') && STORY[sec.id]; if(!st) return;
+    if(st.intro&&st.intro.length) out.push({ sec, kind:'intro', label:'TRƯỚC TRẬN', pages:st.intro, open:sec.state!=='locked' });
+    if(st.outro&&st.outro.length) out.push({ sec, kind:'outro', label:'SAU TRẬN',   pages:st.outro, open:sec.state==='cleared' });
+  });
+  return out;
+}
+function renderComicGrid(grid){
+  const list=comicEntries(), open=list.filter(e=>e.open);
+  $('#archCount').textContent=`${open.length}/${list.length} PHẦN · ${open.reduce((s,e)=>s+e.pages.length,0)} TRANG ĐỌC ĐƯỢC`;
+  list.forEach(e=>{
+    const t=el('div',`tile tile--wide tile--comic tile--${e.kind==='outro'?'rust':'chrome'} ${e.open?'':'is-locked'}`);
+    const pic=el('div','portrait cdx__pic');
+    pic.innerHTML='<div class="cdx__none"><span>NO ASSET</span></div><img alt="">';
+    loadFirst([comicImgName(e.sec.id, e.kind, 1, 1)]).then(src=>{ if(src){ pic.querySelector('img').src=src; pic.classList.add('has-img'); } });
+    t.appendChild(pic);
+    t.insertAdjacentHTML('beforeend',
+      `<span class="tile__lock">${e.open?e.pages.length+' TRANG':'CHƯA MỞ'}</span>
+       <div class="tile__name"><span>${e.sec.id} · ${e.open?e.sec.name:'???'}</span><span class="tier">${e.label}</span></div>`);
+    if(e.open) t.addEventListener('click',()=>{ sfx('open',.17); playComic(e.pages, e.sec, e.kind, {replay:true}); });
     grid.appendChild(t);
   });
 }
