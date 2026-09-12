@@ -7,6 +7,12 @@ const fs = require('fs'), vm = require('vm'), path = require('path');
 const ROOT = path.join(__dirname, '..');
 const read = f => fs.readFileSync(path.join(ROOT, f), 'utf8');
 
+/* --json: nuốt hết bảng biểu, chỉ in {issues, notes} cho scratch/check.js đọc. Phải đặt trước khi dựng ctx
+   của vm vì ctx dùng chung đúng object console này — nạp file lỗi giữa chừng cũng không làm hỏng JSON. */
+const JSON_OUT = process.argv.includes('--json');
+const out = console.log.bind(console);
+if (JSON_OUT) console.log = () => {};
+
 /* ---- sandbox tối thiểu để nạp core.js / data.js / state.js / story.js ---- */
 const noop = () => {}; const mem = {};
 const elStub = () => ({ style: { setProperty: noop, removeProperty: noop }, classList: { add: noop, remove: noop, toggle: noop, contains: () => false },
@@ -24,16 +30,20 @@ const ctx = { console, Math, JSON, Date, Object, Array, String, Number, RegExp, 
 ctx.window = ctx; ctx.globalThis = ctx; ctx.self = ctx;
 vm.createContext(ctx);
 const load = f => { try { vm.runInContext(read(f), ctx, { filename: f }); } catch (e) { console.log(`  (nạp ${f} lỗi giữa chừng, vẫn dùng phần đã khai báo: ${e.message})`); } };
-['js/core.js', 'js/data.js', 'js/state.js', 'js/story.js'].forEach(load);
+['js/core.js', 'js/data.js', 'js/state.js', 'js/comic.js', 'js/story.js'].forEach(load);
 const G = n => { try { return vm.runInContext(`typeof ${n}!=='undefined'?${n}:null`, ctx); } catch (e) { return null; } };
-const STORY = G('STORY'); if (!STORY) { console.log('Không đọc được STORY từ js/story.js'); process.exit(1); }
+const die = m => { if (JSON_OUT) out(JSON.stringify({ issues: [m], notes: [] })); else console.log(m); process.exit(1); };
+const STORY = G('STORY'); if (!STORY) die('Không đọc được STORY từ js/story.js');
 const ROSTER = G('ROSTER') || {}, POOL = G('ENEMY_POOL') || [], SECTORS = G('SECTORS') || [];
 const speakers = new Set([...Object.keys(ROSTER), ...POOL.map(e => e.id)]);
 const secById = id => SECTORS.find(s => s.id === id);
 
 /* ---- quy ước ---- */
-const CELLS = { splash: 1, v2: 2, h2: 2, w3: 3, g4: 4 };
-const ratio = (layout, k) => layout === 'v2' ? '1:1' : layout === 'h2' ? '9:16' : layout === 'w3' ? (k === 0 ? '1:1' : '9:16') : layout === 'splash' ? '9:16' : '?';   // khổ theo ô thật 375×812 (docs/comic-prompts.md §1)
+/* Số ô và khổ ảnh lấy thẳng từ bảng LAYOUTS trong js/comic.js — bản gốc duy nhất. Trước đây chép tay ở đây,
+   nên thêm `w3b` và `v3` hôm 11/09 xong lint báo oan "layout lạ" và in khổ '?' cho 9 panel đúng. */
+const LAYOUTS = G('LAYOUTS'); if (!LAYOUTS) die('Không đọc được LAYOUTS từ js/comic.js');
+const CELLS = Object.fromEntries(Object.entries(LAYOUTS).map(([k, v]) => [k, v.cells]));
+const ratio = (layout, k) => { const L = LAYOUTS[layout]; if (!L) return '?'; return (L.wide === k && L.arWide) ? L.arWide : (L.ar || '?'); };   // khổ theo ô thật 375×812 (docs/comic-prompts.md §1)
 const fname = (sid, kind, pg, pn) => `art/comic/${sid.toLowerCase().replace(/[^a-z0-9]/g, '')}_${kind === 'outro' ? 'o' : 'i'}${pg}_p${pn}.jpg`;
 const words = t => String(t).replace(/…/g, ' ').trim().split(/\s+/).filter(Boolean).length;
 const BANNED = ['bài ca', 'hát lạc điệu', 'bắt nhịp', 'thứ tự lệnh', 'deck', 'Operator', 'Free Zone', 'quận SIS', 'tầng âm bảy'];
@@ -43,7 +53,9 @@ const ART_ID = { 'art/card/yuki.png': 'yuki', 'art/card/ash.png': 'ash', 'art/ca
 
 /* ---- docs/comic-prompts.md ---- */
 const doc = read('docs/comic-prompts.md'); const docMap = new Map();
-for (const m of doc.matchAll(/^- `(art\/comic\/[^`]+)` — (\S+) — (.+)$/gm)) docMap.set(m[1], { ratio: m[2], text: m[3] });
+// Tiền tố `art/comic/` là tuỳ chọn: bản viết lại 11/09 ghi tên trần (`07a_i1_p1.jpg`). Bắt cả hai kiểu rồi
+// chuẩn hoá về đường dẫn đầy đủ, nếu không docMap rỗng và mọi panel đều bị báo oan "chưa có prompt".
+for (const m of doc.matchAll(/^- `(?:art\/comic\/)?([^`\/]+\.jpg)` — (\S+) — (.+)$/gm)) docMap.set('art/comic/' + m[1], { ratio: m[2], text: m[3] });
 
 /* ---- duyệt ---- */
 const issues = [], notes = [], firstSeen = new Map(), pron = {}, seenFiles = new Set(), rows = [];
@@ -111,3 +123,6 @@ console.log(`\n== GHI CHÚ (${notes.length}) ==`);
 notes.forEach(x => console.log('  - ' + x));
 console.log(`\n== VẤN ĐỀ (${issues.length}) ==`);
 issues.forEach(x => console.log('  - ' + x));
+
+if (JSON_OUT) out(JSON.stringify({ issues, notes }));
+process.exit(issues.length ? 1 : 0);   // ghi chú (notes) không làm đỏ, chỉ vấn đề

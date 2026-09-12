@@ -76,13 +76,13 @@ Anh chốt: **sửa văn theo art**, trừ mục 10 (không khí, không xung đ
 - `00t_i2_p1.jpg` — 1:1 — Extreme close-up of @Yuki's face lying in the scrap, eyes just opening, rain running across her cheek, the cracked halo above her sparking; her gaze is hollow rather than frightened — empty, as if half of her is missing.
 - `00t_i2_p2.jpg` — 9:16 — Macro detail: the halo ring snapped clean in two above her white bob hair, blue-green arc electricity jumping across the break, raindrops flashing into steam on the hot metal.
 - `00t_i2_p3.jpg` — 9:16 — @Yuki up on one knee in the mud, the katana ZERO still in her fist, staring at her own hand as if it belongs to a stranger — the sword she cannot remember earning; low angle, sodium-orange floodlight behind her.
-- `00t_i3_p1.jpg` — 9:16 — Three scavengers in welded scrap armor and gas masks wading through the mud toward the camera, crowbars and cutting torches raised, infrared lenses glowing pink through the rain; predatory and hungry.
-- `00t_i3_p2.jpg` — 9:16 — @Yuki mid-lunge, katana ZERO swinging in a wide arc, a small unsettling smile on her face, motion lines and rain trails; scrapyard behind her.
+- `00t_i3_p1.jpg` — 1:1 — Three scavengers in welded scrap armor and gas masks wading through the mud toward the camera, crowbars and cutting torches raised, infrared lenses glowing pink through the rain; predatory and hungry.
+- `00t_i3_p2.jpg` — 1:1 — @Yuki mid-lunge, katana ZERO swinging in a wide arc, a small unsettling smile on her face, motion lines and rain trails; scrapyard behind her.
 
 ### 00-T — outro *(2 trang · 5 panel)*
-- `00t_o1_p1.jpg` — 1:1 — Wide shot ten minutes later: @Yuki standing alone and breathing hard among felled scavengers, weapon lowered, mud around her stained dark; drained, faintly confused by what her own body just did.
-- `00t_o1_p2.jpg` — 9:16 — @Ash crouched close, appraising the broken halo the way an auditor reads a ledger, cigarette in her lips, one eyebrow raised; she is pricing it, not worrying about it.
-- `00t_o1_p3.jpg` — 9:16 — @Kai grabbing his sister's sleeve, half-panicked half-grinning, gesturing at @Yuki with his free hand; he is arguing and enjoying arguing.
+- `00t_o1_p1.jpg` — 3:2 — Wide shot ten minutes later: @Yuki standing alone and breathing hard among felled scavengers, weapon lowered, mud around her stained dark; drained, faintly confused by what her own body just did.
+- `00t_o1_p2.jpg` — 3:2 — @Ash crouched close, appraising the broken halo the way an auditor reads a ledger, cigarette in her lips, one eyebrow raised; she is pricing it, not worrying about it.
+- `00t_o1_p3.jpg` — 3:2 — @Kai grabbing his sister's sleeve, half-panicked half-grinning, gesturing at @Yuki with his free hand; he is arguing and enjoying arguing.
 - `00t_o2_p1.jpg` — 1:1 — @Yuki from a low angle looking straight at the twins, rain streaming down her face, one finger raised toward the cracked ring above her own head; blunt, direct, no self-pity.
 - `00t_o2_p2.jpg` — 1:1 — @Ash arms crossed, chin tipped toward the distance where furnace glow stains the fog orange; @Yuki small in frame behind her, already deciding to follow.
 

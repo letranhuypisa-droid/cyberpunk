@@ -1,0 +1,29 @@
+{
+  "comic_lint": [],
+  "ult_lint": [],
+  "art_audit": [
+    "cipher: thiếu sprite idle,attack,crit,hurt,die",
+    "echo: thiếu sprite idle,attack,crit,hurt,die",
+    "echo: khai ultVideo nhưng không có file",
+    "gravedigger: thiếu sprite idle,attack,crit,hurt,die",
+    "halo: thiếu sprite idle,attack,crit,hurt,die",
+    "junker: thiếu sprite idle,attack,crit,hurt,die",
+    "meridian: thiếu sprite idle,attack,crit,hurt,die",
+    "muzzle: thiếu sprite idle,attack,crit,hurt,die",
+    "muzzle: khai ultVideo nhưng không có file",
+    "nyx: thiếu sprite idle,attack,crit,hurt,die",
+    "ronin: khai ultVideo nhưng không có file",
+    "spark: thiếu sprite idle,attack,crit,hurt,die",
+    "stitch: thiếu sprite idle,attack,crit,hurt,die",
+    "stitch: khai ultVideo nhưng không có file",
+    "toll: thiếu sprite idle,attack,crit,hurt,die",
+    "vesper: thiếu sprite idle,attack,crit,hurt,die",
+    "vixen: thiếu sprite idle,attack,crit,hurt,die",
+    "wire: thiếu sprite idle,attack,crit,hurt,die",
+    "wire: khai ultVideo nhưng không có file",
+    "archon: thiếu sprite hurt",
+    "cantor: thiếu sprite hurt",
+    "enforcer: thiếu sprite hurt",
+    "gutterrat: thiếu sprite die"
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node scratch/check_hook.js",
+            "timeout": 60,
+            "statusMessage": "Đang soát lại (comic/ult/art)..."
+          }
+        ]
+      }
+    ]
+  }
+}

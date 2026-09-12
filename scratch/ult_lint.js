@@ -86,6 +86,12 @@ Object.values(ROSTER).filter(d => d.recruit && d.ult).forEach(d => {
 });
 
 const nUlt = Object.values(ROSTER).filter(d => d.ult).length + ENEMY_POOL.filter(e => e.ult).length;
+
+/* --json: chỉ in {issues} cho scratch/check.js, mỗi vấn đề gộp thành một dòng để so với bản nền. */
+if (process.argv.includes('--json')) {
+  console.log(JSON.stringify({ issues: problems.map(([tag, msg]) => `${tag} — ${msg}`), notes: [] }));
+  process.exit(problems.length ? 1 : 0);
+}
 if (!problems.length) {
   console.log(`\n${nUlt} chiêu cuối: chữ khớp cơ chế, không có vấn đề.\n`);
   process.exit(0);

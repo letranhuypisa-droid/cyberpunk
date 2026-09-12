@@ -8,15 +8,17 @@
    splash 0.49 · v2 1.00 · h2 0.26 · w3 ô rộng 0.93, ô nhỏ 0.52 · v3 1.51 · g4 0.52
    NHƯNG ô co giãn theo chiều cao màn (ở 375×667 mọi ô lệch ~21%), nên ảnh vẽ tay dán bằng `contain` chứ không
    `cover`: thà chừa viền còn hơn xén mất mặt nhân vật. Chỗ chừa lấp bằng chính ảnh đó phóng to + làm mờ.
-   Xem docs/comic-reader.md §2. Đo lại bằng `node scratch/comic_fit.js`. */
+   Xem docs/comic-reader.md §2. Đo lại bằng `node scratch/comic_fit.js`.
+   `ar` = khổ ghi trong docs/comic-prompts.md cho ô thường, `arWide` cho ô `wide`. Bảng này là bản gốc DUY NHẤT:
+   scratch/comic_lint.js đọc thẳng nó, thêm layout mới là lint biết ngay, không phải chép tay sang chỗ khác. */
 const LAYOUTS = {
-  splash:{ cells:1, css:'1fr / 1fr' },
-  v2:    { cells:2, css:'1fr 1fr / 1fr' },
-  h2:    { cells:2, css:'1fr / 1fr 1fr' },
-  w3:    { cells:3, css:'1.15fr 1fr / 1fr 1fr', wide:0 },
-  w3b:   { cells:3, css:'1fr 1.15fr / 1fr 1fr', wide:2 },   // ngược của w3: hai ô dọc ở trên, một ô rộng ở dưới
-  v3:    { cells:3, css:'1fr 1fr 1fr / 1fr' },   // ba dải ngang xếp chồng — chỗ duy nhất hợp với art khổ 16:9
-  g4:    { cells:4, css:'1fr 1fr / 1fr 1fr' },
+  splash:{ cells:1, css:'1fr / 1fr', ar:'9:16' },
+  v2:    { cells:2, css:'1fr 1fr / 1fr', ar:'1:1' },
+  h2:    { cells:2, css:'1fr / 1fr 1fr', ar:'9:16' },
+  w3:    { cells:3, css:'1.15fr 1fr / 1fr 1fr', wide:0, ar:'9:16', arWide:'1:1' },
+  w3b:   { cells:3, css:'1fr 1.15fr / 1fr 1fr', wide:2, ar:'9:16', arWide:'1:1' },   // ngược của w3: hai ô dọc ở trên, một ô rộng ở dưới
+  v3:    { cells:3, css:'1fr 1fr 1fr / 1fr', ar:'3:2' },   // ba dải ngang xếp chồng — chỗ duy nhất hợp với art khổ ngang
+  g4:    { cells:4, css:'1fr 1fr / 1fr 1fr', ar:'9:16' },
 };
 const COMIC = { box:null, running:null };
 function comicUI(){

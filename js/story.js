@@ -86,7 +86,7 @@ const STORY = {
           say('yuki','…Xong hết rồi à?','b'),
         ]},
         { ...half('ash'), artPos:'50% 34%', bubbles:[
-          say('ash','Hàng cực phẩm… Halo cấp S, gãy vòng ngoài nhưng lõi còn nguyên tem. Cạy được cục này đem bán thì hai chị em tao húp thịt hộp nhòe mồm nửa năm!','br'),
+          say('ash','Hàng cực phẩm… Halo cấp S, vỡ vòng ngoài nhưng lõi còn nguyên tem. Cạy ra bán, chị em tao húp thịt hộp nửa năm!','br'),
         ]},
         { ...half('kai'), artPos:'50% 30%', bubbles:[
           say('kai','Bớt giùm em đi, bà chị sinh trước bảy phút ơi. Chị định để em mồ côi một mình hay gì?','b'),
@@ -101,7 +101,7 @@ const STORY = {
            caption ngắn ở `t` (chỉ chớm vai cô), lời thoại gộp làm một ở `b` (đè lên thân, không đè lên mặt).
            Hai câu của Ash vốn là một lượt nói liền mạch nên gộp không mất gì. */
         { ...half('ash'), artPos:'50% 26%', bubbles:[
-          say('ash','Lò đúc của lão Foreman. Chỉ có lửa ở đấy mới luộc nổi hợp kim của Tháp. Mà đời này không ai nuôi báo cô ai đâu cưng — muốn gỡ vòng thì vác xác về làm culi trừ nợ cho băng của tao.','c'),
+          say('ash','Lò đúc lão Foreman. Chỉ lửa ở đó luộc nổi hợp kim Tháp. Mà tao không làm từ thiện: gỡ vòng xong thì trừ nợ.','c'),
           cap('Không đáp lời, cô lẳng lặng cất bước đi theo.','b'),   // rút còn một dòng: dài hơn là đè lên bong bóng ở giữa
         ]}),
     ]},
@@ -114,7 +114,7 @@ const STORY = {
            vì `c` luôn căn giữa 50% bất kể khối dưới cao bao nhiêu. Xếp cột (stack) thì hết đè. */
         { ...half('ronin'), stack:true, bubbles:[
           cap('Tổ nhặt phế liệu của Ronin. Thiết quân luật duy nhất: cấm rã xác người.','tl'),
-          say('ronin','Ở đây tao chỉ lượm sắt vụn, không xẻ thịt đồng loại. Muốn nhập bọn thì tự chứng minh mày không phải một cục nợ vô dụng.','c'),
+          say('ronin','Ở đây tao lượm sắt vụn, không xẻ thịt đồng loại. Muốn nhập bọn thì chứng minh mày không phải cục nợ.','c'),
           say('ronin','Lũ Scav đang chặn cổng bãi xe, bóp nghẹt đường ăn của tổ. Dọn sạch chúng nó cho tao.','b'),
         ]},
         { ...half('muzzle'), stack:true, bubbles:[
@@ -187,7 +187,7 @@ const STORY = {
     intro:[
       page('v2',
         { img:BG.foundry, pos:'50% 40%', bubbles:[
-          cap('Xưởng đúc bỏ hoang cắm sâu dưới lòng đất. Từng thuộc sở hữu của Canticle, nay là hang ổ của băng Foreman — nơi sở hữu ngọn lửa duy nhất ở Khu Đáy đủ nhiệt để bẻ khóa một chiếc Halo.','tl'),
+          cap('Xưởng đúc bỏ hoang cắm sâu dưới lòng đất. Từng của Canticle, nay là hang ổ băng Foreman — nơi có ngọn lửa duy nhất ở Khu Đáy đủ nóng để bẻ khóa một chiếc Halo.','tl'),
         ]},
         { ...half('foreman'), bubbles:[
           say('foreman','Lũ trên Tháp cứ tưởng dát vàng lên người là thành thần thành thánh.','t'),
@@ -305,11 +305,11 @@ const STORY = {
       page('v2',
         { ...half('psalm'), bubbles:[
           cap('Cỗ máy Archon nổ tung thành biển lửa, thổi bay một mảng hàng rào hợp kim kiên cố. Khói đen cuộn xoáy.','tl'),
-          say('psalm','Trên Tháp, đám lính sinh học biến đổi như cô được gọi là Choir — Đội Hợp Xướng. Đứa nào hỏng hóc, lỗi nhịp đều bị lôi đến phòng tôi.','br'),
+          say('psalm','Trên Tháp, lính sinh học biến đổi như cô gọi là Choir — Đội Hợp Xướng. Hỏng hóc là bị lôi đến phòng tôi.','br'),
         ]},
         { ...face('psalm',1.5), bubbles:[
           say('psalm','Tôi nghe chúng xưng tội lần cuối, rồi tự tay nhấn nút format sạch sành sanh. Ba trăm mười hai đứa, không sót một mống.','bl'),
-          say('psalm','Cô là ca thứ ba trăm mười ba. Cô không xưng tội. Cô trừng mắt hỏi tôi: “Bà có đếm xem tay bà đã tước bao nhiêu mạng người rồi không?”','tr'),
+          say('psalm','Cô là ca thứ ba trăm mười ba. Cô không xưng tội. Cô hỏi ngược tôi: “Bà đã tước bao nhiêu mạng người?”','tr'),
         ]}),
       page('v2',
         { ...face('yuki'), bubbles:[
@@ -318,7 +318,7 @@ const STORY = {
         ]},
         { ...face('psalm',1.5), bubbles:[
           say('psalm','Tôi không biết.','tl'),
-          say('psalm','Nhưng dưới đáy cống ngầm có một mụ già ghi chép mọi thứ rơi từ trên trời xuống. Từ sắt vụn… cho tới những đứa trẻ.','br'),
+          say('psalm','Nhưng dưới đáy cống ngầm có mụ già ghi chép mọi thứ rơi từ trên trời xuống. Từ sắt vụn… cho tới trẻ con.','br'),
         ]}),
       /* Trang thêm 11/09 (chỗ mỏng 3): Yuki phải TRẢ GIÁ để nhận Psalm. Lý do tha nằm ở luật của Kai — bị quên là chết lần thứ hai. */
       page('w3',
@@ -353,10 +353,10 @@ const STORY = {
     intro:[
       page('v2',
         { img:BG.sewer, pos:'50% 30%', zoom:1.4, tint:'rust', bubbles:[
-          cap('Thánh đường ngầm rữa nát dưới lòng cống. Ống xả mục nát hàn chắp vá thành một cây đàn phong cầm khổng lồ; xác lính máy xếp lớp thành bệ thờ nghi ngút khói; nến đỏ cắm ngập trên những hộp sọ cơ khí cháy sém.','tl'),
+          cap('Thánh đường rữa nát dưới lòng cống. Ống xả mục hàn chắp vá thành cây đàn phong cầm khổng lồ; xác lính máy xếp thành bệ thờ nghi ngút khói; nến đỏ cắm ngập trên những hộp sọ cơ khí.','tl'),
         ]},
         { ...half('motherrust'), tint:'rust', bubbles:[
-          say('motherrust','Hỡi đứa con của sắt thép… Ta vẫn nhớ ánh mắt hoang dại này, từ trước khi lũ trên Tháp khắc số hiệu nô lệ lên gáy con.','t'),
+          say('motherrust','Hỡi đứa con của sắt thép… Ta nhớ ánh mắt hoang dại này, từ trước khi lũ trên Tháp khắc số hiệu lên gáy con.','t'),
           say('motherrust','Quỳ xuống đi. Để ta tháo rời từng khớp xương rỉ máu, gột rửa và thánh hóa con trong bể dầu thánh…','b'),
         ]}),
       /* h2 -> v2 (10/09): ô h2 chỉ giữ 46% bề ngang ảnh. Thử cắt cả hai kiểu rồi so — panel 2 mất sạch
@@ -375,10 +375,10 @@ const STORY = {
       page('v2',
         { ...face('motherrust',1.5), tint:'rust', bubbles:[
           cap('Mother Rust gục ngã dưới chân bệ thờ loang lổ. Bà không chạy trốn, run rẩy giở cuốn sổ bọc da đen ngòm vì dầu nhớt.','tl'),
-          say('motherrust','Sáu năm về trước, Tầng Bốn sụp đổ. Bốn nghìn mạng người về với thánh. Canticle lạnh lùng đóng lên một con dấu đỏ chót: “Sự cố kết cấu kỹ thuật”.','br'),
+          say('motherrust','Sáu năm trước, Tầng Bốn sụp đổ. Bốn nghìn mạng người. Canticle đóng lên một con dấu đỏ: “Sự cố kết cấu”.','br'),
         ]},
         { img:BG.sewer, pos:'50% 35%', zoom:1.3, tint:'rust', bubbles:[
-          say('motherrust','Ba ngày sau, những chuyến xe tải bọc thép màu trắng bò xuống vùng đổ nát. Chúng không đến để bới sắt vụn… chúng đến để vét sạch lũ trẻ mồ côi.','tl'),
+          say('motherrust','Ba ngày sau, xe tải bọc thép trắng bò xuống vùng đổ nát. Chúng không bới sắt vụn… chúng vét lũ trẻ mồ côi.','tl'),
           say('motherrust','Lựa những đứa phản xạ bén nhất, lầm lì và cứng đầu nhất…','br'),
         ]}),
       page('v2',
@@ -386,14 +386,14 @@ const STORY = {
           say('motherrust','Ta chỉ kịp nhét vài đứa giấu sâu dưới đáy hầm phân hủy. Nhưng không tài nào giấu nổi con…','tl'),
         ]},
         { img:BG.yard, pos:'50% 70%', zoom:1.5, tint:'rust', bubbles:[
-          say('motherrust','Con bé mười một tuổi gầy trơ xương, tay cầm thanh đoản kiếm rỉ sét của bố, lầm lũi đứng chắn ngang bánh xích xe tải.','tl'),
-          say('motherrust','Khóe mắt nó ráo hoảnh, không rơi một giọt nước mắt. Miệng nó chỉ lẩm nhẩm bài đồng dao đếm bước chân của lũ trẻ Khu Đáy…','br'),
+          say('motherrust','Con bé mười một tuổi gầy trơ xương, tay cầm đoản kiếm rỉ sét của bố, đứng chắn ngang bánh xích xe tải.','tl'),
+          say('motherrust','Mắt nó ráo hoảnh, không một giọt nước mắt. Miệng chỉ lẩm nhẩm bài đồng dao đếm bước chân của trẻ Khu Đáy…','br'),
         ]}),
       page('w3',
         { ...face('yuki',1.9), stack:true, bubbles:[
           cap('Mảnh ký ức vụn vỡ bất ngờ dội về trong tâm trí Yuki.','tl'),
           think('yuki','Một bước… Hai bước… Ba bước…','tr'),
-          think('yuki','Âm thanh bê tông nứt toác. Cát bụi mù mịt. Bàn tay lạnh ngắt của mẹ buông thõng. Xác bố bẹp dúm dưới khối dầm thép gãy.','br'),
+          think('yuki','Bê tông nứt toác. Cát bụi mù mịt. Bàn tay lạnh ngắt của mẹ buông thõng. Xác bố bẹp dúm dưới dầm thép gãy.','br'),
         ]},
         /* art đã cắm: Cantor và cái Halo vàng kim nằm ở 1/4 trên khung, mà lời dẫn 28 chữ trong ô nhỏ 176px
            cao tới 162px — để `tl` là che kín cả đầu lẫn vòng. stack:'end' dồn xuống đáy, chừa lại đúng
@@ -423,10 +423,10 @@ const STORY = {
     intro:[
       page('v2',
         { img:BG.lift, pos:'50% 20%', zoom:1.3, tint:'chrome', bubbles:[
-          cap('Sàn nâng công nghiệp số 3, một khối lồng sắt khổng lồ lao vun vút từ đỉnh Tháp xé gió rít xuống đáy sâu. Mỗi nhịp cửa lưới thép mở ra ở từng khoang là một hàng lính Choir đứng bất động, vô hồn như búp bê cơ khí.','tl'),
+          cap('Sàn nâng công nghiệp số 3, một khối lồng sắt khổng lồ lao từ đỉnh Tháp xuống đáy sâu. Mỗi lần cửa lưới mở ra là một hàng lính Choir đứng bất động, vô hồn như búp bê cơ khí.','tl'),
         ]},
         { ...half('cantor'), tint:'chrome', bubbles:[
-          say('cantor','Đơn vị 07. Cô đang để dữ liệu bảo mật rò rỉ bừa bãi ra khắp cái máng lợn tăm tối này. Ta đành phải đích thân hạ cố xuống đây ấn nút xóa rác.','t'),
+          say('cantor','Đơn vị 07. Cô đang để dữ liệu bảo mật rò rỉ khắp cái máng lợn này. Ta đích thân xuống ấn nút xóa rác.','t'),
           say('cantor','Còn Psalm… Giờ khắc của cô cũng hết hạn rồi.','b'),
         ]}),
       /* Trang thêm 11/09 (chỗ mỏng 5): khép vòng — bốn kẻ định giá của chương 1 vọng lại, rồi Yuki đáp bằng cái tên. */
@@ -498,7 +498,7 @@ const STORY = {
         /* art đã cắm: đầu Psalm và Ash nằm ở 1/4 trên khung → dàn đều là che kín cả hai mặt.
            stack:'end' dồn cột xuống đáy, chừa trọn phần đầu. */
         { ...half('psalm'), stack:'end', bubbles:[
-          say('psalm','Trên đỉnh Tháp hiện có hàng nghìn đứa trẻ bị bắt cóc như cô năm xưa. Giờ tất cả đã bị nhào nặn thành một dàn Hợp Xướng Choir hoàn chỉnh.','tl'),
+          say('psalm','Trên đỉnh Tháp có hàng nghìn đứa trẻ bị bắt cóc như cô năm xưa. Giờ chúng đã thành một dàn Choir hoàn chỉnh.','tl'),
           say('ash','Hàng nghìn đứa? Thế nghĩa là… có cả nghìn cái Halo hạng S nguyên seal chưa bóc tem à?','br'),
         ]},
         { ...half('ash'), stack:true, bubbles:[
@@ -508,7 +508,7 @@ const STORY = {
         ]}),
       page('splash',
         { ...half('kai'), stack:true, bubbles:[
-          say('kai','Em sẽ lấy bút ghi lại hết. Không để sót một cái tên nào trên đời. Phải để lũ chuột dưới cống ngầm này biết đường mà ghi nhớ họ!','bl'),
+          say('kai','Em sẽ lấy bút ghi lại hết. Không sót một cái tên nào. Phải để lũ chuột dưới cống này biết đường mà nhớ họ!','bl'),
         ]}),
       /* Trang thêm 11/09 (chỗ mỏng 1): Ronin và Muzzle biến mất sau 07-A. Trả họ về đúng chỗ Ronin phải quyết — cả tổ có leo Tháp hay không.
          Đổi w3 -> v3 (10/09): ô nhỏ 176px không chứa nổi lời dẫn dài + câu của Ronin (tràn 31px ở iPhone SE). */
@@ -522,7 +522,7 @@ const STORY = {
           say('ronin','Tổ của tao xưa nay tuy nghèo rớt mồng tơi, nhưng chưa bao giờ có tiền lệ bỏ mặc khách hàng lại phía sau.','br'),
         ]},
         { ...face('yuki'), stack:true, bubbles:[
-          say('ronin','Tôn chỉ làm ăn của tổ tao: Không tháo dỡ đồng loại. Mà trên kia, đang có cả nghìn con người bị lũ trên Tháp tháo tung ra từng mảnh. Đã đi… thì cả tổ cùng đi.','tl'),
+          say('ronin','Tôn chỉ của tổ tao: không tháo dỡ đồng loại. Trên kia cả nghìn người bị tháo tung. Đã đi thì cả tổ cùng đi.','tl'),
           say('yuki','Rõ, tổ trưởng.','br'),
         ]}),
       page('splash',

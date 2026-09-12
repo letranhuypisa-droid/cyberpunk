@@ -110,6 +110,18 @@
       "port": 8812
     },
     {
+      "name": "static-check",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8797",
+        "--bind",
+        "127.0.0.1"
+      ],
+      "port": 8797
+    },
+    {
       "name": "static-foeult",
       "runtimeExecutable": "python",
       "runtimeArgs": [
