@@ -756,6 +756,41 @@ không thẻ nào đè nhau, tờ chi tiết mở ra có ảnh bãi riêng (`yar
 (`tell`, `tell_up`, `tell_down`, `reveal_a`, `new_char`, `hit3`). `art_audit.js` thêm mục **DẸP LOẠN** kiểm kê
 10 file này; `ult_lint` 60/60 không đổi.
 
+**Ảnh bãi còn đi thêm một chỗ không định trước: nền trận đánh.** `yardSector()` lấy `bg:yardBg(y)`, nên đánh
+BÃI RƠI CŨ giờ đứng trên đúng cái bãi container của nó thay vì nền `bg_07a` chung. Chín cái bãi thành chín nền
+trận khác nhau, không phải sửa dòng nào.
+
+### 12/09 (chiều, tiếp) — đánh tay trận chiếm bãi và trận giành lại (K7)
+
+Hai trận đánh bằng nút thật ở hồ sơ trắng (đội mở đầu cấp 1, `?riot&riotfast&dev`), không gọi `captureYard()`:
+
+| | CHIẾM BÃI | GIÀNH LẠI |
+|---|---|---|
+| Vào trận | nút dưới tờ chi tiết: `2 WAVE · ÁP ĐẢO · +200 CR` | `2 WAVE · ĐỘ KHÓ ×1.6 · GIỮ NGUYÊN QUÂN VÀ KIỆN` |
+| Máu ổ | SCAV 1 203 · CHUỘT CỐNG 978 | SCAV 1 024 · CHUỘT CỐNG 832 — đúng ×0.85 của §D4 |
+| Kết quả | THẮNG · round 16 · 2/3 sống sót | THẮNG · round 14 · 3/3 sống sót |
+| Bảng kết quả | `CHIẾM ĐƯỢC BÃI RƠI CŨ · +200 CR · +2 SH` + `ĐÓNG QUÂN VÀO ĐỂ BÃI BẮT ĐẦU ĐẺ KIỆN` | `GIÀNH LẠI BÃI RƠI CŨ · +100 CR · +1 SH` + `KIỆN ĐÓNG BĂNG ĐÃ ĐƯỢC TRẢ LẠI` |
+| Ví | 3 000 → 3 200 CR · 300 → 302 SH | → 3 300 CR · 303 SH |
+| Hồ sơ bãi | `state:'own'`, quân rỗng, bậc 1 | `state:'own'`, **4 kiện + 212 CR đóng băng trả lại nguyên vẹn** |
+| Hợp đồng tuần · việc ngày | `win` 1 · việc ngày `win` 1 | `win` 2 |
+| Nút `◂ KHU ĐÁY` | hiện, bấm về thẳng bản đồ | hiện |
+
+Về tới bản đồ: nút bãi thành `is-own`, thẻ in `0/1 QUÂN · BẬC 1` + `0/8 · CHƯA CÓ QUÂN`, đầu màn `GIỮ 1/9`,
+`THU NHẬP 0 CR/GIỜ`, ô kiện tiếp `CHƯA CÓ QUÂN`, chip BÁO CÁO nhảy 1 — tức là **R15 (bãi trống quân thì đồng hồ
+đứng) đúng cả khi bãi về bằng trận thật**, không riêng lúc gọi hàm.
+
+Một lỗi chữ sửa luôn: dòng thưởng là dòng dài nhất trong game, ở 375 px nó gãy đúng giữa `+2` và `SH` — số một
+dòng, đơn vị một dòng, đọc như hỏng. Thêm `&nbsp;` giữa số và đơn vị nên chỗ gãy rơi vào dấu `·`.
+
+Còn một chỗ gợn **chưa đụng vào, chờ anh quyết**: ô SECTOR trên đầu màn trận in `BÃI-DROP` — `yardSector()` ghép
+`'BÃI-' + id`, mà `id` là chữ Anh trong code và đây là chỗ duy nhất người chơi nhìn thấy nó. Chiến dịch in `07-A`,
+nên chỗ này hoặc thành số (`BÃI 1`…`BÃI 9`) hoặc giữ nguyên nếu anh thấy đọc được.
+
+**Cách đánh tay một trận để kiểm (ghi lại cho lần sau, tốn nhiều lượt nhất ở đây):** bấm nút theo thời gian
+cố định là hỏng — lượt nào cũng có hoạt ảnh dài ngắn khác nhau, bấm sớm thì mất lượt. Cách chạy được: bật
+`PLAYER.settings.motion=true` (đúng công tắc GIẢM CHUYỂN ĐỘNG trong CONFIG) rồi **chờ tới khi `#btnAttack` hết
+`disabled` mới bấm**, mỗi lượt hai cú: ATTACK rồi chạm kẻ địch.
+
 ---
 
 ## K. Còn chưa làm — soát lại 12/09
@@ -771,7 +806,7 @@ bằng `?riot&riotfast&dev` ở 375×812 và 375×667. Những gì còn lại, x
 | K4 | `sim.js` chưa mô phỏng cyberware → bảng §F1 là **sàn** | Nên | Đội đã lắp cyberware mạnh hơn số in; vòng 3 (72/64/45 % ở cấp 20) sẽ dễ hơn thực tế. Cách làm: nạp `js/cyber.js` + `PLAYER.cyber` giả vào `sim.js --yard`, đo lại `m50` vòng 3 bằng `riot_tune.js m50 200 20`. Nhãn đang lệch về phía bi quan nên chưa gấp. |
 | ~~K5~~ | ~~Thẻ nhãn "CHÂN THANG MÁY" xuống dòng thành 4 dòng ở 375 px~~ | — | **Xong 12/09** (thành bắt buộc khi giãn nút xuống 8%): `.ynode__card` ở màn ≤ 380 px lên `max-width:118px`. Đo thật: tên 99 px + 12 padding + 2 viền = 113, bản cũ để 112. |
 | K6 | Nhận kiện làm mất phần lẻ của chu kỳ đang chạy | Anh quyết | §D3 chốt `mốc = bây giờ` khi nhận. Hệ quả: nhận lúc kiện kế còn 5 phút thì đồng hồ nhảy về 45:00, mất 40 phút — trung bình mất nửa kiện mỗi lần nhận, 3 lần/ngày ≈ 6–8 % sản lượng, và người chơi **nhìn thấy** đồng hồ nhảy lùi. Sửa là bỏ dòng `s.t0=Date.now()` trong `claimYard()` (`settleYards()` ngay trước đó đã đặt mốc đúng cho cả hai trường hợp đầy/chưa đầy). Đổi thì số ở §F2 nhích lên chừng đó. |
-| K7 | Trận chiếm bãi thật (qua `battle.js`) chưa đánh lại trong phiên 12/09 | Nên | 11/09 đã kiểm; 12/09 tôi chiếm bằng `captureYard()` để đi nhanh. Anh kiểm bằng nút CHIẾM BÃI ở BÃI RƠI CŨ (99 % thắng), thắng xong phải thấy "CHIẾM ĐƯỢC … +200 CR · +2 SH" và nút `◂ KHU ĐÁY`. |
+| ~~K7~~ | ~~Trận chiếm bãi thật (qua `battle.js`)~~ | — | **Xong 12/09 (chiều).** Đánh tay cả hai đường ở BÃI RƠI CŨ — CHIẾM BÃI và GIÀNH LẠI — bằng nút thật, không gọi `captureYard()`. Kết quả ở §J. |
 | K8 | Việc còn treo từ §G: PvP tranh bãi · đổi ca đồn trú tự động · bãi có sự kiện theo mùa | Không | Chưa có lý do làm trước chương 2. |
 
 Đã xong 12/09 và rút khỏi danh sách: cờ `?riot` + server kiểm (Q15, R13–R14), lỗi bãi trống quân (R15).

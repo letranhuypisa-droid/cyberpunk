@@ -446,7 +446,9 @@ winReward = async function(g){
     const y=yardById(SECTOR.yard); if(!y) return '';
     const res=captureYard(y.id), r=res.reward;
     PLAYER.credits+=r.credits; PLAYER.shards+=r.shards; savePlayer();
-    return `${res.retake?'GIÀNH LẠI':'CHIẾM ĐƯỢC'} ${y.name} · +${rn(r.credits)} CR · +${r.shards} SH`
+    /* &nbsp; giữa số và đơn vị: bảng kết quả rộng ~300 px, dòng này dài nhất trong game và ở 375 px nó
+       gãy đúng giữa "+2" và "SH" — số một dòng, đơn vị một dòng, đọc như lỗi. */
+    return `${res.retake?'GIÀNH LẠI':'CHIẾM ĐƯỢC'} ${y.name} · +${rn(r.credits)}&nbsp;CR · +${r.shards}&nbsp;SH`
          + `<br>${res.retake?'KIỆN ĐÓNG BĂNG ĐÃ ĐƯỢC TRẢ LẠI':'ĐÓNG QUÂN VÀO ĐỂ BÃI BẮT ĐẦU ĐẺ KIỆN'}`;
   }
   if(SECTOR.mode==='riot'){ riotWeekProgress('win'); savePlayer(); }   // tầng ở HỐ LOẠN cũng tính vào hợp đồng tuần
