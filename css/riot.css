@@ -197,9 +197,13 @@
   .riotmap>.btn-act--full{height:46px}
   .yard{grid-template-rows:19% minmax(0,1fr) auto}
 }
-/* ---- Màn hẹp: thẻ nhãn trên bản đồ co lại ---- */
+/* ---- Màn hẹp: thẻ nhãn trên bản đồ co lại ----
+   max-width phải vừa DÒNG DÀI NHẤT của cả ba dòng, đo ở 375 px: tên "CHÂN THANG MÁY" 99 px (dài nhất),
+   "0/8 · CHƯA CÓ QUÂN" 95 px, "2/2 QUÂN · BẬC 1" 86 px → 99 + 12 padding + 2 viền = 113 px.
+   Bản cũ để 112 px nên thiếu đúng một pixel: tên xuống dòng, thẻ cao 4 dòng và đè lên bãi bên trên
+   (luật ≥ 8% giữa hai nút ở js/riot.js tính theo thẻ 3 dòng cao ~45 px). 118 px chừa 5 px dự phòng. */
 @media (max-width:380px){
-  .ynode__card{max-width:112px;padding:4px 6px}
+  .ynode__card{max-width:118px;padding:4px 6px}
   .ynode__card b{font-size:9px;letter-spacing:.1em}
   .rmstat b{font-size:var(--fs-xs)}
 }

@@ -63,8 +63,9 @@ Anh dặn "cần hỏi gì thì cứ mặc định chọn cái bạn khuyến ng
 | Q6 | Quân đủ mạnh thì có bao giờ mất bãi không? | **Không.** Phản kích mạnh trần **×2 ngưỡng giữ bãi** | Phải có một cái đích "đầu tư đủ thì ngủ yên", nếu không thì mọi bãi đều rơi và người chơi bỏ cuộc. |
 | Q7 | Tài nguyên thứ ba (linh kiện)? | **Bãi chỉ đẻ CR + SH** | Linh kiện (LK) đã có từ `docs/cyberware.md` (cùng ngày), nhưng nguồn của nó là **phân tách bản dư**, không phải bãi. Thêm một vòi nữa vào bãi là phải cân lại cả bảng thu nhập ở §F2. Giữ nguyên. |
 | Q8 | Đồng hồ chạy khi tắt game? | **Có**, tính bằng `Date.now()` | Cả điểm của chế độ. Người chơi vặn đồng hồ máy thì gian lận được — chấp nhận, đây là bản chạy trên máy người chơi, không có server. |
-| Q9 | Ảnh bản đồ District 07? | **Vẽ bằng SVG trong code trước** (không phải ô trống), prompt ảnh thật ở §H | Đúng yêu cầu "thử code trước". Thả `art/map/map_d07.jpg` vào là game tự thay. |
-| Q10 | Ảnh riêng cho từng bãi? | **Dùng lại `art/bg/bg_07*.jpg`** đang có | 9 ảnh mới chỉ để làm hình minh hoạ nhỏ là phí. Prompt cho bản riêng vẫn viết ở §H, thả vào là tự thay. |
+| Q9 | Ảnh bản đồ District 07? | **Vẽ bằng SVG trong code trước** (không phải ô trống), prompt ảnh thật ở §H. **12/09: đã có ảnh thật**, SVG lùi về làm bản dự phòng | Đúng yêu cầu "thử code trước". Thả `art/map/map_d07.jpg` vào là game tự thay — và đúng như thế thật. |
+| Q10 | Ảnh riêng cho từng bãi? | **Dùng lại `art/bg/bg_07*.jpg`** đang có. **12/09: đã có đủ 9 ảnh riêng** | 9 ảnh mới chỉ để làm hình minh hoạ nhỏ là phí — nhưng anh sinh rồi thì dùng, tờ chi tiết mở ra thấy đúng cái bãi mình đang đánh chứ không phải nền màn khác. |
+| Q16 | Anh gửi **hai** bản đồ, dùng bản nào? (12/09) | **Bản 1** → `art/map/map_d07.jpg`; bản 2 giữ ở `art-src/MAP/d07-alt.png` | Chọn theo cái đo được, không theo cái đẹp hơn: 10 nút phải cách nhau ≥ 8% dọc (§C), mà bản 1 rải mốc đúng khoảng đó — chợ xuống tới 46%, hàng rào 63%, hố ở giữa đáy. Bản 2 dồn chợ + nhà thờ vào cùng dải 33–38% và hết mốc ở khoảng 58–70%, nhét 10 nút vào là hoặc chấm rơi ra chỗ trống, hoặc thẻ đè nhau. Đổi sang bản 2 thì phải đo lại cả bảng toạ độ §C. |
 | Q11 | Thang tầng cũ giữ hay bỏ? | **Giữ nguyên**, thành một nút trên bản đồ mới (`HỐ LOẠN`) | Nó đã cân bằng xong và là thước đo sức mạnh; giờ thêm việc mở khoá bãi. |
 | Q12 | "Sức mạnh ổ" tính từ chỉ số kẻ địch hay từ số đo? | **Từ số đo (`m50`)** | Cộng chỉ số xếp SÂN LÒ ĐÚC (0% thắng) *dễ hơn* HÀNG RÀO GÃY (100% thắng). Chi tiết ở §D1 — đây là chỗ đổi lớn nhất so với bản thiết kế ban đầu. |
 | Q13 | Nút dưới cùng của tờ chi tiết làm gì khi đã giữ bãi? | **Đổi theo việc tiếp theo đáng làm**: NHẬN KIỆN → ĐÓNG QUÂN → ĐÓNG | Một nút "đóng" chết ở vị trí đẹp nhất màn hình là phí. |
@@ -101,19 +102,24 @@ là số **đo được** bằng `node scratch/riot_tune.js`, không phải số
 (trùm FOREMAN). Vòng 3 cần tầng 12/15/18 — nghĩa là **không thể mở vòng 3 trước khi đủ mạnh để đánh nó**;
 không phải rào chắn giả, mà là cùng một thước đo.
 
-**Toạ độ trên ảnh** (`% ảnh 9:16`, khớp bố cục ở §H1). Cách đều **9% theo trục dọc**: thẻ nhãn cao ~46 px trên
-màn 375, hai nút gần nhau hơn thế là hai cái thẻ đè lên nhau (đã dính một lần ở bản đầu, x so le không cứu được
-vì hai thẻ gặp nhau ở giữa màn).
+**Toạ độ trên ảnh** (`% ảnh 9:16`) — **đo lại 12/09 trên ảnh thật `art/map/map_d07.jpg`**, mỗi chấm rơi đúng
+cái mốc của nó. Luật khoảng cách: **≥ 8% theo trục dọc giữa hai nút liền nhau**. Đo ở 375 px: ảnh cao 629 px,
+thẻ nhãn 3 dòng cao **45 px**, nên 8% = 50 px chừa được 5 px. Thẻ mọc **vào giữa màn** (`x < 50` thì thẻ sang
+phải, ngược lại sang trái) nên x so le **không** cứu được — hai thẻ gặp nhau ở giữa (đã dính một lần ở bản đầu).
 
-| id | x | y | | id | x | y |
-|---|---|---|---|---|---|---|
-| `grave` | 60 | 14 | | `smelter` | 33 | 59 |
-| `tower` | 32 | 23 | | `fence` | 58 | 68 |
-| `lift` | 63 | 32 | | `drain` | 30 | 77 |
-| `church` | 29 | 41 | | `drop` | 62 | 86 |
-| `market` | 61 | 50 | | `pit` (HỐ LOẠN) | 34 | 95 |
+| id | x | y | mốc trên ảnh | | id | x | y | mốc trên ảnh |
+|---|---|---|---|---|---|---|---|---|
+| `tower` | 29 | 15 | bồn nước sơn số 9 | | `smelter` | 25 | 55 | miệng lò còn đỏ |
+| `lift` | 63 | 23 | chân khung thang máy | | `fence` | 45 | 63 | chỗ tường rào gãy |
+| `grave` | 80 | 31 | ruộng tấm thép cắm đứng | | `drain` | 33 | 75 | ba miệng cống |
+| `church` | 27 | 39 | mái nhà thờ + thánh giá | | `drop` | 72 | 83 | bãi container |
+| `market` | 68 | 47 | dãy mái tôn chợ | | `pit` (HỐ LOẠN) | 46 | 91 | miệng hố đỏ |
 
-`pit` không phải bãi: bấm vào là sang màn thang tầng cũ.
+`pit` không phải bãi: bấm vào là sang màn thang tầng cũ. Toạ độ của nó ở `RIOT_PIT` (`js/riot.js`) để nút,
+bản vẽ SVG dự phòng và bảng này cùng đọc một chỗ.
+
+**Thứ tự trên ảnh không trùng thứ tự vòng.** Ảnh đặt nghĩa địa thép (vòng 3) thấp hơn chân thang máy, còn chợ
+(vòng 2) thì lệch xuống dưới nhà thờ — bảng trên đi theo **ảnh**, vì người chơi nhìn ảnh chứ không nhìn bảng vòng.
 
 ### Đội hình từng bãi (`plan`)
 
@@ -492,6 +498,8 @@ nâng cấp**. Nhãn ở §D1 phải khớp tỉ lệ thắng thật trong ±1 b
 | R13 | Cờ `?riot` / `?riot=all`: vào thẳng bản đồ, mở khoá trong phiên (Q15) | `js/riot.js`, `js/data.js`, `js/riotui.js` | ✓ 12/09 |
 | R14 | Server kiểm `scratch/riot_serve.py` + launch `static-riot` chuyển `/` sang `?riot&riotfast&dev` | `scratch/`, `.claude/launch.json` | ✓ 12/09 |
 | R15 | Bãi trống quân: đồng hồ đứng — không kiện rỗng, không phản kích (§D3) | `js/riot.js`, `js/riotui.js` | ✓ 12/09 |
+| R16 | Art thật: `art/map/map_d07.jpg` + 9 `art/riot/yard_<id>.jpg`; đo lại 10 toạ độ nút trên ảnh (§C) | `art/`, `js/riot.js` | ✓ 12/09 |
+| R17 | SVG dự phòng lấy toạ độ từ `RIOT_YARDS`/`RIOT_PIT` · thẻ nhãn hết xuống dòng (K5) · `art_audit` kiểm kê 10 file | `js/riotui.js`, `css/riot.css`, `scratch/art_audit.js` | ✓ 12/09 |
 
 **Không làm ở đợt này** (ghi lại để khỏi quên): PvP tranh bãi, đổi ca đồn trú tự động, bãi có sự kiện theo mùa.
 Linh kiện và cyberware đã làm cùng ngày 11/09 ở đợt 3+4 gộp (`docs/cyberware.md`); bãi vẫn chỉ đẻ CR + SH (Q7).
@@ -505,29 +513,39 @@ Nguyên tắc theo yêu cầu: **thử code trước**. Kết quả:
 
 | Thứ | Code được? | Hiện đang là gì |
 |---|---|---|
-| Bản đồ District 07 | **Được** | SVG vẽ tay trong `js/riotui.js` (`riotMapSvg()`): 3 vòng, đường ống, khối nhà, sương. Thả `art/map/map_d07.jpg` vào là tự thay. |
+| Bản đồ District 07 | **Được** | **12/09: ảnh thật `art/map/map_d07.jpg` (941×1672, 439 KB)**. SVG `riotMapSvg()` trong `js/riotui.js` lùi về làm bản dự phòng khi thiếu file, và giờ lấy thẳng toạ độ mốc từ `RIOT_YARDS` nên không lệch khỏi ảnh được nữa. |
 | Biểu tượng kiện / quân / phản kích / sức mạnh | **Được — nhưng chưa vẽ** | Giao diện đang dùng chữ (`KIỆN`, `QUÂN ĐÓNG`, `ĐỢT TỚI`) và chấm màu, đọc được. Bản 11/09 ghi "đã có SVG inline" là ghi nhầm — soát 12/09 không thấy trong `js/riotui.js`. Tuỳ chọn, K3. |
-| Ảnh minh hoạ từng bãi | **Không cần ảnh mới** | Dùng lại `art/bg/bg_07*.jpg`. Thả `art/riot/yard_<id>.jpg` vào là tự thay. |
+| Ảnh minh hoạ từng bãi | **Không cần ảnh mới** | **12/09: đủ 9 ảnh `art/riot/yard_<id>.jpg`** (1024×576, 163–194 KB). Chuỗi dự phòng `bg_07*.jpg` vẫn còn nguyên trong `yardBg()`. |
 | Chấm/huy hiệu trạng thái | **Được** | CSS thuần. |
 
-Nên **chỉ có một ảnh thật sự đáng sinh**: bản đồ. Chín ảnh bãi là tuỳ chọn, làm cho đẹp.
+Kiểm kê 10 file này bằng `node scratch/art_audit.js` — mục **DẸP LOẠN** in từng bãi có ảnh riêng hay đang mượn nền.
 
-### H1. `art/map/map_d07.jpg` — bản đồ DISTRICT 07 (bắt buộc nếu muốn đẹp)
+### H1. `art/map/map_d07.jpg` — bản đồ DISTRICT 07 ✓ đã có (12/09)
 
-Quy cách: **1152×2048 (9:16 dọc), JPEG q85, ~600 KB**. Nhìn từ trên xuống chếch khoảng 20° (isometric nông),
-**không** phải lát cắt dọc như `map_halcyon.jpg` — đây là mặt bằng một quận.
+Anh gửi hai bản; bản dùng là **bản 1** (lý do chọn ở Q16), gốc giữ ở `art-src/MAP/d07.png`, bản kia ở
+`art-src/MAP/d07-alt.png`.
 
-Bố cục bắt buộc — **mỗi mốc phải nằm đúng toạ độ này** vì nút bấm đặt theo % ảnh (bảng ở §C):
+Quy cách **thực tế đang dùng: 941×1672 (9:16 dọc), JPEG, 439 KB** — đúng cỡ `map_halcyon.jpg` đang có, và
+lớn hơn chỗ hiển thị (354 px rộng) gấp 2,7 lần nên màn hình dày pixel vẫn nét. Bản 11/09 ghi 1152×2048 là
+số đặt ra trước khi có ảnh; phóng ảnh 941 lên 1152 chỉ làm file nặng thêm chứ không thêm nét, nên giữ cỡ gốc.
 
-| Dải | % ảnh | Phải có gì, ở đâu |
-|---|---|---|
-| Chân Tháp | 0 – 12% | Bốn cọc móng bê tông khổng lồ cắm xuống, bóng đổ dài, ánh tím lạnh hắt từ trên |
-| **TRUNG TÂM** | 12 – 35% | **Nghĩa địa thép** (60/14) · **tháp nước rỉ sơn số 9** (32/23) · **chân thang máy hàng** khung thép (63/32) |
-| vạch chia | 36% | — |
-| **LÒNG KHU** | 36 – 62% | **Mái nhà thờ dưới cống** + thánh giá hàn từ ống (29/41) · **chợ thép** mái tôn chắp vá (61/50) · **sân lò đúc** còn bốc khói (33/59) |
-| vạch chia | 63% | — |
-| **VÀNH NGOÀI** | 63 – 90% | **Hàng rào tập đoàn** đứt đoạn chạy chéo qua (58/68) · **cống ba ngã** (30/77) · **bãi rơi cũ** xác xe + container (62/86) |
-| Đáy | 90 – 100% | **HỐ LOẠN**: một cái hố tròn tối om (34/95), miệng hố bốc khói đỏ |
+Nhìn từ trên xuống chếch khoảng 20° (isometric nông), **không** phải lát cắt dọc như `map_halcyon.jpg` —
+đây là mặt bằng một quận.
+
+Bố cục **đặt hàng** (prompt bên dưới viết theo bảng này) — ảnh sinh ra có đủ cả 10 mốc nhưng **cao độ lệch
+so với đơn đặt**, nên toạ độ nút đã đo lại trên ảnh thật (bảng §C là bảng đang chạy, bảng dưới đây chỉ để
+đọc prompt cho khớp):
+
+| Dải | % ảnh | Phải có gì, ở đâu | Ảnh thật rơi vào |
+|---|---|---|---|
+| Chân Tháp | 0 – 12% | Bốn cọc móng bê tông khổng lồ cắm xuống, bóng đổ dài, ánh tím lạnh hắt từ trên | 0 – 12% ✓ |
+| **TRUNG TÂM** | 12 – 35% | **Nghĩa địa thép** (60/14) · **tháp nước rỉ sơn số 9** (32/23) · **chân thang máy hàng** khung thép (63/32) | nghĩa địa dạt sang phải và xuống (80/31) · tháp nước lên cao (29/15) · thang máy (63/23) |
+| **LÒNG KHU** | 36 – 62% | **Mái nhà thờ dưới cống** + thánh giá hàn từ ống (29/41) · **chợ thép** mái tôn chắp vá (61/50) · **sân lò đúc** còn bốc khói (33/59) | nhà thờ (27/39) ✓ · chợ (68/47) · lò đúc (25/55) |
+| **VÀNH NGOÀI** | 63 – 90% | **Hàng rào tập đoàn** đứt đoạn chạy chéo qua (58/68) · **cống ba ngã** (30/77) · **bãi rơi cũ** xác xe + container (62/86) | hàng rào (45/63) · cống (33/75) · bãi rơi (72/83) |
+| Đáy | 90 – 100% | **HỐ LOẠN**: một cái hố tròn tối om (34/95), miệng hố bốc khói đỏ | hố ra giữa đáy (46/91) |
+
+Lệch nhiều nhất là **nghĩa địa thép**: đặt hàng ở 60/14, ảnh vẽ thành một ruộng tấm thép ở 80/31. Không sửa
+ảnh — sửa `x/y` là đúng thứ tự việc (§H1 cuối mục), và bố cục ảnh đọc tự nhiên hơn bảng đặt hàng.
 
 **Prompt (tiếng Anh, dùng cho Midjourney / Nano Banana / Flux):**
 
@@ -556,21 +574,34 @@ Style: technical illustration meets weathered field map, ink and wash, cel-shade
 --ar 9:16 --style raw
 ```
 
-Sinh xong so với bản SVG đang chạy trong game (mở `riotmap` khi chưa có file) — nó vẽ đúng bảy dải trên, dùng
-làm ảnh tham chiếu bố cục.
-
-Hạ chuẩn sau khi sinh:
+Hạ chuẩn sau khi sinh (đã chạy 12/09 — giữ nguyên cỡ gốc 941×1672, chỉ nén; `-q:v 5` ra ~440 KB):
 
 ```bash
-ffmpeg -i "art-src/MAP/d07.png" -vf scale=1152:2048 -q:v 3 art/map/map_d07.jpg
+ffmpeg -i "art-src/MAP/d07.png" -q:v 5 art/map/map_d07.jpg
 ```
 
-**Kiểm sau khi thả file:** mở `riotmap`, xem 10 cái chấm có rơi đúng vào vật thể tương ứng không. Lệch thì sửa
-`x/y` trong `RIOT_YARDS` (`js/riot.js`) chứ **đừng sửa ảnh**.
+**Kiểm sau khi thả file** (đã làm 12/09, cách làm cho lần sau): mở `?riot=all` ở 375×812, xem 10 cái chấm có
+rơi đúng vật thể không. Lệch thì sửa `x/y` trong `RIOT_YARDS` (`js/riot.js`) **chứ đừng sửa ảnh** — và nhớ luật
+≥ 8% ở §C. Muốn nhìn nhanh chấm nằm đâu mà không phải mở game thì vẽ chấm thẳng lên ảnh:
 
-### H2. `art/riot/yard_<id>.jpg` — ảnh nhỏ từng bãi (tuỳ chọn)
+```bash
+python -c "from PIL import Image,ImageDraw; im=Image.open('art/map/map_d07.jpg').resize((760,1350)); d=ImageDraw.Draw(im); [d.ellipse([760*x/100-11,1350*y/100-11,760*x/100+11,1350*y/100+11],outline=(0,255,120),width=3) for x,y in [(29,15),(63,23),(80,31),(27,39),(68,47),(25,55),(45,63),(33,75),(72,83),(46,91)]]; im.save('scratch/_nodes.png')"
+```
 
-Quy cách: **1024×576 (16:9), JPEG q85, ≤ 200 KB**. Không có thì game dùng `art/bg/bg_07*.jpg` — chấp nhận được.
+### H2. `art/riot/yard_<id>.jpg` — ảnh từng bãi ✓ đã có đủ 9 (12/09)
+
+Quy cách: **1024×576 (16:9), JPEG q81–85, 163–194 KB** (gốc 1672×941 ở `art-src/RIOT/<id>.png`).
+Không có thì game lùi về `art/bg/bg_07*.jpg` — chuỗi dự phòng vẫn giữ trong `yardBg()`.
+
+Ảnh hiện ở dải hero của tờ chi tiết: cao 22% màn (≈ 176 px trên 375×812), `cover` + `center 40%`, tức là
+thấy gần trọn chiều cao ảnh, chỉ cắt hai mép trên dưới vài chục pixel. Chữ tên bãi đè lên nhờ lớp phủ tối
+`.yard__img.has-img::after`, nên ảnh sáng cũng không nuốt chữ.
+
+Hạ chuẩn cả bộ:
+
+```bash
+python -c "from PIL import Image; [Image.open('art-src/RIOT/%s.png'%n).convert('RGB').resize((1024,576),Image.LANCZOS).save('art/riot/yard_%s.jpg'%n,quality=85,optimize=True,progressive=True) for n in ['drop','drain','fence','smelter','market','church','lift','tower','grave']]"
+```
 
 Khung chung cho cả 9 prompt (chỉ đổi phần in đậm):
 
@@ -595,7 +626,10 @@ deep shadows, volumetric dust, wet concrete, cel-shaded illustration, high contr
 ### H3. Cái đã code, không cần sinh ảnh
 
 - **Bản đồ SVG dự phòng** — `riotMapSvg()` trong `js/riotui.js`. Vẽ 5 dải, khối nhà, ống cống, hàng rào chéo,
-  miệng hố, sương ở phần chưa mở khoá. Đủ để chơi và test toạ độ trước khi có ảnh thật.
+  miệng hố, sương ở phần chưa mở khoá. Từ 12/09 nó **lấy thẳng toạ độ mốc từ `RIOT_YARDS` + `RIOT_PIT`**
+  (`x_svg = x% × 9`, `y_svg = y% × 16` trên viewBox 900×1600) nên sửa toạ độ một cái bãi là bản vẽ đi theo,
+  không còn cảnh hai bản đồ chỉ hai chỗ khác nhau. Kiểm nó khi đã có ảnh thật: mở console gõ
+  `rmArt.innerHTML = riotMapSvg()` sau khi bỏ `has-img`, hoặc đổi tên file ảnh đi rồi tải lại.
 - **Biểu tượng** — *chưa làm* (bản 11/09 ghi là đã có, soát 12/09 thì không). Nếu làm: kiện hàng (thùng có nắp
   chéo), quân (hình người vai vuông), phản kích (mũi tên gãy), sức mạnh (tia), `<svg>` 16×16 inline trong
   `js/riotui.js`, đổi màu theo `currentColor`. Không bắt buộc — chữ đang đủ đọc (K3).
@@ -691,6 +725,37 @@ là quyết định của §D3 chứ không phải lỗi, nên ghi ra để anh 
 thứ bậc (100/100/90 · 80/45/30 · 0/0/0 — lệch ngẫu nhiên của mẫu nhỏ, không đổi số nào). Console: chỉ 404 của
 `map_d07`, `art/riot/yard_*` và mấy file SFX đợt 3 đang chờ anh (`tell`, `new_char`, `reveal_a`, `hit3`).
 
+### 12/09 (chiều) — art về: bản đồ thật + 9 ảnh bãi
+
+Anh gửi 11 ảnh: hai bản đồ District 07 (941×1672) và đúng 9 cái bãi (1672×941), tên file trùng luôn `id`
+trong `RIOT_YARDS`. Đây là K1 + K2 của §K, làm hết trong một phiên.
+
+**Chọn bản đồ bằng thước, không bằng mắt (Q16).** Hai bản gần như cùng một bố cục, khác ánh sáng. Cái quyết
+định không phải bản nào đẹp hơn mà bản nào **đặt được 10 cái nút**: thẻ nhãn mọc vào giữa màn nên hai nút
+cách nhau dưới 8% là hai thẻ đè nhau, tức là 10 nút cần trải gần hết chiều cao ảnh. Bản 1 rải mốc đúng
+khoảng đó (chợ 47%, hàng rào 63%, hố giữa đáy 91%); bản 2 dồn chợ + nhà thờ vào cùng dải 33–38% rồi bỏ trống
+58–70%, nhét vào là chấm rơi ra chỗ trống. Bản 2 giữ ở `art-src/MAP/d07-alt.png`.
+
+**Ảnh đúng nhưng cao độ lệch bảng đặt hàng — sửa toạ độ, không sửa ảnh.** §H1 dặn sẵn như vậy từ 11/09 và lần
+này dùng đến thật: nghĩa địa thép đặt ở 60/14 nhưng ảnh vẽ thành ruộng tấm thép ở **80/31**, tháp nước lên
+29/15, chợ xuống 68/47, hố ra giữa đáy 46/91. Đo bằng cách vẽ chấm thẳng lên ảnh (lệnh ở cuối §H1) rồi đối
+chiếu trong game. Cả 10 toạ độ ở §C là số mới.
+
+**Hai chỗ code phải sửa theo art:**
+- **Bản vẽ SVG dự phòng vẽ theo bộ toạ độ cũ** → sau khi đổi `x/y` thì chấm rơi lệch khỏi hình nó vẽ. Sửa
+  gốc: `riotMapSvg()` giờ đọc thẳng `RIOT_YARDS` + `RIOT_PIT` (`x×9`, `y×16`), mọi mốc vẽ tương đối quanh đó.
+  Không còn hai bảng toạ độ trong repo. `RIOT_PIT` cũng thay cho hai con số cắm cứng `34%/95%` ở `renderRiotNodes`.
+- **K5 (thẻ "CHÂN THANG MÁY" xuống dòng) thành lỗi thật sự chứ không còn là chuyện thẩm mỹ**, vì luật ≥ 8%
+  tính theo thẻ **3 dòng cao 45 px**; thẻ 4 dòng là 58 px, đủ để đè lên bãi bên trên. Đo trong trình duyệt:
+  tên dài nhất 99 px + 12 padding + 2 viền = **113 px**, mà `max-width` ở màn ≤ 380 px đang là **112 px** —
+  thiếu đúng một pixel. Nâng lên 118 px.
+
+**Kiểm:** 375×812 và 375×667, `?riot=all&riotfast&dev` — 10 chấm nằm đúng mốc, không thẻ nào xuống dòng,
+không thẻ nào đè nhau, tờ chi tiết mở ra có ảnh bãi riêng (`yard_drop.jpg` … ), console 0 lỗi JS. Network:
+`map_d07.jpg` và `yard_*.jpg` 200 — hết sạch 404 của art, chỉ còn mấy file SFX đợt 3 đang chờ anh
+(`tell`, `tell_up`, `tell_down`, `reveal_a`, `new_char`, `hit3`). `art_audit.js` thêm mục **DẸP LOẠN** kiểm kê
+10 file này; `ult_lint` 60/60 không đổi.
+
 ---
 
 ## K. Còn chưa làm — soát lại 12/09
@@ -700,11 +765,11 @@ bằng `?riot&riotfast&dev` ở 375×812 và 375×667. Những gì còn lại, x
 
 | # | Việc | Bắt buộc? | Ghi chú |
 |---|---|---|---|
-| K1 | **Ảnh bản đồ `art/map/map_d07.jpg`** | Nếu muốn đẹp | Chưa có file (`art/map/` chỉ có `map_halcyon.jpg`). Prompt + bố cục 7 dải ở §H1; game đang chạy bản SVG, toạ độ nút không phải sửa khi thả ảnh vào. |
-| K2 | Chín ảnh bãi `art/riot/yard_<id>.jpg` | Không | Thư mục `art/riot/` chưa tồn tại, đang mượn `bg_07*.jpg`. Prompt §H2. |
+| ~~K1~~ | ~~Ảnh bản đồ `art/map/map_d07.jpg`~~ | — | **Xong 12/09.** 941×1672, 439 KB, bản 1 trong hai bản anh gửi (Q16). Toạ độ 10 nút đo lại trên ảnh → §C. |
+| ~~K2~~ | ~~Chín ảnh bãi `art/riot/yard_<id>.jpg`~~ | — | **Xong 12/09.** Đủ 9/9, 1024×576. Kiểm kê bằng `node scratch/art_audit.js` mục DẸP LOẠN. |
 | K3 | Biểu tượng 16×16 (kiện · quân · phản kích · sức mạnh) | Không | §H3 bản 11/09 ghi "đã code" nhưng thật ra chưa; giao diện dùng chữ và đọc được. |
 | K4 | `sim.js` chưa mô phỏng cyberware → bảng §F1 là **sàn** | Nên | Đội đã lắp cyberware mạnh hơn số in; vòng 3 (72/64/45 % ở cấp 20) sẽ dễ hơn thực tế. Cách làm: nạp `js/cyber.js` + `PLAYER.cyber` giả vào `sim.js --yard`, đo lại `m50` vòng 3 bằng `riot_tune.js m50 200 20`. Nhãn đang lệch về phía bi quan nên chưa gấp. |
-| K5 | Thẻ nhãn "CHÂN THANG MÁY" xuống dòng thành 4 dòng ở 375 px | Nên | Luật §C là thẻ chở đúng 3 dòng. Tên dài nhất trong 9 bãi; sửa `max-width` của `.ynode__card` (140 → ~150 px) hoặc bớt `letter-spacing` cho tên ≥ 14 ký tự. Chưa đè lên nút khác nhờ giãn 9 %. |
+| ~~K5~~ | ~~Thẻ nhãn "CHÂN THANG MÁY" xuống dòng thành 4 dòng ở 375 px~~ | — | **Xong 12/09** (thành bắt buộc khi giãn nút xuống 8%): `.ynode__card` ở màn ≤ 380 px lên `max-width:118px`. Đo thật: tên 99 px + 12 padding + 2 viền = 113, bản cũ để 112. |
 | K6 | Nhận kiện làm mất phần lẻ của chu kỳ đang chạy | Anh quyết | §D3 chốt `mốc = bây giờ` khi nhận. Hệ quả: nhận lúc kiện kế còn 5 phút thì đồng hồ nhảy về 45:00, mất 40 phút — trung bình mất nửa kiện mỗi lần nhận, 3 lần/ngày ≈ 6–8 % sản lượng, và người chơi **nhìn thấy** đồng hồ nhảy lùi. Sửa là bỏ dòng `s.t0=Date.now()` trong `claimYard()` (`settleYards()` ngay trước đó đã đặt mốc đúng cho cả hai trường hợp đầy/chưa đầy). Đổi thì số ở §F2 nhích lên chừng đó. |
 | K7 | Trận chiếm bãi thật (qua `battle.js`) chưa đánh lại trong phiên 12/09 | Nên | 11/09 đã kiểm; 12/09 tôi chiếm bằng `captureYard()` để đi nhanh. Anh kiểm bằng nút CHIẾM BÃI ở BÃI RƠI CŨ (99 % thắng), thắng xong phải thấy "CHIẾM ĐƯỢC … +200 CR · +2 SH" và nút `◂ KHU ĐÁY`. |
 | K8 | Việc còn treo từ §G: PvP tranh bãi · đổi ca đồn trú tự động · bãi có sự kiện theo mùa | Không | Chưa có lý do làm trước chương 2. |

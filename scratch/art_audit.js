@@ -93,6 +93,22 @@ console.log('\n=== NỀN / BẢN ĐỒ ===');
 secs.forEach(s => console.log(s.id.padEnd(6) + ' bg ' + mark(has(s.bg)) + '  (' + (s.bg || []).join(', ') + ')'));
 console.log('map    ' + mark(has(sandbox.MAP_IMG)) + '  (' + (sandbox.MAP_IMG || []).join(', ') + ')');
 
+/* ---- bản đồ Khu Đáy + 9 ảnh bãi (DẸP LOẠN, docs/dep-loan.md §H) ----
+   Nạp js/riot.js riêng ở đây: nó chỉ khai báo hằng số + hàm nên chạy được mà không cần state.js/app.js. */
+try { vm.runInContext(read('js/riot.js').replace(/^'use strict';/, ''), sandbox, { filename: 'js/riot.js' }); }
+catch (e) { console.error('!! lỗi nạp js/riot.js: ' + e.message); }
+vm.runInContext('globalThis.__r = typeof RIOT_YARDS !== "undefined" ? { RIOT_YARDS, RIOT_MAP_IMG, yardBg } : null;', sandbox);
+const riot = sandbox.__r;
+if (riot) {
+  console.log('\n=== DẸP LOẠN (bản đồ Khu Đáy + 9 bãi) ===');
+  console.log('map D07  ' + mark(has(riot.RIOT_MAP_IMG)) + '  (' + riot.RIOT_MAP_IMG.join(', ') + ')');
+  riot.RIOT_YARDS.forEach(y => {
+    const list = riot.yardBg(y), own = exists(list[0]);
+    console.log(y.id.padEnd(8) + y.name.padEnd(16) + 'ảnh bãi ' + mark(own) +
+      (own ? '  (' + list[0] + ')' : '  → mượn tạm ' + list[1]));
+  });
+}
+
 /* ---- panel comic ---- */
 const comicFiles = fs.existsSync(path.join(ROOT, 'art/comic')) ? fs.readdirSync(path.join(ROOT, 'art/comic')) : [];
 let panels = 0, pages = 0;

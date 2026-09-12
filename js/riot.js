@@ -50,8 +50,12 @@ const RIOT_DEV = (()=>{
 
 /* =====================================================================
    9 CÁI BÃI — ba vòng từ rìa bãi rác vào chân Tháp.
-   x/y = % của ảnh art/map/map_d07.jpg (bố cục 5 dải, docs/dep-loan.md §H1); chưa có ảnh thì SVG dự phòng
-   trong riotui.js vẽ đúng bố cục đó nên toạ độ vẫn khớp.
+   x/y = % của ảnh art/map/map_d07.jpg — ĐO TRÊN ẢNH THẬT (12/09), mỗi nút rơi đúng cái mốc của nó:
+   tháp nước số 9, chân thang máy, nghĩa địa thép, mái nhà thờ, chợ, sân lò đúc, hàng rào, cống ba ngã,
+   bãi rơi, miệng hố. Hai luật khi sửa: (1) hai nút liền nhau phải cách nhau ≥ 8% theo trục dọc, nếu không
+   hai thẻ nhãn (cao ~45 px trên ảnh cao ~628 px) đè lên nhau — thẻ mọc vào giữa màn nên x so le không cứu
+   được; (2) sửa xong chạy lại `?riot=all` ở 375×812 xem chấm có còn nằm trên vật thể không.
+   SVG dự phòng trong riotui.js (chỉ hiện khi thiếu ảnh) vẽ theo đúng bộ toạ độ này.
    need  = tầng DẸP LOẠN phải thắng trước mới mở (0 = mở ngay khi mở chế độ)
    hold  = ngưỡng giữ bãi: tổng power() của quân đồn trú để đạt 100% sản lượng và chặn đợt phản kích đầu
    cr/sh = thu nhập GỐC mỗi kiện, trước mọi hệ số
@@ -64,36 +68,39 @@ const RIOT_DEV = (()=>{
            Sửa `plan` thì PHẢI đo lại m50, nếu không con số giao diện hứa với người chơi sẽ sai.
    ===================================================================== */
 const RIOT_YARDS = [
-  { id:'drop',    name:'BÃI RƠI CŨ',      sub:'VÀNH NGOÀI', ring:1, x:62, y:86, fav:'rust',   slots:1, need:0,  hold:800,  cr:20,  sh:0, mult:1.88, m50:2.14, bg:'07a',
+  { id:'drop',    name:'BÃI RƠI CŨ',      sub:'VÀNH NGOÀI', ring:1, x:72, y:83, fav:'rust',   slots:1, need:0,  hold:800,  cr:20,  sh:0, mult:1.88, m50:2.14, bg:'07a',
     desc:'Chỗ Yuki rơi xuống. Băng Scav quay lại vì vẫn còn thứ moi được dưới lớp container.',
     plan:[['scav','scav','gutterrat'],['scav','straydog','chopshop']] },
-  { id:'drain',   name:'CỐNG BA NGÃ',     sub:'VÀNH NGOÀI', ring:1, x:30, y:77, fav:'rust',   slots:1, need:0,  hold:1000, cr:25,  sh:0, mult:1.97, m50:2.23, bg:'07d',
+  { id:'drain',   name:'CỐNG BA NGÃ',     sub:'VÀNH NGOÀI', ring:1, x:33, y:75, fav:'rust',   slots:1, need:0,  hold:1000, cr:25,  sh:0, mult:1.97, m50:2.23, bg:'07d',
     desc:'Ba miệng cống đổ vào một hố. Ai giữ được chỗ này thì giữ được đường rút của cả vành ngoài.',
     plan:[['gutterrat','gutterrat','straydog'],['gutterrat','pipefitter','hollow']] },
-  { id:'fence',   name:'HÀNG RÀO GÃY',    sub:'VÀNH NGOÀI', ring:1, x:58, y:68, fav:'chrome', slots:2, need:3,  hold:2200, cr:35,  sh:0, mult:1.33, m50:1.45, bg:'07c',
+  { id:'fence',   name:'HÀNG RÀO GÃY',    sub:'VÀNH NGOÀI', ring:1, x:45, y:63, fav:'chrome', slots:2, need:3,  hold:2200, cr:35,  sh:0, mult:1.33, m50:1.45, bg:'07c',
     desc:'Vành đai Canticle đứt một quãng. Đèn cảnh báo vẫn chớp, lính vẫn tới theo ca.',
     plan:[['drone','drone','enforcer'],['enforcer','drone','tinman'],['enforcer','bulwark','drone']] },
 
-  { id:'smelter', name:'SÂN LÒ ĐÚC',      sub:'LÒNG KHU',   ring:2, x:33, y:59, fav:'rust',   slots:2, need:5,  hold:2800, cr:45,  sh:1, mult:0.86, m50:0.89, bg:'07b', boss:'foreman',
+  { id:'smelter', name:'SÂN LÒ ĐÚC',      sub:'LÒNG KHU',   ring:2, x:25, y:55, fav:'rust',   slots:2, need:5,  hold:2800, cr:45,  sh:1, mult:0.86, m50:0.89, bg:'07b', boss:'foreman',
     desc:'Lò nguội nhưng sân vẫn ấm. Người của Foreman canh từng xe xỉ.',
     plan:[['welder','slagger','slagger'],['kiln','welder','slagger'],['kiln','drillbit','foreman']] },
-  { id:'market',  name:'CHỢ THÉP',        sub:'LÒNG KHU',   ring:2, x:61, y:50, fav:'rust',   slots:2, need:7,  hold:3200, cr:55,  sh:1, mult:1.38, m50:1.38, bg:'07a', boss:'rigger',
+  { id:'market',  name:'CHỢ THÉP',        sub:'LÒNG KHU',   ring:2, x:68, y:47, fav:'rust',   slots:2, need:7,  hold:3200, cr:55,  sh:1, mult:1.38, m50:1.38, bg:'07a', boss:'rigger',
     desc:'Mái tôn chắp vá, quầy bán tay chân máy đã tháo. Rigger ăn phần trăm từng quầy.',
     plan:[['scav','chopshop','hollow'],['chopshop','glassjaw','scav'],['glassjaw','drillbit','rigger']] },
-  { id:'church',  name:'MÁI NHÀ THỜ',     sub:'LÒNG KHU',   ring:2, x:29, y:41, fav:'rust',   slots:2, need:9,  hold:3600, cr:65,  sh:2, mult:1.17, m50:1.13, bg:'07d', boss:'motherrust',
+  { id:'church',  name:'MÁI NHÀ THỜ',     sub:'LÒNG KHU',   ring:2, x:27, y:39, fav:'rust',   slots:2, need:9,  hold:3600, cr:65,  sh:2, mult:1.17, m50:1.13, bg:'07d', boss:'motherrust',
     desc:'Cây thánh giá hàn từ ống nước nhô lên khỏi mặt cống. Giáo phái không bỏ chỗ này.',
     plan:[['tinman','hollow','pipefitter'],['hollow','tinman','bulwark'],['bulwark','glassjaw','motherrust']] },
 
-  { id:'lift',    name:'CHÂN THANG MÁY',  sub:'TRUNG TÂM',  ring:3, x:63, y:32, fav:'chrome', slots:3, need:12, hold:5000, cr:95,  sh:2, mult:1.59, m50:0.94, bg:'07e', boss:'archon',
+  { id:'lift',    name:'CHÂN THANG MÁY',  sub:'TRUNG TÂM',  ring:3, x:63, y:23, fav:'chrome', slots:3, need:12, hold:5000, cr:95,  sh:2, mult:1.59, m50:0.94, bg:'07e', boss:'archon',
     desc:'Bệ hàng to bằng một con phố, cáp biến mất trong sương. Đường lên Tháp nằm ngay trên đầu.',
     plan:[['drone','enforcer','enforcer'],['chromehound','drone','enforcer'],['bulwark','chromehound','enforcer'],['chromehound','drillbit','archon']] },
-  { id:'tower',   name:'THÁP NƯỚC SỐ 9',  sub:'TRUNG TÂM',  ring:3, x:32, y:23, fav:'rust',   slots:3, need:15, hold:5600, cr:110, sh:3, mult:2.16, m50:1.22, bg:'07a', boss:'rigger',
+  { id:'tower',   name:'THÁP NƯỚC SỐ 9',  sub:'TRUNG TÂM',  ring:3, x:29, y:15, fav:'rust',   slots:3, need:15, hold:5600, cr:110, sh:3, mult:2.16, m50:1.22, bg:'07a', boss:'rigger',
     desc:'Bồn nước rỉ sơn tay số 9. Ai ngồi trên đó thì nhìn được cả nửa quận.',
     plan:[['scav','chopshop','glassjaw'],['glassjaw','drillbit','chopshop'],['drillbit','bulwark','glassjaw'],['glassjaw','chromehound','rigger']] },
-  { id:'grave',   name:'NGHĨA ĐỊA THÉP',  sub:'TRUNG TÂM',  ring:3, x:60, y:14, fav:'rust',   slots:3, need:18, hold:6400, cr:130, sh:3, mult:1.77, m50:0.99,  bg:'07d', boss:'motherrust',
+  { id:'grave',   name:'NGHĨA ĐỊA THÉP',  sub:'TRUNG TÂM',  ring:3, x:80, y:31, fav:'rust',   slots:3, need:18, hold:6400, cr:130, sh:3, mult:1.77, m50:0.99,  bg:'07d', boss:'motherrust',
     desc:'Hơn hai nghìn tấm thép cắm đứng, mỗi tấm một cái tên. Không ai dám tháo một tấm nào.',
     plan:[['tinman','hollow','slagger'],['kiln','glassjaw','bulwark'],['drillbit','bulwark','chromehound'],['chromehound','glassjaw','motherrust']] },
 ];
+/* HỐ LOẠN không phải bãi (bấm vào là sang màn thang tầng cũ) nhưng vẫn là một cái nút trên bản đồ:
+   để toạ độ ở đây cho nút, bản vẽ SVG dự phòng và tài liệu cùng đọc một chỗ. Miệng hố đỏ ở đáy map_d07.jpg. */
+const RIOT_PIT = { x:46, y:91 };
 const yardById = id => RIOT_YARDS.find(y=>y.id===id);
 /* Ảnh minh hoạ: ảnh riêng của bãi nếu có (art/riot/), không thì dùng lại nền sector chương 1 */
 const yardBg = y => ['art/riot/yard_'+y.id+'.jpg', 'art/bg/bg_'+y.bg+'.jpg', 'art/bg/bg_battle.jpg'];

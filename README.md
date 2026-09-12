@@ -170,9 +170,10 @@ chiếm bãi (đánh) → đóng quân 1–3 người → bãi đẻ KIỆN HÀN
 - **Thua phản kích không mất bãi vĩnh viễn**: bãi thành ĐANG BỊ CHIẾM, ngừng đẻ kiện, kiện đã có **đóng băng
   chứ không mất**; đánh một trận GIÀNH LẠI (×0.85 độ khó) là nhận lại nguyên vẹn.
   Đồn trú ≥ 2× ngưỡng thì **không bao giờ** mất bãi.
-- **Ảnh bản đồ** `art/map/map_d07.jpg` chưa có → game vẽ bản đồ tạm bằng SVG (`riotMapSvg()` trong `js/riotui.js`,
-  đúng bố cục 7 dải của prompt). Thả file vào là tự thay, không phải sửa toạ độ.
-  Ảnh minh hoạ từng bãi dùng lại `art/bg/bg_07*.jpg`; thả `art/riot/yard_<id>.jpg` vào là tự thay.
+- **Art (12/09):** bản đồ thật `art/map/map_d07.jpg` (941×1672) + 9 ảnh bãi `art/riot/yard_<id>.jpg` (1024×576).
+  Toạ độ 10 cái nút đo trên chính ảnh đó (`RIOT_YARDS`/`RIOT_PIT` trong `js/riot.js`, bảng ở `docs/dep-loan.md` §C);
+  hai nút liền nhau phải cách ≥ 8% theo trục dọc, gần hơn là hai thẻ nhãn đè nhau. Thiếu file thì `riotMapSvg()`
+  vẽ bản dự phòng bằng SVG — nó đọc cùng bộ toạ độ nên không lệch được. Kiểm kê: `node scratch/art_audit.js`.
 - Thử không phải chờ 45 phút: mở `index.html?riotfast` → một chu kỳ **15 giây**.
 - **Kiểm nhanh (12/09):** `python scratch/riot_serve.py` (hoặc launch `static-riot`, cổng 8802) rồi mở
   `http://127.0.0.1:8802/` → tự chuyển sang `index.html?riot&riotfast&dev`: vào thẳng bản đồ Khu Đáy, coi như đã mở

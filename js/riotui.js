@@ -24,8 +24,10 @@ function rdur(min){
 const rbar = (pct, cls='') => `<i class="rbar ${cls}"><u style="width:${Math.max(0,Math.min(100,pct)).toFixed(1)}%"></u></i>`;
 
 /* =====================================================================
-   BẢN ĐỒ DỰ PHÒNG — vẽ bằng SVG khi chưa có art/map/map_d07.jpg.
-   Bố cục đúng 5 dải của docs/dep-loan.md §H1 nên toạ độ nút trong RIOT_YARDS không phải sửa khi thay ảnh thật.
+   BẢN ĐỒ DỰ PHÒNG — vẽ bằng SVG khi thiếu art/map/map_d07.jpg (ảnh thật đã có trong repo từ 12/09,
+   giữ lại đây để bản thiếu file không còn là cái khung rỗng).
+   Mốc vẽ theo ĐÚNG x/y của RIOT_YARDS: viewBox 900×1600 nên x_svg = x% × 9, y_svg = y% × 16.
+   Sửa toạ độ một cái bãi thì sửa luôn ở đây, nếu không hai bản đồ nói hai chỗ khác nhau.
    ===================================================================== */
 function riotMapSvg(){
   /* Bộ sinh số cố định: bản đồ phải giống hệt nhau mỗi lần mở, không nhảy múa */
@@ -38,45 +40,56 @@ function riotMapSvg(){
   const circ=(x,y,r,f,st,w=3)=>P.push(`<circle cx="${x}" cy="${y}" r="${r}" fill="${f}"${st?` stroke="${st}" stroke-width="${w}"`:''}/>`);
   const txt=(x,y,t,f,sz=26)=>P.push(`<text x="${x}" y="${y}" text-anchor="middle" font-family="monospace" font-size="${sz}" letter-spacing="6" fill="${f}">${t}</text>`);
 
-  /* Vạch chia ba vòng, nhãn nằm NGAY DƯỚI vạch và gọi tên dải bắt đầu từ đó.
-     Khớp y của RIOT_YARDS: vòng 3 (trung tâm) 14–32% · vòng 2 (lòng khu) 41–59% · vòng 1 (vành ngoài) 68–86%. */
-  [[584,'LÒNG KHU', RU+'.55)'],[1016,'VÀNH NGOÀI', RU+'.55)']].forEach(([y,t,c])=>{
+  /* Mốc lấy THẲNG từ RIOT_YARDS (+ RIOT_PIT): viewBox 900×1600 nên x_svg = x% × 9, y_svg = y% × 16.
+     Sửa toạ độ một cái bãi ở js/riot.js là bản vẽ này đi theo, không phải sửa hai chỗ. */
+  const C = id => { const y = id==='pit' ? RIOT_PIT : yardById(id); return [Math.round(y.x*9), Math.round(y.y*16)]; };
+  const [twX,twY]=C('tower'), [lfX,lfY]=C('lift'),   [grX,grY]=C('grave'),
+        [chX,chY]=C('church'),[mkX,mkY]=C('market'), [smX,smY]=C('smelter'),
+        [fnX,fnY]=C('fence'), [drX,drY]=C('drain'),  [dpX,dpY]=C('drop'), [ptX,ptY]=C('pit');
+
+  /* Vạch chia ba vòng, nhãn nằm NGAY DƯỚI vạch và gọi tên dải bắt đầu từ đó — vạch đặt vào khoảng trống
+     giữa hai vòng nên tự đi theo toạ độ bãi. */
+  [[(grY+chY)/2,'LÒNG KHU'],[(smY+fnY)/2,'VÀNH NGOÀI']].forEach(([y,t])=>{
     line(40,y,860,y, ST+'.14)',2,'6 14');
-    P.push(`<text x="52" y="${y+28}" font-family="monospace" font-size="20" letter-spacing="7" fill="${c}">${t}</text>`);
+    P.push(`<text x="52" y="${y+28}" font-family="monospace" font-size="20" letter-spacing="7" fill="${RU}.55)">${t}</text>`);
   });
   P.push(`<text x="52" y="126" font-family="monospace" font-size="20" letter-spacing="7" fill="${CH}.6)">TRUNG TÂM · CHÂN THÁP</text>`);
 
-  /* ---- Vòng 3 · dải trên: cọc móng Tháp, nghĩa địa thép (540,224), tháp nước 9 (288,368), thang máy (567,512) */
-  for(let i=0;i<4;i++){ const x=90+i*215; poly(`${x},80 ${x+104},80 ${x+78},470 ${x+26},470`, CH+'.13)', CH+'.30)',2); line(x+52,80,x+52,470, CH+'.28)',2); }
-  for(let i=0;i<34;i++){ const x=470+rnd()*170, y=190+rnd()*80; box(x,y,6,20+rnd()*16, ST+'.48)'); }
-  line(466,286,650,286, ST+'.30)',2);
-  circ(288,368,52, RU+'.14)', RU+'.70)',4); txt(288,382,'9', RU+'.85)',34);
-  line(258,412,246,470, RU+'.55)',5); line(318,412,330,470, RU+'.55)',5);
-  for(let i=0;i<8;i++){ const y=452+i*20; line(508,y,626,y, ST+'.20)',2); }
-  line(508,452,508,612, ST+'.45)',4); line(626,452,626,612, ST+'.45)',4);
-  line(508,452,626,612, ST+'.16)',2); line(626,452,508,612, ST+'.16)',2);
+  /* ---- Vòng 3 · dải trên: cọc móng Tháp, tháp nước 9, chân thang máy, nghĩa địa thép */
+  for(let i=0;i<4;i++){ const x=90+i*215; poly(`${x},40 ${x+104},40 ${x+82},176 ${x+22},176`, CH+'.13)', CH+'.30)',2); line(x+52,40,x+52,176, CH+'.28)',2); }
+  circ(twX,twY,52, RU+'.14)', RU+'.70)',4); txt(twX,twY+14,'9', RU+'.85)',34);
+  line(twX-30,twY+44,twX-42,twY+102, RU+'.55)',5); line(twX+30,twY+44,twX+42,twY+102, RU+'.55)',5);
+  for(let i=0;i<8;i++){ const y=lfY-60+i*20; line(lfX-59,y,lfX+59,y, ST+'.20)',2); }
+  line(lfX-59,lfY-60,lfX-59,lfY+100, ST+'.45)',4); line(lfX+59,lfY-60,lfX+59,lfY+100, ST+'.45)',4);
+  line(lfX-59,lfY-60,lfX+59,lfY+100, ST+'.16)',2); line(lfX+59,lfY-60,lfX-59,lfY+100, ST+'.16)',2);
+  for(let i=0;i<34;i++){ const x=grX-75+rnd()*150, y=grY-34+rnd()*64; box(x,y,6,20+rnd()*16, ST+'.48)'); }
+  line(grX-74,grY-44,grX+92,grY-44, ST+'.30)',2);
 
-  /* ---- Vòng 2 · dải giữa: mái nhà thờ (261,656), chợ thép (549,800), sân lò đúc (297,944) */
-  poly('182,718 261,616 340,718', RU+'.16)', RU+'.60)',4);
-  line(261,616,261,566, RU+'.75)',5); line(238,592,284,592, RU+'.75)',5);
-  for(let i=0;i<12;i++){ const x=466+(i%4)*48, y=754+Math.floor(i/4)*34;
+  /* ---- Vòng 2 · dải giữa: mái nhà thờ, chợ thép, sân lò đúc ---- */
+  poly(`${chX-79},${chY+62} ${chX},${chY-40} ${chX+79},${chY+62}`, RU+'.16)', RU+'.60)',4);
+  line(chX,chY-40,chX,chY-90, RU+'.75)',5); line(chX-23,chY-64,chX+23,chY-64, RU+'.75)',5);
+  for(let i=0;i<12;i++){ const x=mkX-93+(i%4)*48, y=mkY-46+Math.floor(i/4)*34;
     poly(`${x},${y} ${x+42},${y} ${x+33},${y+23} ${x+9},${y+23}`, AC+'.12)', AC+'.42)',2); }
-  circ(297,944,44, RU+'.18)', RU+'.70)',4); circ(297,944,18, RU+'.35)');
-  for(let i=0;i<3;i++) P.push(`<ellipse cx="${305+i*12}" cy="${890-i*42}" rx="${26+i*11}" ry="${12+i*5}" fill="${RU}.10)"/>`);
+  circ(smX,smY,44, RU+'.18)', RU+'.70)',4); circ(smX,smY,18, RU+'.35)');
+  for(let i=0;i<3;i++) P.push(`<ellipse cx="${smX+8+i*12}" cy="${smY-54-i*42}" rx="${26+i*11}" ry="${12+i*5}" fill="${RU}.10)"/>`);
 
-  /* ---- Vòng 1 · dải dưới: hàng rào gãy (522,1088), cống ba ngã (270,1232), bãi rơi (558,1376), hố loạn (306,1520) */
-  line(60,1150,860,1040, ST+'.42)',4,'40 18');
-  for(let i=0;i<10;i++){ const t=i/9, x=60+t*800, y=1150-t*110; line(x,y-15,x,y+15, ST+'.28)',2); }
-  circ(270,1232,34,'rgba(8,10,14,.9)', ST+'.45)',3);
-  [[-58,-34],[0,-64],[58,-34]].forEach(([dx,dy])=>{ line(270+dx,1232+dy,270,1232, ST+'.32)',9); circ(270+dx,1232+dy,15,'rgba(8,10,14,.75)', ST+'.38)',2); });
-  for(let i=0;i<26;i++){ const x=430+rnd()*360, y=1300+rnd()*180, w=22+rnd()*52, h=12+rnd()*20;
+  /* ---- Vòng 1 · dải dưới: hàng rào gãy (chéo qua cả dải), cống ba ngã, bãi rơi, hố loạn ---- */
+  const fnA=fnY+(fnX-60)*90/800, fnB=fnA-90;      // đường chéo đi đúng qua mốc hàng rào
+  line(60,fnA,860,fnB, ST+'.42)',4,'40 18');
+  for(let i=0;i<10;i++){ const t=i/9, x=60+t*800, y=fnA-t*90; line(x,y-15,x,y+15, ST+'.28)',2); }
+  circ(drX,drY,34,'rgba(8,10,14,.9)', ST+'.45)',3);
+  [[-58,-34],[0,-64],[58,-34]].forEach(([dx,dy])=>{ line(drX+dx,drY+dy,drX,drY, ST+'.32)',9); circ(drX+dx,drY+dy,15,'rgba(8,10,14,.75)', ST+'.38)',2); });
+  for(let i=0;i<26;i++){ const x=dpX-174+rnd()*300, y=dpY-96+rnd()*160, w=22+rnd()*52, h=12+rnd()*20;
     box(x,y,w,h, rnd()<.4 ? RU+'.26)' : 'rgba(130,118,102,.34)'); }
-  line(470,1330,700,1420, ST+'.16)',2);
-  circ(306,1520,70,'rgba(6,7,10,.95)','rgba(255,75,75,.55)',4); circ(306,1520,44,'rgba(255,75,75,.12)');
-  for(let i=0;i<3;i++) P.push(`<ellipse cx="${300+i*9}" cy="${1462-i*32}" rx="${26+i*11}" ry="${12+i*5}" fill="rgba(255,75,75,.09)"/>`);
+  line(dpX-108,dpY-44,dpX+122,dpY+46, ST+'.16)',2);
+  circ(ptX,ptY,70,'rgba(6,7,10,.95)','rgba(255,75,75,.55)',4); circ(ptX,ptY,44,'rgba(255,75,75,.12)');
+  for(let i=0;i<3;i++) P.push(`<ellipse cx="${ptX-6+i*9}" cy="${ptY-58-i*32}" rx="${26+i*11}" ry="${12+i*5}" fill="rgba(255,75,75,.09)"/>`);
 
-  /* Đường đi xuyên ba vòng, nối đúng các mốc */
-  P.push(`<path d="M306,1450 C360,1380 470,1400 558,1376 C640,1350 600,1200 522,1088 C440,980 330,1010 297,944 C262,874 230,760 261,656 C300,540 480,560 567,512 C640,470 400,440 288,368 C210,318 360,270 540,224"
+  /* Đường đi xuyên ba vòng, nối các mốc theo đúng thứ tự từ dưới lên: hố → bãi rơi → cống → hàng rào
+     → lò đúc → chợ → nhà thờ → nghĩa địa → thang máy → tháp nước */
+  const road=[[ptX,ptY-70],[dpX,dpY],[drX,drY],[fnX,fnY],[smX,smY],[mkX,mkY],[chX,chY],[grX,grY],[lfX,lfY],[twX,twY+52]];
+  P.push(`<path d="M${road[0]} ${road.slice(1).map(([x,y],i)=>{ const [px,py]=road[i];
+      return `C${px+(x-px)*.4},${py+(y-py)*.7} ${px+(x-px)*.6},${py+(y-py)*.3} ${x},${y}`; }).join(' ')}"
     fill="none" stroke="${ST}.16)" stroke-width="4" stroke-dasharray="12 16"/>`);
 
   return `<svg viewBox="0 0 900 1600" preserveAspectRatio="none" aria-hidden="true">
@@ -168,9 +181,10 @@ function renderRiotNodes(){
     n.addEventListener('click',()=>openYard(y.id));
     box.appendChild(n);
   });
-  /* HỐ LOẠN — thang tầng cũ, không phải bãi. Toạ độ khớp miệng hố vẽ trong riotMapSvg() (306,1520 / 900×1600). */
+  /* HỐ LOẠN — thang tầng cũ, không phải bãi. Toạ độ ở RIOT_PIT (js/riot.js): miệng hố đỏ ở đáy map_d07.jpg,
+     cách BÃI RƠI CŨ 8% nên hai thẻ nhãn không đè nhau. */
   const p=el('button','ynode ynode--pit ynode--r is-open');
-  p.style.left='34%'; p.style.top='95%';
+  p.style.left=RIOT_PIT.x+'%'; p.style.top=RIOT_PIT.y+'%';
   p.innerHTML=`<i class="ynode__dot"></i><span class="ynode__card"><b>HỐ LOẠN</b><em>THANG VÔ HẠN</em><u class="mono">TẦNG ${PLAYER.riot.tier} · CAO ${PLAYER.riot.best||0}</u></span>`;
   p.addEventListener('click',()=>{ sfx('select',.3); go('riot'); });
   box.appendChild(p);
