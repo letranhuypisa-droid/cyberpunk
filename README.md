@@ -24,14 +24,14 @@ rồi mở `http://localhost:8765/index.html`. UI kit và token: `kit.html`. Nú
 | `css/chromefall.css` | Token thiết kế (Chrome/Rust/tier/ngữ nghĩa, sáng + tối) và toàn bộ giao diện; khối `v0.3` ở cuối: chọn mục tiêu, lao vào, hint, comic, archive |
 | `css/fx.css` | Overlay hiệu ứng đòn đánh/trạng thái (placeholder vẽ bằng CSS, `.fx--sheet` khi có ảnh) + hộp holo video chiêu cuối `.holo` |
 | `js/core.js` | Tiện ích DOM, thẻ nhân vật (`cardEl`), loader ảnh/video có fallback, hộp phát video `.cutin` dùng chung (ult trong trận, mở rương ở gacha), thanh HP/Energy, theme |
-| `js/data.js` | **Số liệu & hồ sơ**: roster (ATK/HP/SPD/CRIT, skill + fx/status, passive), kẻ địch (`FOE_STATS`, `FOE_SKILL`, `ult`), **chiêu mộ** (`RECRUIT_*` — nạp kẻ địch chương 1 vào `ROSTER` thành đơn vị chơi được), chương/sector, **`RIOT`** (dẹp loạn), `RULES` (move, holo, foeUltGain), hồ sơ người chơi (v3, tự chuyển từ v2), lore, bonds, **`BANNERS`** (hai bể gacha + khoá theo chương). Sửa ở đây. |
+| `js/data.js` | **Số liệu & hồ sơ**: roster (ATK/HP/SPD/CRIT, skill + fx/status, passive), kẻ địch (`FOE_STATS`, `FOE_SKILL`, `ult`), **chiêu mộ** (`RECRUIT_*` — nạp kẻ địch chương 1 vào `ROSTER` thành đơn vị chơi được), chương/sector, **`RIOT`** (dẹp loạn), `RULES` (move, holo, foeUltGain), hồ sơ người chơi (v3, tự chuyển từ v2), lore, bonds, **`BANNER`** (một bể gacha; khoá theo chương + `beaten()` cho quân chiêu mộ). Sửa ở đây. |
 | `js/story.js` | **Comic từng màn**: trang, panel, bong bóng cho intro/outro của 00-T → 07-E. Sửa lời thoại ở đây. |
 | `js/comic.js` | Renderer trang comic: layout panel, ảnh + fallback, bong bóng hiện dần, lật trang, SKIP |
 | `js/state.js` | Lưu/nạp hồ sơ (`SAVE`, local hoặc remote), nâng cấp (`UPGRADE`), **`unitStats(id)`** — một chỗ duy nhất tính chỉ số cuối, và `power(id)`/`teamPower()`, nhiệm vụ ngày |
 | `js/audio.js` | SFX giao diện (audio/*.ogg) + âm chiến đấu: có `audio/<tên>.ogg\|mp3\|wav` thì dùng file, thiếu thì tổng hợp WebAudio. Một thao tác = một tiếng (`SFX_ONE`/`SFX_BEAT`); `SFX_VARIANTS` cho tiếng nhiều bản (`hit`, `hit2`…); `SFX_MUTE` cho nút không kêu |
 | `js/fx.js` | Overlay hiệu ứng trên sprite: một lần (hit/crit/nổ/điện/độc/cháy/choáng/hồi máu/lá chắn) và lặp theo trạng thái + lá chắn; tự dùng sprite sheet `art/fx/<kind>.webp` nếu có |
 | `js/battle.js` | Engine trận: passive, lượt theo SPD, chế độ chọn mục tiêu, di chuyển tới mục tiêu kiểu Idle Heroes (`playMoveAttack`), sát thương + chí mạng, lá chắn (`addShield`/`absorbShield`), trạng thái choáng/độc/cháy (`applyStatus`/`tickStatus`), ult + video holo trên đầu nhân vật (`playHolo`), chiêu cuối của địch (`enemyUlt`), wave (hồi máu giữa wave), hint tutorial. `finish()` tách nhánh thưởng theo `SECTOR.mode` (chiến dịch / `'riot'`) |
-| `js/app.js` | Router màn hình, lobby, squad (3 slot, lưu đội), sector, **dẹp loạn** (`renderRiot`), gacha hai bể, archive (tab Kỹ năng / Passive / Hồ sơ), config, COMMS |
+| `js/app.js` | Router màn hình, lobby, squad (3 slot, lưu đội), sector, **dẹp loạn** (`renderRiot`), gacha một bể, archive (4 tab; `openLore` dùng chung cho nhân vật lẫn kẻ địch), config, COMMS |
 | `js/data_later.js` | Dữ liệu chương 2–3 bản cũ (không nạp), giữ để viết lại quanh Yuki |
 | `scratch/key_frame.py` | Tách nền frame sprite (idle/attack/hurt), in `box` để dán vào `ROSTER` |
 | `scratch/ult_lint.js` | Soát chiêu cuối: số trong `desc` có khớp `mult`/`hits`/`shieldPct`/`healPct`/`flat`/`drainEnergy` không, `energyMax` có bằng `ult.cost` không, và bản chiêu mộ có còn viết theo giọng phía địch không. Thoát mã 1 nếu lệch |
@@ -131,10 +131,26 @@ Ba thứ cài để game còn việc làm trong lúc chờ chương 2. Chi tiế
 dựng **bản sao** rồi nạp vào `ROSTER` — def gốc trong `ENEMY_POOL` không bị đụng, nên cân bằng 6 màn chương 1
 giữ nguyên. Lính thường **không** được thêm `ult` vào `ENEMY_POOL`; chiêu của chúng chỉ sống trên bản chiêu mộ.
 
-**Khoá gacha theo chương.** Chỉ quay được người đã xuất hiện trong màn chơi của chương đã ra.
-Nhân vật lấy chương từ `HERO_DEBUT` (chép tay theo `docs/story.md`); kẻ địch suy từ `CHAPTERS` + `SECTORS[].plan`
-nên chương 2 cài xong là địch chương 2 tự vào bể. Hai bể: **REQUISITION** (nhân vật, SH) và **CHIÊU MỘ**
-(kẻ địch, CR). Trùng không hoàn SH nữa — giữ thành bản dư trong `PLAYER.extra` để phân tách lấy linh kiện (đợt 3).
+**Một bể gacha, hai đường vào bể (gộp 12/09 — `docs/gacha-merge.md`).** Bản 11/09 tách hai bể REQUISITION
+(nhân vật, SH) và CHIÊU MỘ (kẻ địch, CR), nhưng cả hai chạy chung `pull()` và đổ chung vào `ROSTER` nên khác
+biệt duy nhất là loại tiền — hai cái tên hứa hẹn hai cơ chế không có thật. Giờ còn **một bể REQUISITION trả SH**:
+
+- *nhân vật* mở theo chương. Lấy từ `HERO_DEBUT` (chép tay theo `docs/story.md`).
+- *quân chiêu mộ* phải **đánh bại con đó trong trận** mới vào bể (`PLAYER.defeated`, ghi trong `killUnit`).
+  Vẫn kèm khoá theo chương suy từ `CHAPTERS` + `SECTORS[].plan`, nên chương 2 cài xong là địch chương 2 tự vào.
+
+Tính lúc con đó **chết**, không đợi clear màn: hạ trùm ở wave 3 rồi gục ở wave 4 thì vẫn là đã hạ, và DẸP LOẠN
+không ghi vào `PLAYER.cleared`. Bể tự lớn theo tiến trình: 4 (hồ sơ mới) → 7 → 11 → 17 → 22 → 24 (xong 07-D).
+Hồ sơ cũ được gieo `defeated` từ `cleared` × `SECTORS[].plan` nên không tụt.
+Trùng không hoàn SH — giữ thành bản dư trong `PLAYER.extra` để phân tách lấy linh kiện (đợt 3).
+CR giờ chỉ còn việc nâng cấp; hố tiêu CR thứ hai là cyberware.
+
+**Một mục cho một nhân vật ở ARCHIVE (12/09 — `docs/archive-merge.md`).** Trước đó 20 trong 21 mục *Sổ bộ*
+trùng id với tab *Nhân vật*, và hai tab giữ hai **nửa** của cùng một trang: `LORE` chỉ có cho 19 nhân vật nên
+tab HỒ SƠ của cả 20 con chiêu mộ rỗng, trong khi danh xưng / tiểu sử / nhận diện / flavor chiêu cuối của
+chúng nằm bên `CODEX`. Giờ tab **Nhân vật = 19 người**, tab **Sổ bộ = 21 kẻ địch** và không id nào ở cả hai.
+`FOE_LORE` sinh từ `CODEX` lúc nạp rồi ánh xạ sang hình dạng `LORE`, nên `openLore` dựng được trang cho cả
+hai bên mà không phải viết thêm chữ. Sổ bộ **không khoá đọc**, chỉ đánh dấu `CHƯA HẠ` → `ĐÃ HẠ` → `ĐÃ CÓ`.
 
 **DẸP LOẠN.** Thang đánh vô hạn ở Khu Đáy, mở sau 07-A. `riotSector(n)` dựng object hình dạng SECTOR rồi
 `go('battle')` — engine trận không biết mình đang ở chế độ nào. Wave của mỗi tầng **cố định** (`riotRng` gieo

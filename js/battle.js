@@ -7,7 +7,8 @@
    B.mode: 'idle' | 'target' (đang chờ người chơi chạm kẻ địch). B.gen tăng mỗi lần initBattle: mọi hàm async
    chụp lại gen và dừng nếu trận đã bị reset giữa chừng (RESET / RETRY / BASE).
    ===================================================================== */
-const B = { units:[], queue:[], idx:0, round:0, target:null, busy:false, over:false, frames:{}, mode:'idle', pending:null, gen:0 };
+/* opened = kẻ địch LẦN ĐẦU bị hạ trong trận này, để bảng kết quả in "MỞ BỂ · <tên>". */
+const B = { units:[], queue:[], idx:0, round:0, target:null, busy:false, over:false, frames:{}, mode:'idle', pending:null, gen:0, opened:[] };
 const UI = {
   stage:$('#stage'), allies:$('#allies'), enemies:$('#enemies'), turnbar:$('#turnbar'), ticker:$('#ticker'), fx:$('#fx'), log:$('#log'),
   btnAttack:$('#btnAttack'), btnUlt:$('#btnUlt'), ultName:$('#ultName'), ultMeta:$('#ultMeta'), ultBar:$('#ultBarFill'), ultInfo:$('#ultInfo'),
@@ -70,7 +71,7 @@ function initBattle(){
   // unitStats (state.js) = chỉ số cuối: gốc × cấp nâng cấp × linh kiện × cyberware. Thẻ nhân vật đọc cùng hàm này
   // nên con số trên thẻ và con số vào trận luôn khớp.
   B.units = team.map((id,i)=>{ const d=ROSTER[id], s=unitStats(id); const u=makeUnit({...d, ...s, level:lvl(id)},'ally',i); applyStaticPassives(u,team,enemyDefs); return u; });
-  B.round=0; B.idx=0; B.target=null; B.busy=false; B.over=false; B.wave=0; B.queue=[];
+  B.round=0; B.idx=0; B.target=null; B.busy=false; B.over=false; B.wave=0; B.queue=[]; B.opened=[];
   UI.log.innerHTML=''; UI.result.hidden=true; UI.fx.innerHTML=''; turnTiles.clear();
   UI.sectorNo.textContent=SECTOR.id; UI.waveNo.textContent=`0/${SECTOR.waves}`; UI.roundNo.textContent='00';
   UI.stage.classList.remove('has-bg'); UI.stage.style.removeProperty('--bgimg');
@@ -421,7 +422,15 @@ function applyStatus(src, tgt, st, quiet){
 const statusChips = u => (u.status||[]).map(s=>({ type:s.kind, label:STATUS_DEF[s.kind].label, val:s.turns+'T' }));
 const syncStatusFx = u => setFxLoops(u, [...(u.shield?['shield']:[]), ...(u.status||[]).map(s=>s.kind)]);
 function clearStatus(u){ if(u.status && u.status.length){ u.status=[]; updateUnit(u); } }
-function killUnit(u){ u.alive=false; u.chips=[]; u.status=[]; u.shield=0; if(B.target===u) B.target=null; }
+/* Chỗ duy nhất mọi cái chết đi qua — gọi từ cả sát thương (dealDamage) và độc/cháy (tickStatus).
+   Hạ kẻ địch = mở con đó ở bể gacha (xem khối GACHA trong data.js). Ghi ngay tại đây chứ không đợi
+   clear màn: hạ trùm ở wave 3 rồi chết ở wave 4 thì vẫn là đã hạ, và DẸP LOẠN không ghi vào cleared.
+   makeUnit spread ...def nên u.id là id trong ENEMY_POOL; `controlled` không đổi u.side nên con bị
+   điều khiển chết vẫn tính đúng bên. Không savePlayer ở đây — finish() lưu một lần cho cả trận. */
+function killUnit(u){
+  u.alive=false; u.chips=[]; u.status=[]; u.shield=0; if(B.target===u) B.target=null;
+  if(u.side==='enemy' && noteDefeated(u.id)) B.opened.push(u.id);
+}
 
 /* ---- Lá chắn: hút sát thương trước khi vào HP, không đếm lượt — đánh vỡ mới thôi (chiêu FIRE STORM của Kiln).
    Hiện thành chip KHIÊN <số còn lại> trên bảng unit + overlay lặp 'shield' (js/fx.js, syncStatusFx). ---- */
@@ -560,6 +569,14 @@ async function winReward(g){
   if(st&&st.outro&&first&&!(PLAYER.settings&&PLAYER.settings.skipStory)){ await wait(700); if(g!==B.gen) return txt; await playComic(st.outro, SECTOR, 'outro'); }
   return txt;
 }
+/* Kẻ địch mới hạ được trong trận này → dòng thông báo mở bể. Chỉ kể con chiêu mộ được VÀ đã tới chương
+   của nó: hạ Cantor thì defeated có hắn nhưng bể không bao giờ có (RECRUIT_SKIP), nói "mở bể" là nói dối. */
+function openedTxt(){
+  const ids=B.opened.filter(id => ROSTER[id] && unlocked(id));
+  if(!ids.length) return '';
+  const names=ids.map(id=>ROSTER[id].name).join(' · ');
+  return `MỞ BỂ · ${names} — quay được ở REQUISITION`;
+}
 let finish = async function(win){
   const g=B.gen; B.over=true; setInputs(false);
   let rewardTxt='';
@@ -567,6 +584,11 @@ let finish = async function(win){
     rewardTxt = await winReward(g);
     if(g!==B.gen) return;
   }
+  /* Lưu một lần cho cả trận, KỂ CẢ khi thua: killUnit đã ghi vào PLAYER.defeated mà nhánh thua
+     trước giờ không lưu gì, để nguyên thì hạ được con nào rồi chết là mất trắng con đó. */
+  savePlayer();
+  const opened=openedTxt();
+  if(opened) rewardTxt = rewardTxt ? rewardTxt+'<br>'+opened : opened;
   const nAlly=B.units.filter(u=>u.side==='ally').length;
   if(win) AUDIO.victory(); else AUDIO.defeat();
   UI.result.hidden=false; UI.result.className='result '+(win?'win':'lose');
