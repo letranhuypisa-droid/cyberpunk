@@ -851,6 +851,36 @@ const STREAK = [ { days:1, sh:20 }, { days:3, sh:40 }, { days:5, sh:60 }, { days
 
    Mỗi mốc một LOẠI thưởng khác nhau, cố ý: bốn lần cùng một thứ thì mốc cuối không đáng nhớ hơn mốc đầu.
    statPct nhân dồn (1.06 × 1.06) chứ không cộng — cùng luật với cyberware, xem unitStats ở js/state.js. */
+/* =====================================================================
+   HỢP ĐỒNG THÁNG (đợt 7 · D3 — đặc tả ở docs/hop-dong-thang.md)
+   Thẻ mùa bản CHỈ CÓ NHÁNH MIỄN PHÍ: game không bán gì, nên thứ duy nhất mượn từ mô hình đó là thanh
+   tiến trình nhìn thấy được. Mùa = một tháng dương lịch.
+
+   Thưởng cố ý KHÔNG lấy SH làm chính: `node scratch/econ_sh.js` đo được người chơi đủ 7 ngày đã nhận
+   3.088 SH/tuần = 103 lượt quay = chạm pity 50 sau chưa đầy nửa tuần. Đổ thêm SH vào đây là đổ nước vào
+   cốc đã tràn. Tiền thưởng đi vào chỗ thiếu thật: CR (76.000 để lên cấp 20 một người) và LK (2.208 để
+   kịch cyberware một người), cộng hai món cosmetic chỉ có ở đây.
+
+   Đổi mùa mới: sửa `title` một dòng là xong. Mốc và thưởng giữ nguyên qua các mùa cho tới khi có lý do đổi. */
+const PASS = {
+  dayCap: 60,                                     // trần dấu mỗi ngày — một buổi cày trắng đêm không nuốt cả mùa
+  step: 50,                                       // dấu cho mỗi mốc
+  title: { id:'s2609', name:'NGƯỜI DỌN KHU ĐÁY' },  // danh hiệu của mùa này (mốc 20)
+  frame: { id:'f2609', name:'VIỀN HỢP ĐỒNG' },      // khung viền thẻ (mốc 10)
+  /* Dấu cho mỗi việc. Khoá trùng với id của dailyProgress (win/pull/riotcrate) để chỉ phải hook MỘT chỗ. */
+  pts: { win:2, pull:1, riotcrate:1, daily:4, level:2, ascend:15 },
+  /* 20 mốc. thuộc tính: cr · lk · sh · frame · title. Hai mốc cosmetic đứng ở 10 và 20 — giữa mùa và cuối mùa. */
+  tiers: [
+    { n:1,  cr:2000  }, { n:2,  lk:20 },   { n:3,  cr:3000 },  { n:4,  sh:60 },
+    { n:5,  lk:40    }, { n:6,  cr:4000 }, { n:7,  lk:40 },    { n:8,  cr:5000 },
+    { n:9,  sh:80    }, { n:10, cr:6000, frame:true },
+    { n:11, lk:60    }, { n:12, cr:6000 }, { n:13, lk:60 },    { n:14, sh:80 },
+    { n:15, cr:7000  }, { n:16, lk:80 },   { n:17, cr:8000 },  { n:18, lk:100 },
+    { n:19, sh:80    }, { n:20, cr:12000, lk:160, title:true },
+  ],
+};
+const passSeason = d => { d=d||new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; };
+
 const ASCEND = [
   { star:1, lv:5,  cr:2000,  dupes:1, lk:60,  statPct:6,               label:'+6% ATK/HP' },
   { star:2, lv:10, cr:6000,  dupes:1, lk:90,  energyStart:20,          label:'Vào trận có sẵn 20 Energy' },
@@ -911,7 +941,7 @@ const PLAYER_DEFAULTS = () => ({ name:'YUKI', level:1, credits:3000, shards:300,
   pity:{hero:0}, pulls:0, cleared:[], defeated:[], extra:{}, riot:{tier:1, best:0}, parts:0, cyber:{}, sweep:null, seenNew:[],
   /* đợt 7 — giữ chân: lastSeen = mốc thời gian lần cuối đóng game (quà VỀ RỒI tính từ đây) ·
      week = chuỗi ngày trong tuần {id, days:[ngày đã mở], claimed:[mốc đã nhận]} · records = kỷ lục cá nhân */
-  lastSeen:0, week:null, records:{}, asc:{},
+  lastSeen:0, week:null, records:{}, asc:{}, pass:null, title:'', frame:'',
   settings:{sound:true, sfx:true, motion:false, skipStory:false, anim:true, ultVideo:true, revealVideo:true, auto:false, speed:1}, levels:{}, daily:null, hintsSeen:[] });
 const _loaded = (()=>{ try{ for(const k of [PLAYER_KEY,...LEGACY_KEYS]){ const raw=localStorage.getItem(k); if(raw) return { p:JSON.parse(raw), legacy:k!==PLAYER_KEY }; } }catch(e){} return { p:{}, legacy:false }; })();
 const PLAYER = Object.assign(PLAYER_DEFAULTS(), _loaded.p);

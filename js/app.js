@@ -24,6 +24,7 @@ function go(name){
   if(name==='cyber'   && typeof renderCyber==='function')   renderCyber();     // cấy ghép 5 ô (js/cyberui.js)
   if(name==='sector') renderSectors();
   if(name==='home') renderHome();
+  if(name==='pass') renderPass();
   if(name==='gacha'){ markSeen('gacha'); renderGacha(); }
   if(name==='cyber') markSeen('cyber');
   if(name==='riotmap') markSeen('riot');
@@ -42,7 +43,8 @@ document.addEventListener('keydown', e=>{ if(APP.dataset.screen==='title' && (e.
 loadFirst(['art/title_keyart.png','art-src/YUKI/Yuki PNG.png']).then(src=>{ if(src){ const im=$('#titleArt'); im.src=src; im.classList.add('has-img'); } });
 
 /* ---- HOME ---- */
-function renderWallet(){ document.querySelectorAll('#pShards,#gShards').forEach(e=>e.textContent=PLAYER.shards.toLocaleString('en-US')); $('#pCredits').textContent=PLAYER.credits.toLocaleString('en-US'); $('#pName').textContent=PLAYER.name; $('#pLevel').textContent=`LV ${PLAYER.level} · KHU ĐÁY`; }
+function renderWallet(){ document.querySelectorAll('#pShards,#gShards').forEach(e=>e.textContent=PLAYER.shards.toLocaleString('en-US')); $('#pCredits').textContent=PLAYER.credits.toLocaleString('en-US'); $('#pName').textContent=PLAYER.name; $('#pLevel').textContent=`LV ${PLAYER.level} · KHU ĐÁY`;
+  const t=$('#pTitle'); if(t){ t.textContent=PLAYER.title||''; t.hidden=!PLAYER.title; } }
 function renderDailyStrip(){
   const d=dailyTick(); const done=DAILY_TASKS.filter(t=>(d.prog[t.id]||0)>=t.goal).length; const claim=dailyClaimable().length;
   const s=$('#daily'); s.hidden=false; s.classList.toggle('has-claim', claim>0);
@@ -92,6 +94,47 @@ function renderStreakList(){
 $('#streak').addEventListener('click',()=>{ renderStreakList(); $('#streakBox').hidden=false; });
 $('#streakClose').addEventListener('click',()=>{ $('#streakBox').hidden=true; });
 
+/* ---- HỢP ĐỒNG THÁNG: dải ở HOME + màn 20 mốc (js/pass.js, docs/hop-dong-thang.md) ---- */
+function renderPassStrip(){
+  const s=$('#passStrip'); if(!s || typeof passInfo!=='function') return;
+  const p=passInfo();
+  s.hidden=false; s.classList.toggle('has-claim', p.claimable>0);
+  $('#passText').innerHTML = `<b>HỢP ĐỒNG ${p.open}/${p.max}</b> — `
+    + (p.claimable ? `${p.claimable} mốc chờ nhận` : p.next ? `còn ${p.need} dấu nữa là mốc ${p.open+1}` : 'đã lấy hết mốc tháng này');
+}
+function renderPass(){
+  if(typeof passInfo!=='function') return;
+  const p=passInfo(), list=$('#passList'); list.innerHTML='';
+  $('#passSub').textContent=`MÙA ${p.season} · ${p.open}/${p.max} MỐC`;
+  $('#passPts').textContent=`${p.pts} DẤU`;
+  $('#passNext').textContent = p.next ? `mốc ${p.open+1} cần thêm ${p.need}` : 'đã mở hết 20 mốc';
+  /* Thanh chạy trong PHẠM VI MỐC hiện tại, không phải cả mùa: 1.000 dấu thì thanh gần như đứng yên cả tuần */
+  const inTier = p.next ? (PASS.step - p.need)/PASS.step*100 : 100;
+  $('#passBar').style.setProperty('--v', Math.round(inTier)+'%');
+  $('#passDay').textContent = `Hôm nay còn ăn được ${p.dayLeft}/${PASS.dayCap} dấu · thắng trận +${PASS.pts.win} · quay +${PASS.pts.pull} · xong một nhiệm vụ ngày +${PASS.pts.daily} · đột phá +${PASS.pts.ascend}`;
+  const claimed=(PLAYER.pass||{}).claimed||[];
+  PASS.tiers.forEach(t=>{
+    const open=t.n<=p.open, got=claimed.includes(t.n);
+    const r=el('div','dl__row'+(got?' is-claimed':'')+(t.frame||t.title?' dl__row--gold':''));
+    r.innerHTML=`<div class="dl__info"><b>MỐC ${t.n} · ${t.n*PASS.step} dấu</b>
+      <span class="mono">${passRewardTxt(t)}</span></div>
+      <button class="btn-ghost dl__claim" ${open&&!got?'':'disabled'}>${got?'ĐÃ NHẬN':open?'NHẬN':'—'}</button>`;
+    r.querySelector('.dl__claim').addEventListener('click',()=>{ if(passClaim(t.n)){ AUDIO.upgrade(); renderWallet(); renderPass(); renderPassStrip(); applyCosmetics(); } });
+    list.appendChild(r);
+  });
+  const btn=$('#passAll'); btn.disabled = !p.claimable;
+  $('#passAllMeta').textContent = p.claimable ? `${p.claimable} mốc đang chờ` : 'chưa có mốc nào chờ nhận';
+}
+$('#passAll').addEventListener('click',()=>{ const got=passClaimAll(); if(!got) return sfx('error',.4);
+  AUDIO.upgrade(); renderWallet(); renderPass(); renderPassStrip(); applyCosmetics(); });
+$('#passStrip').addEventListener('click',()=>go('pass'));
+/* Hai món cosmetic của hợp đồng: danh hiệu dưới tên ở HOME, khung viền cho mọi thẻ nhân vật.
+   Không cộng một điểm sức mạnh nào — đó là lý do chúng được phép là phần thưởng cuối mùa. */
+function applyCosmetics(){
+  document.documentElement.classList.toggle('has-frame', !!PLAYER.frame);
+  const t=$('#pTitle'); if(t){ t.textContent=PLAYER.title||''; t.hidden=!PLAYER.title; }
+}
+
 /* ---- VỀ RỒI: hộp đón lúc mở game, một lần mỗi ngày (docs/giu-chan.md §D1) ----
    Không chỉ đưa tiền: nó kể lại chuyện đã xảy ra lúc đi vắng (bãi đẻ kiện, nhiệm vụ ngày đã reset,
    chuỗi ngày vừa cộng thêm), để cú mở game là NHẬN chứ không phải BẮT ĐẦU LÀM. */
@@ -136,7 +179,7 @@ function warmNextBattle(){
 }
 
 function renderHome(){
-  renderWallet(); renderDailyStrip(); renderStreakStrip(); warmNextBattle();
+  renderWallet(); renderDailyStrip(); renderStreakStrip(); renderPassStrip(); applyCosmetics(); warmNextBattle();
   showComeback();                                    // hộp đón lúc mở game (một lần mỗi phiên, một lần mỗi ngày)
   const bonds=availableBonds(); const c=$('#comms');
   if(bonds.length){ const b=bonds[Math.floor(Math.random()*bonds.length)]; c.hidden=false;

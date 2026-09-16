@@ -35,7 +35,9 @@ function upgrade(id){
   const l=lvl(id); if(l>=UPGRADE.maxLevel) return 'max';
   if(l>=ascCap(id)) return 'gate';                                  // tới trần tạm: phải ĐỘT PHÁ mới lên tiếp
   const c=UPGRADE.cost(l); if(PLAYER.credits<c) return 'poor';
-  PLAYER.credits-=c; PLAYER.levels=PLAYER.levels||{}; PLAYER.levels[id]=l+1; savePlayer(); return 'ok';
+  PLAYER.credits-=c; PLAYER.levels=PLAYER.levels||{}; PLAYER.levels[id]=l+1;
+  if(typeof passAdd==='function') passAdd('level');
+  savePlayer(); return 'ok';
 }
 
 /* =====================================================================
@@ -70,6 +72,7 @@ function ascend(id, pay){
   else { if(PLAYER.parts < m.lk) return 'pay'; PLAYER.parts -= m.lk; }
   PLAYER.credits -= m.cr;
   PLAYER.asc = PLAYER.asc || {}; PLAYER.asc[id] = ascStars(id) + 1;
+  if(typeof passAdd==='function') passAdd('ascend');
   savePlayer(); return 'ok';
 }
 /* Cộng dồn thưởng của những sao ĐÃ đạt. statPct nhân dồn (1.06 × 1.06), giống cách cyberware nối vào. */
@@ -139,7 +142,11 @@ function dailyTick(){
   if(!PLAYER.daily || PLAYER.daily.date!==today()){ PLAYER.daily={ date:today(), prog:{}, claimed:[] }; savePlayer(); }
   return PLAYER.daily;
 }
+/* Một chỗ duy nhất cho cả nhiệm vụ ngày lẫn dấu HỢP ĐỒNG THÁNG: win / pull / riotcrate đều đi qua đây,
+   nên hook ở đây rẻ hơn nhiều so với rải passAdd khắp battle.js, app.js, riot.js (docs/hop-dong-thang.md §C).
+   Dấu cộng theo SỐ LẦN THẬT (n), không theo tiến độ nhiệm vụ — nhiệm vụ ngày đầy rồi thì vẫn còn dấu. */
 function dailyProgress(id, n=1){
+  if(typeof passAdd==='function') passAdd(id, n);
   const d=dailyTick(); const t=DAILY_TASKS.find(x=>x.id===id); if(!t) return;
   const before=d.prog[id]||0; d.prog[id]=Math.min(t.goal, before+n);
   if(before<t.goal && d.prog[id]>=t.goal && typeof AUDIO!=='undefined') AUDIO.ready();
@@ -215,5 +222,7 @@ const recordGet = key => (PLAYER.records||{})[key] || null;
 function dailyClaim(id){
   const d=dailyTick(); const t=DAILY_TASKS.find(x=>x.id===id);
   if(!t || (d.prog[id]||0)<t.goal || d.claimed.includes(id)) return false;
-  d.claimed.push(id); PLAYER.shards+=t.reward; savePlayer(); return true;
+  d.claimed.push(id); PLAYER.shards+=t.reward;
+  if(typeof passAdd==='function') passAdd('daily');   // làm xong một nhiệm vụ ngày = 4 dấu hợp đồng tháng
+  savePlayer(); return true;
 }

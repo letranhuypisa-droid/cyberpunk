@@ -171,7 +171,9 @@ chơi, và vì chỉ nhận một lần mỗi ngày nên không có đường t�
 
 **D4 (đột phá) đã làm ngay sau đó** — đặc tả và số đo riêng ở `docs/dot-pha.md`.
 
-Còn để dành: **D3** (hợp đồng tháng) · **D6** (kéo nhiệm vụ tuần ra khỏi
+**D3 (hợp đồng tháng) đã làm** — `docs/hop-dong-thang.md`; phép đo SH ở đó đã đổi hẳn thiết kế thưởng.
+
+Còn để dành: **D6** (kéo nhiệm vụ tuần ra khỏi
 DẸP LOẠN) · **D7** (việc hôm nay xoay theo thứ). D3 phải kèm một lượt tính lại tổng SH mỗi tuần —
 `node scratch/riot_econ.js` mới đo phần thu nhập từ bãi, chưa đo phần nhiệm vụ.
 

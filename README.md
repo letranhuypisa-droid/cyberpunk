@@ -236,6 +236,21 @@ lá trùng gacha → PHÂN TÁCH → LINH KIỆN (LK) → nâng bậc 6 ô cyber
 
 > `scratch/sim.js` **chưa mô phỏng cyberware** — bảng tỉ lệ thắng ở `docs/dep-loan.md` §F1 là **sàn**.
 
+## HỢP ĐỒNG THÁNG — 20 mốc, mỗi tháng một mùa (16/09, đợt 7 · D3)
+
+Đặc tả: `docs/hop-dong-thang.md`. Thẻ mùa bản **chỉ có nhánh miễn phí** — game không bán gì, nên thứ duy nhất
+mượn từ mô hình đó là **thanh tiến trình nhìn thấy được**.
+
+- **DẤU** từ mọi việc: thắng trận +2 · quay +1 · nhận kiện +1 · xong một nhiệm vụ ngày +4 · nâng một cấp +2 ·
+  đột phá một sao +15. **Trần 60 dấu/ngày** để một buổi cày trắng đêm không nuốt cả mùa.
+- **20 mốc × 50 dấu**; chơi đều tay ~17 ngày là đủ — cố ý đạt hết **trước khi hết tháng**, không chạy nước rút.
+- Thưởng cả mùa **53.000 CR · 560 LK · 300 SH** + **khung viền thẻ** (mốc 10) và **danh hiệu** (mốc 20).
+  SH cố ý ít: `node scratch/econ_sh.js` đo được người chơi đủ 7 ngày đã nhận **3.088 SH/tuần = 103 lượt quay**,
+  tức chạm pity 50 sau chưa đầy nửa tuần — đổ thêm SH vào đây là đổ nước vào cốc đã tràn.
+
+`scratch/econ_sh.js` = công cụ cộng mọi nguồn SH mỗi tuần và quy ra số lượt quay · **chạy lại mỗi lần thêm
+một nguồn thưởng mới**.
+
 ## ĐỘT PHÁ — bốn cái đích trên thang 20 cấp (16/09, đợt 7 · D4)
 
 Đặc tả + số đo: `docs/dot-pha.md`. Cấp **5 · 10 · 15** là **trần tạm** — đủ CR cũng không lên tiếp được cho tới

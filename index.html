@@ -48,7 +48,7 @@
     <div class="screen home" data-screen="home">
       <div class="topbar">
         <div class="topbar__avatar" id="homeAvatar"></div>
-        <div class="topbar__id"><b id="pName" title="Chạm để đổi biệt danh" style="cursor:pointer">YUKI</b><span id="pLevel">LV 1 · KHU ĐÁY</span></div>
+        <div class="topbar__id"><b id="pName" title="Chạm để đổi biệt danh" style="cursor:pointer">YUKI</b><span id="pLevel">LV 1 · KHU ĐÁY</span><span class="topbar__title" id="pTitle" hidden></span></div>
         <!-- Chạm vào cụm tiền → mở mục TIỀN của trang CÁCH CHƠI (app.js) -->
       <div class="topbar__cur" id="walletChips" title="Chạm để xem CR và SH dùng làm gì"><span class="pill"><small>CR</small><span id="pCredits">12,480</span></span><span class="pill"><small>SH</small><span id="pShards">900</span></span></div>
       </div>
@@ -70,6 +70,8 @@
       <!-- Chuỗi ngày: đếm số ngày CÓ MỞ GAME trong tuần, tích luỹ chứ không gãy (docs/giu-chan.md §D2) -->
       <button class="comms comms--streak" id="streak" hidden><span class="comms__k">TUẦN</span><span class="comms__t" id="streakText"></span><span class="comms__go">▸</span></button>
       <div class="dl" id="streakBox" hidden><div class="sh"><span class="sh__title">Chuỗi ngày</span><span class="sh__sub" id="streakSub">—</span><button class="btn-ghost" id="streakClose">◂ BASE</button></div><div class="dl__list" id="streakList"></div></div>
+      <!-- HỢP ĐỒNG THÁNG: thanh tiến trình 20 mốc cho mỗi tháng (docs/hop-dong-thang.md) -->
+      <button class="comms comms--pass" id="passStrip" hidden><span class="comms__k">THÁNG</span><span class="comms__t" id="passText"></span><span class="comms__go">▸</span></button>
       <button class="comms" id="comms" hidden><span class="comms__k">COMMS</span><span class="comms__t" id="commsText"></span><span class="comms__go">▸</span></button>
       <!-- Nhãn tiếng Việt là chính, chữ Anh giữ ở dòng nhỏ (docs/ui-nguoi-moi.md §B1).
            Nút chưa mở được thì vẫn hiện nhưng mờ và ghi điều kiện mở — renderHome lo phần đó. -->
@@ -249,6 +251,19 @@
         <button class="btn-act btn-act--go" id="btnRiotGo" data-go="battle"><span class="btn-act__k">Vào tầng</span><span class="btn-act__v" id="riotMeta">—</span></button>
         <button class="btn-act" id="btnRiotSweep" title="QUÉT NHANH — thưởng dọn lại, không phải đánh"><span class="btn-act__k">Quét ▸</span><span class="btn-act__v" id="riotSweepMeta">—</span></button>
       </div>
+    </div>
+
+    <!-- ===== SCREEN: HỢP ĐỒNG THÁNG — 20 mốc, một tháng một mùa. Thưởng là CR/LK và hai món cosmetic;
+         SH cố ý ít vì nguồn SH đã thừa (docs/hop-dong-thang.md §A). ===== -->
+    <div class="screen pass" data-screen="pass">
+      <div class="sh"><span class="sh__title">Hợp đồng tháng</span><span class="sh__sub" id="passSub">—</span><button class="btn-ghost" data-go="home">◂ BASE</button></div>
+      <div class="passhd">
+        <div class="passhd__row"><b id="passPts">0</b><span id="passNext">—</span></div>
+        <div class="bar" data-state="ok" style="--v:0%" id="passBar"><div class="bar__track"><i class="bar__ghost"></i><i class="bar__fill"></i><i class="bar__ticks"></i></div></div>
+        <div class="passhd__note" id="passDay">—</div>
+      </div>
+      <div class="dl__list" id="passList"></div>
+      <button class="btn-act btn-act--go btn-act--full" id="passAll"><span class="btn-act__k">Nhận tất cả</span><span class="btn-act__v" id="passAllMeta">—</span></button>
     </div>
 
     <!-- ===== SCREEN: GACHA — MỘT bể REQUISITION, trả SH. Nhân vật mở theo chương, quân chiêu mộ
@@ -431,6 +446,7 @@
 <script src="js/battle.js"></script>
 <script src="js/comic.js"></script>
 <script src="js/sweep.js"></script>
+<script src="js/pass.js"></script>
 <script src="js/app.js"></script>
 <script src="js/riotui.js"></script>
 <script src="js/cyberui.js"></script>
