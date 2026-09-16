@@ -37,6 +37,7 @@ function upgrade(id){
   const c=UPGRADE.cost(l); if(PLAYER.credits<c) return 'poor';
   PLAYER.credits-=c; PLAYER.levels=PLAYER.levels||{}; PLAYER.levels[id]=l+1;
   if(typeof passAdd==='function') passAdd('level');
+  weekProgress('wlevel');
   savePlayer(); return 'ok';
 }
 
@@ -147,6 +148,7 @@ function dailyTick(){
    Dấu cộng theo SỐ LẦN THẬT (n), không theo tiến độ nhiệm vụ — nhiệm vụ ngày đầy rồi thì vẫn còn dấu. */
 function dailyProgress(id, n=1){
   if(typeof passAdd==='function') passAdd(id, n);
+  if(id==='win') weekProgress('wwin', n); else if(id==='pull') weekProgress('wpull', n);
   const d=dailyTick(); const t=DAILY_TASKS.find(x=>x.id===id); if(!t) return;
   const before=d.prog[id]||0; d.prog[id]=Math.min(t.goal, before+n);
   if(before<t.goal && d.prog[id]>=t.goal && typeof AUDIO!=='undefined') AUDIO.ready();
@@ -192,12 +194,36 @@ function weekId(d){
 }
 function streakTick(){
   const id=weekId();
-  if(!PLAYER.week || PLAYER.week.id!==id) PLAYER.week={ id, days:[], claimed:[] };
+  if(!PLAYER.week || PLAYER.week.id!==id) PLAYER.week={ id, days:[], claimed:[], prog:{}, wclaimed:[] };
+  if(!PLAYER.week.prog) PLAYER.week.prog={};
+  if(!PLAYER.week.wclaimed) PLAYER.week.wclaimed=[];   // hồ sơ tạo trước D6 thiếu hai khoá này
   const d=today();
   if(!PLAYER.week.days.includes(d)){ PLAYER.week.days.push(d); savePlayer(); }
   return PLAYER.week;
 }
 const streakDays = () => streakTick().days.length;
+
+/* ---- Nhiệm vụ tuần chung (đợt 7 · D6, bảng ở WEEK_TASKS trong js/data.js) ----
+   Dùng chung object PLAYER.week với chuỗi ngày: cùng một tuần, cùng một lần reset thứ Hai, không sinh
+   đồng hồ thứ năm. Tiến độ đếm ở weekProgress, gọi từ dailyProgress và upgrade như hợp đồng tháng. */
+function weekProgress(id, n=1){
+  const w=streakTick(), t=(typeof WEEK_TASKS!=='undefined') && WEEK_TASKS.find(x=>x.id===id); if(!t) return;
+  w.prog = w.prog || {};
+  const before=w.prog[id]||0; w.prog[id]=Math.min(t.goal, before+n);
+  if(before<t.goal && w.prog[id]>=t.goal && typeof AUDIO!=='undefined') AUDIO.ready();
+}
+const weekDone = t => ((streakTick().prog||{})[t.id]||0) >= t.goal;
+const weekClaimable = () => (typeof WEEK_TASKS==='undefined' ? [] :
+  WEEK_TASKS.filter(t=>weekDone(t) && !streakTick().wclaimed.includes(t.id)));
+function weekClaim(id){
+  const w=streakTick(), t=WEEK_TASKS.find(x=>x.id===id);
+  if(!t || !weekDone(t) || w.wclaimed.includes(id)) return false;
+  w.wclaimed.push(id);
+  if(t.cr) PLAYER.credits += t.cr;
+  if(t.lk) PLAYER.parts += t.lk;
+  if(t.sh) PLAYER.shards += t.sh;
+  savePlayer(); return true;
+}
 const streakClaimable = () => { const w=streakTick(); return STREAK.filter(s=>w.days.length>=s.days && !w.claimed.includes(s.days)); };
 /* Mốc kế tiếp chưa tới (để in "còn 2 ngày nữa"); hết mốc thì null */
 const streakNext = () => { const n=streakDays(); return STREAK.find(s=>s.days>n) || null; };

@@ -227,7 +227,9 @@ function scrapOne(id, n){
   const have=(PLAYER.extra||{})[id]||0; const k=Math.max(0, Math.min(have, n==null?have:n));
   if(!k) return null;
   PLAYER.extra[id]=have-k; if(!PLAYER.extra[id]) delete PLAYER.extra[id];
-  const lk=k*scrapLk(id); PLAYER.parts+=lk; savePlayer();
+  /* VIỆC HÔM NAY (D7): ngày `lk2` thì phân tách ra gấp đôi LK */
+  const x=(typeof todayIs==='function' && todayIs('lk2')) ? 2 : 1;
+  const lk=k*scrapLk(id)*x; PLAYER.parts+=lk; savePlayer();
   return { n:k, lk };
 }
 function scrapAll(){

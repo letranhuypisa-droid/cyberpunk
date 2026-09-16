@@ -736,12 +736,15 @@ function endTurn(){
 /* Thưởng thắng trận theo CHẾ ĐỘ. SECTOR.mode: không có = chiến dịch (mặc định) · 'riot' = dẹp loạn.
    Chiến dịch ghi tiến trình vào PLAYER.cleared và chạy comic kết màn; dẹp loạn chỉ nâng tầng.
    Trả về dòng chữ hiện ở bảng kết quả. */
+/* VIỆC HÔM NAY (D7): ngày `cr2` nhân đôi CR của MỌI trận. Chỉ CR — SH không được nhân vì nguồn SH
+   đã vượt giá quay (docs/hop-dong-thang.md §A). Quét nhanh không ăn ưu đãi này: nó đã là đường tắt sẵn. */
+const crBonus = () => (typeof todayIs==='function' && todayIs('cr2')) ? 2 : 1;
 async function winReward(g){
   dailyProgress('win');
   if(SECTOR.mode==='riot'){
     const n=SECTOR.tier, r=SECTOR.reward, first = n>PLAYER.riot.best;
     const k = first ? 1 : RIOT.replayPct;                              // chơi lại tầng đã thắng = 30%
-    const sh=Math.round(r.shards*k), cr=Math.round(r.credits*k);
+    const sh=Math.round(r.shards*k), cr=Math.round(r.credits*k*crBonus());
     PLAYER.shards+=sh; PLAYER.credits+=cr;
     if(first){ PLAYER.riot.best=n; PLAYER.riot.tier=Math.min(RIOT.maxTier, n+1); }
     savePlayer();
@@ -750,10 +753,11 @@ async function winReward(g){
   }
   const first=!PLAYER.cleared.includes(SECTOR.id);
   let txt;
-  if(first){ PLAYER.cleared.push(SECTOR.id); PLAYER.shards+=SECTOR.reward.shards; PLAYER.credits+=SECTOR.reward.credits; savePlayer();
-    txt=`LẦN ĐẦU · +${SECTOR.reward.shards} SH · +${SECTOR.reward.credits} CR`;
+  if(first){ const cr=SECTOR.reward.credits*crBonus();
+    PLAYER.cleared.push(SECTOR.id); PLAYER.shards+=SECTOR.reward.shards; PLAYER.credits+=cr; savePlayer();
+    txt=`LẦN ĐẦU · +${SECTOR.reward.shards} SH · +${cr} CR`;
     if(SECTOR.unlock && !owns(SECTOR.unlock)){ PLAYER.owned.push(SECTOR.unlock); savePlayer(); txt+=`<br>NHÂN VẬT MỚI · ${ROSTER[SECTOR.unlock].name} — đọc hồ sơ ở THƯ VIỆN`; } }
-  else { const sh=Math.round(SECTOR.reward.shards*.25), cr=Math.round(SECTOR.reward.credits*.25);   // chơi lại = tuần tra, 25% thưởng
+  else { const sh=Math.round(SECTOR.reward.shards*.25), cr=Math.round(SECTOR.reward.credits*.25*crBonus());   // chơi lại = tuần tra, 25% thưởng
     PLAYER.shards+=sh; PLAYER.credits+=cr; savePlayer(); txt=`TUẦN TRA · +${sh} SH · +${cr} CR`; }
   syncSectorStates();
   const st=STORY[SECTOR.id];

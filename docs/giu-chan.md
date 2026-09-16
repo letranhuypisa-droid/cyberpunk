@@ -173,7 +173,9 @@ chơi, và vì chỉ nhận một lần mỗi ngày nên không có đường t�
 
 **D3 (hợp đồng tháng) đã làm** — `docs/hop-dong-thang.md`; phép đo SH ở đó đã đổi hẳn thiết kế thưởng.
 
-Còn để dành: **D6** (kéo nhiệm vụ tuần ra khỏi
+**D6 và D7 đã làm** — xem §H bên dưới.
+
+Không còn đề xuất nào treo. Việc nợ còn lại: (kéo nhiệm vụ tuần ra khỏi
 DẸP LOẠN) · **D7** (việc hôm nay xoay theo thứ). D3 phải kèm một lượt tính lại tổng SH mỗi tuần —
 `node scratch/riot_econ.js` mới đo phần thu nhập từ bãi, chưa đo phần nhiệm vụ.
 
@@ -200,3 +202,27 @@ sửa ở ba chỗ gọi.
 **Ghi kỷ lục sát thương ngay trong `dealDamage`** — mỗi đòn đều xét, nhưng `recordSet` chỉ lưu hồ sơ khi
 con số thật sự lớn hơn cái cũ, nên không thành mỗi đòn một lần ghi ổ đĩa. Chỉ tính đòn của đội mình và chỉ
 tính phần thật sự vào máu (phần lá chắn đỡ không phải thành tích).
+
+
+## H. D6 + D7 — đã cài 16/09
+
+**D6 · NHIỆM VỤ TUẦN CHUNG.** Ba việc ai cũng làm được từ màn đầu tiên, không phải xong 07-A như ba việc
+của DẸP LOẠN: **thắng 20 trận → 6.000 CR · quay 10 lượt → 80 LK · nâng cấp 5 lần → 4.000 CR**.
+Thưởng **không có SH** — cùng lý do với hợp đồng tháng (§A của `docs/hop-dong-thang.md`).
+Ba việc cũ của Khu Đáy **không bị chuyển đi** — chúng vẫn sống ở màn DẸP LOẠN, chỉ được liệt kê thêm trong
+hộp TUẦN ở HOME để mọi việc tuần nằm chung một chỗ. Cùng một sổ (`PLAYER.riot.week`) nên nhận ở đâu cũng như nhau.
+
+**D7 · VIỆC HÔM NAY.** Mỗi thứ một ưu đãi, **bốn loại, không loại nào tăng SH**:
+
+| Thứ | Ưu đãi |
+|---|---|
+| Hai · Sáu | **CR ×2** cho thưởng mọi trận (quét nhanh không tính — nó đã là đường tắt) |
+| Ba · Chủ nhật | **DẤU ×2** cho hợp đồng tháng (trần 60/ngày giữ nguyên) |
+| Tư · Bảy | **THÊM 4 VÉ QUÉT** (12 thay vì 8) |
+| Năm | **LINH KIỆN ×2** khi phân tách bản dư |
+
+Cả bảy ngày được in trong hộp TUẦN — biết **mai có gì** là một nửa tác dụng của cơ chế này.
+
+**Đo lại sau khi cài** (`node scratch/econ_sh.js 7`): **3.158 → 3.278 SH/tuần**. Toàn bộ phần tăng (120 SH)
+đến từ hai ngày thêm vé quét; nhiệm vụ tuần chung góp **0 SH** đúng như thiết kế. Công cụ đo nay in cả hai
+dòng đó để lần sau không ai phải tự nhớ.

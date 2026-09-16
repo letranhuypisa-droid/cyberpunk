@@ -22,7 +22,10 @@ function passTick(){
 function passAdd(kind, times=1){
   if(typeof PASS==='undefined' || !PASS.pts[kind]) return 0;
   const p=passTick();
-  const want=PASS.pts[kind]*times;
+  /* VIỆC HÔM NAY (D7): ngày `pass2` cho gấp đôi dấu — trần ngày KHÔNG đổi, nên nó rút ngắn thời gian
+     chạm trần chứ không nâng trần. */
+  const x = (typeof todayIs==='function' && todayIs('pass2')) ? 2 : 1;
+  const want=PASS.pts[kind]*times*x;
   const room=Math.max(0, PASS.dayCap - p.day.n);
   const got=Math.min(want, room);
   if(!got) return 0;

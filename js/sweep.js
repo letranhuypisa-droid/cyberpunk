@@ -17,7 +17,10 @@ function sweepTick(){
   if(!PLAYER.sweep || PLAYER.sweep.date!==today()){ PLAYER.sweep={ date:today(), used:0 }; savePlayer(); }
   return PLAYER.sweep;
 }
-const sweepLeft = () => Math.max(0, PLAY.sweepDay - sweepTick().used);
+/* VIỆC HÔM NAY (D7): ngày `sweep` thêm TODAY_SWEEP_BONUS vé. Tính vào TRẦN chứ không phải vé tặng riêng,
+   nên vé không dùng hết trong ngày ưu đãi cũng không mang sang hôm sau. */
+const sweepCap = () => PLAY.sweepDay + ((typeof todayIs==='function' && todayIs('sweep')) ? TODAY_SWEEP_BONUS : 0);
+const sweepLeft = () => Math.max(0, sweepCap() - sweepTick().used);
 
 /* Quét được không, và vì sao không — trả về chuỗi lý do để nút nói thẳng thay vì chỉ mờ đi.
    sec = object sector của chiến dịch, hoặc object hình dạng sector của một tầng HỐ LOẠN (riotSector(n)). */
@@ -59,7 +62,7 @@ function sweepBtnTxt(sec){
   const g=sweepGain(sec);
   return `+${g.shards} SH · +${g.credits} CR`;
 }
-const sweepBtnKey = () => `Quét · ${sweepLeft()}/${PLAY.sweepDay} vé`;
+const sweepBtnKey = () => `Quét · ${sweepLeft()}/${sweepCap()} vé`;
 /* Quét rồi hiện hộp kết quả. Hộp cố ý gọn hơn bảng kết quả trận: ở đây không có trận nào để tổng kết,
    chỉ có tiền vào ví và số vé còn lại. */
 function sweepDo(sec, n=1){
@@ -70,7 +73,7 @@ function sweepDo(sec, n=1){
   if(box){
     $('#swT').textContent=`QUÉT ×${r.n} · ${sec.id}`;
     $('#swS').innerHTML=`<b class="result__rw">+${r.shards.toLocaleString('en-US')} SH · +${r.credits.toLocaleString('en-US')} CR</b>`
-      + `<br><span class="mono">${sec.name} · còn ${sweepLeft()}/${PLAY.sweepDay} vé hôm nay</span>`;
+      + `<br><span class="mono">${sec.name} · còn ${sweepLeft()}/${sweepCap()} vé hôm nay</span>`;
     box.hidden=false;
   }
   if(typeof renderWallet==='function') renderWallet();

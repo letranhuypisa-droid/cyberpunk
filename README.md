@@ -236,6 +236,16 @@ lá trùng gacha → PHÂN TÁCH → LINH KIỆN (LK) → nâng bậc 6 ô cyber
 
 > `scratch/sim.js` **chưa mô phỏng cyberware** — bảng tỉ lệ thắng ở `docs/dep-loan.md` §F1 là **sàn**.
 
+## VIỆC TUẦN VÀ VIỆC HÔM NAY (16/09, đợt 7 · D6 + D7)
+
+Chi tiết: `docs/giu-chan.md` §H. Hộp **TUẦN** ở HOME giờ chứa bốn thứ cùng nhịp tuần/ngày:
+chuỗi ngày · **3 việc tuần chung** · 3 việc Khu Đáy · bảng **việc hôm nay** của cả bảy ngày.
+
+- **Nhiệm vụ tuần chung** (`WEEK_TASKS`): thắng 20 trận → 6.000 CR · quay 10 lượt → 80 LK · nâng cấp 5 lần
+  → 4.000 CR. Ai cũng làm được từ màn đầu — trước đây ba việc tuần duy nhất nằm trong DẸP LOẠN, khoá sau 07-A.
+- **Việc hôm nay** (`TODAY_BONUS`): Hai/Sáu **CR ×2** · Ba/Chủ nhật **DẤU ×2** · Tư/Bảy **thêm 4 vé quét** ·
+  Năm **LK ×2 khi phân tách**. **Không loại nào tăng SH** — nguồn SH đã vượt giá quay.
+
 ## HỢP ĐỒNG THÁNG — 20 mốc, mỗi tháng một mùa (16/09, đợt 7 · D3)
 
 Đặc tả: `docs/hop-dong-thang.md`. Thẻ mùa bản **chỉ có nhánh miễn phí** — game không bán gì, nên thứ duy nhất

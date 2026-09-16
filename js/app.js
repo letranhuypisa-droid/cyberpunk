@@ -67,10 +67,13 @@ $('#dailyClose').addEventListener('click',()=>{ $('#dailyBox').hidden=true; });
    tab KỶ LỤC trong THƯ VIỆN. Số liệu ở COMEBACK/STREAK (js/data.js), logic ở js/state.js.
    ===================================================================== */
 function renderStreakStrip(){
-  const n=streakDays(), claim=streakClaimable().length, next=streakNext();
+  const n=streakDays(), next=streakNext();
+  const claim=streakClaimable().length + (typeof weekClaimable==='function' ? weekClaimable().length : 0);
+  const done=(typeof WEEK_TASKS!=='undefined') ? WEEK_TASKS.filter(weekDone).length : 0;
   const s=$('#streak'); if(!s) return;
   s.hidden=false; s.classList.toggle('has-claim', claim>0);
-  $('#streakText').innerHTML = `<b>${n}/7 NGÀY TUẦN NÀY</b> — ` + (claim ? `${claim} mốc chờ nhận`
+  $('#streakText').innerHTML = `<b>TUẦN ${n}/7 NGÀY · ${done}/${(typeof WEEK_TASKS!=='undefined'?WEEK_TASKS.length:0)} VIỆC</b> — `
+    + (claim ? `${claim} mốc chờ nhận`
     : next ? `còn ${next.days-n} ngày nữa là +${next.sh} SH` : 'đã nhận hết mốc tuần này');
 }
 function renderStreakList(){
@@ -90,6 +93,46 @@ function renderStreakList(){
     r.querySelector('.dl__claim').addEventListener('click',()=>{ if(streakClaim(s.days)){ sfx('open',.22); renderWallet(); renderStreakList(); renderStreakStrip(); } });
     list.appendChild(r);
   });
+
+  /* Nhiệm vụ tuần chung (D6) — ba việc ai cũng làm được, không phải xong 07-A mới thấy như ba việc
+     của DẸP LOẠN bên dưới. Thưởng CR/LK chứ không SH (docs/hop-dong-thang.md §A). */
+  if(typeof WEEK_TASKS!=='undefined'){
+    list.insertAdjacentHTML('beforeend', `<div class="dl__head">VIỆC TUẦN NÀY</div>`);
+    WEEK_TASKS.forEach(t=>{
+      const p=(w.prog||{})[t.id]||0, done=p>=t.goal, claimed=w.wclaimed.includes(t.id);
+      const rw=[t.cr&&`${t.cr.toLocaleString('en-US')} CR`, t.lk&&`${t.lk} LK`, t.sh&&`${t.sh} SH`].filter(Boolean).join(' · ');
+      const r=el('div','dl__row'+(claimed?' is-claimed':''));
+      r.innerHTML=`<div class="dl__info"><b>${t.label}</b>
+        <div class="bar" data-state="ok" style="--v:${Math.round(p/t.goal*100)}%"><div class="bar__track"><i class="bar__ghost"></i><i class="bar__fill"></i><i class="bar__ticks"></i></div></div>
+        <span class="mono">${p}/${t.goal} · ${rw}</span></div>
+        <button class="btn-ghost dl__claim" ${done&&!claimed?'':'disabled'}>${claimed?'ĐÃ NHẬN':done?'NHẬN':'—'}</button>`;
+      r.querySelector('.dl__claim').addEventListener('click',()=>{ if(weekClaim(t.id)){ sfx('open',.22); renderWallet(); renderStreakList(); renderStreakStrip(); } });
+      list.appendChild(r);
+    });
+  }
+  /* Ba việc của Khu Đáy vẫn sống ở màn DẸP LOẠN; liệt kê lại ở đây để người chơi thấy TẤT CẢ việc tuần
+     trong một chỗ. Cùng một sổ (PLAYER.riot.week) nên nhận ở đâu cũng như nhau. */
+  if(typeof RIOT_WEEK!=='undefined' && typeof riotUnlocked==='function' && riotUnlocked()){
+    const rw=riotWeekTick();
+    list.insertAdjacentHTML('beforeend', `<div class="dl__head">VIỆC Ở KHU ĐÁY</div>`);
+    RIOT_WEEK.forEach(t=>{
+      const p=(rw.prog||{})[t.id]||0, done=p>=t.goal, claimed=rw.claimed.includes(t.id);
+      const r=el('div','dl__row'+(claimed?' is-claimed':''));
+      r.innerHTML=`<div class="dl__info"><b>${t.label}</b>
+        <div class="bar" data-state="ok" style="--v:${Math.round(p/t.goal*100)}%"><div class="bar__track"><i class="bar__ghost"></i><i class="bar__fill"></i><i class="bar__ticks"></i></div></div>
+        <span class="mono">${p}/${t.goal} · +${t.reward} SH</span></div>
+        <button class="btn-ghost dl__claim" ${done&&!claimed?'':'disabled'}>${claimed?'ĐÃ NHẬN':done?'NHẬN':'—'}</button>`;
+      r.querySelector('.dl__claim').addEventListener('click',()=>{ if(riotWeekClaim(t.id)){ sfx('open',.22); renderWallet(); renderStreakList(); renderStreakStrip(); } });
+      list.appendChild(r);
+    });
+  }
+  /* VIỆC HÔM NAY (D7): in cả bảy ngày để biết mai có gì — đó là nửa tác dụng của cơ chế này */
+  if(typeof TODAY_BONUS!=='undefined'){
+    const now=new Date().getDay();
+    list.insertAdjacentHTML('beforeend', `<div class="dl__head">VIỆC HÔM NAY · XOAY THEO THỨ</div>`);
+    const rows=TODAY_BONUS.map((b,i)=>`<div class="tdrow${i===now?' is-now':''}"><b>${b.label}</b><span>${b.note}</span></div>`).join('');
+    list.insertAdjacentHTML('beforeend', `<div class="tdlist">${rows}</div>`);
+  }
 }
 $('#streak').addEventListener('click',()=>{ renderStreakList(); $('#streakBox').hidden=false; });
 $('#streakClose').addEventListener('click',()=>{ $('#streakBox').hidden=true; });
@@ -217,6 +260,9 @@ function renderHome(){
   $('#homeSector').textContent=sec.id;
   $('#homeSectorMeta').textContent=`${sec.name} · ${sec.waves} đợt địch${sec.boss?' · trùm '+ENEMY_POOL.find(e=>e.id===sec.boss).name:''}`;
   const pm=$('#playMeta'); if(pm) pm.textContent=`${sec.id} · ${sec.name}`;
+  /* VIỆC HÔM NAY (D7): một dòng ngay dưới nút chơi — ưu đãi chỉ có tác dụng nếu người chơi BIẾT nó đang bật */
+  const tb=$('#todayLine');
+  if(tb && typeof todayBonus==='function'){ const b=todayBonus(); tb.innerHTML=`<b>${b.label}</b> · ${b.note}`; tb.hidden=false; }
 }
 /* Mở dần: nút chưa tới lúc thì mờ + ghi điều kiện, tới lúc thì sáng kèm chấm đỏ đúng một lần
    (docs/ui-nguoi-moi.md §C5). Mốc mở khai ở MENU_UNLOCK trong js/data.js. */

@@ -881,6 +881,38 @@ const PASS = {
 };
 const passSeason = d => { d=d||new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; };
 
+/* =====================================================================
+   NHIỆM VỤ TUẦN CHUNG (đợt 7 · D6) — ba việc đầu vốn nằm trong DẸP LOẠN (RIOT_WEEK ở js/riot.js) nên người
+   chưa xong 07-A không thấy nhiệm vụ tuần nào cả. Ba việc dưới đây ai cũng làm được từ màn đầu tiên.
+   Thưởng KHÔNG dùng SH (xem docs/hop-dong-thang.md §A: SH đang thừa) — trả CR và LK.
+   Tiến độ dùng chung sổ với hợp đồng tháng: đếm ở dailyProgress/upgrade, xem js/state.js. */
+const WEEK_TASKS = [
+  { id:'wwin',   label:'Thắng 20 trận',        goal:20, cr:6000 },
+  { id:'wpull',  label:'Quay 10 lượt',         goal:10, lk:80 },
+  { id:'wlevel', label:'Nâng cấp 5 lần',       goal:5,  cr:4000 },
+];
+
+/* =====================================================================
+   VIỆC HÔM NAY (đợt 7 · D7) — mỗi thứ trong tuần một ưu đãi, để hai ngày liên tiếp không giống hệt nhau.
+   Bốn loại, KHÔNG có loại nào tăng SH: nguồn SH đã vượt giá quay (docs/hop-dong-thang.md §A).
+     cr2    thưởng CR của trận ×2 (cả chiến dịch lẫn HỐ LOẠN; quét nhanh không tính — nó đã là đường tắt)
+     lk2    phân tách bản dư ra ×2 LK
+     sweep  thêm 4 vé quét trong ngày
+     pass2  mọi việc cho ×2 dấu hợp đồng tháng (trần ngày vẫn nguyên)
+   Mảng theo getDay(): 0 = Chủ nhật … 6 = thứ Bảy. */
+const TODAY_BONUS = [
+  { kind:'pass2', label:'Chủ nhật · DẤU ×2',        note:'mọi việc cho gấp đôi dấu hợp đồng tháng' },
+  { kind:'cr2',   label:'Thứ Hai · CR ×2',          note:'thưởng CR của mọi trận nhân đôi' },
+  { kind:'pass2', label:'Thứ Ba · DẤU ×2',          note:'mọi việc cho gấp đôi dấu hợp đồng tháng' },
+  { kind:'sweep', label:'Thứ Tư · THÊM 4 VÉ QUÉT',  note:'12 vé thay vì 8' },
+  { kind:'lk2',   label:'Thứ Năm · LINH KIỆN ×2',   note:'phân tách bản dư ra gấp đôi LK' },
+  { kind:'cr2',   label:'Thứ Sáu · CR ×2',          note:'thưởng CR của mọi trận nhân đôi' },
+  { kind:'sweep', label:'Thứ Bảy · THÊM 4 VÉ QUÉT', note:'12 vé thay vì 8' },
+];
+const TODAY_SWEEP_BONUS = 4;
+const todayBonus = d => TODAY_BONUS[(d||new Date()).getDay()];
+const todayIs = kind => todayBonus().kind===kind;
+
 const ASCEND = [
   { star:1, lv:5,  cr:2000,  dupes:1, lk:60,  statPct:6,               label:'+6% ATK/HP' },
   { star:2, lv:10, cr:6000,  dupes:1, lk:90,  energyStart:20,          label:'Vào trận có sẵn 20 Energy' },

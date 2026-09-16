@@ -18,8 +18,8 @@ const ctx={ console, Math, JSON, Object, Array, Set, Map, Number, String, Date, 
 ctx.window=ctx; vm.createContext(ctx);
 const load = f => vm.runInContext(fs.readFileSync(path.join(__dirname,'..','js',f),'utf8'), ctx, {filename:f});
 load('data.js'); load('state.js'); load('riot.js');
-const { DAILY_TASKS, STREAK, COMEBACK, PLAY, RIOT, RIOT_WEEK, BANNER, SECTORS, ASCEND, PASS } =
-  vm.runInContext('({DAILY_TASKS,STREAK,COMEBACK,PLAY,RIOT,RIOT_WEEK,BANNER,SECTORS,ASCEND,PASS:typeof PASS!=="undefined"?PASS:null})', ctx);
+const { DAILY_TASKS, STREAK, COMEBACK, PLAY, RIOT, RIOT_WEEK, BANNER, SECTORS, ASCEND, PASS, WEEK_TASKS, TODAY_BONUS, TODAY_SWEEP_BONUS } =
+  vm.runInContext('({DAILY_TASKS,STREAK,COMEBACK,PLAY,RIOT,RIOT_WEEK,BANNER,SECTORS,ASCEND,PASS,WEEK_TASKS,TODAY_BONUS,TODAY_SWEEP_BONUS})', ctx);
 
 const DAYS = Math.max(1, Math.min(7, +process.argv[2] || 7));
 const fmt = n => Math.round(n).toLocaleString('en-US');
@@ -38,9 +38,17 @@ const riotWeek  = RIOT_WEEK.reduce((s,t)=>s+t.reward, 0);
 const passSh = PASS ? PASS.tiers.reduce((s,t)=>s+(t.sh||0),0) : 0;
 const passWeek = passSh/30*DAYS;
 
+/* VIỆC HÔM NAY (D7) chỉ có MỘT loại đụng tới SH: ngày thêm vé quét. CR×2, LK×2, DẤU×2 không sinh SH —
+   đó là lý do chọn bốn loại đó thay vì SH×2. Tính theo số ngày `sweep` trong tuần, kẹp theo số ngày chơi. */
+const sweepDays = (TODAY_BONUS||[]).filter(b=>b.kind==='sweep').length;
+const bonusTicketSh = Math.min(DAYS, sweepDays) * (TODAY_SWEEP_BONUS||0)
+  * Math.round(RIOT.reward(sweepTier).shards * RIOT.replayPct);
+
 const rows = [
   ['Nhiệm vụ ngày',            dailySh*DAYS,  `${dailySh} SH × ${DAYS} ngày`],
   ['Hợp đồng tháng',           passWeek,      `${passSh} SH cả mùa ÷ 30 ngày × ${DAYS} (thưởng chính là CR/LK)`],
+  ['Nhiệm vụ tuần chung',      (WEEK_TASKS||[]).reduce((s,t)=>s+(t.sh||0),0), `${(WEEK_TASKS||[]).length} việc — trả CR/LK, cố ý không trả SH`],
+  ['Việc hôm nay (thêm vé)',   bonusTicketSh, `${sweepDays} ngày × ${TODAY_SWEEP_BONUS||0} vé · CR×2/LK×2/DẤU×2 không sinh SH`],
   ['Quà VỀ RỒI',               comeback*DAYS, `${comeback} SH × ${DAYS} ngày (kịch trần ${COMEBACK.capHours} giờ)`],
   ['Quét nhanh (tầng 20)',     sweepSh*DAYS,  `${PLAY.sweepDay} vé × ${Math.round(RIOT.reward(sweepTier).shards*RIOT.replayPct)} SH × ${DAYS} ngày`],
   ['Chuỗi ngày',               streakSh,      `mốc đạt được khi chơi ${DAYS} ngày`],
