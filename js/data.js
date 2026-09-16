@@ -824,6 +824,21 @@ const PLAY = { speeds:[1,2,3], autoDelay:240, autoHealAt:.7, sweepDay:8, sweepPc
 /* Mở dần menu ở HOME (đợt 6, docs/ui-nguoi-moi.md §C5). Người mới mở game thấy 7 nút mà 6 thứ chưa dùng
    được thì không biết bấm gì trước; nút chưa mở vẫn hiện (để biết game còn gì phía trước) nhưng mờ đi và
    ghi rõ phải xong màn nào. DẸP LOẠN đã tự khoá bằng RIOT.unlock từ trước, đây là hai cái còn lại. */
+/* =====================================================================
+   GIỮ CHÂN (đợt 7, docs/giu-chan.md §D). Ba thứ, không đụng một con số cân bằng CHIẾN ĐẤU nào:
+     VỀ RỒI   — mở game sau khi vắng thì được quà theo số giờ vắng (COMEBACK)
+     CHUỖI NGÀY — đếm số ngày CÓ MỞ GAME trong tuần, tích luỹ chứ không gãy (STREAK)
+     KỶ LỤC   — chỗ ghi lại cái tốt nhất mình từng làm (RECORDS bên js/state.js)
+
+   Vì sao quà vắng mặt nhỏ hơn hẳn một buổi cày: 8 giờ vắng = 64 SH + 1.600 CR, trong khi quét 8 vé
+   tầng 20 đã là 120 SH + 6.240 CR. Nó nâng sàn cho người bận, không thay thế việc chơi — và trần theo
+   NGÀY (once mỗi ngày) nên không có đường nào tắt-mở game liên tục để farm.
+   ===================================================================== */
+const COMEBACK = { shHour:8, crHour:200, capHours:8, minHours:1 };
+/* Mốc chuỗi ngày: mở game bao nhiêu ngày trong tuần thì được gì. Tích luỹ — nghỉ một hôm không mất gì,
+   chỉ là chậm tới mốc sau. Tổng cả tuần 240 SH, xấp xỉ một ngày rưỡi nhiệm vụ ngày. */
+const STREAK = [ { days:1, sh:20 }, { days:3, sh:40 }, { days:5, sh:60 }, { days:7, sh:120 } ];
+
 const MENU_UNLOCK = { gacha:'00-T', cyber:'07-A' };
 const menuOpen = key => !MENU_UNLOCK[key] || PLAYER.cleared.includes(MENU_UNLOCK[key]);
 
@@ -875,6 +890,9 @@ const LEGACY_KEYS=['chromefall.player.v2'];
      phải bật lại 30 lần (docs/che-do-choi.md §B, §C). */
 const PLAYER_DEFAULTS = () => ({ name:'YUKI', level:1, credits:3000, shards:300, owned:['yuki','ash','kai'], team:['yuki','ash','kai'],
   pity:{hero:0}, pulls:0, cleared:[], defeated:[], extra:{}, riot:{tier:1, best:0}, parts:0, cyber:{}, sweep:null, seenNew:[],
+  /* đợt 7 — giữ chân: lastSeen = mốc thời gian lần cuối đóng game (quà VỀ RỒI tính từ đây) ·
+     week = chuỗi ngày trong tuần {id, days:[ngày đã mở], claimed:[mốc đã nhận]} · records = kỷ lục cá nhân */
+  lastSeen:0, week:null, records:{},
   settings:{sound:true, sfx:true, motion:false, skipStory:false, anim:true, ultVideo:true, revealVideo:true, auto:false, speed:1}, levels:{}, daily:null, hintsSeen:[] });
 const _loaded = (()=>{ try{ for(const k of [PLAYER_KEY,...LEGACY_KEYS]){ const raw=localStorage.getItem(k); if(raw) return { p:JSON.parse(raw), legacy:k!==PLAYER_KEY }; } }catch(e){} return { p:{}, legacy:false }; })();
 const PLAYER = Object.assign(PLAYER_DEFAULTS(), _loaded.p);

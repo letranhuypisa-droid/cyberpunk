@@ -87,6 +87,72 @@ function dailyProgress(id, n=1){
   savePlayer();
 }
 function dailyClaimable(){ const d=dailyTick(); return DAILY_TASKS.filter(t=>(d.prog[t.id]||0)>=t.goal && !d.claimed.includes(t.id)); }
+
+/* =====================================================================
+   GIỮ CHÂN (đợt 7 — docs/giu-chan.md §D1 §D2 §D5). Số liệu ở COMEBACK/STREAK trong js/data.js.
+   ===================================================================== */
+
+/* ---- VỀ RỒI: quà theo số giờ vắng mặt ----
+   PLAYER.lastSeen được đóng dấu lúc rời trang (pagehide) và định kỳ khi đang chơi, nên nó là "lần cuối
+   thật sự có mặt". Quà tính theo giờ, kẹp ở COMEBACK.capHours, và CHỈ NHẬN MỘT LẦN MỖI NGÀY — không có
+   đường tắt-mở game liên tục để farm. Trả về null nếu chưa đủ COMEBACK.minHours hoặc đã nhận hôm nay. */
+function comebackOffer(){
+  const last = PLAYER.lastSeen || 0;
+  if(!last) return null;                                    // hồ sơ mới: chưa từng rời đi thì không có gì để "về"
+  if(PLAYER.records && PLAYER.records.comebackDate === today()) return null;
+  const hoursRaw = (Date.now() - last) / 36e5;
+  if(hoursRaw < COMEBACK.minHours) return null;
+  const h = Math.min(COMEBACK.capHours, Math.floor(hoursRaw));
+  return { hours:h, hoursRaw, shards:h*COMEBACK.shHour, credits:h*COMEBACK.crHour, capped:hoursRaw>COMEBACK.capHours };
+}
+function comebackClaim(offer){
+  if(!offer) return false;
+  PLAYER.shards += offer.shards; PLAYER.credits += offer.credits;
+  PLAYER.records = PLAYER.records || {}; PLAYER.records.comebackDate = today();
+  savePlayer(); return true;
+}
+/* Đóng dấu "tôi đang ở đây". Gọi lúc rời trang và mỗi vài phút — đừng gọi mỗi frame, mỗi lần là một lần ghi ổ đĩa. */
+function touchSeen(){ PLAYER.lastSeen = Date.now(); savePlayer(); }
+
+/* ---- CHUỖI NGÀY: đếm số ngày CÓ MỞ GAME trong tuần, tích luỹ ----
+   Cố ý KHÔNG phải chuỗi liên tiếp: nghỉ một hôm thì chậm tới mốc sau chứ không mất gì (docs/giu-chan.md §D2).
+   Tuần bắt đầu thứ Hai; dùng chung cách tính với hợp đồng tuần của DẸP LOẠN nếu file đó đã nạp. */
+function weekId(d){
+  if(typeof riotWeekId==='function') return riotWeekId(d);
+  d = d || new Date();
+  const t = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  t.setDate(t.getDate() - ((t.getDay()+6)%7));
+  return `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
+}
+function streakTick(){
+  const id=weekId();
+  if(!PLAYER.week || PLAYER.week.id!==id) PLAYER.week={ id, days:[], claimed:[] };
+  const d=today();
+  if(!PLAYER.week.days.includes(d)){ PLAYER.week.days.push(d); savePlayer(); }
+  return PLAYER.week;
+}
+const streakDays = () => streakTick().days.length;
+const streakClaimable = () => { const w=streakTick(); return STREAK.filter(s=>w.days.length>=s.days && !w.claimed.includes(s.days)); };
+/* Mốc kế tiếp chưa tới (để in "còn 2 ngày nữa"); hết mốc thì null */
+const streakNext = () => { const n=streakDays(); return STREAK.find(s=>s.days>n) || null; };
+function streakClaim(days){
+  const w=streakTick(), s=STREAK.find(x=>x.days===days);
+  if(!s || w.days.length<s.days || w.claimed.includes(days)) return false;
+  w.claimed.push(days); PLAYER.shards += s.sh; savePlayer(); return true;
+}
+
+/* ---- KỶ LỤC: cái tốt nhất mình từng làm (docs/giu-chan.md §D5) ----
+   Không có server, nên đối thủ duy nhất là bản thân hôm qua. recordSet chỉ ghi khi thật sự tốt hơn:
+   `better` quyết định chiều so sánh vì "nhanh nhất" là nhỏ hơn còn "sâu nhất" là lớn hơn. */
+function recordSet(key, value, extra, better){
+  PLAYER.records = PLAYER.records || {};
+  const cur = PLAYER.records[key];
+  const cmp = better || ((a,b)=>a>b);                       // mặc định: lớn hơn là tốt hơn
+  if(cur && !cmp(value, cur.value)) return false;
+  PLAYER.records[key] = Object.assign({ value, date:today() }, extra||{});
+  savePlayer(); return true;
+}
+const recordGet = key => (PLAYER.records||{})[key] || null;
 function dailyClaim(id){
   const d=dailyTick(); const t=DAILY_TASKS.find(x=>x.id===id);
   if(!t || (d.prog[id]||0)<t.goal || d.claimed.includes(id)) return false;

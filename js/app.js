@@ -59,6 +59,68 @@ function renderDailyList(){
 }
 $('#daily').addEventListener('click',()=>{ renderDailyList(); $('#dailyBox').hidden=false; });
 $('#dailyClose').addEventListener('click',()=>{ $('#dailyBox').hidden=true; });
+
+/* =====================================================================
+   GIỮ CHÂN (đợt 7 — docs/giu-chan.md). Ba mảnh: dải CHUỖI NGÀY ở HOME, hộp VỀ RỒI lúc mở game,
+   tab KỶ LỤC trong THƯ VIỆN. Số liệu ở COMEBACK/STREAK (js/data.js), logic ở js/state.js.
+   ===================================================================== */
+function renderStreakStrip(){
+  const n=streakDays(), claim=streakClaimable().length, next=streakNext();
+  const s=$('#streak'); if(!s) return;
+  s.hidden=false; s.classList.toggle('has-claim', claim>0);
+  $('#streakText').innerHTML = `<b>${n}/7 NGÀY TUẦN NÀY</b> — ` + (claim ? `${claim} mốc chờ nhận`
+    : next ? `còn ${next.days-n} ngày nữa là +${next.sh} SH` : 'đã nhận hết mốc tuần này');
+}
+function renderStreakList(){
+  const w=streakTick(), list=$('#streakList'); list.innerHTML='';
+  $('#streakSub').textContent=`${w.days.length}/7 NGÀY · TUẦN BẮT ĐẦU THỨ HAI`;
+  /* Nói thẳng luật ngay trên đầu danh sách: đây là thứ người chơi sợ nhất ở mọi game có "chuỗi" */
+  list.insertAdjacentHTML('beforeend',
+    `<div class="dl__note">Đếm số ngày <b>có mở game</b> trong tuần. Nghỉ một hôm <b>không mất gì</b> —
+     chỉ là tới mốc sau chậm hơn. Sang thứ Hai thì đếm lại từ đầu.</div>`);
+  STREAK.forEach(s=>{
+    const have=w.days.length>=s.days, claimed=w.claimed.includes(s.days);
+    const r=el('div','dl__row'+(claimed?' is-claimed':''));
+    r.innerHTML=`<div class="dl__info"><b>${s.days} ngày trong tuần</b>
+      <div class="bar" data-state="ok" style="--v:${Math.round(Math.min(1,w.days.length/s.days)*100)}%"><div class="bar__track"><i class="bar__ghost"></i><i class="bar__fill"></i><i class="bar__ticks"></i></div></div>
+      <span class="mono">${Math.min(w.days.length,s.days)}/${s.days} · +${s.sh} SH</span></div>
+      <button class="btn-ghost dl__claim" ${have&&!claimed?'':'disabled'}>${claimed?'ĐÃ NHẬN':have?'NHẬN':'—'}</button>`;
+    r.querySelector('.dl__claim').addEventListener('click',()=>{ if(streakClaim(s.days)){ sfx('open',.22); renderWallet(); renderStreakList(); renderStreakStrip(); } });
+    list.appendChild(r);
+  });
+}
+$('#streak').addEventListener('click',()=>{ renderStreakList(); $('#streakBox').hidden=false; });
+$('#streakClose').addEventListener('click',()=>{ $('#streakBox').hidden=true; });
+
+/* ---- VỀ RỒI: hộp đón lúc mở game, một lần mỗi ngày (docs/giu-chan.md §D1) ----
+   Không chỉ đưa tiền: nó kể lại chuyện đã xảy ra lúc đi vắng (bãi đẻ kiện, nhiệm vụ ngày đã reset,
+   chuỗi ngày vừa cộng thêm), để cú mở game là NHẬN chứ không phải BẮT ĐẦU LÀM. */
+let backShown=false;
+function showComeback(){
+  if(backShown) return; backShown=true;                     // một lần mỗi phiên, kể cả khi quay lại HOME nhiều lần
+  const o=comebackOffer(); if(!o) return;
+  const box=$('#backBox'); if(!box) return;
+  const h=Math.floor(o.hoursRaw), d=Math.floor(h/24);
+  $('#backTime').innerHTML = d>=1 ? `Vắng <b>${d} ngày ${h%24} giờ</b>` : h>=1 ? `Vắng <b>${h} giờ</b>` : `Vắng <b>${Math.round(o.hoursRaw*60)} phút</b>`;
+  $('#backRw').innerHTML = `+${o.shards} SH · +${o.credits.toLocaleString('en-US')} CR`
+    + (o.capped ? `<span class="back__cap">(tính tối đa ${COMEBACK.capHours} giờ)</span>` : '');
+  const lines=[];
+  if(typeof riotSummary==='function' && riotUnlocked()){
+    const s=riotSummary();
+    if(s && s.crates) lines.push(`${s.crates} kiện hàng đang chờ ở Khu Đáy`);
+    if(s && s.contested) lines.push(`${s.contested} bãi bị chiếm — đánh một trận là lấy lại`);
+  }
+  lines.push(`Nhiệm vụ ngày đã làm mới — ${DAILY_TASKS.length} việc, tổng ${DAILY_TASKS.reduce((a,t)=>a+t.reward,0)} SH`);
+  const st=streakNext(); if(st) lines.push(`Chuỗi tuần: ${streakDays()}/7 ngày, còn ${st.days-streakDays()} ngày nữa là +${st.sh} SH`);
+  $('#backList').innerHTML = lines.map(t=>`<li>${t}</li>`).join('');
+  $('#backOkV').textContent = `+${o.shards} SH · +${o.credits.toLocaleString('en-US')} CR`;
+  $('#backOk').onclick=()=>{ if(comebackClaim(o)){ AUDIO.upgrade(); renderWallet(); } box.hidden=true; };
+  box.hidden=false; sfx('open',.2);
+}
+/* Đóng dấu "đang ở đây" — lúc rời trang và mỗi 3 phút. Quà VỀ RỒI tính từ mốc này. */
+addEventListener('pagehide', ()=>{ if(typeof touchSeen==='function') touchSeen(); });
+addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='hidden' && typeof touchSeen==='function') touchSeen(); });
+setInterval(()=>{ if(typeof touchSeen==='function' && document.visibilityState==='visible') touchSeen(); }, 180000);
 /* Ngồi ở HOME là lúc rảnh nhất — tranh thủ nạp trước thứ vào trận sẽ cần: pose `idle` của đội hình, nền
    sector kế, hai sheet fx kêu ngay đòn đầu. Nạp xong thì cổng nạp lúc vào trận thường mở luôn ở 100%.
    Tuần tự ở nhịp rảnh nên không giành băng thông với ảnh đang hiện trên HOME. */
@@ -74,7 +136,8 @@ function warmNextBattle(){
 }
 
 function renderHome(){
-  renderWallet(); renderDailyStrip(); warmNextBattle();
+  renderWallet(); renderDailyStrip(); renderStreakStrip(); warmNextBattle();
+  showComeback();                                    // hộp đón lúc mở game (một lần mỗi phiên, một lần mỗi ngày)
   const bonds=availableBonds(); const c=$('#comms');
   if(bonds.length){ const b=bonds[Math.floor(Math.random()*bonds.length)]; c.hidden=false;
     $('#commsText').innerHTML=`<b>${ROSTER[b.pair[0]].name} · ${ROSTER[b.pair[1]].name}</b> — ${b.lines[0].text}`;
@@ -200,8 +263,9 @@ function renderArchive(){
   /* arch--codex = lưới thẻ ngang 4:3 (cột rộng 148px): Địa danh / Thuật ngữ vì ảnh là cảnh, và Truyện vì
      ảnh là panel comic. Sổ bộ dùng đúng thẻ 3/4 của tab Nhân vật: chúng là cùng một loại thứ — thứ sở hữu được. */
   grid.classList.toggle('arch--codex', ARCH.tab!=='char' && ARCH.tab!=='foe' && ARCH.tab!=='howto');
-  grid.classList.toggle('arch--howto', ARCH.tab==='howto');
+  grid.classList.toggle('arch--howto', ARCH.tab==='howto' || ARCH.tab==='rec');
   if(ARCH.tab==='howto') return renderHowtoGrid(grid);
+  if(ARCH.tab==='rec') return renderRecordGrid(grid);
   if(ARCH.tab==='comic') return renderComicGrid(grid);
   if(ARCH.tab==='foe') return renderFoeGrid(grid);
   if(ARCH.tab!=='char') return renderCodexGrid(grid, codexGroup(ARCH.tab));
@@ -287,6 +351,33 @@ function renderComicGrid(grid){
       `<span class="tile__lock">${e.open?e.pages.length+' TRANG':'CHƯA MỞ'}</span>
        <div class="tile__name"><span>${e.sec.id} · ${e.open?e.sec.name:'???'}</span><span class="tier">${e.label}</span></div>`);
     if(e.open) t.addEventListener('click',()=>{ sfx('open',.17); playComic(e.pages, e.sec, e.kind, {replay:true}); });
+    grid.appendChild(t);
+  });
+}
+/* Tab KỶ LỤC: cái tốt nhất mình từng làm (docs/giu-chan.md §D5). Game không có mạng nên đối thủ duy nhất
+   là bản thân hôm qua — mỗi dòng ghi cả NGÀY lập để thấy mình tiến tới đâu. Chưa có thì ghi "chưa có",
+   kèm câu nói làm thế nào để lập, chứ không để một dấu gạch trống không giải thích gì. */
+function renderRecordGrid(grid){
+  const r = k => (typeof recordGet==='function' ? recordGet(k) : null);
+  const fast=r('fastWin'), hit=r('bigHit');
+  const deep=PLAYER.riot.best, yards=(typeof riotSummary==='function' && riotUnlocked()) ? (riotSummary()||{}).own : 0;
+  const rows=[
+    { name:'Thắng gọn nhất', val: fast ? `${fast.value} vòng` : null,
+      sub: fast ? `${fast.sector} · ${fast.name} · ${fast.waves} đợt · ${fast.date}` : 'Thắng một trận là có ngay' },
+    { name:'Cú đánh mạnh nhất', val: hit ? hit.value.toLocaleString('en-US') : null,
+      sub: hit ? `${hit.who} → ${hit.target}${hit.crit?' · chí mạng':''} · ${hit.sector} · ${hit.date}` : 'Đánh một đòn vào kẻ địch là có' },
+    { name:'Tầng HỐ LOẠN sâu nhất', val: deep ? `tầng ${deep}` : null,
+      sub: deep ? `mở tới tầng ${PLAYER.riot.tier}` : 'Xong 07-A rồi xuống Khu Đáy' },
+    { name:'Chuỗi ngày tuần này', val: `${streakDays()}/7 ngày`,
+      sub: (streakNext() ? `còn ${streakNext().days-streakDays()} ngày nữa là +${streakNext().sh} SH` : 'đã lấy hết mốc tuần này') },
+    { name:'Bãi đang giữ', val: yards ? `${yards}/${typeof RIOT_YARDS!=='undefined'?RIOT_YARDS.length:9}` : null,
+      sub: yards ? 'ở DẸP LOẠN' : 'Chiếm một cái bãi ở Khu Đáy' },
+    { name:'Đã hạ', val: `${(PLAYER.defeated||[]).length} loại kẻ địch`, sub:`sở hữu ${PLAYER.owned.length} đơn vị · đã quay ${PLAYER.pulls} lượt` },
+  ];
+  $('#archCount').textContent = `${rows.filter(x=>x.val).length}/${rows.length} CÓ SỐ`;
+  rows.forEach(x=>{
+    const t=el('div','howtile rectile'+(x.val?'':' is-empty'));
+    t.innerHTML=`<b>${x.name}</b><em>${x.val||'chưa có'}</em><small>${x.sub}</small>`;
     grid.appendChild(t);
   });
 }

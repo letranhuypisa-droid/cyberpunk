@@ -154,8 +154,45 @@ và bạn bè. Cái giá của một cơ chế ép buộc không phải là ti�
 [DiVA: Dark Patterns Within Gacha Games](https://www.diva-portal.org/smash/get/diva2:1888600/FULLTEXT01.pdf) ·
 [ScienceDirect 2026: dark patterns & random rewards](https://www.sciencedirect.com/science/article/pii/S1875952126000443)
 
-## G. Việc tiếp theo
+## G. Đã cài — gói D1 + D2 + D5 (16/09, anh chốt ngay trong phiên)
 
-Chưa cài gì. Khi anh chốt, thứ tự tôi đề nghị là **D1 → D2 → D5** (một ngày công, không đụng cân bằng),
-rồi D3 nếu muốn một đích dài cho tháng 10 — và D3 phải kèm một lượt tính lại tổng SH mỗi tuần
-(`node scratch/riot_econ.js` đang đo phần thu nhập từ bãi, cần thêm phần nhiệm vụ).
+| Việc | Cài ở đâu | Số chốt |
+|---|---|---|
+| **D1 · VỀ RỒI** | `comebackOffer/comebackClaim` (`js/state.js`), hộp `#backBox`, gọi từ `renderHome` | `COMEBACK` = **8 SH + 200 CR mỗi giờ vắng**, trần **8 giờ**, tối thiểu 1 giờ, **một lần mỗi ngày** |
+| **D2 · CHUỖI NGÀY** | `streakTick/streakClaim`, dải `#streak` ở HOME | `STREAK` = mốc **1 · 3 · 5 · 7** ngày → **20 · 40 · 60 · 120 SH**, tổng **240 SH/tuần**, tuần bắt đầu thứ Hai |
+| **D5 · KỶ LỤC** | `recordSet/recordGet`, tab **KỶ LỤC** trong THƯ VIỆN | 6 dòng: thắng gọn nhất (số vòng) · cú đánh mạnh nhất · tầng HỐ LOẠN sâu nhất · chuỗi tuần · bãi đang giữ · đã hạ |
+
+**Quà vắng mặt đặt ở đâu trong kinh tế:** 8 giờ vắng = **64 SH + 1.600 CR**, so với quét 8 vé tầng 20 là
+**120 SH + 6.240 CR** và nhiệm vụ ngày **170 SH**. Tức nó **nâng sàn cho người bận**, không thay được việc
+chơi, và vì chỉ nhận một lần mỗi ngày nên không có đường tắt-mở game liên tục để farm.
+
+**Chuỗi ngày cố ý không gãy:** nghỉ một hôm chỉ làm mốc sau tới chậm hơn, không mất gì — và câu đó được
+**in thẳng trên đầu danh sách** chứ không để người chơi tự đoán.
+
+Còn để dành: **D3** (hợp đồng tháng) · **D4** (đột phá cấp 5/10/15/20) · **D6** (kéo nhiệm vụ tuần ra khỏi
+DẸP LOẠN) · **D7** (việc hôm nay xoay theo thứ). D3 phải kèm một lượt tính lại tổng SH mỗi tuần —
+`node scratch/riot_econ.js` mới đo phần thu nhập từ bãi, chưa đo phần nhiệm vụ.
+
+## H. Nhật ký
+
+### 16/09 — cài D1 + D2 + D5
+
+**Mốc thời gian phải do game tự đóng dấu, không tin `Date.now()` lúc mở.** `PLAYER.lastSeen` được ghi ở ba
+chỗ: `pagehide`, `visibilitychange → hidden`, và mỗi 3 phút khi tab đang hiện. Thiếu cái thứ ba thì một
+phiên bị kill (đóng máy, hết pin) sẽ để lại mốc từ lần mở trước và quà vắng mặt tính sai hẳn một ngày.
+
+**Hồ sơ mới không được nhận quà "về rồi".** `comebackOffer` trả `null` khi `lastSeen` bằng 0 — người chưa
+từng rời đi thì không có gì để "về". Nếu không chặn, người chơi mới mở game lần đầu đã ăn ngay 64 SH và
+mất luôn ý nghĩa của cơ chế.
+
+**Kỷ lục "thắng gọn nhất" đo bằng SỐ VÒNG chứ không bằng giây.** Từ đợt 5 game có tốc độ ×1/×2/×3 và AUTO,
+nên thời gian thật của một trận phụ thuộc vào nút người chơi bấm — đo giây thì kỷ lục chỉ nói lên rằng
+họ đã vặn ×3. Số vòng là thước đo duy nhất không đổi theo cách xem.
+
+**`recordSet` nhận hàm so sánh** vì không phải kỷ lục nào cũng "lớn hơn là tốt hơn": thắng gọn nhất là
+**nhỏ hơn**. Viết sẵn tham số `better` ngay từ đầu rẻ hơn nhiều so với việc sau này phát hiện ra và phải
+sửa ở ba chỗ gọi.
+
+**Ghi kỷ lục sát thương ngay trong `dealDamage`** — mỗi đòn đều xét, nhưng `recordSet` chỉ lưu hồ sơ khi
+con số thật sự lớn hơn cái cũ, nên không thành mỗi đòn một lần ghi ổ đĩa. Chỉ tính đòn của đội mình và chỉ
+tính phần thật sự vào máu (phần lá chắn đỡ không phải thành tích).

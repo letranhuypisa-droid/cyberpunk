@@ -236,6 +236,21 @@ lá trùng gacha → PHÂN TÁCH → LINH KIỆN (LK) → nâng bậc 6 ô cyber
 
 > `scratch/sim.js` **chưa mô phỏng cyberware** — bảng tỉ lệ thắng ở `docs/dep-loan.md` §F1 là **sàn**.
 
+## GIỮ CHÂN — về rồi, chuỗi ngày, kỷ lục (16/09, đợt 7)
+
+Nghiên cứu + bảy đề xuất + những cơ chế **cố ý không làm**: `docs/giu-chan.md`. Đã cài ba thứ đầu:
+
+- **VỀ RỒI** (`COMEBACK` trong `js/data.js`): mở game sau khi vắng ≥1 giờ thì được **8 SH + 200 CR mỗi giờ**,
+  trần 8 giờ, **một lần mỗi ngày**; hộp kèm tổng kết chuyện xảy ra lúc đi vắng (kiện hàng, bãi bị chiếm,
+  nhiệm vụ ngày đã reset). Mốc thời gian là `PLAYER.lastSeen`, đóng dấu lúc rời trang và mỗi 3 phút.
+- **CHUỖI NGÀY** (`STREAK`): đếm số ngày **có mở game** trong tuần — 1/3/5/7 ngày → 20/40/60/120 SH.
+  **Tích luỹ, không gãy**: nghỉ một hôm chỉ chậm tới mốc sau, và câu đó in thẳng trên đầu danh sách.
+- **KỶ LỤC** (tab trong THƯ VIỆN): thắng gọn nhất (đo bằng **số vòng**, không phải giây — vì có ×2/×3),
+  cú đánh mạnh nhất, tầng HỐ LOẠN sâu nhất, chuỗi tuần, bãi đang giữ, số loại kẻ địch đã hạ.
+
+Bảy thứ **không làm** và vì sao: thanh thể lực · sự kiện hết hạn độc quyền · chuỗi ngày gãy về 0 ·
+hộp quà đổi tiền thật · giấu tỉ lệ gacha · thông báo gây lo lắng · đếm ngược ép quyết định.
+
 ## GIAO DIỆN CHO NGƯỜI MỚI (16/09, đợt 6)
 
 Đặc tả: `docs/ui-nguoi-moi.md`. Người đọc giả định: **chưa từng chơi game gacha đánh theo lượt**.

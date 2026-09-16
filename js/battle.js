@@ -457,6 +457,11 @@ function dealDamage(src, tgt, mult, opts={}){
   if(real || !blocked) spawnNumber(spr, real, crit?'crit':'');
   const killed = tgt.hp<=0 && tgt.alive;
   if(killed) killUnit(tgt);
+  /* KỶ LỤC: cú đánh mạnh nhất từ trước tới nay. Chỉ tính đòn của ĐỘI MÌNH (đòn của địch không phải
+     thành tích), và tính phần THẬT SỰ vào máu chứ không tính phần lá chắn đỡ. recordSet tự lưu hồ sơ
+     nhưng chỉ khi con số THẬT SỰ lớn hơn cái cũ, nên đây không phải mỗi đòn một lần ghi ổ đĩa. */
+  if(src.side==='ally' && real>0 && typeof recordSet==='function')
+    recordSet('bigHit', real, { who:src.name, target:tgt.name, crit, sector:SECTOR.id });
   /* Một đòn = một tiếng (xem SFX_ONE trong js/audio.js). Thứ tự ưu tiên: kết liễu > hiệu ứng riêng của đòn
      (mìn, súng điện) > chí mạng > đấm thường — hiệu ứng riêng đứng trên chí mạng vì nó cho biết ĐÒN GÌ vừa trúng,
      còn chí mạng thì đã có overlay và số đỏ trên màn. Tiếng trạng thái gọi sau (applyStatus) rơi vào cùng nhịp
@@ -757,6 +762,13 @@ let finish = async function(win){
   const opened=openedTxt();
   if(opened) rewardTxt = rewardTxt ? rewardTxt+'<br>'+opened : opened;
   const nAlly=B.units.filter(u=>u.side==='ally').length;
+  /* KỶ LỤC (docs/giu-chan.md §D5): trận thắng gọn nhất tính bằng SỐ VÒNG nên "tốt hơn" là nhỏ hơn.
+     Chỉ tính trận có đủ wave của nó — thắng một tầng 3 wave khác hẳn thắng một màn 2 wave, nhưng số vòng
+     là thước đo chung duy nhất không phụ thuộc tốc độ máy hay tốc độ ×2/×3. */
+  if(win && typeof recordSet==='function'){
+    recordSet('fastWin', B.round, { sector:SECTOR.id, name:SECTOR.name, waves:SECTOR.waves }, (a,b)=>a<b);
+    savePlayer();
+  }
   if(win) AUDIO.victory(); else AUDIO.defeat();
   UI.result.hidden=false; UI.result.className='result '+(win?'win':'lose');
   $('#resT').textContent = win?'THẮNG':'CẢ ĐỘI GỤC';

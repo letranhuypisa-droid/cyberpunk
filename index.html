@@ -67,6 +67,9 @@
       </div>
       <button class="comms comms--daily" id="daily" hidden><span class="comms__k">DAILY</span><span class="comms__t" id="dailyText"></span><span class="comms__go">▸</span></button>
       <div class="dl" id="dailyBox" hidden><div class="sh"><span class="sh__title">Nhiệm vụ ngày</span><span class="sh__sub" id="dailyDate"></span><button class="btn-ghost" id="dailyClose">◂ BASE</button></div><div class="dl__list" id="dailyList"></div></div>
+      <!-- Chuỗi ngày: đếm số ngày CÓ MỞ GAME trong tuần, tích luỹ chứ không gãy (docs/giu-chan.md §D2) -->
+      <button class="comms comms--streak" id="streak" hidden><span class="comms__k">TUẦN</span><span class="comms__t" id="streakText"></span><span class="comms__go">▸</span></button>
+      <div class="dl" id="streakBox" hidden><div class="sh"><span class="sh__title">Chuỗi ngày</span><span class="sh__sub" id="streakSub">—</span><button class="btn-ghost" id="streakClose">◂ BASE</button></div><div class="dl__list" id="streakList"></div></div>
       <button class="comms" id="comms" hidden><span class="comms__k">COMMS</span><span class="comms__t" id="commsText"></span><span class="comms__go">▸</span></button>
       <!-- Nhãn tiếng Việt là chính, chữ Anh giữ ở dòng nhỏ (docs/ui-nguoi-moi.md §B1).
            Nút chưa mở được thì vẫn hiện nhưng mờ và ghi điều kiện mở — renderHome lo phần đó. -->
@@ -126,6 +129,7 @@
         <button class="lore__tab" data-atab="foe">Sổ bộ</button>
         <button class="lore__tab" data-atab="comic">Truyện</button>
         <button class="lore__tab" data-atab="howto">Cách chơi</button>
+        <button class="lore__tab" data-atab="rec">Kỷ lục</button>
       </div>
       <div class="arch" id="archGrid"></div>
       <div class="lore" id="lore" hidden>
@@ -375,6 +379,18 @@
         <div class="sh"><span class="sh__title">Cách chơi</span><span class="sh__sub" id="howSub">—</span><button class="btn-ghost" id="howClose">ĐÓNG ✕</button></div>
         <div class="howto__tabs" id="howTabs"></div>
         <div class="howto__body" id="howBody"></div>
+      </div>
+    </div>
+
+    <!-- ===== VỀ RỒI: mở game sau khi vắng thì được quà theo số giờ vắng, kèm tổng kết những gì đã
+         xảy ra lúc đi vắng (docs/giu-chan.md §D1). Một lần mỗi ngày. ===== -->
+    <div class="back" id="backBox" hidden>
+      <div class="back__box">
+        <span class="back__k">VỀ RỒI</span>
+        <div class="back__t" id="backTime">—</div>
+        <div class="back__rw" id="backRw">—</div>
+        <ul class="back__list" id="backList"></ul>
+        <button class="btn-act btn-act--go btn-act--full" id="backOk"><span class="btn-act__k">Nhận</span><span class="btn-act__v" id="backOkV">—</span></button>
       </div>
     </div>
 
