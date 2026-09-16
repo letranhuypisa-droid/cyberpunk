@@ -236,6 +236,26 @@ lá trùng gacha → PHÂN TÁCH → LINH KIỆN (LK) → nâng bậc 6 ô cyber
 
 > `scratch/sim.js` **chưa mô phỏng cyberware** — bảng tỉ lệ thắng ở `docs/dep-loan.md` §F1 là **sàn**.
 
+## GIAO DIỆN CHO NGƯỜI MỚI (16/09, đợt 6)
+
+Đặc tả: `docs/ui-nguoi-moi.md`. Người đọc giả định: **chưa từng chơi game gacha đánh theo lượt**.
+Không đụng cơ chế, không đụng cân bằng — chỉ chữ, thứ tự và dẫn dắt.
+
+- **Nhãn tiếng Việt, chữ Anh giữ ở dòng nhỏ.** `SQUAD → ĐỘI HÌNH`, `GACHA → TUYỂN QUÂN`,
+  `ARCHIVE → THƯ VIỆN`, `CYBERWARE → CẤY GHÉP`, HUD trận `SECTOR/ROUND/WAVE → MÀN/VÒNG/ĐỢT`,
+  `ATTACK → Đòn thường`. Tên riêng (CHROMEFALL, HALCYON, ZERO, REQUISITION) không dịch.
+- **Một nút chính ở HOME**: `CHƠI TIẾP` vào thẳng màn đang mở, `ĐỔI ĐỘI` là nút phụ — trước đây hai nút
+  cùng dẫn tới một trận.
+- **Trang CÁCH CHƠI** (`HOWTO` trong `js/data.js`, 9 mục): vòng chơi · trận đánh · chỉ số · chiêu cuối ·
+  trạng thái · tiền · tuyển quân · cấy ghép & dẹp loạn · chơi nhanh hơn. Mở bằng nút `?` ở HUD trận /
+  đội hình / tuyển quân, bằng cách chạm cụm tiền hoặc cụm chỉ số trên thẻ, hoặc tab CÁCH CHƠI trong THƯ VIỆN.
+  Là **overlay**, nên mở giữa trận cũng không huỷ trận.
+- **Mở dần**: TUYỂN QUÂN mở sau 00-T, CẤY GHÉP sau 07-A (`MENU_UNLOCK`); nút chưa mở vẫn hiện nhưng mờ và
+  ghi `cần xong 00-T`. Vừa mở thì có chấm đỏ tới khi bấm vào lần đầu.
+- **Chỉ dẫn lần đầu** cho 7 màn ngoài trận (`TIPS` trong `js/app.js`), một lần cho mỗi hồ sơ, dùng chung
+  sổ `PLAYER.hintsSeen` với hint trong trận.
+- **Nút chiêu cuối đếm đòn**: `CÒN 4 ĐÒN NỮA · 0/100 EN` thay cho `THIẾU 100 EN`.
+
 ## NHỊP CHƠI — AUTO, tốc độ, quét nhanh, đánh tiếp (16/09, đợt 5)
 
 Đặc tả đầy đủ: `docs/che-do-choi.md`. Bốn thứ điều khiển **nhịp**, không thêm nội dung và

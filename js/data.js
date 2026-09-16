@@ -466,7 +466,7 @@ const SECTORS = [
   { id:'00-T', name:'BÃI RƠI', tag:'Tutorial · Yuki tỉnh dậy', waves:2, mult:.6, rec:60, reward:{shards:40, credits:400}, team:['yuki'],
     plan:[['scav','gutterrat'],['straydog','scav','gutterrat']],
     hints:[
-      { when:'firstTurn',  text:'Đến lượt Yuki. Bấm ATTACK, rồi chạm vào kẻ địch muốn đánh. Mỗi đòn thường cho +25 Energy.' },
+      { when:'firstTurn',  text:'Đến lượt Yuki. Bấm ĐÒN THƯỜNG, rồi chạm vào kẻ địch muốn đánh. Mỗi đòn cho +25 Energy — đủ 100 là tung được chiêu cuối.' },
       { when:'targetMode', text:'Đang chọn mục tiêu. Chạm vào một kẻ địch để đánh. Bấm HUỶ hoặc phím Esc để đổi ý.' },
       { when:'energyFull', text:'Energy đầy: nút chiêu cuối sáng lên. Chiêu ZERO gây 320% ATK, giết được thì hoàn 50 Energy.' },
       { when:'wave',       text:'Wave mới: kẻ địch thay mới, đội mình giữ nguyên HP và Energy, được hồi 30% HP để lấy hơi.' },
@@ -821,6 +821,41 @@ const RULES = { critMult:1.5, variance:.08, waveHeal:.3, autoTargetSingle:true, 
                 HỐ LOẠN dùng RIOT.replayPct (30%) — quét không bao giờ lãi hơn đánh. */
 const PLAY = { speeds:[1,2,3], autoDelay:240, autoHealAt:.7, sweepDay:8, sweepPct:.25 };
 
+/* Mở dần menu ở HOME (đợt 6, docs/ui-nguoi-moi.md §C5). Người mới mở game thấy 7 nút mà 6 thứ chưa dùng
+   được thì không biết bấm gì trước; nút chưa mở vẫn hiện (để biết game còn gì phía trước) nhưng mờ đi và
+   ghi rõ phải xong màn nào. DẸP LOẠN đã tự khoá bằng RIOT.unlock từ trước, đây là hai cái còn lại. */
+const MENU_UNLOCK = { gacha:'00-T', cyber:'07-A' };
+const menuOpen = key => !MENU_UNLOCK[key] || PLAYER.cleared.includes(MENU_UNLOCK[key]);
+
+/* =====================================================================
+   CÁCH CHƠI — trang tra cứu trong game (đợt 6, docs/ui-nguoi-moi.md §C4).
+   Viết cho người CHƯA từng chơi game đánh theo lượt: mỗi mục là một câu hỏi họ sẽ hỏi, trả lời gọn,
+   có số thật của game để đối chiếu. Mở bằng openHowto(id) — nút `?` ở các màn, chạm vào cụm tiền,
+   chạm vào cụm chỉ số trên thẻ, hoặc tab CÁCH CHƠI trong THƯ VIỆN.
+   Sửa chữ ở đây, giao diện tự đổ. Đừng thêm số cân bằng vào đây nếu nó không có trong RULES/UPGRADE —
+   chữ ở đây phải luôn đúng với code, không thì người mới học sai. */
+const HOWTO = [
+  { id:'loop', name:'Vòng chơi', sub:'Một buổi chơi trông như thế nào',
+    text:'Chọn <b>đội 3 người</b> → vào một <b>màn</b> trên bản đồ → đánh thắng → nhận CR và SH → tiêu vào nâng cấp, tuyển quân, cấy ghép → đội mạnh hơn thì đi được màn khó hơn. Truyện kể bằng trang truyện tranh trước và sau mỗi màn; bấm SKIP hoặc tắt hẳn trong CÀI ĐẶT nếu muốn đánh luôn.' },
+  { id:'battle', name:'Trận đánh', sub:'Lượt, đợt địch, chọn mục tiêu',
+    text:'Hai bên thay phiên nhau, <b>ai SPD cao đi trước</b>. Tới lượt mình: bấm <b>ĐÒN THƯỜNG</b> rồi chạm vào kẻ địch muốn đánh (còn một địch thì đánh luôn, khỏi chọn). Một màn có nhiều <b>đợt địch</b> — hết đợt này đến đợt khác, đội mình giữ nguyên máu và Energy, được hồi 30% máu giữa hai đợt. Cả đội gục là thua, đánh lại không mất gì.' },
+  { id:'stats', name:'Chỉ số', sub:'ATK · HP · SPD · CRIT',
+    text:'<b>ATK</b> = sức đánh, <b>HP</b> = máu. <b>SPD</b> = tốc độ, quyết định thứ tự đi trong một vòng (xem thanh chân dung trên đầu màn). <b>CRIT</b> = % ra đòn chí mạng, chí mạng đánh mạnh gấp rưỡi. Nâng cấp bằng CR cho +4% ATK và HP mỗi cấp, tối đa cấp 20; cấy ghép cộng thêm cả bốn chỉ số.' },
+  { id:'energy', name:'Chiêu cuối', sub:'Energy và nút chiêu',
+    text:'Mỗi đòn thường nạp <b>Energy</b> (thường 25, vài người 30–35). Đủ số ghi trên nút chiêu — 50 đến 125 tuỳ người, tức là <b>khoảng ba đến năm đòn thường</b> — thì nút sáng lên. Chiêu cuối mạnh hơn đòn thường nhiều lần và có đoạn phim ngắn; tắt phim ở CÀI ĐẶT thì sát thương vẫn y nguyên. Kẻ địch cũng có chiêu cuối và cũng nạp Energy như vậy — nhìn thanh dưới tên chúng mà liệu.' },
+  { id:'status', name:'Trạng thái', sub:'Choáng · độc · cháy · lá chắn',
+    text:'<b>Choáng</b> = mất lượt. <b>Độc</b> và <b>cháy</b> = đầu mỗi lượt mất thêm máu. <b>Lá chắn</b> hút sát thương trước khi vào máu và không hết theo lượt — phải đánh vỡ. Trùm miễn nhiễm choáng. Các trạng thái này hiện thành ô chữ nhỏ ngay dưới thanh máu, và xoá sạch cho đội mình khi sang đợt địch mới.' },
+  { id:'money', name:'Tiền trong game', sub:'CR · SH · LK',
+    text:'<b>CR (Credit)</b> — nâng cấp nhân vật và nâng bậc cấy ghép. <b>SH (Shard)</b> — quay tuyển quân. <b>LK (Linh kiện)</b> — chỉ dùng cho cấy ghép, và chỉ có được bằng cách phân tách thẻ trùng. Đánh màn được CR và SH; nhiệm vụ ngày cho SH; chiếm bãi ở DẸP LOẠN đẻ CR và SH đều đặn kể cả lúc không chơi.' },
+  { id:'gacha', name:'Tuyển quân', sub:'Quay thẻ, bậc S/A/B, pity',
+    text:'Quay bằng SH để lấy người mới. Bậc <b>S</b> hiếm nhất, rồi <b>A</b>, rồi <b>B</b> — bậc cao chỉ số cao hơn, không phải người bậc thấp thì vô dụng. Quay trúng người đã có thì thành <b>bản dư</b>, đem phân tách lấy LK. Thanh <b>PITY</b> đầy là lượt sau chắc chắn ra bậc cao nhất đang có trong bể. Bể to dần: đánh bại kẻ địch nào thì kẻ đó vào bể, tuyển về đánh thuê cho mình.' },
+  { id:'meta', name:'Cấy ghép & Dẹp loạn', sub:'Hai chỗ tiêu tiền dài hạn',
+    text:'<b>CẤY GHÉP</b>: mỗi người 6 ô (đầu · thân · tay · chân · hai phụ kiện), mỗi ô một thang 10 bậc, nâng bằng LK + CR. Thang chỉ đi lên, không tháo ra. <b>DẸP LOẠN</b>: bản đồ Khu Đáy có 9 cái bãi chiếm được; để người ở lại giữ bãi thì bãi đẻ kiện hàng theo giờ — nhưng người đang giữ bãi thì không ra trận được, nên roster đông mới có giá.' },
+  { id:'pace', name:'Chơi nhanh hơn', sub:'AUTO · tốc độ · quét nhanh',
+    text:'Trong trận có nút <b>AUTO</b> (máy đánh thay) và nút <b>×1/×2/×3</b> (tăng tốc). Cả hai nhớ cho những trận sau. Màn đã thắng rồi thì khỏi đánh lại: bấm <b>QUÉT</b> ở danh sách màn để nhận thẳng phần thưởng chơi lại, mỗi ngày 8 lượt quét.' },
+];
+const howtoById = id => HOWTO.find(h=>h.id===id) || HOWTO[0];
+
 /* =====================================================================
    HỒ SƠ NGƯỜI CHƠI — lưu localStorage (state.js). owned = nhân vật đã có; team = đội hình đã chọn.
    v3: nhân vật chính là Yuki, đội 3 người. Hồ sơ v2 (Operator, đội 5) được đọc và chuyển đổi.
@@ -839,7 +874,7 @@ const LEGACY_KEYS=['chromefall.player.v2'];
    settings.auto / settings.speed = AUTO và tốc độ trận, nhớ qua trận sau: người cày 30 trận một tối không
      phải bật lại 30 lần (docs/che-do-choi.md §B, §C). */
 const PLAYER_DEFAULTS = () => ({ name:'YUKI', level:1, credits:3000, shards:300, owned:['yuki','ash','kai'], team:['yuki','ash','kai'],
-  pity:{hero:0}, pulls:0, cleared:[], defeated:[], extra:{}, riot:{tier:1, best:0}, parts:0, cyber:{}, sweep:null,
+  pity:{hero:0}, pulls:0, cleared:[], defeated:[], extra:{}, riot:{tier:1, best:0}, parts:0, cyber:{}, sweep:null, seenNew:[],
   settings:{sound:true, sfx:true, motion:false, skipStory:false, anim:true, ultVideo:true, revealVideo:true, auto:false, speed:1}, levels:{}, daily:null, hintsSeen:[] });
 const _loaded = (()=>{ try{ for(const k of [PLAYER_KEY,...LEGACY_KEYS]){ const raw=localStorage.getItem(k); if(raw) return { p:JSON.parse(raw), legacy:k!==PLAYER_KEY }; } }catch(e){} return { p:{}, legacy:false }; })();
 const PLAYER = Object.assign(PLAYER_DEFAULTS(), _loaded.p);

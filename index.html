@@ -34,11 +34,11 @@
       <div class="title__grid"></div>
       <img class="title__art" id="titleArt" alt="">
       <div class="title__wrap">
-        <div class="title__tag">A GACHA TACTICS GAME</div>
+        <div class="title__tag">ĐÁNH THEO LƯỢT · TUYỂN QUÂN BẰNG THẺ</div>
         <div class="title__logo"><b>CHROME</b><i>FALL</i></div>
         <div class="title__rule"></div>
-        <div class="title__sub">CHROME ABOVE · RUST BELOW</div>
-        <div class="title__cta">TAP TO START</div>
+        <div class="title__sub">CHROME Ở TRÊN · RUST Ở DƯỚI</div>
+        <div class="title__cta">CHẠM ĐỂ BẮT ĐẦU</div>
       </div>
       <div class="title__ver">v0.3 · BUILD 2026-09-06<br>PROTOTYPE · DỮ LIỆU GIẢ</div>
       <div class="title__legal">© CHROMEFALL</div>
@@ -49,42 +49,49 @@
       <div class="topbar">
         <div class="topbar__avatar" id="homeAvatar"></div>
         <div class="topbar__id"><b id="pName" title="Chạm để đổi biệt danh" style="cursor:pointer">YUKI</b><span id="pLevel">LV 1 · KHU ĐÁY</span></div>
-        <div class="topbar__cur"><span class="pill"><small>CR</small><span id="pCredits">12,480</span></span><span class="pill"><small>SH</small><span id="pShards">900</span></span></div>
+        <!-- Chạm vào cụm tiền → mở mục TIỀN của trang CÁCH CHƠI (app.js) -->
+      <div class="topbar__cur" id="walletChips" title="Chạm để xem CR và SH dùng làm gì"><span class="pill"><small>CR</small><span id="pCredits">12,480</span></span><span class="pill"><small>SH</small><span id="pShards">900</span></span></div>
       </div>
       <div class="hero">
         <div class="portrait" id="heroArt"></div>
         <div class="hero__feat" id="heroFeat">NHÂN VẬT CHÍNH<b>YUKI</b></div>
+        <!-- MỘT nút chính: vào thẳng màn đang mở. Đổi đội hình là việc thỉnh thoảng nên xuống nút phụ. -->
         <div class="hero__panel">
-          <span class="lbl">Next mission</span>
-          <button class="hero__mission" id="btnContinue" title="Vào thẳng màn đang mở"><b id="homeSector">00-T</b><span id="homeSectorMeta">BÃI RƠI · 2 WAVE</span><i>TIẾP TỤC ▸</i></button>
-          <button class="btn-act btn-act--go btn-act--full" data-go="squad"><span class="btn-act__k">Deploy</span><span class="btn-act__v">Chọn đội hình → bản đồ → chiến đấu</span></button>
+          <span class="lbl">Màn đang mở</span>
+          <button class="hero__mission" id="btnContinue" title="Vào thẳng màn đang mở"><b id="homeSector">00-T</b><span id="homeSectorMeta">BÃI RƠI · 2 ĐỢT ĐỊCH</span><i>▸</i></button>
+          <div class="hero__acts">
+            <button class="btn-act btn-act--go" id="btnPlay"><span class="btn-act__k">Chơi tiếp</span><span class="btn-act__v" id="playMeta">Vào màn đang mở</span></button>
+            <button class="btn-act" data-go="squad"><span class="btn-act__k">Đổi đội</span><span class="btn-act__v">3 người ra trận</span></button>
+          </div>
         </div>
       </div>
       <button class="comms comms--daily" id="daily" hidden><span class="comms__k">DAILY</span><span class="comms__t" id="dailyText"></span><span class="comms__go">▸</span></button>
-      <div class="dl" id="dailyBox" hidden><div class="sh"><span class="sh__title">Daily</span><span class="sh__sub" id="dailyDate"></span><button class="btn-ghost" id="dailyClose">◂ BASE</button></div><div class="dl__list" id="dailyList"></div></div>
+      <div class="dl" id="dailyBox" hidden><div class="sh"><span class="sh__title">Nhiệm vụ ngày</span><span class="sh__sub" id="dailyDate"></span><button class="btn-ghost" id="dailyClose">◂ BASE</button></div><div class="dl__list" id="dailyList"></div></div>
       <button class="comms" id="comms" hidden><span class="comms__k">COMMS</span><span class="comms__t" id="commsText"></span><span class="comms__go">▸</span></button>
+      <!-- Nhãn tiếng Việt là chính, chữ Anh giữ ở dòng nhỏ (docs/ui-nguoi-moi.md §B1).
+           Nút chưa mở được thì vẫn hiện nhưng mờ và ghi điều kiện mở — renderHome lo phần đó. -->
       <div class="menu">
-        <button class="menu__btn" data-go="squad"><b>SQUAD</b><small>3 SLOT</small></button>
-        <button class="menu__btn" data-go="map"><b>MAP</b><small>HALCYON</small></button>
+        <button class="menu__btn" data-go="squad"><b>ĐỘI HÌNH</b><small>3 người</small></button>
+        <button class="menu__btn" data-go="map"><b>BẢN ĐỒ</b><small>HALCYON</small></button>
         <button class="menu__btn" id="btnRiotMenu" data-go="riotmap"><b>DẸP LOẠN</b><small id="riotMenuSub">KHOÁ</small><i class="menu__dot" id="riotMenuDot" hidden></i></button>
-        <button class="menu__btn" data-go="cyber"><b>CYBERWARE</b><small id="cyberMenuSub">6 Ô</small><i class="menu__dot" id="cyberMenuDot" hidden></i></button>
-        <button class="menu__btn" data-go="gacha"><b>GACHA</b><small>REQUISITION</small></button>
-        <button class="menu__btn" data-go="archive"><b>ARCHIVE</b><small>LORE</small></button>
-        <button class="menu__btn" data-go="config"><b>CONFIG</b><small>SYS</small></button>
+        <button class="menu__btn" id="btnCyberMenu" data-go="cyber"><b>CẤY GHÉP</b><small id="cyberMenuSub">6 ô</small><i class="menu__dot" id="cyberMenuDot" hidden></i></button>
+        <button class="menu__btn" id="btnGachaMenu" data-go="gacha"><b>TUYỂN QUÂN</b><small id="gachaMenuSub">quay thẻ</small><i class="menu__dot" id="gachaMenuDot" hidden></i></button>
+        <button class="menu__btn" data-go="archive"><b>THƯ VIỆN</b><small>hồ sơ · truyện</small></button>
+        <button class="menu__btn" data-go="config"><b>CÀI ĐẶT</b><small>âm thanh · hồ sơ</small></button>
       </div>
     </div>
 
     <!-- ===== SCREEN: SQUAD ===== -->
     <div class="screen squad" data-screen="squad">
-      <div class="sh"><span class="sh__title">Squad</span><span class="sh__sub" id="squadCount"></span><button class="btn-ghost" data-go="home">◂ BASE</button></div>
+      <div class="sh"><span class="sh__title">Đội hình</span><span class="sh__sub" id="squadCount"></span><button class="btn-ghost" id="btnHowSquad" title="Cách chơi">?</button><button class="btn-ghost" data-go="home">◂ BASE</button></div>
       <div class="team" id="squadSlots"></div>
       <div class="roster" id="squadRoster"></div>
-      <button class="btn-act btn-act--go btn-act--full" id="btnDeploy" data-go="map"><span class="btn-act__k">Confirm squad</span><span class="btn-act__v">Chọn đủ 3 nhân vật</span></button>
+      <button class="btn-act btn-act--go btn-act--full" id="btnDeploy" data-go="map"><span class="btn-act__k">Xong · ra bản đồ</span><span class="btn-act__v">Chọn đủ 3 nhân vật</span></button>
     </div>
 
     <!-- ===== SCREEN: MAP — bản đồ HALCYON, chạm khu vực để vào danh sách màn ===== -->
     <div class="screen map" data-screen="map">
-      <div class="sh"><span class="sh__title">Halcyon</span><span class="sh__sub" id="mapSub">CHẠM VÀO KHU VỰC</span><button class="btn-ghost" data-go="home">◂ BASE</button></div>
+      <div class="sh"><span class="sh__title">Bản đồ</span><span class="sh__sub" id="mapSub">CHẠM VÀO KHU VỰC</span><button class="btn-ghost" data-go="home">◂ BASE</button></div>
       <div class="map__view" id="mapView">
         <div class="map__img" id="mapImg">
           <div class="map__lines" id="mapLines"></div>
@@ -98,11 +105,11 @@
 
     <!-- ===== SCREEN: SECTOR SELECT ===== -->
     <div class="screen sector" data-screen="sector">
-      <div class="sh"><span class="sh__title" id="sectorTitle">Sector</span><span class="sh__sub" id="sectorSub">TUTORIAL + CHƯƠNG 1 · PVE</span><button class="btn-ghost" data-go="map">◂ MAP</button></div>
+      <div class="sh"><span class="sh__title" id="sectorTitle">Chọn màn</span><span class="sh__sub" id="sectorSub">TUTORIAL + CHƯƠNG 1 · PVE</span><button class="btn-ghost" data-go="map">◂ MAP</button></div>
       <div class="slist" id="sectorList"></div>
       <!-- QUÉT = lấy thưởng TUẦN TRA của màn đã thắng mà không vào trận, tốn 1 vé/ngày (docs/che-do-choi.md §D) -->
       <div class="entbar">
-        <button class="btn-act btn-act--go" id="btnEnter" data-go="battle"><span class="btn-act__k">Enter sector</span><span class="btn-act__v" id="enterMeta">—</span></button>
+        <button class="btn-act btn-act--go" id="btnEnter" data-go="battle"><span class="btn-act__k">Vào trận</span><span class="btn-act__v" id="enterMeta">—</span></button>
         <button class="btn-act" id="btnSweep" title="QUÉT NHANH — thưởng chơi lại, không phải đánh"><span class="btn-act__k">Quét ▸</span><span class="btn-act__v" id="sweepMeta">—</span></button>
       </div>
     </div>
@@ -111,13 +118,14 @@
          Nhân vật 19 người · Sổ bộ 21 kẻ địch · Địa danh / Thuật ngữ = thư viện.
          Hộp #lore dùng chung cho cả Nhân vật lẫn Sổ bộ; #codex chỉ còn cho địa danh / thuật ngữ. ===== -->
     <div class="screen archive" data-screen="archive">
-      <div class="sh"><span class="sh__title">Archive</span><span class="sh__sub" id="archCount"></span><button class="btn-ghost" data-go="home">◂ BASE</button></div>
+      <div class="sh"><span class="sh__title">Thư viện</span><span class="sh__sub" id="archCount"></span><button class="btn-ghost" data-go="home">◂ BASE</button></div>
       <div class="lore__tabs arch__tabs" id="archTabs">
         <button class="lore__tab is-on" data-atab="char">Nhân vật</button>
         <button class="lore__tab" data-atab="place">Địa danh</button>
         <button class="lore__tab" data-atab="term">Thuật ngữ</button>
         <button class="lore__tab" data-atab="foe">Sổ bộ</button>
         <button class="lore__tab" data-atab="comic">Truyện</button>
+        <button class="lore__tab" data-atab="howto">Cách chơi</button>
       </div>
       <div class="arch" id="archGrid"></div>
       <div class="lore" id="lore" hidden>
@@ -136,7 +144,7 @@
 
     <!-- ===== SCREEN: CONFIG ===== -->
     <div class="screen config" data-screen="config">
-      <div class="sh"><span class="sh__title">Config</span><span class="sh__sub">SYSTEM</span><button class="btn-ghost" data-go="home">◂ BASE</button></div>
+      <div class="sh"><span class="sh__title">Cài đặt</span><span class="sh__sub">HỆ THỐNG</span><button class="btn-ghost" data-go="home">◂ BASE</button></div>
       <div class="cfg">
         <button class="cfg__row" data-cfg="ultVideo"><span><b>VIDEO CHIÊU CUỐI</b><small>Phát cut-in khi tung Ultimate. Tắt thì vào đòn ngay, sát thương không đổi</small></span><i class="cfg__sw"></i></button>
         <button class="cfg__row" data-cfg="revealVideo"><span><b>VIDEO MỞ RƯƠNG</b><small>Phát video khi quay trúng nhân vật mới ở REQUISITION. Tắt thì vào thẳng màn khoe nhân vật</small></span><i class="cfg__sw"></i></button>
@@ -153,7 +161,7 @@
     <!-- ===== SCREEN: CYBERWARE — chọn nhân vật → chọn ô → chọn món → lắp / nâng bậc / tháo.
          Nội dung do js/cyberui.js đổ; icon vẽ bằng SVG, thả art/cyber/<id>.png vào là tự thay. ===== -->
     <div class="screen cyber" data-screen="cyber">
-      <div class="sh"><span class="sh__title">Cyberware</span><span class="pill"><small>LK</small><span id="cbParts">0</span></span><span class="pill"><small>CR</small><span id="cbCr">0</span></span><button class="btn-ghost" data-go="home">◂ BASE</button></div>
+      <div class="sh"><span class="sh__title">Cấy ghép</span><span class="pill"><small>LK</small><span id="cbParts">0</span></span><span class="pill"><small>CR</small><span id="cbCr">0</span></span><button class="btn-ghost" data-go="home">◂ BASE</button></div>
       <div class="cbpick" id="cbPick"></div>
       <div class="cbbody" id="cbBody"></div>
       <button class="btn-act btn-act--full" id="btnScrap"><span class="btn-act__k">Phân tách bản dư</span><span class="btn-act__v" id="scrapMeta">—</span></button>
@@ -242,10 +250,10 @@
     <!-- ===== SCREEN: GACHA — MỘT bể REQUISITION, trả SH. Nhân vật mở theo chương, quân chiêu mộ
          phải đánh bại con đó trước (docs/gacha-merge.md). ===== -->
     <div class="screen gacha" data-screen="gacha">
-      <div class="sh"><span class="sh__title" id="gachaTitle">Requisition</span><span class="pill"><small id="gCurLbl">SH</small><span id="gShards">900</span></span><button class="btn-ghost" data-go="home">◂ BASE</button></div>
+      <div class="sh"><span class="sh__title" id="gachaTitle">Tuyển quân</span><span class="pill"><small id="gCurLbl">SH</small><span id="gShards">900</span></span><button class="btn-ghost" id="btnHowGacha" title="Cách chơi">?</button><button class="btn-ghost" data-go="home">◂ BASE</button></div>
       <div class="gbanner">
         <div class="portrait" id="gachaArt"></div>
-        <div class="gbanner__tag" id="gachaTag">RATE-UP</div>
+        <div class="gbanner__tag" id="gachaTag">TỈ LỆ CAO</div>
         <div class="gbanner__name" id="gachaFeat">YUKI</div>
         <div class="gbanner__panel">
           <div class="grates" id="gRates"></div>
@@ -254,13 +262,13 @@
         </div>
       </div>
       <div class="gpull">
-        <button class="btn-act btn-act--full" id="btnPull1"><span class="btn-act__k">Pull ×1</span><span class="btn-act__v">30 SH</span></button>
-        <button class="btn-act btn-act--go btn-act--full" id="btnPull10"><span class="btn-act__k">Pull ×10</span><span class="btn-act__v">270 SH · ≥1 A</span></button>
+        <button class="btn-act btn-act--full" id="btnPull1"><span class="btn-act__k">Quay ×1</span><span class="btn-act__v">30 SH</span></button>
+        <button class="btn-act btn-act--go btn-act--full" id="btnPull10"><span class="btn-act__k">Quay ×10</span><span class="btn-act__v">270 SH · ≥1 A</span></button>
       </div>
       <div class="gfoot"><span class="lbl">Owned <b id="gOwned">5</b>/19 · Pulls <b id="gPulls">0</b></span><button class="btn-ghost" id="btnRefill" title="Dev: nạp thử" hidden>+1000 SH · DEV</button></div>
       <!-- Chưa vào bể: thẻ xám, để người chơi biết SH để dành cho ai. Hai nhóm — kẻ địch đã tới chương
            mà chưa hạ (ghi luôn màn gặp được), và người chưa tới chương của họ. -->
-      <div class="glocked" id="gLocked" hidden><div class="glocked__h"><b>CHƯA VÀO BỂ</b><small id="gLockedSub"></small></div><div class="glocked__grid" id="gLockedGrid"></div></div>
+      <div class="glocked" id="gLocked" hidden><div class="glocked__h"><b>CHƯA VÀO BỂ QUAY</b><small id="gLockedSub"></small></div><div class="glocked__grid" id="gLockedGrid"></div></div>
       <div class="reveal" id="reveal" hidden>
         <div class="reveal__grid" id="revealGrid"></div>
         <div class="cutin" id="revealCutin" hidden><!-- video mở rương (Yuki) phát trước khi lật thẻ -->
@@ -308,13 +316,14 @@
   <div class="arena screen" data-screen="battle">
     <header class="hud">
       <div class="hud__row">
-        <div><span class="lbl">Sector</span><span class="mono" id="sectorNo">07-B</span></div>
-        <div><span class="lbl">Round</span><span class="mono" id="roundNo">01</span></div>
-        <div><span class="lbl">Wave</span><span class="mono" id="waveNo">1/3</span></div>
+        <div><span class="lbl">Màn</span><span class="mono" id="sectorNo">07-B</span></div>
+        <div><span class="lbl">Vòng</span><span class="mono" id="roundNo">01</span></div>
+        <div><span class="lbl">Đợt</span><span class="mono" id="waveNo">1/3</span></div>
         <!-- nhịp trận (docs/che-do-choi.md §B §C): AUTO máy đánh thay · tốc độ xoay vòng ×1/×2/×3. Cả hai nhớ vào hồ sơ -->
-        <button class="btn-ghost hud__tg hud__pace" id="btnAuto" aria-pressed="false" title="AUTO — máy đánh thay">AUTO</button>
+        <button class="btn-ghost hud__pace" id="btnHowBattle" title="Cách chơi">?</button>
+        <button class="btn-ghost hud__tg" id="btnAuto" aria-pressed="false" title="AUTO — máy đánh thay">AUTO</button>
         <button class="btn-ghost hud__tg" id="btnSpeed" title="Tốc độ trận ×1 / ×2 / ×3">×1</button>
-        <button class="btn-ghost" id="btnReset">RESET</button>
+        <button class="btn-ghost" id="btnReset">ĐÁNH LẠI</button>
         <button class="btn-ghost" data-go="home" title="Rút lui về căn cứ">◂ BASE</button>
       </div>
       <div class="turn" id="turnbar" style="margin-top:14px"></div>
@@ -345,11 +354,11 @@
         <i class="holo__tail"></i>
       </div>
       <div class="ultbanner" id="ultBanner"><div class="ultbanner__n" id="ubName">ZERO</div><div class="ultbanner__line"></div><div class="ultbanner__s" id="ubSub"></div></div>
-      <div class="result" id="result" hidden><div class="result__box"><div class="result__t" id="resT"></div><div class="result__s" id="resS"></div><button class="btn-ghost btn-ghost--go" id="btnNext" hidden>TẦNG ▸</button> <button class="btn-ghost" id="btnAgain">RETRY</button> <button class="btn-ghost" id="btnResRiot" data-go="riotmap" hidden>◂ KHU ĐÁY</button> <button class="btn-ghost" data-go="home">RETURN TO BASE</button></div></div>
+      <div class="result" id="result" hidden><div class="result__box"><div class="result__t" id="resT"></div><div class="result__s" id="resS"></div><button class="btn-ghost btn-ghost--go" id="btnNext" hidden>TẦNG ▸</button> <button class="btn-ghost" id="btnAgain">ĐÁNH LẠI</button> <button class="btn-ghost" id="btnResRiot" data-go="riotmap" hidden>◂ KHU ĐÁY</button> <button class="btn-ghost" data-go="home">◂ VỀ CĂN CỨ</button></div></div>
     </div>
 
     <div class="actions">
-      <button class="btn-act" id="btnAttack"><span class="btn-act__k">Attack</span><span class="btn-act__v">Đòn thường · chọn mục tiêu</span></button>
+      <button class="btn-act" id="btnAttack"><span class="btn-act__k">Đòn thường</span><span class="btn-act__v">Đòn thường · chọn mục tiêu</span></button>
       <button class="btn-ult" id="btnUlt" data-state="locked">
         <span class="btn-ult__name" id="ultName">—</span>
         <span class="btn-ult__meta" id="ultMeta">—</span>
@@ -358,6 +367,25 @@
     </div>
     <div id="fx" style="position:absolute;inset:0;pointer-events:none;z-index:35"></div>
   </div>
+
+    <!-- ===== CÁCH CHƠI: overlay tra cứu, mở được từ MỌI màn kể cả giữa trận (không đổi màn hình nên
+         không làm mất trận đang đánh). Nội dung ở HOWTO trong js/data.js. ===== -->
+    <div class="howto" id="howto" hidden>
+      <div class="howto__box">
+        <div class="sh"><span class="sh__title">Cách chơi</span><span class="sh__sub" id="howSub">—</span><button class="btn-ghost" id="howClose">ĐÓNG ✕</button></div>
+        <div class="howto__tabs" id="howTabs"></div>
+        <div class="howto__body" id="howBody"></div>
+      </div>
+    </div>
+
+    <!-- ===== CHỈ DẪN LẦN ĐẦU: hiện đúng một lần cho mỗi hồ sơ khi vào một màn mới ===== -->
+    <div class="tip" id="tipBox" hidden>
+      <div class="tip__box">
+        <span class="tip__k">LẦN ĐẦU VÀO ĐÂY</span>
+        <div class="tip__t" id="tipText">—</div>
+        <div class="tip__row"><button class="btn-ghost" id="tipHow">CÁCH CHƠI ▸</button><button class="btn-act btn-act--go" id="tipOk"><span class="btn-act__k">Đã hiểu</span></button></div>
+      </div>
+    </div>
 
     <!-- ===== QUÉT NHANH: hộp kết quả. Không có trận nào để tổng kết nên hộp chỉ ghi tiền vào ví + vé còn lại ===== -->
     <div class="swbox" id="swBox" hidden>
@@ -370,8 +398,8 @@
   </div><!-- /screens -->
 
   <aside class="side">
-    <div class="side__block"><span class="lbl">Ultimate · đang tới lượt</span><div class="ultinfo" id="ultInfo">—</div></div>
-    <div class="side__block"><span class="lbl">Battle log</span><ol class="log" id="log"></ol></div>
+    <div class="side__block"><span class="lbl">Chiêu cuối · người đang tới lượt</span><div class="ultinfo" id="ultInfo">—</div></div>
+    <div class="side__block"><span class="lbl">Diễn biến trận</span><ol class="log" id="log"></ol></div>
     <div class="side__block"><span class="lbl">Ghi chú</span><div class="ultinfo">Đội mình bên trái, địch bên phải. Bấm ATTACK hoặc chiêu cuối đơn mục tiêu rồi chạm vào kẻ địch muốn đánh; nhân vật sẽ lao tới đúng con đó. Chiêu diện rộng và hồi máu ra đòn ngay. Sang wave mới cả đội hồi 30% HP. HP về 0 là KIA đến hết trận. Thứ tự lượt theo SPD (cao đi trước). Độc/cháy trừ HP đầu lượt, choáng mất lượt kế tiếp.<span class="mono">Chỉ số địch, SPD/CRIT, công thức sát thương, trạng thái = ★ FAKE (xem JS)</span></div></div>
   </aside>
 </section>

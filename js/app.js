@@ -24,7 +24,10 @@ function go(name){
   if(name==='cyber'   && typeof renderCyber==='function')   renderCyber();     // cấy ghép 5 ô (js/cyberui.js)
   if(name==='sector') renderSectors();
   if(name==='home') renderHome();
-  if(name==='gacha') renderGacha();
+  if(name==='gacha'){ markSeen('gacha'); renderGacha(); }
+  if(name==='cyber') markSeen('cyber');
+  if(name==='riotmap') markSeen('riot');
+  firstTimeTip(name);                                  // hộp chỉ dẫn lần đầu vào một màn (docs/ui-nguoi-moi.md §C5)
   if(name==='archive') renderArchive();
   if(name==='config') renderConfig();
   if(scrollY<300) window.scrollTo({top:0});
@@ -43,7 +46,7 @@ function renderWallet(){ document.querySelectorAll('#pShards,#gShards').forEach(
 function renderDailyStrip(){
   const d=dailyTick(); const done=DAILY_TASKS.filter(t=>(d.prog[t.id]||0)>=t.goal).length; const claim=dailyClaimable().length;
   const s=$('#daily'); s.hidden=false; s.classList.toggle('has-claim', claim>0);
-  $('#dailyText').innerHTML=`<b>DAILY ${done}/${DAILY_TASKS.length}</b> — ${claim?claim+' nhiệm vụ chờ nhận thưởng':'nhiệm vụ hôm nay'}`;
+  $('#dailyText').innerHTML=`<b>NHIỆM VỤ NGÀY ${done}/${DAILY_TASKS.length}</b> — ${claim?claim+' việc chờ nhận thưởng':'làm xong được thêm SH'}`;
 }
 function renderDailyList(){
   const d=dailyTick(); const list=$('#dailyList'); list.innerHTML=''; $('#dailyDate').textContent=`RESET 00:00 · ${d.date}`;
@@ -87,22 +90,51 @@ function renderHome(){
     rb.classList.toggle('is-locked', !on); rb.disabled=!on;
     /* Nút menu chỉ cao 56px và chữ nhỏ chỉ vừa MỘT dòng — in việc gấp nhất, không in cả bảng tổng quan */
     const o = on && typeof riotSummary==='function' ? riotSummary() : null;
-    $('#riotMenuSub').textContent = !on ? `CẦN XONG ${RIOT.unlock}`
-      : !o ? `TẦNG ${PLAYER.riot.tier}`
-      : o.crates ? `${o.crates} KIỆN CHỜ`
-      : o.contested ? `${o.contested} BÃI MẤT`
-      : `${o.own}/${RIOT_YARDS.length} BÃI`;
+    $('#riotMenuSub').textContent = !on ? `cần xong ${RIOT.unlock}`
+      : !o ? `tầng ${PLAYER.riot.tier}`
+      : o.crates ? `${o.crates} kiện chờ`
+      : o.contested ? `${o.contested} bãi mất`
+      : `${o.own}/${RIOT_YARDS.length} bãi`;
     const dot=$('#riotMenuDot'); if(dot) dot.hidden = !(on && typeof riotHasWork==='function' && riotHasWork()); }
-  /* Nút CYBERWARE: in ví linh kiện; chấm đỏ khi còn lá trùng chưa phân tách (lời hứa treo từ gacha) */
+  /* Nút CẤY GHÉP: in ví linh kiện; chấm đỏ khi còn lá trùng chưa phân tách (lời hứa treo từ gacha) */
   const cb=$('#cyberMenuSub');
   if(cb && typeof scrapTotal==='function'){
     const t=scrapTotal();
-    cb.textContent = PLAYER.parts ? `${PLAYER.parts.toLocaleString('en-US')} LK` : t.n ? `${t.n} LÁ DƯ` : '6 Ô';
-    const cd=$('#cyberMenuDot'); if(cd) cd.hidden = !t.n;
+    cb.textContent = PLAYER.parts ? `${PLAYER.parts.toLocaleString('en-US')} LK` : t.n ? `${t.n} lá dư` : '6 ô';
+    // "có việc" ghi vào data-work chứ không tắt/bật chấm ngay: syncMenuLocks bên dưới còn một lý do
+    // thứ hai để bật chấm (tính năng vừa mở khoá, chưa xem lần nào) và nó là chỗ quyết định cuối.
+    const cd=$('#cyberMenuDot'); if(cd) cd.dataset.work = t.n ? '1' : '';
   }
+  syncMenuLocks();
   const sec = SECTORS.find(x=>x.state==='open') || SECTORS[SECTORS.length-1];
   SECTOR = sec;
-  $('#homeSector').textContent=sec.id; $('#homeSectorMeta').textContent=`${sec.name} · ${sec.waves} WAVE · ${sec.boss?ENEMY_POOL.find(e=>e.id===sec.boss).name:'KHÔNG BOSS'}`;
+  $('#homeSector').textContent=sec.id;
+  $('#homeSectorMeta').textContent=`${sec.name} · ${sec.waves} đợt địch${sec.boss?' · trùm '+ENEMY_POOL.find(e=>e.id===sec.boss).name:''}`;
+  const pm=$('#playMeta'); if(pm) pm.textContent=`${sec.id} · ${sec.name}`;
+}
+/* Mở dần: nút chưa tới lúc thì mờ + ghi điều kiện, tới lúc thì sáng kèm chấm đỏ đúng một lần
+   (docs/ui-nguoi-moi.md §C5). Mốc mở khai ở MENU_UNLOCK trong js/data.js. */
+function syncMenuLocks(){
+  const rows=[['gacha', $('#btnGachaMenu'), $('#gachaMenuSub'), $('#gachaMenuDot'), 'quay thẻ'],
+              ['cyber', $('#btnCyberMenu'), $('#cyberMenuSub'), $('#cyberMenuDot'), null]];
+  PLAYER.seenNew = PLAYER.seenNew || [];
+  rows.forEach(([key, btn, sub, dot, dfl])=>{
+    if(!btn) return;
+    const on = typeof menuOpen==='function' ? menuOpen(key) : true;
+    btn.classList.toggle('is-locked', !on); btn.disabled=!on;
+    if(!on){ if(sub) sub.textContent=`cần xong ${MENU_UNLOCK[key]}`; if(dot) dot.hidden=true; return; }
+    if(dfl && sub) sub.textContent=dfl;                       // CẤY GHÉP tự viết dòng của nó ở trên
+    /* Chấm đỏ có ĐÚNG HAI lý do: tính năng vừa mở mà chưa xem lần nào, hoặc đang có việc phải làm
+       (lá dư chờ phân tách — renderHome ghi vào data-work). Phải gán cả hai chiều: chỉ bật mà không
+       bao giờ tắt thì xem xong quay lại chấm vẫn còn, đúng lỗi gặp lúc thử 16/09. */
+    if(dot) dot.hidden = !(dot.dataset.work==='1' || !PLAYER.seenNew.includes(key));
+  });
+}
+/* Ghi nhận người chơi đã xem tính năng vừa mở (tắt chấm đỏ, một lần cho mỗi hồ sơ) */
+function markSeen(key){
+  PLAYER.seenNew = PLAYER.seenNew || [];
+  if(PLAYER.seenNew.includes(key)) return;
+  PLAYER.seenNew.push(key); savePlayer();
 }
 
 /* ---- SQUAD: 3 slot + roster, bấm thẻ để thêm/bỏ, kéo thả cũng được. Đội hình lưu vào hồ sơ. ---- */
@@ -140,8 +172,8 @@ function renderSquad(){
   const rank = id => (owns(id)?2:0) + (owns(id)&&isFreeUnit(id)?1:0);
   [...roster.querySelectorAll('.card')].sort((a,b)=>rank(b.dataset.id)-rank(a.dataset.id)).forEach(c=>roster.appendChild(c));
   const n=SQUAD.slots.filter(Boolean).length;
-  $('#squadCount').innerHTML=`<b>${n}</b>/${TEAM_SIZE} DEPLOYED`;
-  const btn=$('#btnDeploy'); btn.disabled = n!==TEAM_SIZE; btn.querySelector('.btn-act__v').textContent = n===TEAM_SIZE ? 'Tiếp → bản đồ HALCYON' : `Chọn thêm ${TEAM_SIZE-n} nhân vật`;
+  $('#squadCount').innerHTML=`<b>${n}</b>/${TEAM_SIZE} ĐÃ CHỌN`;
+  const btn=$('#btnDeploy'); btn.disabled = n!==TEAM_SIZE; btn.querySelector('.btn-act__v').textContent = n===TEAM_SIZE ? 'Xong — ra bản đồ chọn màn' : `Cần chọn thêm ${TEAM_SIZE-n} người`;
   if(n===TEAM_SIZE){ TEAM=SQUAD.slots.slice(); PLAYER.team=TEAM.slice(); savePlayer(); }
 }
 
@@ -167,7 +199,9 @@ function renderArchive(){
   document.querySelectorAll('#archTabs .lore__tab').forEach(b=>b.classList.toggle('is-on', b.dataset.atab===ARCH.tab));
   /* arch--codex = lưới thẻ ngang 4:3 (cột rộng 148px): Địa danh / Thuật ngữ vì ảnh là cảnh, và Truyện vì
      ảnh là panel comic. Sổ bộ dùng đúng thẻ 3/4 của tab Nhân vật: chúng là cùng một loại thứ — thứ sở hữu được. */
-  grid.classList.toggle('arch--codex', ARCH.tab!=='char' && ARCH.tab!=='foe');
+  grid.classList.toggle('arch--codex', ARCH.tab!=='char' && ARCH.tab!=='foe' && ARCH.tab!=='howto');
+  grid.classList.toggle('arch--howto', ARCH.tab==='howto');
+  if(ARCH.tab==='howto') return renderHowtoGrid(grid);
   if(ARCH.tab==='comic') return renderComicGrid(grid);
   if(ARCH.tab==='foe') return renderFoeGrid(grid);
   if(ARCH.tab!=='char') return renderCodexGrid(grid, codexGroup(ARCH.tab));
@@ -256,6 +290,15 @@ function renderComicGrid(grid){
     grid.appendChild(t);
   });
 }
+/* Tab CÁCH CHƠI: danh sách mục, không có ảnh — đây là chỗ tra luật, không phải chỗ ngắm */
+function renderHowtoGrid(grid){
+  $('#archCount').textContent=`${HOWTO.length} MỤC · KHÔNG CẦN MỞ KHOÁ`;
+  HOWTO.forEach(h=>{
+    const t=el('button','howtile', `<b>${h.name}</b><small>${h.sub||''}</small>`);
+    t.addEventListener('click',()=>openHowto(h.id));
+    grid.appendChild(t);
+  });
+}
 function openCodex(g, it){
   const box=$('#codex'); box.className='lore lore--codex '+(it.faction==='rust'?'lore--rust':'lore--chrome');
   const pic=codexPic(it); $('#codexArt').replaceWith(pic); pic.id='codexArt';
@@ -271,6 +314,63 @@ function openCodex(g, it){
   body.scrollTop=0; box.hidden=false; sfx('open',.17);
 }
 $('#codexClose').addEventListener('click',()=>{ $('#codex').hidden=true; });
+
+/* =====================================================================
+   CÁCH CHƠI — overlay tra cứu (chữ ở HOWTO trong js/data.js, kế hoạch ở docs/ui-nguoi-moi.md §C4)
+   Là OVERLAY chứ không phải một màn: mở giữa trận cũng được, vì nó không đụng data-screen nên
+   không huỷ trận đang đánh (go() đặt B.gen++ và dọn mọi việc đang chờ khi rời màn battle).
+   ===================================================================== */
+function openHowto(id){
+  const box=$('#howto'); if(!box || typeof HOWTO==='undefined') return;
+  const cur=howtoById(id);
+  const tabs=$('#howTabs'); tabs.innerHTML='';
+  HOWTO.forEach(h=>{
+    const b=el('button','lore__tab'+(h.id===cur.id?' is-on':''), h.name);
+    b.addEventListener('click',()=>openHowto(h.id));
+    tabs.appendChild(b);
+  });
+  $('#howSub').textContent=cur.sub||'';
+  $('#howBody').innerHTML=`<p>${cur.text}</p>`;
+  $('#howBody').scrollTop=0;
+  box.hidden=false; sfx('open',.17);
+  const on=tabs.querySelector('.is-on'); if(on && on.scrollIntoView) on.scrollIntoView({block:'nearest', inline:'center'});
+}
+{ const box=$('#howto');
+  $('#howClose').addEventListener('click',()=>{ box.hidden=true; });
+  box.addEventListener('click', e=>{ if(e.target===box) box.hidden=true; });   // chạm nền cũng đóng
+  [['btnHowBattle','battle'],['btnHowSquad','stats'],['btnHowGacha','gacha']].forEach(([id,sec])=>{
+    const b=$('#'+id); if(b) b.addEventListener('click', e=>{ e.stopPropagation(); openHowto(sec); });
+  });
+  const w=$('#walletChips'); if(w) w.addEventListener('click',()=>openHowto('money'));
+  /* Chạm vào cụm chỉ số trên BẤT KỲ thẻ nhân vật nào → mục CHỈ SỐ. Bắt ở pha capture để cú chạm
+     không bị thẻ nuốt mất thành "chọn người vào đội". */
+  document.addEventListener('click', e=>{
+    const s=e.target.closest && e.target.closest('.card__stats'); if(!s) return;
+    e.stopPropagation(); e.preventDefault(); openHowto('stats');
+  }, true);
+}
+
+/* ---- Chỉ dẫn lần đầu vào một màn: hai ba câu, một lần cho mỗi hồ sơ (docs/ui-nguoi-moi.md §C5).
+   Dùng chung sổ `PLAYER.hintsSeen` với hint trong trận nên RESET TIẾN TRÌNH cũng xoá luôn. ---- */
+const TIPS = {
+  squad:   'Đội ra trận 3 người. Chạm vào thẻ bên dưới để đưa vào đội hoặc bỏ ra. Ai đang giữ bãi ở DẸP LOẠN thì không ra trận được — đổi ở màn bãi.',
+  map:     'Chạm vào khu vực đang sáng để xem danh sách màn của khu đó. Khu mờ là chương chưa mở.',
+  sector:  'Mỗi màn có vài đợt địch liên tiếp. Thắng lần đầu được thưởng đầy, đánh lại chỉ còn 25% — muốn cày nhanh thì bấm QUÉT.',
+  gacha:   'Quay bằng SH để lấy người mới. Trúng người đã có thì thành bản dư, đem sang CẤY GHÉP phân tách lấy LK. Thanh PITY đầy là lượt sau chắc chắn ra bậc cao.',
+  cyber:   'Mỗi nhân vật có 6 ô, mỗi ô một thang 10 bậc, nâng bằng LK và CR. Thang chỉ đi lên: không tháo, không hoàn.',
+  riotmap: 'Chiếm một cái bãi rồi để người ở lại giữ thì bãi đẻ kiện hàng theo giờ, kể cả lúc bạn không chơi. Người giữ bãi thì không ra trận được.',
+  archive: 'Hồ sơ nhân vật, sổ bộ kẻ địch, địa danh, thuật ngữ, truyện đã đọc — và tab CÁCH CHƠI nếu cần tra luật.',
+};
+const TIP_HOW = { squad:'stats', map:'loop', sector:'battle', gacha:'gacha', cyber:'meta', riotmap:'meta', archive:'loop' };
+function firstTimeTip(screen){
+  const t=TIPS[screen], box=$('#tipBox'); if(!t || !box) return;
+  const key='tip:'+screen; if(PLAYER.hintsSeen.includes(key)) return;
+  PLAYER.hintsSeen.push(key); savePlayer();
+  $('#tipText').textContent=t;
+  $('#tipHow').onclick=()=>{ box.hidden=true; openHowto(TIP_HOW[screen]||'loop'); };
+  box.hidden=false; sfx('open',.17);
+}
+$('#tipOk').addEventListener('click',()=>{ $('#tipBox').hidden=true; });
 const LORE_TAB = { cur:'skill' };
 /* Dòng dưới nút CYBERWARE trong hồ sơ — guard typeof vì kit.html không nạp js/cyber.js */
 function cyberBtnTxt(id){
@@ -385,7 +485,7 @@ function renderGacha(){
   if(!renderGacha.pre){ renderGacha.pre=true; Object.values(ROSTER).forEach(d=>{ if(d.reveal) loadFirst(d.reveal); }); }
   const art=$('#gachaArt');
   if(feat && art.dataset.id!==feat.id){ const p=portraitEl(feat); art.replaceWith(p); p.id='gachaArt'; p.dataset.id=feat.id; }
-  $('#gachaTag').textContent = feat ? `RATE-UP · TIER ${feat.tier}` : 'BỂ TRỐNG';
+  $('#gachaTag').textContent = feat ? `TỈ LỆ CAO · BẬC ${feat.tier}` : 'BỂ TRỐNG';
   $('#gachaFeat').textContent = feat ? feat.name : '—';
   $('#gRates').innerHTML = ['S','A','B'].map(t=>{
     const n=gachaPool(t,b).length;
@@ -409,7 +509,7 @@ function renderGacha(){
       : `Bể có <b>${pool.length}</b> đơn vị`
         + (unbeaten ? ` · còn <b>${unbeaten}</b> kẻ địch vào bể khi bị hạ ngoài trận` : '')
         + ` · 50% số lần ra bậc của người rate-up là chính họ · ×10 chắc chắn ≥1 A · trùng thành <b>bản dư</b>, không hoàn ${b.curLabel}`;
-  $('#gOwned').parentElement.innerHTML=`Owned <b id="gOwned">${have}</b>/${pool.length} · Pulls <b id="gPulls">${PLAYER.pulls}</b>`;
+  $('#gOwned').parentElement.innerHTML=`Đã có <b id="gOwned">${have}</b>/${pool.length} · Đã quay <b id="gPulls">${PLAYER.pulls}</b> lượt`;
   const canPull = pool.length>0;
   $('#btnPull1').disabled = !canPull || PLAYER[b.cur]<b.cost1;
   $('#btnPull10').disabled= !canPull || PLAYER[b.cur]<b.cost10;
@@ -621,7 +721,7 @@ function renderRiot(){
     const rw=done ? `DỌN LẠI +${Math.round(s.reward.credits*RIOT.replayPct)} CR` : `+${s.reward.credits} CR · +${s.reward.shards} SH`;
     r.innerHTML=`<span class="srow__id">${String(n).padStart(2,'0')}</span>
       <span><div class="srow__name">TẦNG ${n}${isBoss?' · TRÙM':''}</div>
-      <div class="srow__meta">${s.waves} WAVE · ĐỘ KHÓ ×${s.mult} · ATK GỢI Ý ${s.rec}+${isBoss?' · '+ENEMY_POOL.find(e=>e.id===s.boss).name:''}</div>
+      <div class="srow__meta">${s.waves} đợt địch · độ khó ×${s.mult} · nên có ATK ${s.rec}+${isBoss?' · '+ENEMY_POOL.find(e=>e.id===s.boss).name:''}</div>
       <div class="srow__waves">${Array.from({length:s.waves},(_,i)=>`<i class="${isBoss&&i===s.waves-1?'boss':''} ${done?'done':''}"></i>`).join('')}<span class="srow__rw">${rw}</span></div></span>
       <span class="srow__state">${done?'XONG':'MỚI'}</span>`;
     r.addEventListener('click',()=>{ RIOTV.tier=n; renderRiot(); });
@@ -629,7 +729,7 @@ function renderRiot(){
   }
   const s=riotSector(RIOTV.tier);
   $('#btnRiotGo').disabled=false;
-  $('#riotMeta').textContent=`TẦNG ${RIOTV.tier} · ${s.waves} WAVE · ĐỘ KHÓ ×${s.mult}`;
+  $('#riotMeta').textContent=`TẦNG ${RIOTV.tier} · ${s.waves} đợt địch · độ khó ×${s.mult}`;
   syncSweepBtn($('#btnRiotSweep'), $('#riotSweepMeta'), s);   // quét tầng đang chọn
 }
 /* Vào trận: gán SECTOR bằng object hình dạng sector của tầng đang chọn. go('battle') lo phần còn lại. */
@@ -740,7 +840,11 @@ function renderMap(){
   });
 }
 $('#btnContinueMap').addEventListener('click',()=>{ const a=currentArea(); if(a) openArea(a); });
-$('#btnContinue').addEventListener('click',()=>{ const a=currentArea(); if(a) openArea(a); else go('map'); });
+/* Hai nút cùng một việc: khối màn đang mở ở trên và nút CHƠI TIẾP ở dưới — cả hai vào thẳng
+   màn đang mở (docs/ui-nguoi-moi.md §C1). Người mới chỉ cần thấy một đường đi. */
+{ const play=()=>{ const a=currentArea(); if(a) openArea(a); else go('map'); };
+  $('#btnContinue').addEventListener('click', play);
+  const p=$('#btnPlay'); if(p) p.addEventListener('click', play); }
 
 /* ---- SECTOR SELECT — chỉ đổ các màn của khu vực chọn trên map (MAP_AREA); null = đổ hết ---- */
 function renderSectors(){
@@ -760,7 +864,7 @@ function renderSectors(){
       const r=el('button',`srow is-${sec.state} ${sec===SECTOR?'is-selected':''}`);
       const bossName = sec.boss ? ENEMY_POOL.find(e=>e.id===sec.boss).name : (sec.waves>2?'BOSS ???':'KHÔNG BOSS');
       r.innerHTML=`<span class="srow__id">${sec.id}</span>
-        <span><div class="srow__name">${sec.name}</div><div class="srow__meta">${sec.tag} · ${sec.waves} WAVE · ATK GỢI Ý ${sec.rec}+ · ${sec.state==='cleared'||sec.state==='open'?bossName:'???'}</div>
+        <span><div class="srow__name">${sec.name}</div><div class="srow__meta">${sec.tag} · ${sec.waves} đợt địch · nên có ATK ${sec.rec}+ · ${sec.state==='cleared'||sec.state==='open'?bossName:'???'}</div>
         <div class="srow__waves">${Array.from({length:sec.waves},(_,i)=>`<i class="${sec.boss&&i===sec.waves-1?'boss':''} ${sec.state==='cleared'?'done':''}"></i>`).join('')}<span class="srow__rw">${sec.state==='cleared'?'TUẦN TRA +'+Math.round(sec.reward.shards*.25)+' SH':'+'+sec.reward.shards+' SH'}</span></div></span>
         <span class="srow__state">${sec.state==='cleared'?'XONG':sec.state==='open'?'MỞ':'KHOÁ'}</span>`;
       if(sec.state==='locked') r.disabled=true;
@@ -772,7 +876,7 @@ function renderSectors(){
   const ok = SECTOR && SECTOR.state!=='locked';
   $('#btnEnter').disabled = !ok;
   $('#enterMeta').textContent = ok
-    ? `${SECTOR.id} · ${SECTOR.name} · ${SECTOR.waves} WAVE${SECTOR.team?' · ĐỘI CỐ ĐỊNH: '+SECTOR.team.map(i=>ROSTER[i].name).join(', '):''}`
+    ? `${SECTOR.id} · ${SECTOR.name} · ${SECTOR.waves} đợt địch${SECTOR.team?' · đội cố định: '+SECTOR.team.map(i=>ROSTER[i].name).join(', '):''}`
     : 'CHỌN MỘT MÀN ĐANG MỞ';
   syncSweepBtn($('#btnSweep'), $('#sweepMeta'), SECTOR);
 }

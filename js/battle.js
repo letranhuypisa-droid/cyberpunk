@@ -595,8 +595,14 @@ function updateUltButton(u){
   UI.ultName.textContent=u.ult.name;
   UI.ultBar.style.setProperty('--p', (u.energy/u.ult.cost*100)+'%');
   const kindTxt = u.ult.kind==='control'?'ĐIỀU KHIỂN':u.ult.kind==='heal'?'HỒI MÁU':u.ult.kind==='aoe'?'TOÀN BỘ ĐỊCH · '+Math.round(u.ult.mult*100)+'% ATK':Math.round(u.ult.mult*100)+'% ATK';
-  if(u.energy>=u.ult.cost){ UI.btnUlt.dataset.state='ready'; UI.ultMeta.textContent=`${u.energy}/${u.ult.cost} · ${kindTxt}`; }
-  else { UI.btnUlt.dataset.state='locked'; UI.ultMeta.textContent=`THIẾU ${u.ult.cost-u.energy} EN · ${u.energy}/${u.ult.cost}`; }
+  if(u.energy>=u.ult.cost){ UI.btnUlt.dataset.state='ready'; UI.ultMeta.textContent=`SẴN SÀNG · ${kindTxt}`; }
+  else {
+    /* Người mới không đọc được "THIẾU 100 EN" — họ cần biết còn phải đánh mấy đòn nữa
+       (docs/ui-nguoi-moi.md §C3). Số Energy vẫn in ở sau cho người muốn con số. */
+    const per=(u.skill&&u.skill.energy)||25, left=Math.ceil((u.ult.cost-u.energy)/per);
+    UI.btnUlt.dataset.state='locked';
+    UI.ultMeta.textContent=`CÒN ${left} ĐÒN NỮA · ${u.energy}/${u.ult.cost} EN`;
+  }
   const sk=u.skill||{};
   UI.ultInfo.innerHTML=`<b>${u.name} · ${u.ult.name}</b>${u.ult.desc}<span class="mono">COST ${u.ult.cost} · ENERGY ${u.energy}/${u.energyMax}</span>`
     + (sk.desc?`<span class="mono">ĐÒN THƯỜNG: ${sk.desc}</span>`:'')
@@ -722,7 +728,7 @@ async function winReward(g){
   let txt;
   if(first){ PLAYER.cleared.push(SECTOR.id); PLAYER.shards+=SECTOR.reward.shards; PLAYER.credits+=SECTOR.reward.credits; savePlayer();
     txt=`LẦN ĐẦU · +${SECTOR.reward.shards} SH · +${SECTOR.reward.credits} CR`;
-    if(SECTOR.unlock && !owns(SECTOR.unlock)){ PLAYER.owned.push(SECTOR.unlock); savePlayer(); txt+=`<br>NHÂN VẬT MỚI · ${ROSTER[SECTOR.unlock].name} — đọc hồ sơ ở ARCHIVE`; } }
+    if(SECTOR.unlock && !owns(SECTOR.unlock)){ PLAYER.owned.push(SECTOR.unlock); savePlayer(); txt+=`<br>NHÂN VẬT MỚI · ${ROSTER[SECTOR.unlock].name} — đọc hồ sơ ở THƯ VIỆN`; } }
   else { const sh=Math.round(SECTOR.reward.shards*.25), cr=Math.round(SECTOR.reward.credits*.25);   // chơi lại = tuần tra, 25% thưởng
     PLAYER.shards+=sh; PLAYER.credits+=cr; savePlayer(); txt=`TUẦN TRA · +${sh} SH · +${cr} CR`; }
   syncSectorStates();

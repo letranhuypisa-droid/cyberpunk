@@ -822,6 +822,45 @@ button.hero__mission:hover i{color:var(--text-1)}
 .srow__waves{display:flex;gap:3px;margin-top:6px}
 .srow__waves i{width:16px;height:4px;background:var(--surface-4);clip-path:var(--poly-slant)} .srow__waves i.boss{background:var(--hp-low)} .srow__waves i.done{background:var(--hp)}
 
+/* =====================================================================
+   GIAO DIỆN CHO NGƯỜI MỚI (đợt 6 — docs/ui-nguoi-moi.md)
+   ===================================================================== */
+/* Hai nút ở HOME: CHƠI TIẾP to hơn ĐỔI ĐỘI, vì một cái là việc chính còn cái kia là việc thỉnh thoảng */
+.hero__acts{display:grid;grid-template-columns:1.45fr 1fr;gap:8px}
+.hero__acts .btn-act{height:52px}
+/* Nút menu bị khoá: vẫn đọc được tên (để biết game còn gì phía trước) nhưng mờ và không bấm được */
+.menu__btn.is-locked{opacity:.42;cursor:not-allowed}
+.menu__btn.is-locked small{color:var(--hp-low)}
+/* CÁCH CHƠI — overlay tra cứu, mở được cả khi đang trong trận */
+.howto{position:absolute;inset:0;z-index:70;display:grid;place-items:end center;background:rgba(6,7,10,.86)}
+.howto[hidden]{display:none}
+.howto__box{width:100%;max-height:82%;display:grid;grid-template-rows:auto auto minmax(0,1fr);
+  border-top:1px solid var(--line-2);background:var(--bg-1);animation:result-in 200ms var(--ease-hit-out)}
+.howto__tabs{display:flex;gap:6px;padding:8px 10px;overflow-x:auto;border-bottom:1px solid var(--line-1);scrollbar-width:none}
+.howto__tabs::-webkit-scrollbar{display:none}
+.howto__tabs .lore__tab{flex:0 0 auto}
+.howto__body{padding:14px 14px calc(18px + env(safe-area-inset-bottom));overflow:auto;
+  font:var(--fs-sm)/1.65 var(--font-ui);color:var(--text-2)}
+.howto__body b{color:var(--text-1)}
+/* Tab CÁCH CHƠI trong THƯ VIỆN: danh sách chữ, không ảnh */
+.arch--howto{display:grid;grid-template-columns:1fr;gap:8px;align-content:start}
+.howtile{display:block;width:100%;padding:12px;text-align:left;border:1px solid var(--line-1);background:var(--surface-1);
+  color:var(--text-1);clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px)}
+.howtile:hover{border-color:var(--line-3)}
+.howtile b{display:block;font:700 var(--fs-sm)/1 var(--font-ui);letter-spacing:.18em;text-transform:uppercase}
+.howtile small{display:block;margin-top:5px;font:var(--fs-2xs)/1.3 var(--font-mono);color:var(--text-3)}
+/* Chỉ dẫn lần đầu vào một màn */
+.tip{position:absolute;inset:0;z-index:68;display:grid;place-items:center;padding:18px;background:rgba(6,7,10,.7)}
+.tip[hidden]{display:none}
+.tip__box{max-width:330px;padding:16px;border:1px solid var(--energy);background:var(--surface-1);
+  clip-path:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px)}
+.tip__k{font:800 8px/1 var(--font-mono);letter-spacing:.24em;color:var(--energy)}
+.tip__t{margin:10px 0 14px;font:var(--fs-sm)/1.6 var(--font-ui);color:var(--text-1)}
+.tip__row{display:flex;gap:8px;align-items:center;justify-content:space-between}
+.tip__row .btn-act{height:44px;flex:1}
+/* Cụm chỉ số trên thẻ và cụm tiền ở HOME: chạm được nên phải trông như chạm được */
+.card__stats,.topbar__cur{cursor:pointer}
+
 /* ---- Thanh đáy hai nút: VÀO TRẬN + QUÉT (docs/che-do-choi.md §D). Nút vào trận rộng hơn — nó vẫn là việc chính ---- */
 .entbar{display:grid;grid-template-columns:1.3fr 1fr;gap:8px}
 .entbar .btn-act{height:52px}
