@@ -13,7 +13,7 @@ const ctx={ console, Math, JSON, Object, Array, Set, Map, Number, String, Date, 
   rand:a=>a[Math.floor(Math.random()*a.length)] };
 ctx.window=ctx; vm.createContext(ctx);
 vm.runInContext(fs.readFileSync(path.join(__dirname,'..','js','data.js'),'utf8'), ctx, {filename:'data.js'});
-const { ROSTER, ENEMY_POOL, SECTORS, RULES, TEAM_SIZE } = vm.runInContext('({ROSTER,ENEMY_POOL,SECTORS,RULES,TEAM_SIZE})', ctx);
+const { ROSTER, ENEMY_POOL, SECTORS, RULES, TEAM_SIZE, ASCEND } = vm.runInContext('({ROSTER,ENEMY_POOL,SECTORS,RULES,TEAM_SIZE,ASCEND:typeof ASCEND!=="undefined"?ASCEND:[]})', ctx);
 SECTORS.forEach(s=>{ if(OVR[s.id]!=null) s.mult=OVR[s.id]; });
 // Thử số liệu khác không cần sửa data.js: SIM_PATCH="ROSTER.ash.skill.status.pct=.15" node scratch/sim.js 300
 if(process.env.SIM_PATCH) vm.runInContext(process.env.SIM_PATCH, ctx);
@@ -116,7 +116,20 @@ function runSector(sec, teamIds){
    tỉ lệ thắng thật — lệch quá ±10 điểm thì chỉnh ngưỡng ở powerVerdict() hoặc mult của bãi. ---- */
 if(process.argv.includes('--yard')){
   const li=process.argv.indexOf('--lv'), LV = li>0 ? +process.argv[li+1]||1 : 1;
-  if(LV>1){ const k=1+.04*(LV-1); TEAM_ARG.forEach(id=>{ const d=ROSTER[id]; if(!d) return; d.atk=Math.round(d.atk*k); d.hp=Math.round(d.hp*k); }); }
+  /* Cấp nâng cấp VÀ đột phá đi kèm nhau: cấp 5/10/15 là cửa chặn trong game (ASCEND ở js/data.js), nên
+     "đội cấp 20" ngoài đời luôn là đội đã đủ bốn sao. Sim phải mô phỏng đúng thế, không thì bảng dò bãi
+     báo khó hơn thực tế. CRIT/Energy/chiêu cuối của đột phá chưa mô phỏng — bảng vẫn là SÀN. */
+  const ASC = (ASCEND||[]).filter(s=>LV>=s.lv);
+  /* Phần PHI-CHỈ-SỐ của đột phá (Energy mở màn, chiêu cuối ×1.15) — cùng công thức với ascPowerExtra()
+     trong js/state.js. Phải cộng tay ở đây vì sim giả lập cấp bằng cách nhân thẳng vào def chứ không
+     đi qua PLAYER.levels/PLAYER.asc, nên unitStats() không nhìn thấy gì. */
+  const ASC_EXTRA = ASC.length ? (ASC.some(s=>s.energyStart)?.03:0) + (ASC.reduce((m,s)=>m*(s.ultMult||1),1)-1)*.5 : 0;
+  if(LV>1){
+    const kAsc = ASC.reduce((m,s)=>m*(s.statPct?1+s.statPct/100:1), 1);
+    const k=(1+.04*(LV-1))*kAsc;
+    TEAM_ARG.forEach(id=>{ const d=ROSTER[id]; if(!d) return; d.atk=Math.round(d.atk*k); d.hp=Math.round(d.hp*k); });
+    if(ASC.length) console.log(`(đột phá: ${ASC.length} sao → ×${kAsc.toFixed(3)} ATK/HP, sức mạnh +${Math.round(ASC_EXTRA*100)}% phần phi-chỉ-số)`);
+  }
   vm.runInContext(fs.readFileSync(path.join(__dirname,'..','js','state.js'),'utf8'), ctx, {filename:'state.js'});
   vm.runInContext(fs.readFileSync(path.join(__dirname,'..','js','riot.js'),'utf8'), ctx, {filename:'riot.js'});
   const { RIOT_YARDS, yardSector, yardPower, powerVerdict, teamPower } = vm.runInContext('({RIOT_YARDS,yardSector,yardPower,powerVerdict,teamPower})', ctx);
@@ -124,7 +137,7 @@ if(process.argv.includes('--yard')){
   const mi=process.argv.indexOf('--ymult');
   if(mi>0) (process.argv[mi+1]||'').split(',').filter(Boolean).forEach(x=>{ const [id,v]=x.split('='); const y=RIOT_YARDS.find(q=>q.id===id); if(y) y.mult=+v; });
   const oi=process.argv.indexOf('--only'), ONLY = oi>0 ? process.argv[oi+1] : null;
-  const mine=teamPower(TEAM_ARG);
+  const mine=Math.round(teamPower(TEAM_ARG)*(1+ASC_EXTRA));
   console.log(`team=${TEAM_ARG.join('+')} cấp ${LV} · sức mạnh đội ${mine} · ${N} trận/bãi`);
   for(const y of RIOT_YARDS){
     if(ONLY && y.id!==ONLY) continue;

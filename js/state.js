@@ -33,8 +33,55 @@ const lvl = id => (PLAYER.levels && PLAYER.levels[id]) || 1;
 const statMult = id => 1 + UPGRADE.statPerLevel*(lvl(id)-1);
 function upgrade(id){
   const l=lvl(id); if(l>=UPGRADE.maxLevel) return 'max';
+  if(l>=ascCap(id)) return 'gate';                                  // tới trần tạm: phải ĐỘT PHÁ mới lên tiếp
   const c=UPGRADE.cost(l); if(PLAYER.credits<c) return 'poor';
   PLAYER.credits-=c; PLAYER.levels=PLAYER.levels||{}; PLAYER.levels[id]=l+1; savePlayer(); return 'ok';
+}
+
+/* =====================================================================
+   ĐỘT PHÁ (đợt 7 · D4 — bảng mốc ở ASCEND trong js/data.js, đặc tả ở docs/dot-pha.md)
+   Cấp 5/10/15 là cửa: hết CR cũng không qua được cho tới khi đột phá. Vì cửa chặn nên số sao suy được
+   từ cấp — nhưng vẫn lưu riêng ở PLAYER.asc, để "đang ở cấp 5 và ĐÃ đột phá" khác "đang ở cấp 5 và chưa".
+   ===================================================================== */
+const ascStars = id => (PLAYER.asc && PLAYER.asc[id]) || 0;
+/* Trần cấp hiện tại: chưa sao nào thì 5, một sao thì 10… đủ bốn sao thì chạm trần chung UPGRADE.maxLevel */
+const ascCap = id => Math.min(UPGRADE.maxLevel, ASCEND[ascStars(id)] ? ASCEND[ascStars(id)].lv : UPGRADE.maxLevel);
+/* Mốc sắp tới (null nếu đã đủ bốn sao) */
+const ascNext = id => ASCEND[ascStars(id)] || null;
+const dupesOf = id => (PLAYER.extra && PLAYER.extra[id]) || 0;
+/* Vì sao chưa đột phá được — trả về chuỗi lý do để nút nói thẳng thay vì chỉ mờ đi */
+function ascWhy(id){
+  const m=ascNext(id); if(!m) return 'max';
+  if(lvl(id) < m.lv) return 'level';                                // chưa tới cấp mốc
+  if(PLAYER.credits < m.cr) return 'cr';
+  if(dupesOf(id) < m.dupes && PLAYER.parts < m.lk) return 'pay';    // không đủ CẢ HAI đường trả
+  return 'ok';
+}
+const canAscend = id => ascWhy(id)==='ok';
+/* Trả bằng gì: 'dupes' nếu còn đủ bản dư, không thì 'lk'. Bản dư luôn là đường rẻ nên ưu tiên khi có đủ. */
+const ascPayWith = id => { const m=ascNext(id); if(!m) return null; return dupesOf(id)>=m.dupes ? 'dupes' : 'lk'; };
+function ascend(id, pay){
+  const m=ascNext(id); if(!m) return 'max';
+  if(lvl(id) < m.lv) return 'level';
+  if(PLAYER.credits < m.cr) return 'cr';
+  pay = pay || ascPayWith(id);
+  if(pay==='dupes'){ if(dupesOf(id) < m.dupes) return 'pay';
+    PLAYER.extra[id] = dupesOf(id) - m.dupes; if(!PLAYER.extra[id]) delete PLAYER.extra[id]; }
+  else { if(PLAYER.parts < m.lk) return 'pay'; PLAYER.parts -= m.lk; }
+  PLAYER.credits -= m.cr;
+  PLAYER.asc = PLAYER.asc || {}; PLAYER.asc[id] = ascStars(id) + 1;
+  savePlayer(); return 'ok';
+}
+/* Cộng dồn thưởng của những sao ĐÃ đạt. statPct nhân dồn (1.06 × 1.06), giống cách cyberware nối vào. */
+function ascBonus(id){
+  const n=ascStars(id); const b={ statMult:1, crit:0, energyStart:0, ultMult:1 };
+  for(let i=0;i<n && i<ASCEND.length;i++){ const m=ASCEND[i];
+    if(m.statPct) b.statMult *= 1 + m.statPct/100;
+    if(m.crit) b.crit += m.crit;
+    if(m.energyStart) b.energyStart = Math.max(b.energyStart, m.energyStart);
+    if(m.ultMult) b.ultMult *= m.ultMult;
+  }
+  return b;
 }
 
 /* =====================================================================
@@ -45,15 +92,18 @@ function upgrade(id){
    ===================================================================== */
 /* Cấp nâng cấp NHÂN trước, cyberware nhân sau — hai nguồn nhân nhau chứ không cộng dồn phần trăm.
    cyberBonus() ở js/cyber.js nạp sau file này, nên phải guard typeof (kit.html cũng không nạp nó). */
+/* Ba nguồn, nhân/cộng theo đúng thứ tự: cấp nâng cấp (nhân) × đột phá (nhân) × cyberware (nhân);
+   CRIT thì cộng thẳng. Đột phá nằm giữa vì nó là phần thưởng của chính thang cấp. */
 function unitStats(id){
   const d = (typeof ROSTER!=='undefined' && ROSTER[id]) || null;
   if(!d) return { atk:0, hp:0, spd:100, crit:0 };
   const m = statMult(id);
+  const a = typeof ascBonus==='function' ? ascBonus(id) : { statMult:1, crit:0 };
   const c = typeof cyberBonus==='function' ? cyberBonus(id) : { atkPct:0, hpPct:0, spd:0, crit:0 };
-  return { atk:  Math.round(d.atk*m*(1+(c.atkPct||0)/100)),
-           hp:   Math.round(d.hp *m*(1+(c.hpPct ||0)/100)),
+  return { atk:  Math.round(d.atk*m*a.statMult*(1+(c.atkPct||0)/100)),
+           hp:   Math.round(d.hp *m*a.statMult*(1+(c.hpPct ||0)/100)),
            spd:  Math.round((d.spd||100) + (c.spd||0)),
-           crit: Math.round((d.crit||0)  + (c.crit||0)) };
+           crit: Math.round((d.crit||0)  + (a.crit||0) + (c.crit||0)) };
 }
 /* Chỉ số GỐC (đã tính cấp, chưa tính cyberware) — màn CYBERWARE in "145 → 168" cần vế trái này */
 function baseStats(id){
@@ -64,7 +114,16 @@ function baseStats(id){
 }
 /* Sức mạnh tổng — thước đo duy nhất cho ngưỡng giữ bãi ở chế độ chiếm bãi.
    Trọng số ★ FAKE, đo bằng đội mở đầu: Yuki cấp 1 ≈ 1.494 · yuki+ash+kai ≈ 4.200. */
-const power = id => { const s=unitStats(id); return Math.round(s.atk*4 + s.hp*.6 + s.spd*2 + s.crit*6); };
+/* Hai thưởng đột phá KHÔNG nằm trong bốn chỉ số (Energy vào trận, chiêu cuối ×1.15) nên phải cộng tay,
+   nếu không thì nhãn độ khó ở DẸP LOẠN nói dối: đo 16/09 thấy đội cấp 20 đủ bốn sao thắng 94–100% ở ba
+   cái bãi mà nhãn vẫn ghi NGANG SỨC (docs/dot-pha.md §F). 0.03 cho Energy mở màn + một nửa phần chiêu
+   cuối tăng thêm — nửa còn lại coi như đã nằm trong ATK. */
+function ascPowerExtra(id){
+  if(typeof ascBonus!=='function') return 0;
+  const a=ascBonus(id);
+  return (a.energyStart?.03:0) + (a.ultMult>1 ? (a.ultMult-1)*.5 : 0);
+}
+const power = id => { const s=unitStats(id); return Math.round((s.atk*4 + s.hp*.6 + s.spd*2 + s.crit*6) * (1+ascPowerExtra(id))); };
 const teamPower = ids => (ids||[]).filter(Boolean).reduce((s,id)=>s+power(id), 0);
 
 /* ---- Nhiệm vụ ngày ★ FAKE: reset theo ngày địa phương ---- */

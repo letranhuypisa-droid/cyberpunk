@@ -169,7 +169,9 @@ chơi, và vì chỉ nhận một lần mỗi ngày nên không có đường t�
 **Chuỗi ngày cố ý không gãy:** nghỉ một hôm chỉ làm mốc sau tới chậm hơn, không mất gì — và câu đó được
 **in thẳng trên đầu danh sách** chứ không để người chơi tự đoán.
 
-Còn để dành: **D3** (hợp đồng tháng) · **D4** (đột phá cấp 5/10/15/20) · **D6** (kéo nhiệm vụ tuần ra khỏi
+**D4 (đột phá) đã làm ngay sau đó** — đặc tả và số đo riêng ở `docs/dot-pha.md`.
+
+Còn để dành: **D3** (hợp đồng tháng) · **D6** (kéo nhiệm vụ tuần ra khỏi
 DẸP LOẠN) · **D7** (việc hôm nay xoay theo thứ). D3 phải kèm một lượt tính lại tổng SH mỗi tuần —
 `node scratch/riot_econ.js` mới đo phần thu nhập từ bãi, chưa đo phần nhiệm vụ.
 

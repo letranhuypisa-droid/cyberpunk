@@ -483,6 +483,33 @@ function passiveInfo(p){
     return { def:{name:'',faction:w.enemyFaction,portrait:[]}, cond:`ĐỊCH PHE ${w.enemyFaction.toUpperCase()}`, state: secs.length?'SECTOR '+secs.join(' · '):'CHƯA GẶP', cls:'' }; }
   return { def:null, cond:'LUÔN BẬT', state:'ĐANG BẬT', cls:'is-active' };
 }
+/* ---- Khối ĐỘT PHÁ trong hồ sơ nhân vật (docs/dot-pha.md) ----
+   Bốn ô sao: đã đạt thì sáng và ghi thưởng, chưa tới thì mờ và ghi điều kiện. Nút dưới cùng nói rõ
+   PHẢI TRẢ GÌ — bản dư của chính người đó (rẻ) hoặc LINH KIỆN (luôn có, cho Yuki/Psalm không vào bể quay).
+   Guard typeof vì kit.html không nạp state.js. */
+function ascBlock(id){
+  if(typeof ASCEND==='undefined' || typeof ascStars!=='function') return '';
+  const n=ascStars(id), m=ascNext(id), L1=lvl(id);
+  const cells = ASCEND.map(s=>{
+    const got=s.star<=n, cur=m&&m.star===s.star;
+    return `<div class="asc__cell${got?' is-on':''}${cur?' is-next':''}"><b>${'★'.repeat(s.star)}</b><small>LV ${s.lv}</small><em>${s.label}</em></div>`;
+  }).join('');
+  let btn='';
+  if(m){
+    const why=ascWhy(id), pay=ascPayWith(id), have=dupesOf(id);
+    const priceTxt = `${m.cr.toLocaleString('en-US')} CR + ` + (pay==='dupes' ? `${m.dupes} bản dư` : `${m.lk} LK`);
+    const txt = why==='level' ? `Cần lên cấp ${m.lv} trước (đang ${L1})`
+              : why==='cr'    ? `Thiếu CR · cần ${m.cr.toLocaleString('en-US')}`
+              : why==='pay'   ? `Cần ${m.dupes} bản dư ${ROSTER[id].name} (đang có ${have}) hoặc ${m.lk} LK`
+              : `${priceTxt} → ${m.label}`;
+    btn = `<button class="btn-act btn-act--go asc__go" id="loreAsc" ${why==='ok'?'':'disabled'}>
+      <span class="btn-act__k">Đột phá ★${m.star}</span><span class="btn-act__v">${txt}</span></button>`;
+  } else {
+    btn = `<div class="asc__max">ĐỦ BỐN SAO · đã chạm đỉnh của thang cấp</div>`;
+  }
+  return `<div class="asc"><div class="asc__hd"><b>ĐỘT PHÁ</b><small>${n}/4 sao · trần cấp hiện tại ${ascCap(id)}</small></div>
+    <div class="asc__grid">${cells}</div>${btn}</div>`;
+}
 /* Trang hồ sơ — dùng chung cho 19 nhân vật (tab NHÂN VẬT) và 21 kẻ địch (tab SỔ BỘ), xem
    docs/archive-merge.md. Ba mức, quyết bởi việc đơn vị này có def chơi được và đã sở hữu chưa:
      đã sở hữu          KỸ NĂNG · PASSIVE · HỒ SƠ  (đầy đủ, có nút Upgrade)
@@ -514,14 +541,16 @@ function openLore(id){
   let skillHtml='', tabsHtml='';
   if(kit){
     const st=unitStats(id), L1=lvl(id), sk=d.skill||{};   // cùng hàm với thẻ nhân vật và lúc vào trận
-    const upTxt = L1>=UPGRADE.maxLevel ? 'MAX' : `LV ${L1+1} · ${UPGRADE.cost(L1).toLocaleString('en-US')} CR`;
+    const gated = typeof ascCap==='function' && L1>=ascCap(id) && L1<UPGRADE.maxLevel;   // chạm trần tạm, phải đột phá
+    const upTxt = L1>=UPGRADE.maxLevel ? 'MAX' : gated ? `CẦN ĐỘT PHÁ ★${ascStars(id)+1}` : `LV ${L1+1} · ${UPGRADE.cost(L1).toLocaleString('en-US')} CR`;
     const kindTxt = d.ult.kind==='control'?'ĐIỀU KHIỂN':d.ult.kind==='heal'?'HỒI MÁU':d.ult.kind==='aoe'?'TOÀN BỘ ĐỊCH':'MỘT MỤC TIÊU';
     tabsHtml = `<div class="lore__tabs"><button class="lore__tab" data-tab="skill">Kỹ năng</button><button class="lore__tab" data-tab="passive">Passive</button><button class="lore__tab" data-tab="lore">Hồ sơ</button></div>`;
     skillHtml = `
     <div class="lore__pane lore__pane--skill">
       <div class="lore__stats"><span class="pill"><small>LV</small>${L1}</span><span class="pill"><small>ATK</small>${st.atk}</span><span class="pill"><small>HP</small>${st.hp}</span><span class="pill"><small>EN</small>${d.energyMax}</span><span class="pill"><small>SPD</small>${st.spd}</span><span class="pill"><small>CRIT</small>${st.crit+(sk.critPct||0)}%</span>
-        <button class="btn-act btn-act--go lore__up" id="loreUp" ${L1>=UPGRADE.maxLevel||PLAYER.credits<UPGRADE.cost(L1)?'disabled':''}><span class="btn-act__k">Upgrade</span><span class="btn-act__v">${upTxt} · +${Math.round(UPGRADE.statPerLevel*100)}% ATK/HP</span></button>
-        <button class="btn-act lore__up" id="loreCyber"><span class="btn-act__k">Cyberware</span><span class="btn-act__v">${cyberBtnTxt(id)}</span></button></div>
+        <button class="btn-act btn-act--go lore__up" id="loreUp" ${L1>=UPGRADE.maxLevel||gated||PLAYER.credits<UPGRADE.cost(L1)?'disabled':''}><span class="btn-act__k">Nâng cấp</span><span class="btn-act__v">${upTxt}${L1>=UPGRADE.maxLevel||gated?'':` · +${Math.round(UPGRADE.statPerLevel*100)}% ATK/HP`}</span></button>
+        <button class="btn-act lore__up" id="loreCyber"><span class="btn-act__k">Cấy ghép</span><span class="btn-act__v">${cyberBtnTxt(id)}</span></button></div>
+      ${ascBlock(id)}
       ${L.weapon?`<div class="lore__ult"><b>VŨ KHÍ</b><span class="lore__flavor">${L.weapon}</span></div>`:''}
       <div class="lore__ult lore__skill"><b>ĐÒN THƯỜNG</b>${L.attack?`<span class="lore__flavor">${L.attack}</span>`:''}<span>${sk.desc||'100% ATK, +25 Energy.'}</span></div>
       <div class="lore__ult"><b>CHIÊU CUỐI · ${d.ult.name}</b>${L.ultFlavor?`<span class="lore__flavor">${L.ultFlavor}</span>`:''}<span>${d.ult.desc}</span><div class="lore__pills"><span class="pill"><small>COST</small>${d.ult.cost} EN</span><span class="pill">${kindTxt}</span>${d.ult.mult?`<span class="pill">${Math.round(d.ult.mult*100)}% ATK</span>`:''}</div></div>
@@ -556,6 +585,12 @@ function openLore(id){
   body.querySelectorAll('.lore__tab').forEach(x=>x.classList.toggle('is-on',x.dataset.tab===box.dataset.tab));
   body.scrollTop=0; box.hidden=false;
   const up=$('#loreUp'); if(up) up.addEventListener('click',()=>{ const r=upgrade(id); if(r==='ok'){ AUDIO.upgrade(); renderWallet(); const sc=body.scrollTop; openLore(id); body.scrollTop=sc; } else sfx('error',.4); });
+  /* Đột phá: dựng lại cả trang vì nó đổi chỉ số, đổi trần cấp và đổi luôn nút nâng cấp ở trên */
+  const asc=$('#loreAsc'); if(asc) asc.addEventListener('click',()=>{
+    const r=ascend(id); if(r!=='ok') return sfx('error',.4);
+    AUDIO.ready(); AUDIO.upgrade(); renderWallet();
+    const sc=body.scrollTop; openLore(id); $('#loreBody').scrollTop=sc;
+  });
   const cy=$('#loreCyber'); if(cy) cy.addEventListener('click',()=>{ if(typeof openCyberFor==='function') openCyberFor(id); });
 }
 $('#loreClose').addEventListener('click',()=>{ $('#lore').hidden=true; });

@@ -83,6 +83,25 @@ function applyStaticPassives(u, teamIds, enemyDefs){
   u.atk=Math.round(u.atk*atk); u.hpMax=Math.round(u.hpMax*hp); u.hp=u.hpMax; u.energy=Math.min(u.energyMax,en);
   u.active.forEach(p=>u.chips.push({type:'buff',label:p.tag||p.name,pas:p.id}));   // pas → chip chạm được, mở bảng nội tại
 }
+/* ---- ĐỘT PHÁ: hai thưởng chỉ sống trong trận (docs/dot-pha.md §C) ----
+   ★II = vào trận có sẵn Energy — lấy MAX với Energy do passive cho, không cộng dồn, nếu không hai nguồn
+         cùng loại sẽ nhân đôi một thứ vốn chỉ nên có một lần.
+   ★IV = chiêu cuối ×1.15 — nhân vào MỌI con số độ lớn của chiêu (hệ số, % hồi, % khiên, sát thương cố định)
+         nhưng KHÔNG đụng cost/hits/drainEnergy: "mạnh hơn 15%" chứ không phải "rẻ hơn" hay "nhiều nhịp hơn".
+   Chỉ áp cho đội mình; bản chiêu mộ đứng phía địch vẫn dùng def gốc trong ENEMY_POOL.
+   Lưu ý đã biết: `ult.desc` là chữ viết tay trong data.js nên vẫn in số GỐC — nút chiêu và bảng chỉ số
+   đọc `u.ult.mult` nên hiện số thật; chênh này được ghi ở docs/dot-pha.md thay vì sinh 39 câu mô tả mới. */
+function applyAscend(u, id){
+  const a = typeof ascBonus==='function' ? ascBonus(id) : null;
+  if(!a) return;
+  if(a.energyStart) u.energy = Math.min(u.energyMax, Math.max(u.energy, a.energyStart));
+  if(a.ultMult && a.ultMult!==1 && u.ult){
+    const k=a.ultMult, o={...u.ult};
+    ['mult','healPct','shieldPct','flat'].forEach(key=>{ if(o[key]) o[key]=Math.round(o[key]*k*1000)/1000; });
+    o.ascMult=k; u.ult=o;
+  }
+  u.stars = typeof ascStars==='function' ? ascStars(id) : 0;
+}
 /* Passive theo đòn: đồng đội → luôn áp; địch → chỉ khi mục tiêu đúng id / đúng phe */
 const scopeHits = (w,other) => !w || w.always || w.ally || w.allyAny || (w.enemy && other.id===w.enemy) || (w.enemyFaction && other.side==='enemy' && other.faction===w.enemyFaction);
 function passiveMods(src,tgt){
@@ -113,7 +132,7 @@ function initBattle(){
   // đội mình: nhân ATK/HP theo cấp nâng cấp (state.js), rồi áp passive tĩnh
   // unitStats (state.js) = chỉ số cuối: gốc × cấp nâng cấp × linh kiện × cyberware. Thẻ nhân vật đọc cùng hàm này
   // nên con số trên thẻ và con số vào trận luôn khớp.
-  B.units = team.map((id,i)=>{ const d=ROSTER[id], s=unitStats(id); const u=makeUnit({...d, ...s, level:lvl(id)},'ally',i); applyStaticPassives(u,team,enemyDefs); return u; });
+  B.units = team.map((id,i)=>{ const d=ROSTER[id], s=unitStats(id); const u=makeUnit({...d, ...s, level:lvl(id)},'ally',i); applyStaticPassives(u,team,enemyDefs); applyAscend(u,id); return u; });
   B.round=0; B.idx=0; B.target=null; B.busy=false; B.over=false; B.wave=0; B.queue=[]; B.opened=[];
   UI.log.innerHTML=''; UI.result.hidden=true; UI.fx.innerHTML=''; turnTiles.clear();
   UI.sectorNo.textContent=SECTOR.id; UI.waveNo.textContent=`0/${SECTOR.waves}`; UI.roundNo.textContent='00';

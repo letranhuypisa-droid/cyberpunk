@@ -175,9 +175,12 @@ function cardEl(def, state){
      kit.html không nạp state.js nên thiếu unitStats thì rơi về chỉ số gốc của def. */
   const st = typeof unitStats==='function' ? unitStats(def.id) : def;
   const up = st.atk>def.atk;                                      // có nâng cấp → tô sáng cụm chỉ số
+  // Sao đột phá (docs/dot-pha.md): dấu duy nhất phân biệt hai người cùng bậc, cùng cấp
+  const stars = typeof ascStars==='function' ? ascStars(def.id) : 0;
   const body=el('div','card__body');
   body.appendChild(Object.assign(portraitEl(def,'card__portrait'),{}));
   body.insertAdjacentHTML('beforeend', `<div class="card__tier">${def.tier}</div><div class="card__fac">${def.faction}</div>
+    ${stars?`<div class="card__stars">${'★'.repeat(stars)}</div>`:''}
     <div class="card__info"><div class="card__name">${def.name}</div>
     <div class="card__stats${up?' is-up':''}"><span><b>ATK</b><em>${st.atk}</em></span><span><b>HP</b><em>${st.hp}</em></span><span><b>SPD</b><em>${st.spd||0}</em></span><span><b>CRIT</b><em>${st.crit||0}%</em></span></div></div>
     <div class="card__state">${state==='selected'?'SELECTED':state==='locked'?'LOCKED':''}</div>`);

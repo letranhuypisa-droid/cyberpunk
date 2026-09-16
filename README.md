@@ -236,6 +236,24 @@ lá trùng gacha → PHÂN TÁCH → LINH KIỆN (LK) → nâng bậc 6 ô cyber
 
 > `scratch/sim.js` **chưa mô phỏng cyberware** — bảng tỉ lệ thắng ở `docs/dep-loan.md` §F1 là **sàn**.
 
+## ĐỘT PHÁ — bốn cái đích trên thang 20 cấp (16/09, đợt 7 · D4)
+
+Đặc tả + số đo: `docs/dot-pha.md`. Cấp **5 · 10 · 15** là **trần tạm** — đủ CR cũng không lên tiếp được cho tới
+khi ĐỘT PHÁ; cấp 20 là đỉnh. Bảng mốc ở `ASCEND` (`js/data.js`), logic ở `js/state.js`.
+
+| Mốc | Ở cấp | Giá | Thưởng |
+|---|---|---|---|
+| ★ I | 5 | 2.000 CR + 1 bản dư *hoặc* 60 LK | +6% ATK/HP |
+| ★ II | 10 | 6.000 CR + 1 bản dư *hoặc* 90 LK | vào trận có sẵn 20 Energy |
+| ★ III | 15 | 12.000 CR + 2 bản dư *hoặc* 150 LK | +6% ATK/HP · +5 CRIT |
+| ★ IV | 20 | 24.000 CR + 3 bản dư *hoặc* 240 LK | chiêu cuối ×1.15 hệ số |
+
+- **Hai cách trả**: bản dư của chính nhân vật đó (rẻ) hoặc LINH KIỆN (luôn có). Yuki và Psalm không nằm
+  trong bể quay nên vĩnh viễn không có bản dư — thiếu đường LK thì hai người quan trọng nhất game kẹt ở cấp 5.
+- **Cân bằng:** 6 màn chương 1 **không đổi** (sim đánh bằng đội cấp 1). DẸP LOẠN thì đổi thật: đội cấp 20
+  đủ bốn sao thắng **96–100%** cả chín bãi (trước đó ba bãi cuối là 44/63/77%). `power()` nay cộng thêm phần
+  **phi-chỉ-số** của đột phá (`ascPowerExtra`) để nhãn độ khó không nói dối nữa.
+
 ## GIỮ CHÂN — về rồi, chuỗi ngày, kỷ lục (16/09, đợt 7)
 
 Nghiên cứu + bảy đề xuất + những cơ chế **cố ý không làm**: `docs/giu-chan.md`. Đã cài ba thứ đầu:

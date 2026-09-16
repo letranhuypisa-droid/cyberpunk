@@ -851,6 +851,25 @@ button.hero__mission:hover i{color:var(--text-1)}
 .howtile:hover{border-color:var(--line-3)}
 .howtile b{display:block;font:700 var(--fs-sm)/1 var(--font-ui);letter-spacing:.18em;text-transform:uppercase}
 .howtile small{display:block;margin-top:5px;font:var(--fs-2xs)/1.3 var(--font-mono);color:var(--text-3)}
+/* ĐỘT PHÁ — bốn ô sao trong hồ sơ nhân vật (docs/dot-pha.md) */
+.asc{margin-top:10px;border:1px solid var(--line-1);background:var(--surface-1);padding:10px}
+.asc__hd{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:8px}
+.asc__hd b{font:800 var(--fs-xs)/1 var(--font-ui);letter-spacing:.24em;color:var(--text-1)}
+.asc__hd small{font:var(--fs-2xs)/1 var(--font-mono);color:var(--text-3);letter-spacing:.06em}
+.asc__grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
+.asc__cell{padding:8px 6px;border:1px solid var(--line-1);background:var(--surface-2);text-align:center;opacity:.5}
+.asc__cell b{display:block;font:700 var(--fs-2xs)/1 var(--font-ui);letter-spacing:.06em;color:var(--text-3)}
+.asc__cell small{display:block;margin-top:3px;font:var(--fs-2xs)/1 var(--font-mono);color:var(--text-3)}
+.asc__cell em{display:block;margin-top:5px;font:var(--fs-2xs)/1.3 var(--font-mono);font-style:normal;color:var(--text-3)}
+.asc__cell.is-on{opacity:1;border-color:var(--energy-full)}
+.asc__cell.is-on b{color:var(--energy-full)} .asc__cell.is-on em{color:var(--text-2)}
+.asc__cell.is-next{opacity:1;border-color:var(--energy)} .asc__cell.is-next b{color:var(--energy)}
+.asc__go{width:100%;height:52px}
+.asc__max{padding:10px;text-align:center;border:1px dashed var(--energy-full);color:var(--energy-full);
+  font:800 var(--fs-2xs)/1 var(--font-mono);letter-spacing:.16em}
+/* Sao trên thẻ nhân vật */
+.card__stars{position:absolute;top:26px;right:6px;z-index:3;font:700 10px/1 var(--font-ui);letter-spacing:.04em;
+  color:var(--energy-full);text-shadow:0 1px 3px rgba(0,0,0,.9)}
 /* VỀ RỒI — hộp đón lúc mở game (docs/giu-chan.md §D1) */
 .back{position:absolute;inset:0;z-index:69;display:grid;place-items:center;padding:18px;background:rgba(6,7,10,.86)}
 .back[hidden]{display:none}

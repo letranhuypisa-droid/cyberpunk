@@ -839,6 +839,25 @@ const COMEBACK = { shHour:8, crHour:200, capHours:8, minHours:1 };
    chỉ là chậm tới mốc sau. Tổng cả tuần 240 SH, xấp xỉ một ngày rưỡi nhiệm vụ ngày. */
 const STREAK = [ { days:1, sh:20 }, { days:3, sh:40 }, { days:5, sh:60 }, { days:7, sh:120 } ];
 
+/* =====================================================================
+   ĐỘT PHÁ (đợt 7 · D4 — đặc tả đầy đủ ở docs/dot-pha.md)
+   Cấp 5/10/15 là TRẦN TẠM: đủ CR cũng không lên tiếp cho tới khi đột phá. Cấp 20 là đỉnh, mốc thứ tư
+   không mở thêm cấp mà là phần thưởng cuối. Vì cửa chặn nên "cấp 20" luôn đồng nghĩa "đủ bốn sao" —
+   scratch/sim.js dựa vào đúng tính chất này khi chạy --lv.
+
+   Hai cách trả, ai cũng đi được một đường: `dupes` bản dư của CHÍNH nhân vật đó (rẻ, cần quay trúng lại)
+   hoặc `lk` LINH KIỆN (đắt hơn nhưng luôn có). Yuki và Psalm nằm trong STORY_ONLY nên không bao giờ có
+   bản dư — nếu chỉ có một đường thì hai người quan trọng nhất game bị kẹt ở cấp 5.
+
+   Mỗi mốc một LOẠI thưởng khác nhau, cố ý: bốn lần cùng một thứ thì mốc cuối không đáng nhớ hơn mốc đầu.
+   statPct nhân dồn (1.06 × 1.06) chứ không cộng — cùng luật với cyberware, xem unitStats ở js/state.js. */
+const ASCEND = [
+  { star:1, lv:5,  cr:2000,  dupes:1, lk:60,  statPct:6,               label:'+6% ATK/HP' },
+  { star:2, lv:10, cr:6000,  dupes:1, lk:90,  energyStart:20,          label:'Vào trận có sẵn 20 Energy' },
+  { star:3, lv:15, cr:12000, dupes:2, lk:150, statPct:6, crit:5,       label:'+6% ATK/HP · +5 CRIT' },
+  { star:4, lv:20, cr:24000, dupes:3, lk:240, ultMult:1.15,            label:'Chiêu cuối ×1.15 hệ số' },
+];
+
 const MENU_UNLOCK = { gacha:'00-T', cyber:'07-A' };
 const menuOpen = key => !MENU_UNLOCK[key] || PLAYER.cleared.includes(MENU_UNLOCK[key]);
 
@@ -892,7 +911,7 @@ const PLAYER_DEFAULTS = () => ({ name:'YUKI', level:1, credits:3000, shards:300,
   pity:{hero:0}, pulls:0, cleared:[], defeated:[], extra:{}, riot:{tier:1, best:0}, parts:0, cyber:{}, sweep:null, seenNew:[],
   /* đợt 7 — giữ chân: lastSeen = mốc thời gian lần cuối đóng game (quà VỀ RỒI tính từ đây) ·
      week = chuỗi ngày trong tuần {id, days:[ngày đã mở], claimed:[mốc đã nhận]} · records = kỷ lục cá nhân */
-  lastSeen:0, week:null, records:{},
+  lastSeen:0, week:null, records:{}, asc:{},
   settings:{sound:true, sfx:true, motion:false, skipStory:false, anim:true, ultVideo:true, revealVideo:true, auto:false, speed:1}, levels:{}, daily:null, hintsSeen:[] });
 const _loaded = (()=>{ try{ for(const k of [PLAYER_KEY,...LEGACY_KEYS]){ const raw=localStorage.getItem(k); if(raw) return { p:JSON.parse(raw), legacy:k!==PLAYER_KEY }; } }catch(e){} return { p:{}, legacy:false }; })();
 const PLAYER = Object.assign(PLAYER_DEFAULTS(), _loaded.p);
