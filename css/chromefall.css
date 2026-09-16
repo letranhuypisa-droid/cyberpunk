@@ -139,6 +139,7 @@ a{color:inherit;text-decoration:none}
 .topnav__links a:hover{color:var(--text-1);border-color:var(--line-3)}
 .btn-ghost{height:26px;padding:0 10px;border:1px solid var(--line-2);font:var(--fs-2xs) var(--font-mono);letter-spacing:.1em;color:var(--text-2);white-space:nowrap}
 .btn-ghost:hover{color:var(--text-1);border-color:var(--line-3)}
+.btn-ghost--go{color:var(--energy);border-color:var(--energy)}   /* việc nên làm tiếp: nút TẦNG ▸ / MÀN KẾ ▸ ở bảng kết quả */
 @media (max-width:640px){.brand__sub{display:none}.topnav{gap:var(--s-3);padding:0 var(--s-3)}.topnav__links{gap:var(--s-3)}.brand{letter-spacing:.16em}}
 
 /* =====================================================================
@@ -821,6 +822,17 @@ button.hero__mission:hover i{color:var(--text-1)}
 .srow__waves{display:flex;gap:3px;margin-top:6px}
 .srow__waves i{width:16px;height:4px;background:var(--surface-4);clip-path:var(--poly-slant)} .srow__waves i.boss{background:var(--hp-low)} .srow__waves i.done{background:var(--hp)}
 
+/* ---- Thanh đáy hai nút: VÀO TRẬN + QUÉT (docs/che-do-choi.md §D). Nút vào trận rộng hơn — nó vẫn là việc chính ---- */
+.entbar{display:grid;grid-template-columns:1.3fr 1fr;gap:8px}
+.entbar .btn-act{height:52px}
+/* ---- QUÉT NHANH: hộp kết quả. Cùng lớp overlay với truyện/comic (z 60) vì nó mở từ màn chọn màn ---- */
+.swbox{position:absolute;inset:0;z-index:62;display:grid;place-items:center;background:rgba(6,7,10,.82);animation:result-in 220ms var(--ease-hit-out)}
+.swbox[hidden]{display:none}
+.swbox__in{min-width:260px;text-align:center;padding:var(--s-5) var(--s-6);border:1px solid var(--line-2);background:var(--surface-1);
+  clip-path:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px)}
+.swbox__t{font:900 var(--fs-lg)/1 var(--font-ui);letter-spacing:.24em;text-indent:.24em}
+.swbox__s{margin:10px 0 16px;font:var(--fs-xs)/1.6 var(--font-mono);color:var(--text-2);letter-spacing:.1em}
+
 .side__block{border:1px solid var(--line-1);background:var(--surface-1);padding:var(--s-3)}
 .side__block .lbl{display:block;margin-bottom:8px}
 .log{list-style:none;display:flex;flex-direction:column;gap:3px;font:var(--fs-xs)/1.4 var(--font-mono);color:var(--text-2);max-height:360px;overflow:auto}
@@ -832,10 +844,17 @@ button.hero__mission:hover i{color:var(--text-1)}
 
 /* ---- HUD trên ---- */
 .hud{padding:8px 10px 4px;border-bottom:1px solid var(--line-1);background:linear-gradient(var(--bg-1),var(--bg-0))}
-.hud__row{display:flex;align-items:center;gap:var(--s-4)}
+/* wrap + gap hẹp: hàng này giờ có sáu thứ (Sector · Round · Wave · AUTO · tốc độ · RESET · ◂ BASE).
+   Ở 375px chúng vừa đủ một hàng; máy hẹp hơn thì xuống hàng chứ không bị cắt mất nút ngoài cùng. */
+.hud__row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.hud__row .btn-ghost{padding:0 6px}
 .hud__row>div{display:flex;flex-direction:column;gap:1px}
 .hud__row .mono{font-size:var(--fs-sm);color:var(--text-1);font-weight:600}
-.hud__reset{margin-left:auto}
+.hud__pace{margin-left:auto}                        /* nút AUTO mở nhóm nút bên phải: AUTO · ×1 · RESET · ◂ BASE */
+/* Nút bật/tắt trong HUD (AUTO, tốc độ) — bật thì sáng màu Energy (--energy, cùng màu thanh Energy).
+   KHÔNG dùng --energy-full: ở theme tối nó là #FFF, trùng đúng màu hover nên "đang bật" nhìn y như "đang rê chuột". */
+.hud__tg{min-width:38px;text-align:center}
+.hud__tg.is-on{color:var(--energy);border-color:var(--energy)}
 .ticker{margin-top:6px;padding-top:6px;border-top:1px solid var(--line-1);font:var(--fs-2xs) var(--font-mono);letter-spacing:.08em;color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ticker::before{content:"» ";color:var(--text-3)}
 

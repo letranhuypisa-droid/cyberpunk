@@ -16,6 +16,35 @@ const UI = {
   hint:$('#hint'), hintText:$('#hintText'),
 };
 
+/* =====================================================================
+   NHỊP TRẬN — TỐC ĐỘ ×1/×2/×3 và AUTO (đợt 5, docs/che-do-choi.md §B §C)
+   Một hệ số duy nhất. `sp(ms)` chia mọi khoảng chờ VÀ mọi `duration` animation trong file này cho nó;
+   `pause(ms)` là `wait` đã chia — trong trận thì gọi pause, đừng gọi wait.
+   Cái bẫy: animDone(a, ms) chờ a.finished HOẶC wait(ms+80). Chia duration mà quên chia mốc timeout thì
+   ×3 vẫn chờ đúng bằng ×1 — nhanh phần hình, không nhanh phần chờ. Nên mọi chỗ gọi animDone đều truyền
+   con số ĐÃ chia (biến D trong playMoveAttack / playAttackAnim).
+   KHÔNG đi qua đây: video chiêu cuối (nhịp của nó là nhịp của video), trang comic, màn nạp LOAD.gate,
+   và các setTimeout gỡ chip 2,5 giây — chip là chữ để đọc, không phải animation.
+   ===================================================================== */
+const BSPEED = { k: 1 };
+const sp = ms => Math.max(1, Math.round(ms / BSPEED.k));
+const pause = ms => wait(sp(ms));
+const speedList = () => (typeof PLAY!=='undefined' && PLAY.speeds) || [1,2,3];
+function setSpeed(k){
+  BSPEED.k = speedList().includes(k) ? k : 1;
+  PLAYER.settings.speed = BSPEED.k; savePlayer(); syncPaceBtns();
+}
+const autoOn = () => !!(PLAYER.settings && PLAYER.settings.auto);
+function setAuto(on){
+  PLAYER.settings.auto = !!on; savePlayer(); syncPaceBtns();
+  if(!on) return;
+  /* Bật giữa lúc đang chọn mục tiêu: huỷ chế độ chọn rồi để máy đánh tiếp từ chính lượt này —
+     không thì người chơi bật AUTO xong màn hình đứng chờ một cú chạm mà họ không định chạm nữa. */
+  if(B.mode==='target') exitTargeting();
+  const u=current();
+  if(u && u.side==='ally' && u.alive && !B.busy && !B.over) autoAct(u);
+}
+
 function makeUnit(def, side, i){
   return { ...def, side, uid:side+'-'+i, hp:def.hp, hpMax:def.hp, energy:0, shield:0, alive:true, controlled:false, chips:[], status:[], active:[], el:null };
 }
@@ -127,7 +156,7 @@ async function waveTransition(){
   UI.ubName.textContent=`WAVE ${String(B.wave+1).padStart(2,'0')}`; UI.ubSub.textContent='ĐỢT ĐỊCH MỚI';
   UI.banner.style.setProperty('--accent','var(--rust)');
   UI.banner.classList.remove('show'); void UI.banner.offsetWidth; UI.banner.classList.add('show');
-  await wait(reduced()?300:1000); if(g!==B.gen) return;
+  await pause(reduced()?300:1000); if(g!==B.gen) return;
   spawnWave(); B.busy=false; newRound();
 }
 
@@ -326,35 +355,37 @@ function syncSpriteAnim(){
 function flashSprite(u){
   if(!u.el) return;
   const pose=u.el.querySelector('.unit__pose');
-  if(pose.classList.contains('has-img')) pose.querySelector('.unit__flash').animate([{opacity:.26},{opacity:0}],{duration:200,easing:'linear'});
-  else pose.querySelector('.sil').animate([{filter:'brightness(2.2)'},{filter:'brightness(1)'}],{duration:200,easing:'linear'});
+  if(pose.classList.contains('has-img')) pose.querySelector('.unit__flash').animate([{opacity:.26},{opacity:0}],{duration:sp(200),easing:'linear'});
+  else pose.querySelector('.sil').animate([{filter:'brightness(2.2)'},{filter:'brightness(1)'}],{duration:sp(200),easing:'linear'});
 }
 /* Trúng đòn: đổi sang frame hurt (nếu có) + giật lùi 300ms + chớp đỏ, rồi về idle.
    Chết: giữ frame hurt, mất bão hoà, sụm nhẹ xuống (CSS .is-dead). */
 async function playHurt(u, killed){
-  const e=u.el; if(!e) return; e.classList.add('is-hit'); setTimeout(()=>e.classList.remove('is-hit'), 320);
+  const e=u.el; if(!e) return; e.classList.add('is-hit'); setTimeout(()=>e.classList.remove('is-hit'), sp(320));
   const f = B.frames[frameKey(u)] ? await B.frames[frameKey(u)] : null;
   const fr = f && (killed ? f.die : f.hurt);           // chết → frame die (Drill-Bit), không có thì hurt; trúng đòn → hurt
   if(!fr) return;
   flashSprite(u); setFrame(u, fr);
   if(killed) return;
-  await wait(reduced()?200:420);
+  await pause(reduced()?200:420);
   if(!u.alive || u.el!==e) return;
   flashSprite(u); setFrame(u, f.idle);
 }
 const animDone = (a, ms) => Promise.race([a.finished.catch(()=>{}), wait(ms+80)]);
-/* Attack tại chỗ (giảm chuyển động / dự phòng): +28px/90ms out (scale 1.02,.96) → giữ 120ms → về 0/180ms. Tổng 390ms */
+/* Attack tại chỗ (giảm chuyển động / dự phòng): +28px/90ms out (scale 1.02,.96) → giữ 120ms → về 0/180ms. Tổng 390ms
+   (mọi mốc chia theo tốc độ trận — sp() ở đầu file) */
 async function playAttackAnim(u, poseName){
   const f = await B.frames[frameKey(u)]; if(!u.el) return; const pose=u.el.querySelector('.unit__pose');
   flashSprite(u);
   const fr=f&&(f[poseName]||f.attack); if(fr) setFrame(u,fr);   // poseName 'crit' → frame đòn chí mạng nếu sprite có
   if(!reduced()){
     // animDone: không chỉ chờ .finished — tab nền/bị throttle có thể không tick animation → kèm timeout để trận không treo
-    const out = pose.animate([{transform:'translateX(0) scale(1,1)'},{transform:'translateX(28px) scale(1.02,.96)'}],{duration:90,easing:'cubic-bezier(.16,.9,.3,1)',fill:'forwards'});
-    await animDone(out,90); await wait(120);
-    const back = pose.animate([{transform:'translateX(28px) scale(1.02,.96)'},{transform:'translateX(0) scale(1,1)'}],{duration:180,easing:'cubic-bezier(.3,0,.4,1)',fill:'forwards'});
-    await animDone(back,180); out.cancel(); back.cancel();
-  } else { await wait(390); }
+    const D={ out:sp(90), back:sp(180) };
+    const out = pose.animate([{transform:'translateX(0) scale(1,1)'},{transform:'translateX(28px) scale(1.02,.96)'}],{duration:D.out,easing:'cubic-bezier(.16,.9,.3,1)',fill:'forwards'});
+    await animDone(out,D.out); await pause(120);
+    const back = pose.animate([{transform:'translateX(28px) scale(1.02,.96)'},{transform:'translateX(0) scale(1,1)'}],{duration:D.back,easing:'cubic-bezier(.3,0,.4,1)',fill:'forwards'});
+    await animDone(back,D.back); out.cancel(); back.cancel();
+  } else { await pause(390); }
   flashSprite(u);
   if(f&&f.idle) setFrame(u,f.idle);
 }
@@ -375,20 +406,21 @@ async function playMoveAttack(u,tgt,strike,o){
   o=Object.assign({},RULES.move,o||{});
   const g=B.gen; const f=B.frames[frameKey(u)]?await B.frames[frameKey(u)]:null; if(g!==B.gen||!u.el) return;
   const pose=u.el.querySelector('.unit__pose'); const d=!reduced()&&moveDelta(u,tgt);
-  if(!d){ const p=playAttackAnim(u,o.pose); await wait(90); if(g===B.gen) strike(); await p; return; }
+  if(!d){ const p=playAttackAnim(u,o.pose); await pause(90); if(g===B.gen) strike(); await p; return; }
   const elm=u.el; elm.classList.add('is-dashing'); elm.style.setProperty('--zd',o.z);
+  const D={ out:sp(o.out), impact:sp(o.impact), back:sp(o.back) };   // tốc độ trận: chia cả duration lẫn mốc timeout của animDone
   const to=`translate(${d.dx}px,${d.dy}px)`, push=`translate(${d.dx+12*d.dir}px,${d.dy}px)`;
-  const out=pose.animate([{transform:'translate(0,0)'},{transform:to}],{duration:o.out,easing:'cubic-bezier(.2,.8,.2,1)',fill:'forwards'});
-  await animDone(out,o.out);
+  const out=pose.animate([{transform:'translate(0,0)'},{transform:to}],{duration:D.out,easing:'cubic-bezier(.2,.8,.2,1)',fill:'forwards'});
+  await animDone(out,D.out);
   if(g!==B.gen){ out.cancel(); return; }
   const fr=f&&(f[o.pose]||f.attack); flashSprite(u); if(fr) setFrame(u,fr);   // o.pose='crit' → frame đòn chí mạng (quay trước bằng rollCrit)
-  const hit=pose.animate([{transform:to},{transform:push}],{duration:o.impact,fill:'forwards'});
+  const hit=pose.animate([{transform:to},{transform:push}],{duration:D.impact,fill:'forwards'});
   strike();
-  await animDone(hit,o.impact); await wait(o.hold);
+  await animDone(hit,D.impact); await pause(o.hold);
   if(g!==B.gen){ out.cancel(); hit.cancel(); return; }
   flashSprite(u); if(f&&f.idle) setFrame(u,f.idle);
-  const back=pose.animate([{transform:push},{transform:'translate(0,0)'}],{duration:o.back,easing:'cubic-bezier(.3,0,.4,1)',fill:'forwards'});
-  await animDone(back,o.back); out.cancel(); hit.cancel(); back.cancel();
+  const back=pose.animate([{transform:push},{transform:'translate(0,0)'}],{duration:D.back,easing:'cubic-bezier(.3,0,.4,1)',fill:'forwards'});
+  await animDone(back,D.back); out.cancel(); hit.cancel(); back.cancel();
   elm.classList.remove('is-dashing'); elm.style.removeProperty('--zd');
 }
 
@@ -525,12 +557,12 @@ async function tickStatus(u){
     log(`${u.name} ${STATUS_DEF[s.kind].label.toLowerCase()}: −${s.dmg}${killed?' · KIA':''}`, killed);
     if(killed){ killUnit(u); AUDIO.kia(); playHurt(u,true); updateUnit(u); return true; }
     if(AUDIO[s.kind]) AUDIO[s.kind]();
-    updateUnit(u); await wait(reduced()?120:380); if(g!==B.gen) return true;
+    updateUnit(u); await pause(reduced()?120:380); if(g!==B.gen) return true;
   }
   const st=u.status.find(s=>s.kind==='stun'); let skip=false;
   if(st){ st.turns--; skip=true; playFx(u,'stun'); if(AUDIO.stun) AUDIO.stun(); log(`${u.name} bị choáng, mất lượt`, true); }
   u.status=u.status.filter(s=>s.turns>0); updateUnit(u);
-  if(skip){ await wait(reduced()?150:520); if(g!==B.gen) return true; }
+  if(skip){ await pause(reduced()?150:520); if(g!==B.gen) return true; }
   return skip;
 }
 
@@ -612,6 +644,41 @@ UI.stage.addEventListener('click', e=>{
   const u=B.units.find(x=>x.uid===c.dataset.uid); if(u) openPassive(u, c.dataset.pas);
 }, true);
 
+/* ---- AUTO — máy đánh thay (docs/che-do-choi.md §B) ----
+   autoPlan trả về Ý ĐỊNH, autoAct gọi đúng execAttack/execUlt mà người chơi vẫn gọi. Nhờ vậy không có
+   đường nào để AUTO đánh theo luật khác: chí mạng, variance, passive, trạng thái, hoàn Energy đi qua y nguyên.
+   Chọn con HP HIỆN TẠI thấp nhất chứ không chọn ngẫu nhiên: bớt một con địch là bớt một lượt bị đánh, và
+   đòn thường của Yuki còn ăn thêm phần kết liễu dưới 35% HP. */
+const weakestOf  = list => list.slice().sort((a,b)=>a.hp-b.hp)[0] || null;
+const scariestOf = list => list.slice().sort((a,b)=>
+  (b.rank==='boss')-(a.rank==='boss') || (b.rank==='elite')-(a.rank==='elite') || (b.atk||0)-(a.atk||0))[0] || null;
+function autoPlan(u){
+  const foes=alive('enemy'); if(!foes.length) return null;
+  const ult=u.ult;
+  if(ult && u.energy>=ult.cost){
+    const k=ult.kind;
+    /* Hồi máu là chiêu DUY NHẤT máy biết giữ lại: tung lúc cả đội còn full là đổ đi, mà energyMax = ult.cost
+       nên giữ cũng không tràn. Các kiểu còn lại tung ngay — không có tình huống nào để dành mà lợi hơn. */
+    if(k==='heal'){
+      if(alive('ally').some(a=>a.hp/a.hpMax <= PLAY.autoHealAt)) return { kind:'ult', target:null };
+    }
+    else if(k==='control') return { kind:'ult', target:scariestOf(foes) };            // chiếm quyền con lính thường là đổ chiêu
+    else if(k==='nuke')    return { kind:'ult', target: ult.target==='lowest' ? null : weakestOf(foes) };
+    else return { kind:'ult', target:null };                                          // aoe, shield: không có mục tiêu để chọn sai
+  }
+  return { kind:'attack', target:weakestOf(foes) };
+}
+async function autoAct(u){
+  const g=B.gen;
+  await pause(PLAY.autoDelay);                       // để người chơi kịp thấy ai đang tới lượt
+  if(g!==B.gen || B.over || B.busy || !autoOn()) return;
+  if(current()!==u || !u.alive || u.side!=='ally') return;
+  if(B.mode==='target') return;   // người chơi vừa bấm ATTACK để tự ngắm: để họ chọn, máy không cướp lượt
+  const plan=autoPlan(u); if(!plan) return;
+  ticker(`AUTO · ${u.name} ${plan.kind==='ult' ? 'tung '+u.ult.name : 'đánh thường'}`);
+  if(plan.kind==='ult') execUlt(u, plan.target); else execAttack(u, plan.target);
+}
+
 async function startTurn(){
   if(B.over) return;
   const u=current();
@@ -623,9 +690,10 @@ async function startTurn(){
   if(u.side==='ally'){
     ensureTarget(); setInputs(true); updateUltButton(u); ticker(`${u.name} — chọn hành động`);
     if(B.round===1) showHint('firstTurn');
+    if(autoOn()) autoAct(u);                         // nút vẫn bấm được: bấm tay trước thì B.busy chặn cú đánh của máy
   } else {
     setInputs(false); ticker(`${u.name} đang hành động…`);
-    const g=B.gen; await wait(reduced()?250:700); if(g!==B.gen) return; await enemyAct(u);
+    const g=B.gen; await pause(reduced()?250:700); if(g!==B.gen) return; await enemyAct(u);
   }
 }
 function endTurn(){
@@ -659,7 +727,7 @@ async function winReward(g){
     PLAYER.shards+=sh; PLAYER.credits+=cr; savePlayer(); txt=`TUẦN TRA · +${sh} SH · +${cr} CR`; }
   syncSectorStates();
   const st=STORY[SECTOR.id];
-  if(st&&st.outro&&first&&!(PLAYER.settings&&PLAYER.settings.skipStory)){ await wait(700); if(g!==B.gen) return txt; await playComic(st.outro, SECTOR, 'outro'); }
+  if(st&&st.outro&&first&&!(PLAYER.settings&&PLAYER.settings.skipStory)){ await pause(700); if(g!==B.gen) return txt; await playComic(st.outro, SECTOR, 'outro'); }
   return txt;
 }
 /* Kẻ địch mới hạ được trong trận này → dòng thông báo mở bể. Chỉ kể con chiêu mộ được VÀ đã tới chương
@@ -687,8 +755,31 @@ let finish = async function(win){
   UI.result.hidden=false; UI.result.className='result '+(win?'win':'lose');
   $('#resT').textContent = win?'THẮNG':'CẢ ĐỘI GỤC';
   $('#resS').innerHTML = (win?`${SECTOR.waves} wave · round ${B.round} · ${alive('ally').length}/${nAlly} sống sót`:`Wave ${B.wave}/${SECTOR.waves} · round ${B.round} · cả đội KIA`) + (rewardTxt?`<br><b class="result__rw">${rewardTxt}</b>`:'');
+  syncNextBtn(win);
   log(win?'Thắng.':'Thua.', true);
 };
+/* ĐÁNH TIẾP ở bảng kết quả (docs/che-do-choi.md §E). Thang tầng là chỗ bấm lặp nhiều nhất trong game mà
+   đường ra cũ mất năm cú chạm: kết quả → HOME → DẸP LOẠN → HỐ LOẠN → chọn tầng → vào.
+   Đi qua go('battle') chứ không gọi initBattle trực tiếp, để màn kế vẫn có cổng nạp (nền + sprite) như mọi lần vào trận. */
+function syncNextBtn(win){
+  const b=$('#btnNext'); if(!b) return;
+  b.hidden=true; b.onclick=null;
+  if(!win) return;
+  const enter = (sec, skipIntro) => { UI.result.hidden=true; SECTOR=sec; B.skipIntro=skipIntro; go('battle'); B.skipIntro=false; };
+  if(SECTOR.mode==='riot'){
+    const n=(SECTOR.tier||0)+1;
+    if(n>PLAYER.riot.tier || n>RIOT.maxTier) return;          // chưa mở tầng trên (thua tầng này) hoặc đã tới trần thang
+    b.textContent=`TẦNG ${n} ▸`;
+    b.onclick=()=>enter(riotSector(n), true);                 // HỐ LOẠN không có comic
+    b.hidden=false; return;
+  }
+  if(SECTOR.mode) return;                                     // 'yard' (trận chiếm bãi ở DẸP LOẠN): thắng xong về bản đồ, không mời vào màn chiến dịch
+  const next=SECTORS.find(s=>s.state==='open');               // syncSectorStates đã chạy trong winReward
+  if(!next || next===SECTOR) return;
+  b.textContent=`${next.id} ▸`;
+  b.onclick=()=>enter(next, false);                           // màn chiến dịch mới: để comic intro chạy như thường
+  b.hidden=false;
+}
 
 /* ---- Chọn mục tiêu: bấm ATTACK / ULT đơn mục tiêu → địch sáng lên → chạm địch → thực hiện ---- */
 function enterTargeting(kind){
@@ -742,7 +833,7 @@ async function execAttack(u,t){
   const crit=rollCrit(u,t,true);   // quay trước để chọn frame chí mạng
   await playMoveAttack(u,t,()=>{ dealDamage(u,t,sk.mult||1,{basic:true, crit, fx:sk.fx, status:sk.status}); gainEnergy(u,sk.energy||25); dailyProgress('attacks'); },{pose:crit?'crit':'attack'});
   if(g!==B.gen) return;
-  await wait(reduced()?80:160); if(g!==B.gen) return;
+  await pause(reduced()?80:160); if(g!==B.gen) return;
   B.busy=false; endTurn();
 }
 /* Mở màn chiêu cuối, dùng chung cho đội mình và kẻ địch: chớp sân, rồi video holo trên đầu người phát chiêu
@@ -753,14 +844,14 @@ async function execAttack(u,t){
    video có tiếng khi trang chưa nhận cú chạm nào (và file hỏng cũng vậy) — trước đây gặp cảnh đó là người chơi
    vừa không thấy hình vừa không nghe tiếng, vì AUDIO.ult đã bị bỏ. Nay hỏng thì rơi xuống banner + tiếng. */
 async function ultCutin(u){
-  UI.stageflash.animate([{opacity:.18},{opacity:0}],{duration:360,easing:'ease-out'});
+  UI.stageflash.animate([{opacity:.18},{opacity:0}],{duration:sp(360),easing:'ease-out'});
   const src = ultVideoOn() ? await pickCutin(u) : null;
   if(src && await playHolo(u, src)) return;          // video chạy được: xong, tiếng đã nằm trong video
   AUDIO.ult();                                       // không có video, hoặc có mà không phát nổi → banner chữ + tiếng như cũ
   UI.ubName.textContent=u.ult.name; UI.ubSub.textContent=`${u.name} · ${u.ult.desc.split('.')[0]}`;
   UI.banner.style.setProperty('--accent', u.faction==='rust'?'var(--rust)':'var(--chrome)');
   UI.banner.classList.remove('show'); void UI.banner.offsetWidth; UI.banner.classList.add('show');
-  return wait(reduced()?150:420);
+  return pause(reduced()?150:420);
 }
 async function execUlt(u,t){
   const g=B.gen; B.busy=true; setInputs(false); UI.btnUlt.dataset.state='casting'; UI.ultMeta.textContent='CASTING…';
@@ -788,7 +879,7 @@ async function execUlt(u,t){
       if(ult.drainEnergy && t.alive){ const lost=loseEnergy(t, ult.drainEnergy===true?null:ult.drainEnergy); if(lost) log(`${t.name} mất ${lost} Energy`, true); }
     },{pose:crit?'crit':'attack'});
   } else if(k==='aoe'){
-    const anim=playAttackAnim(u); await wait(90); if(g!==B.gen) return;
+    const anim=playAttackAnim(u); await pause(90); if(g!==B.gen) return;
     alive('enemy').forEach(x=>dealDamage(u,x,ult.mult,o));
     // drainEnergy trên nhánh diện rộng: rút của MỌI kẻ địch còn sống (DRONE). Con nào không có chiêu cuối
     // thì không có thanh Energy nên không mất gì — đó là lý do bản chiêu mộ phải có hệ số nền tử tế.
@@ -803,7 +894,7 @@ async function execUlt(u,t){
        · healPct (Thợ Hàn, Mother Rust, Thợ Ống — chiêu của kẻ địch chiêu mộ về): hồi % HP TỐI ĐA của
          người được vá, mặc định cho người thủng nhất; healAll thì cho cả đội. Tính theo máu chứ không
          theo ATK nên mấy con đỡ đòn ATK thấp vẫn vá được ra hồn. */
-    const anim=playAttackAnim(u); await wait(90); if(g!==B.gen) return;
+    const anim=playAttackAnim(u); await pause(90); if(g!==B.gen) return;
     if(ult.healPct){
       const list = ult.healAll ? alive('ally') : [alive('ally').sort((a,b)=>a.hp/a.hpMax - b.hp/b.hpMax)[0] || u];
       let total=0;
@@ -822,7 +913,7 @@ async function execUlt(u,t){
     const tgt = (ult.shieldTarget==='biggest' && others.length)
       ? others.sort((x,y)=>y.hpMax-x.hpMax)[0] : u;
     const amt=Math.round(u.hpMax*(ult.shieldPct||1));
-    const anim=playAttackAnim(u); await wait(90); if(g!==B.gen) return;
+    const anim=playAttackAnim(u); await pause(90); if(g!==B.gen) return;
     addShield(tgt, amt); playFx(tgt, ult.fx||'shield');
     log(tgt===u ? `${u.name} dựng lá chắn ${amt} — đánh vỡ mới thôi`
                : `${u.name} che cho ${tgt.name}: lá chắn ${amt} — đánh vỡ mới thôi`, true);
@@ -832,14 +923,14 @@ async function execUlt(u,t){
     if(t){
       /* Cùng nhịp với nhánh 'aoe': nhún tới + đổi sang frame đánh, 90ms sau mới ăn hiệu ứng lên mục tiêu.
          Trước 11/09 nhánh này không đụng gì tới người phát chiêu — xem hết video holo xong Psalm vẫn đứng yên. */
-      const anim=playAttackAnim(u); await wait(90); if(g!==B.gen) return;
+      const anim=playAttackAnim(u); await pause(90); if(g!==B.gen) return;
       t.controlled=true; addChip(t,'control','CONTROLLED','1T'); playFx(t, ult.fx||'shock'); if(AUDIO.shock) AUDIO.shock();
       log(`${u.name} chiếm quyền điều khiển ${t.name}`, true);
       await anim;
     }
   }
   if(g!==B.gen) return;
-  await wait(reduced()?200:600); if(g!==B.gen) return;
+  await pause(reduced()?200:600); if(g!==B.gen) return;
   B.busy=false; endTurn();
 }
 /* ---- Video chiêu cuối: hộp holo chiếu trên đầu người phát chiêu (RULES.holo · css/fx.css .holo · playVideoBox ở core.js) ----
@@ -880,12 +971,12 @@ function stopCutin(){ const box=$('#ultHolo'); if(box) stopVideoBox(box); UI.sta
 async function enemyAct(e){
   const g=B.gen;
   if(e.link && e.alive && alive('enemy').some(x=>x!==e && x.link)){            // HALO LINK
-    const amt=Math.round(e.hpMax*.08); if(e.hp<e.hpMax){ heal(e,e,amt); log(`${e.name} hồi ${amt} HP qua HALO LINK`); await wait(reduced()?100:350); if(g!==B.gen) return; }
+    const amt=Math.round(e.hpMax*.08); if(e.hp<e.hpMax){ heal(e,e,amt); log(`${e.name} hồi ${amt} HP qua HALO LINK`); await pause(reduced()?100:350); if(g!==B.gen) return; }
   }
-  if(e.ult){ gainEnergy(e, RULES.foeUltGain); await wait(reduced()?60:220); if(g!==B.gen) return; }   // nạp Energy đầu lượt: người chơi kịp thấy thanh đầy
+  if(e.ult){ gainEnergy(e, RULES.foeUltGain); await pause(reduced()?60:220); if(g!==B.gen) return; }   // nạp Energy đầu lượt: người chơi kịp thấy thanh đầy
   if(e.ult && e.energy>=e.ult.cost && !e.controlled){                          // đủ Energy → tung chiêu cuối thay cho đòn thường
     await enemyUlt(e); if(g!==B.gen) return;
-    await wait(reduced()?200:600); if(g!==B.gen) return;
+    await pause(reduced()?200:600); if(g!==B.gen) return;
     return endTurn();
   }
   let tgt;
@@ -900,7 +991,7 @@ async function enemyAct(e){
   if(tgt===e){ dealDamage(e,tgt,1,o); }
   else await playMoveAttack(e,tgt,()=>dealDamage(e,tgt,1,o),{out:200,impact:60,hold:100,back:200,pose:crit?'crit':'attack'});
   if(g!==B.gen) return;
-  await wait(reduced()?200:320); if(g!==B.gen) return;
+  await pause(reduced()?200:320); if(g!==B.gen) return;
   endTurn();
 }
 /* ---- Chiêu cuối của kẻ địch (khai trong ENEMY_POOL, js/data.js) ----
@@ -925,20 +1016,20 @@ async function enemyUlt(e){
     const others=alive('enemy').filter(x=>x!==e);
     const t = ult.shieldTarget==='biggest' && others.length                                   // BULWARK chắn cho con to nhất còn sống (đứng một mình thì tự chắn)
       ? others.sort((a,b)=>b.hpMax-a.hpMax)[0] : e;
-    const anim=playAttackAnim(e); await wait(90); if(g!==B.gen) return;
+    const anim=playAttackAnim(e); await pause(90); if(g!==B.gen) return;
     addShield(t, amt); playFx(t, ult.fx||'shield');
     log(t===e ? `${e.name} dựng lá chắn ${amt} — đánh vỡ mới thôi` : `${e.name} dựng lá chắn ${amt} cho ${t.name} — đánh vỡ mới thôi`, true);
     await anim;
   } else if(ult.kind==='heal'){
     const list = ult.healAll ? alive('enemy') : [alive('enemy').sort((a,b)=>a.hp/a.hpMax - b.hp/b.hpMax)[0] || e];   // con thủng nhất, tính cả chính nó
-    const anim=playAttackAnim(e); await wait(90); if(g!==B.gen) return;
+    const anim=playAttackAnim(e); await pause(90); if(g!==B.gen) return;
     let total=0;
     list.forEach(t=>{ if(!t) return; const before=t.hp; heal(e, t, Math.round(t.hpMax*(ult.healPct||.3))); playFx(t, ult.fx||'heal'); total+=t.hp-before; });
     log(ult.healAll ? `${e.name} vá cho cả đám — hồi ${total} HP` : `${e.name} vá cho ${list[0].name} — hồi ${total} HP`, true);
     await anim;
   } else if(ult.kind==='aoe'){
     const a=alive('ally'); if(!a.length) return;
-    const anim=playAttackAnim(e); await wait(90); if(g!==B.gen) return;
+    const anim=playAttackAnim(e); await pause(90); if(g!==B.gen) return;
     a.forEach(t=>dealDamage(e, t, ult.mult||1, {fx:ult.fx, status:ult.status}));
     if(ult.drainEnergy){                                                                      // DRONE MK1: quét một đường rồi nhiễu Halo cả đội
       const lost=a.filter(t=>t.alive).map(t=>loseEnergy(t, ult.drainEnergy===true?null:ult.drainEnergy)).reduce((x,y)=>x+y,0);
@@ -959,6 +1050,21 @@ UI.btnAttack.addEventListener('click', playerAttack);
 UI.btnUlt.addEventListener('click', playerUlt);
 $('#btnReset').addEventListener('click', ()=>{ B.skipIntro=true; initBattle(); B.skipIntro=false; });
 $('#btnAgain').addEventListener('click', ()=>{ B.skipIntro=true; initBattle(); B.skipIntro=false; });
+
+/* ---- Hai nút nhịp trong HUD: AUTO bật/tắt · TỐC ĐỘ xoay vòng ×1 → ×2 → ×3 → ×1 ----
+   Cả hai lưu vào hồ sơ (PLAYER.settings.auto/speed) nên giữ nguyên qua trận sau và qua lần mở game sau. */
+function syncPaceBtns(){
+  const a=$('#btnAuto'), s=$('#btnSpeed');
+  if(a){ a.classList.toggle('is-on', autoOn()); a.setAttribute('aria-pressed', autoOn()?'true':'false'); }
+  if(s){ s.textContent='×'+BSPEED.k; s.classList.toggle('is-on', BSPEED.k>1); }
+}
+{ const a=$('#btnAuto'), s=$('#btnSpeed');
+  if(a) a.addEventListener('click', ()=>{ sfx('select',.2); setAuto(!autoOn()); });
+  if(s) s.addEventListener('click', ()=>{ const L=speedList(); sfx('cursor',.12); setSpeed(L[(L.indexOf(BSPEED.k)+1)%L.length]); });
+  const k=PLAYER.settings.speed;                                   // hồ sơ cũ chưa có khoá này → Object.assign ở data.js đã điền 1
+  BSPEED.k = speedList().includes(k) ? k : 1;
+  syncPaceBtns();
+}
 document.addEventListener('keydown', e=>{
   if($('#battle').dataset.screen!=='battle') return;
   if(e.key==='Escape' && PAS.box && !PAS.box.hidden){ e.preventDefault(); return closePassive(); }   // Esc đóng bảng nội tại trước

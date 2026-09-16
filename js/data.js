@@ -808,6 +808,20 @@ const RULES = { critMult:1.5, variance:.08, waveHeal:.3, autoTargetSingle:true, 
                 holo:{ ratio:16/9, wPct:.72, wMin:220, wMax:340, hPct:.5, gap:10 } };
 
 /* =====================================================================
+   NHỊP CHƠI (đợt 5, 16/09 — đặc tả đầy đủ ở docs/che-do-choi.md)
+   Bốn thứ điều khiển nhịp, KHÔNG đụng một con số cân bằng nào: AUTO · tốc độ · quét nhanh · đánh tiếp.
+     speeds     các mức tốc độ trận, bấm nút trong HUD để xoay vòng. Trần ×3 là cố ý: dưới ~55 ms một nhịp
+                thì số sát thương bay lên chưa đọc kịp đã tắt và sprite đổi tư thế thành nháy.
+     autoDelay  máy chờ ngần này (ms, chia theo tốc độ) rồi mới đánh hộ — để người chơi kịp thấy ai đang tới lượt.
+     autoHealAt máy chỉ tung chiêu hồi máu khi có người ở dưới mức này (hồi lúc cả đội full là đổ đi).
+     sweepDay   VÉ QUÉT mỗi ngày, reset 00:00 cùng nhiệm vụ ngày. Vì sao phải có trần: thưởng chơi lại là
+                vòi không đáy, thứ duy nhất chặn nó xưa nay là thời gian đánh tay. Bỏ thời gian mà không
+                đặt trần thì CR/SH thành vô hạn trong một tối và hai hố tiêu (nâng cấp, cyberware) hỏng theo.
+     sweepPct   phần thưởng một lượt quét màn chiến dịch = đúng mức TUẦN TRA đang có (25%), không hơn.
+                HỐ LOẠN dùng RIOT.replayPct (30%) — quét không bao giờ lãi hơn đánh. */
+const PLAY = { speeds:[1,2,3], autoDelay:240, autoHealAt:.7, sweepDay:8, sweepPct:.25 };
+
+/* =====================================================================
    HỒ SƠ NGƯỜI CHƠI — lưu localStorage (state.js). owned = nhân vật đã có; team = đội hình đã chọn.
    v3: nhân vật chính là Yuki, đội 3 người. Hồ sơ v2 (Operator, đội 5) được đọc và chuyển đổi.
    ===================================================================== */
@@ -819,10 +833,14 @@ const LEGACY_KEYS=['chromefall.player.v2'];
    defeated = id kẻ địch ĐÃ HẠ trong trận, ghi lúc con đó chết (killUnit) chứ không phải lúc clear màn.
      Đây là cửa vào bể gacha của quân chiêu mộ. Lý do không suy từ cleared: DẸP LOẠN không ghi vào cleared,
      và hạ trùm ở wave 3 rồi chết ở wave 4 thì vẫn là đã hạ.
-   riot = tiến trình DẸP LOẠN: tier đang mở, best = tầng cao nhất đã thắng. */
+   riot = tiến trình DẸP LOẠN: tier đang mở, best = tầng cao nhất đã thắng.
+   sweep = vé QUÉT NHANH đã dùng hôm nay {date, used} — cùng mốc ngày với nhiệm vụ ngày (today() ở js/state.js),
+     để không có hai đồng hồ lệch nhau. null = chưa quét ngày nào.
+   settings.auto / settings.speed = AUTO và tốc độ trận, nhớ qua trận sau: người cày 30 trận một tối không
+     phải bật lại 30 lần (docs/che-do-choi.md §B, §C). */
 const PLAYER_DEFAULTS = () => ({ name:'YUKI', level:1, credits:3000, shards:300, owned:['yuki','ash','kai'], team:['yuki','ash','kai'],
-  pity:{hero:0}, pulls:0, cleared:[], defeated:[], extra:{}, riot:{tier:1, best:0}, parts:0, cyber:{},
-  settings:{sound:true, sfx:true, motion:false, skipStory:false, anim:true, ultVideo:true, revealVideo:true}, levels:{}, daily:null, hintsSeen:[] });
+  pity:{hero:0}, pulls:0, cleared:[], defeated:[], extra:{}, riot:{tier:1, best:0}, parts:0, cyber:{}, sweep:null,
+  settings:{sound:true, sfx:true, motion:false, skipStory:false, anim:true, ultVideo:true, revealVideo:true, auto:false, speed:1}, levels:{}, daily:null, hintsSeen:[] });
 const _loaded = (()=>{ try{ for(const k of [PLAYER_KEY,...LEGACY_KEYS]){ const raw=localStorage.getItem(k); if(raw) return { p:JSON.parse(raw), legacy:k!==PLAYER_KEY }; } }catch(e){} return { p:{}, legacy:false }; })();
 const PLAYER = Object.assign(PLAYER_DEFAULTS(), _loaded.p);
 PLAYER.settings = Object.assign(PLAYER_DEFAULTS().settings, _loaded.p.settings||{});

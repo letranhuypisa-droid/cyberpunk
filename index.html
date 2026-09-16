@@ -100,7 +100,11 @@
     <div class="screen sector" data-screen="sector">
       <div class="sh"><span class="sh__title" id="sectorTitle">Sector</span><span class="sh__sub" id="sectorSub">TUTORIAL + CHƯƠNG 1 · PVE</span><button class="btn-ghost" data-go="map">◂ MAP</button></div>
       <div class="slist" id="sectorList"></div>
-      <button class="btn-act btn-act--go btn-act--full" id="btnEnter" data-go="battle"><span class="btn-act__k">Enter sector</span><span class="btn-act__v" id="enterMeta">—</span></button>
+      <!-- QUÉT = lấy thưởng TUẦN TRA của màn đã thắng mà không vào trận, tốn 1 vé/ngày (docs/che-do-choi.md §D) -->
+      <div class="entbar">
+        <button class="btn-act btn-act--go" id="btnEnter" data-go="battle"><span class="btn-act__k">Enter sector</span><span class="btn-act__v" id="enterMeta">—</span></button>
+        <button class="btn-act" id="btnSweep" title="QUÉT NHANH — thưởng chơi lại, không phải đánh"><span class="btn-act__k">Quét ▸</span><span class="btn-act__v" id="sweepMeta">—</span></button>
+      </div>
     </div>
 
     <!-- ===== SCREEN: ARCHIVE — 4 tab, mỗi sinh vật đúng MỘT mục (docs/archive-merge.md):
@@ -229,7 +233,10 @@
         <div class="riot__next"><span class="lbl">Đang mở</span><b id="riotOpen">—</b></div>
       </div>
       <div class="slist" id="riotList"></div>
-      <button class="btn-act btn-act--go btn-act--full" id="btnRiotGo" data-go="battle"><span class="btn-act__k">Vào tầng</span><span class="btn-act__v" id="riotMeta">—</span></button>
+      <div class="entbar">
+        <button class="btn-act btn-act--go" id="btnRiotGo" data-go="battle"><span class="btn-act__k">Vào tầng</span><span class="btn-act__v" id="riotMeta">—</span></button>
+        <button class="btn-act" id="btnRiotSweep" title="QUÉT NHANH — thưởng dọn lại, không phải đánh"><span class="btn-act__k">Quét ▸</span><span class="btn-act__v" id="riotSweepMeta">—</span></button>
+      </div>
     </div>
 
     <!-- ===== SCREEN: GACHA — MỘT bể REQUISITION, trả SH. Nhân vật mở theo chương, quân chiêu mộ
@@ -304,7 +311,10 @@
         <div><span class="lbl">Sector</span><span class="mono" id="sectorNo">07-B</span></div>
         <div><span class="lbl">Round</span><span class="mono" id="roundNo">01</span></div>
         <div><span class="lbl">Wave</span><span class="mono" id="waveNo">1/3</span></div>
-        <button class="btn-ghost hud__reset" id="btnReset">RESET</button>
+        <!-- nhịp trận (docs/che-do-choi.md §B §C): AUTO máy đánh thay · tốc độ xoay vòng ×1/×2/×3. Cả hai nhớ vào hồ sơ -->
+        <button class="btn-ghost hud__tg hud__pace" id="btnAuto" aria-pressed="false" title="AUTO — máy đánh thay">AUTO</button>
+        <button class="btn-ghost hud__tg" id="btnSpeed" title="Tốc độ trận ×1 / ×2 / ×3">×1</button>
+        <button class="btn-ghost" id="btnReset">RESET</button>
         <button class="btn-ghost" data-go="home" title="Rút lui về căn cứ">◂ BASE</button>
       </div>
       <div class="turn" id="turnbar" style="margin-top:14px"></div>
@@ -335,7 +345,7 @@
         <i class="holo__tail"></i>
       </div>
       <div class="ultbanner" id="ultBanner"><div class="ultbanner__n" id="ubName">ZERO</div><div class="ultbanner__line"></div><div class="ultbanner__s" id="ubSub"></div></div>
-      <div class="result" id="result" hidden><div class="result__box"><div class="result__t" id="resT"></div><div class="result__s" id="resS"></div><button class="btn-ghost" id="btnAgain">RETRY</button> <button class="btn-ghost" id="btnResRiot" data-go="riotmap" hidden>◂ KHU ĐÁY</button> <button class="btn-ghost" data-go="home">RETURN TO BASE</button></div></div>
+      <div class="result" id="result" hidden><div class="result__box"><div class="result__t" id="resT"></div><div class="result__s" id="resS"></div><button class="btn-ghost btn-ghost--go" id="btnNext" hidden>TẦNG ▸</button> <button class="btn-ghost" id="btnAgain">RETRY</button> <button class="btn-ghost" id="btnResRiot" data-go="riotmap" hidden>◂ KHU ĐÁY</button> <button class="btn-ghost" data-go="home">RETURN TO BASE</button></div></div>
     </div>
 
     <div class="actions">
@@ -348,6 +358,15 @@
     </div>
     <div id="fx" style="position:absolute;inset:0;pointer-events:none;z-index:35"></div>
   </div>
+
+    <!-- ===== QUÉT NHANH: hộp kết quả. Không có trận nào để tổng kết nên hộp chỉ ghi tiền vào ví + vé còn lại ===== -->
+    <div class="swbox" id="swBox" hidden>
+      <div class="swbox__in">
+        <div class="swbox__t" id="swT">QUÉT</div>
+        <div class="swbox__s" id="swS">—</div>
+        <button class="btn-ghost" id="swClose">XONG</button>
+      </div>
+    </div>
   </div><!-- /screens -->
 
   <aside class="side">
@@ -367,6 +386,7 @@
 <script src="js/fx.js"></script>
 <script src="js/battle.js"></script>
 <script src="js/comic.js"></script>
+<script src="js/sweep.js"></script>
 <script src="js/app.js"></script>
 <script src="js/riotui.js"></script>
 <script src="js/cyberui.js"></script>

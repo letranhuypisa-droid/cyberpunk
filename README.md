@@ -32,8 +32,9 @@ Kiểm DẸP LOẠN mà không phải qua tiêu đề: `python scratch/riot_serv
 | `js/state.js` | Lưu/nạp hồ sơ (`SAVE`, local hoặc remote), nâng cấp (`UPGRADE`), **`unitStats(id)`** — một chỗ duy nhất tính chỉ số cuối (gốc × cấp × cyberware) và `baseStats(id)`, và `power(id)`/`teamPower()`, nhiệm vụ ngày |
 | `js/audio.js` | SFX giao diện (audio/*.ogg) + âm chiến đấu: có `audio/<tên>.ogg\|mp3\|wav` thì dùng file, thiếu thì tổng hợp WebAudio. Một thao tác = một tiếng (`SFX_ONE`/`SFX_BEAT`); `SFX_VARIANTS` cho tiếng nhiều bản (`hit`, `hit2`…); `SFX_MUTE` cho nút không kêu |
 | `js/fx.js` | Overlay hiệu ứng trên sprite: một lần (hit/crit/ZERO/nổ/điện/độc/cháy/choáng/hồi máu/lá chắn) và lặp theo trạng thái + lá chắn. `FX_META` khai 10 kind, 4 kind có bản lặp; dùng sprite sheet `art/fx/<kind>.webp` nếu có, thiếu thì placeholder CSS — **14/14 đã có file** từ 12/09 |
-| `js/battle.js` | Engine trận: lưới sân 3 hàng mỗi phe (`FORMATION`, không ai chồng lên ai) + `stageScale()` đặt `--big`, bảng nội tại chạm-để-đọc (`openPassive`), passive, lượt theo SPD, chế độ chọn mục tiêu, di chuyển tới mục tiêu kiểu Idle Heroes (`playMoveAttack`), sát thương + chí mạng, lá chắn (`addShield`/`absorbShield`), trạng thái choáng/độc/cháy (`applyStatus`/`tickStatus`), ult + video holo trên đầu nhân vật (`playHolo`), chiêu cuối của địch (`enemyUlt`), wave (hồi máu giữa wave), hint tutorial. `finish()` tách nhánh thưởng theo `SECTOR.mode` (chiến dịch / `'riot'`) |
-| `js/app.js` | Router màn hình, lobby, squad (3 slot, lưu đội, **khoá người đang đồn trú**), sector, thang tầng dẹp loạn (`renderRiot`), gacha một bể, archive (5 tab: Nhân vật · Sổ bộ · Địa danh · Thuật ngữ · Truyện; `openLore` dùng chung cho nhân vật lẫn kẻ địch), config, COMMS |
+| `js/battle.js` | **Nhịp trận** (16/09): `BSPEED`/`sp()` — tốc độ ×1/×2/×3 chia mọi khoảng chờ và mọi duration; `autoPlan`/`autoAct` — AUTO máy đánh thay; `syncNextBtn` — nút đánh tiếp ở bảng kết quả. Engine trận: lưới sân 3 hàng mỗi phe (`FORMATION`, không ai chồng lên ai) + `stageScale()` đặt `--big`, bảng nội tại chạm-để-đọc (`openPassive`), passive, lượt theo SPD, chế độ chọn mục tiêu, di chuyển tới mục tiêu kiểu Idle Heroes (`playMoveAttack`), sát thương + chí mạng, lá chắn (`addShield`/`absorbShield`), trạng thái choáng/độc/cháy (`applyStatus`/`tickStatus`), ult + video holo trên đầu nhân vật (`playHolo`), chiêu cuối của địch (`enemyUlt`), wave (hồi máu giữa wave), hint tutorial. `finish()` tách nhánh thưởng theo `SECTOR.mode` (chiến dịch / `'riot'`) |
+| `js/app.js` | Router màn hình, lobby, squad (3 slot, lưu đội, **khoá người đang đồn trú**), sector, thang tầng dẹp loạn (`renderRiot`), gacha một bể, archive (5 tab: Nhân vật · Sổ bộ · Địa danh · Thuật ngữ · Truyện; `openLore` dùng chung cho nhân vật lẫn kẻ địch), config, COMMS. Nút **QUÉT** ở hai danh sách màn dùng chung `syncSweepBtn` |
+| `js/sweep.js` | **QUÉT NHANH**: vé quét theo ngày (`sweepLeft`), thưởng quét (`sweepGain` — đúng mức chơi lại, không hơn), hộp kết quả. Cố ý không ghi tiến trình: không `defeated`, không `cleared`, không nâng tầng, không cộng nhiệm vụ ngày |
 | `js/riot.js` | **DẸP LOẠN — chiếm bãi**: 9 cái bãi ở District 07 (`RIOT_YARDS`), kinh tế (`RIOT_ECON`), sức mạnh ổ neo vào số đo `m50`, đồn trú, kiện hàng theo chu kỳ, phản kích, nâng bãi, hợp đồng tuần. Số liệu sửa ở đây |
 | `js/riotui.js` | Màn bản đồ Khu Đáy + tờ chi tiết một bãi + chọn quân đồn trú + báo cáo vắng mặt; bản đồ dự phòng vẽ bằng SVG. Bọc `winReward`/`finish` của `battle.js` để cộng thưởng trận chiếm bãi (không sửa `battle.js`) |
 | `js/cyber.js` | **CYBERWARE**: 6 ô × thang 10 bậc = 60 món (`CYBER_SLOTS`), đường cong chỉ số, giá, ví **LINH KIỆN (LK)**, phân tách bản dư, trần của RONIN. Nối vào chỉ số qua `cyberBonus(id)` — `unitStats` gọi đúng một chỗ này |
@@ -65,6 +66,7 @@ Kiểm DẸP LOẠN mà không phải qua tiêu đề: `python scratch/riot_serv
 | `docs/ult-prompts.md` | Quy cách video cut-in chiêu cuối + prompt từng nhân vật |
 | `docs/plan-2026-09.md` | Đánh giá hiện trạng 07/09 + kế hoạch tháng 9 (mục tiêu: hoàn thành chương 1 trước 30/09) |
 | `docs/dep-loan.md` | **DẸP LOẠN**: thiết kế 9 cái bãi, đóng quân, kiện hàng, phản kích, nâng bãi, hợp đồng tuần + số cân bằng đo được + đặc tả giao diện + prompt bản đồ District 07 |
+| `docs/che-do-choi.md` | **NHỊP CHƠI** (đợt 5): AUTO, tốc độ ×1/×2/×3, quét nhanh (vé theo ngày), đánh tiếp — luật máy chơi, chỗ không tăng tốc, vì sao quét phải có trần |
 | `docs/cyberware.md` | **CYBERWARE**: 6 ô × 10 bậc = 60 món, đường cong chỉ số, giá LK/CR, phân tách bản dư, trần của RONIN, quy cách 6 tấm contact sheet |
 | `docs/enemy-prompts.md` | Prompt art 21 kẻ địch chương 1 + đề xuất nội tại/lore cho địch |
 | `docs/hero-prompts.md` | Prompt art 10 nhân vật gacha chưa có ảnh (thẻ + sprite nền xanh), kèm đề xuất tạo hình từng người |
@@ -233,4 +235,21 @@ lá trùng gacha → PHÂN TÁCH → LINH KIỆN (LK) → nâng bậc 6 ô cyber
   tấm đó (`python scratch/cyber_sheet.py head`). Thiếu file thì ô hiện icon SVG, game vẫn chạy.
 
 > `scratch/sim.js` **chưa mô phỏng cyberware** — bảng tỉ lệ thắng ở `docs/dep-loan.md` §F1 là **sàn**.
+
+## NHỊP CHƠI — AUTO, tốc độ, quét nhanh, đánh tiếp (16/09, đợt 5)
+
+Đặc tả đầy đủ: `docs/che-do-choi.md`. Bốn thứ điều khiển **nhịp**, không thêm nội dung và
+**không đụng một con số cân bằng nào** (`node scratch/sim.js 400` trước/sau chỉ lệch trong khoảng nhiễu của chính nó).
+
+- **AUTO** (nút trong HUD trận, nhớ qua trận sau). Đòn thường và chiêu `nuke` nhắm con **HP hiện tại thấp nhất**,
+  `control` nhắm con nguy hiểm nhất (trùm → elite → ATK cao nhất), `aoe`/`shield` tung ngay, `heal` **giữ lại**
+  tới khi có người ≤ 70% HP. Máy gọi đúng `execAttack`/`execUlt` mà người chơi vẫn gọi nên không có đường nào
+  để nó đánh theo luật khác. Không bỏ qua truyện, không tự rút lui.
+- **TỐC ĐỘ ×1 / ×2 / ×3** (nút cạnh AUTO): một hệ số `BSPEED.k`, `sp(ms)` chia mọi khoảng chờ **và** mọi
+  `duration` animation trong trận. Không tăng tốc video chiêu cuối, trang comic, màn nạp, đồng hồ kiện hàng.
+- **QUÉT NHANH** (nút cạnh VÀO TRẬN ở màn chọn màn và thang HỐ LOẠN): màn/tầng **đã thắng** thì lấy đúng thưởng
+  chơi lại (chiến dịch 25%, HỐ LOẠN 30%) mà không vào trận, **8 vé mỗi ngày** reset 00:00 cùng nhiệm vụ ngày.
+  Quét không mở gì: không ghi `defeated`/`cleared`, không nâng tầng, không tính nhiệm vụ ngày.
+- **ĐÁNH TIẾP**: thắng xong bảng kết quả có `TẦNG N ▸` (HỐ LOẠN) hoặc `MÀN KẾ ▸` (chiến dịch vừa mở màn mới) —
+  đi thẳng, thay cho năm cú chạm vòng qua HOME.
 

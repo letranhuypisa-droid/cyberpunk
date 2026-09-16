@@ -607,7 +607,8 @@ function renderRiot(){
   if(!riotUnlocked()){
     $('#riotSub').textContent='KHOÁ · CẦN XONG '+RIOT.unlock;
     list.innerHTML=`<div class="srow is-locked srow--soon"><span class="srow__id">—</span><span><div class="srow__name">CHƯA MỞ</div><div class="srow__meta">Xong màn ${RIOT.unlock} rồi quay lại. Dẹp loạn là chỗ cày SH vô hạn — và là chỗ hạ thêm quân để mở bể.</div></span></div>`;
-    $('#btnRiotGo').disabled=true; $('#riotMeta').textContent='CẦN XONG '+RIOT.unlock; return;
+    $('#btnRiotGo').disabled=true; $('#riotMeta').textContent='CẦN XONG '+RIOT.unlock;
+    syncSweepBtn($('#btnRiotSweep'), $('#riotSweepMeta'), null); return;
   }
   $('#riotSub').textContent='KHU ĐÁY · XUNG ĐỘT TỰ PHÁT';
   // Hiện tầng đang mở + 4 tầng đã qua gần nhất (đủ để chọn chỗ cày, không đổ ra 40 dòng)
@@ -629,6 +630,7 @@ function renderRiot(){
   const s=riotSector(RIOTV.tier);
   $('#btnRiotGo').disabled=false;
   $('#riotMeta').textContent=`TẦNG ${RIOTV.tier} · ${s.waves} WAVE · ĐỘ KHÓ ×${s.mult}`;
+  syncSweepBtn($('#btnRiotSweep'), $('#riotSweepMeta'), s);   // quét tầng đang chọn
 }
 /* Vào trận: gán SECTOR bằng object hình dạng sector của tầng đang chọn. go('battle') lo phần còn lại. */
 $('#btnRiotGo').addEventListener('click',()=>{ if(riotUnlocked()) SECTOR = riotSector(RIOTV.tier); });
@@ -772,6 +774,17 @@ function renderSectors(){
   $('#enterMeta').textContent = ok
     ? `${SECTOR.id} · ${SECTOR.name} · ${SECTOR.waves} WAVE${SECTOR.team?' · ĐỘI CỐ ĐỊNH: '+SECTOR.team.map(i=>ROSTER[i].name).join(', '):''}`
     : 'CHỌN MỘT MÀN ĐANG MỞ';
+  syncSweepBtn($('#btnSweep'), $('#sweepMeta'), SECTOR);
+}
+/* Nút QUÉT dùng chung cho màn chiến dịch và thang HỐ LOẠN (js/sweep.js, docs/che-do-choi.md §D).
+   Guard typeof vì kit.html không nạp sweep.js. */
+function syncSweepBtn(btn, meta, sec){
+  if(!btn || typeof sweepWhy!=='function') return;
+  btn.disabled = !canSweep(sec);
+  const k=btn.querySelector('.btn-act__k'); if(k) k.textContent = sweepBtnKey();
+  if(meta) meta.textContent = sweepBtnTxt(sec);
+  // quét xong phải vẽ lại chính nút này: số vé còn lại nằm trên nhãn của nó
+  btn.onclick = () => { if(sweepDo(sec)){ renderWallet(); syncSweepBtn(btn, meta, sec); } };
 }
 syncSectorStates();
 
